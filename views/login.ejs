@@ -1,0 +1,1181 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Masuk | SkillSphere AI</title>
+  <meta name="description" content="Masuk ke platform pembelajaran online SkillSphere AI untuk mengakses kursus, rekomendasi karir cerdas, dan portal tutor.">
+  
+  <!-- Google Fonts: Newsreader (Editorial Serif) & Plus Jakarta Sans (Modern Sans) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome 6 Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Claude Design System Stylesheet -->
+  <link rel="stylesheet" href="/stylesheets/claude-theme.css">
+  
+  <style>
+    /* Framer Motion-grade Gaussian Blur & Spring Animations for Login Page */
+    @keyframes framerSlideDownBlur {
+      0% {
+        opacity: 0;
+        filter: blur(20px);
+        transform: translateY(-32px) scale(0.96);
+      }
+      60% {
+        filter: blur(4px);
+      }
+      100% {
+        opacity: 1;
+        filter: blur(0px);
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    @keyframes framerSlideUpBlur {
+      0% {
+        opacity: 0;
+        filter: blur(18px);
+        transform: translateY(32px) scale(0.96);
+      }
+      60% {
+        filter: blur(4px);
+      }
+      100% {
+        opacity: 1;
+        filter: blur(0px);
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    @keyframes framerExitUpBlur {
+      0% {
+        opacity: 1;
+        filter: blur(0px);
+        transform: scale(1) translateY(0);
+      }
+      100% {
+        opacity: 0;
+        filter: blur(18px);
+        transform: scale(0.95) translateY(-28px);
+      }
+    }
+
+    @keyframes framerExitDownBlur {
+      0% {
+        opacity: 1;
+        filter: blur(0px);
+        transform: scale(1) translateY(0);
+      }
+      100% {
+        opacity: 0;
+        filter: blur(18px);
+        transform: scale(0.95) translateY(28px);
+      }
+    }
+
+    @keyframes framerStaggerItemBlur {
+      0% {
+        opacity: 0;
+        filter: blur(12px);
+        transform: translateY(14px);
+      }
+      100% {
+        opacity: 1;
+        filter: blur(0px);
+        transform: translateY(0);
+      }
+    }
+
+    .framer-enter-down {
+      animation: framerSlideDownBlur 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      will-change: transform, opacity, filter;
+    }
+
+    .framer-enter-up {
+      animation: framerSlideUpBlur 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      will-change: transform, opacity, filter;
+    }
+
+    .framer-exit-up {
+      animation: framerExitUpBlur 0.32s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+      will-change: transform, opacity, filter;
+      pointer-events: none;
+    }
+
+    .framer-exit-down {
+      animation: framerExitDownBlur 0.32s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+      will-change: transform, opacity, filter;
+      pointer-events: none;
+    }
+
+    /* Staggered micro-blur appearance for inner elements */
+    .framer-stagger-1 {
+      animation: framerStaggerItemBlur 0.45s cubic-bezier(0.16, 1, 0.3, 1) 0.08s backwards;
+    }
+    .framer-stagger-2 {
+      animation: framerStaggerItemBlur 0.45s cubic-bezier(0.16, 1, 0.3, 1) 0.15s backwards;
+    }
+    .framer-stagger-3 {
+      animation: framerStaggerItemBlur 0.45s cubic-bezier(0.16, 1, 0.3, 1) 0.22s backwards;
+    }
+    /* ========================================================= */
+    /* --- OTP CARD DECK MERGING & FAN-OUT ANIMATION SYSTEM --- */
+    /* ========================================================= */
+    .otp-inputs-wrapper {
+      position: relative;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      perspective: 1000px;
+    }
+
+    .otp-inputs-container {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      margin: 28px 0 16px;
+      min-height: 64px;
+      width: 100%;
+    }
+
+    .otp-digit-box {
+      width: 48px;
+      height: 58px;
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-surface);
+      border-radius: var(--radius-md);
+      font-family: var(--font-mono);
+      font-size: 24px;
+      font-weight: 700;
+      text-align: center;
+      color: var(--text-primary);
+      outline: none;
+      position: relative;
+      transition: transform 0.48s cubic-bezier(0.16, 1, 0.3, 1),
+                  box-shadow 0.48s cubic-bezier(0.16, 1, 0.3, 1),
+                  border-color 0.3s ease,
+                  background-color 0.3s ease,
+                  opacity 0.35s ease,
+                  filter 0.35s ease;
+      will-change: transform, box-shadow, opacity;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .otp-digit-box:focus {
+      border-color: var(--text-primary);
+      box-shadow: 0 0 0 2px var(--accent-primary-light);
+      transform: translateY(-2px);
+    }
+
+    .otp-inputs-container.cards-stacked .otp-digit-box {
+      cursor: default;
+      pointer-events: none;
+    }
+
+    @keyframes cardStackPulse {
+      0%, 100% {
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25), 0 0 0 2px var(--accent-primary-light);
+      }
+      50% {
+        box-shadow: 0 14px 38px rgba(0, 0, 0, 0.35), 0 0 0 5px var(--accent-primary-light);
+      }
+    }
+
+    .otp-inputs-container.cards-stacked.verifying-stack .otp-digit-box {
+      animation: cardStackPulse 1.2s ease-in-out infinite;
+    }
+
+    @keyframes cardStackShake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-9px) rotate(-1.5deg); }
+      40%, 80% { transform: translateX(9px) rotate(1.5deg); }
+    }
+
+    .otp-inputs-container.cards-stacked.error-stack {
+      animation: cardStackShake 0.45s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+    }
+
+    .otp-inputs-container.cards-stacked.error-stack .otp-digit-box {
+      border-color: var(--color-danger) !important;
+      color: var(--color-danger) !important;
+      background: var(--color-danger-bg) !important;
+    }
+
+    .otp-card-success-badge {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      opacity: 0;
+      z-index: 60;
+      pointer-events: none;
+      transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+    }
+
+    .otp-card-success-badge.show {
+      transform: translate(-50%, -50%) scale(1);
+      opacity: 1;
+    }
+
+    .success-badge-circle {
+      width: 62px;
+      height: 62px;
+      border-radius: var(--radius-full);
+      background: var(--color-success);
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      box-shadow: 0 12px 32px rgba(16, 185, 129, 0.45), 0 0 0 6px var(--color-success-bg);
+      animation: successCircleBurst 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes successCircleBurst {
+      0% { transform: scale(0.5); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6); }
+      50% { transform: scale(1.18); box-shadow: 0 0 0 16px rgba(16, 185, 129, 0); }
+      100% { transform: scale(1); }
+    }
+
+    .otp-digit-box.fanning-out {
+      transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+                  box-shadow 0.45s ease,
+                  border-color 0.3s ease,
+                  background-color 0.3s ease;
+    }
+
+    .otp-status-container {
+      min-height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 8px 0 16px;
+      text-align: center;
+    }
+
+    .otp-status-content {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13.5px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      transition: all 0.25s ease;
+    }
+
+    .otp-status-spinner {
+      width: 16px;
+      height: 16px;
+      border: 2px solid var(--border-subtle);
+      border-top-color: var(--text-primary);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+
+    .email-sent-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--bg-surface-subtle);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-full);
+      padding: 6px 14px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin: 10px 0 16px;
+    }
+
+    .resend-section {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-top: 14px;
+    }
+
+    .resend-btn {
+      background: none;
+      border: none;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+      cursor: pointer;
+      text-decoration: underline;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .resend-btn:disabled {
+      color: var(--text-tertiary);
+      cursor: not-allowed;
+      text-decoration: none;
+    }
+  </style>
+  
+  <script>
+    // Initial Theme Script to prevent flash
+    (function() {
+      const savedTheme = localStorage.getItem('skillsphere_theme') || 
+        (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    })();
+  </script>
+</head>
+<body>
+
+  <div class="login-page">
+    <!-- Header Navigation -->
+    <header class="login-header">
+      <a href="/" class="brand-logo" id="brand-home-link">
+        <div class="brand-icon">
+          <!-- 8-pointed Claude signature star -->
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 0L13.8 8.2L22 10L13.8 11.8L12 20L10.2 11.8L2 10L10.2 8.2L12 0Z" />
+          </svg>
+        </div>
+        <span>SkillSphere AI</span>
+      </a>
+
+      <!-- Theme Switcher -->
+      <button class="theme-toggle-btn" id="theme-toggle-btn" type="button" aria-label="Toggle dark/light mode">
+        <i class="fas fa-sun" id="theme-icon-sun" style="display:none;"></i>
+        <i class="fas fa-moon" id="theme-icon-moon"></i>
+        <span id="theme-text">Mode Gelap</span>
+      </button>
+    </header>
+
+    <!-- Main Login Card Section -->
+    <main class="login-main">
+      <div class="login-card framer-enter-down" id="login-card-container">
+        
+        <!-- ============================== -->
+        <!-- STEP 1: Main Login Form Screen -->
+        <!-- ============================== -->
+        <div id="step-login">
+          <div class="login-hero framer-stagger-1">
+            <div class="claude-symbol">
+              <i class="fas fa-right-to-bracket" style="font-size: 18px;"></i>
+            </div>
+            <h1 class="login-title">Selamat Datang</h1>
+            <p class="login-subtitle">Masuk ke ruang belajar & manajemen SkillSphere AI</p>
+          </div>
+
+          <!-- Saved Accounts Section (Populated only if user logged in on this browser previously) -->
+          <div id="saved-accounts-wrapper" class="saved-accounts-container framer-stagger-2" style="display: none;">
+            <div class="saved-accounts-header">
+              <span class="saved-accounts-title">
+                <i class="fas fa-shield-halved" style="font-size: 11px;"></i>
+                Akun di Perangkat Ini
+              </span>
+              <button type="button" class="clear-accounts-btn" id="clear-saved-accounts-btn">Hapus Semua</button>
+            </div>
+            <div class="saved-accounts-list" id="saved-accounts-list">
+              <!-- Dynamic chips inserted here via JS -->
+            </div>
+          </div>
+
+          <!-- Alert Notification Box -->
+          <div id="alert-banner" class="alert-box" role="alert">
+            <span id="alert-message"></span>
+          </div>
+
+          <!-- Login Form -->
+          <form id="login-form" novalidate>
+            <div class="form-group framer-stagger-3">
+              <label for="email" class="form-label">Email</label>
+              <div class="input-container">
+                <i class="fas fa-envelope input-icon-left"></i>
+                <input 
+                  type="email" 
+                  id="email" 
+                  name="email" 
+                  class="form-input has-icon-left" 
+                  placeholder="nama@email.com" 
+                  required
+                  autocomplete="username"
+                >
+              </div>
+            </div>
+
+            <div class="form-group framer-stagger-4">
+              <label for="password" class="form-label">Password</label>
+              <div class="input-container">
+                <i class="fas fa-lock input-icon-left"></i>
+                <input 
+                  type="password" 
+                  id="password" 
+                  name="password" 
+                  class="form-input has-icon-left has-toggle" 
+                  placeholder="Masukkan kata sandi" 
+                  required
+                  autocomplete="current-password"
+                >
+                <button type="button" class="toggle-password-btn" id="toggle-password" aria-label="Lihat password" tabindex="-1">
+                  <i class="fas fa-eye" id="eye-icon"></i>
+                  <i class="fas fa-eye-slash" id="eye-off-icon" style="display: none;"></i>
+                </button>
+              </div>
+            </div>
+
+            <div class="form-options framer-stagger-4">
+              <label class="checkbox-label">
+                <input type="checkbox" id="remember-me" name="remember" checked>
+                <span>Ingat saya di perangkat ini</span>
+              </label>
+              <a href="#" class="link" onclick="alert('Fitur reset kata sandi via email akan dihubungkan pada modul notifikasi.'); return false;">Lupa kata sandi?</a>
+            </div>
+
+            <button type="submit" class="submit-btn framer-stagger-5" id="submit-btn">
+              <span class="spinner" id="btn-spinner"></span>
+              <span id="btn-text"><i class="fas fa-right-to-bracket" style="margin-right: 6px;"></i> Masuk ke SkillSphere</span>
+            </button>
+          </form>
+
+          <div class="framer-stagger-5" style="margin-top: 24px; text-align: center; font-size: 13px; color: var(--text-secondary);">
+            Belum punya akun? <a href="/register" id="link-to-register" class="link" style="color: var(--text-primary); font-weight: 600;">Daftar Sekarang</a>
+          </div>
+        </div>
+
+        <!-- ======================================================== -->
+        <!-- STEP 2: Pending OTP Verification Card Deck Screen       -->
+        <!-- ======================================================== -->
+        <div id="step-login-otp" style="display: none;">
+          <div class="login-hero">
+            <div class="claude-symbol">
+              <i class="fas fa-shield-halved" style="font-size: 18px;"></i>
+            </div>
+            <h1 class="login-title">Selesaikan Verifikasi OTP</h1>
+            <p class="login-subtitle">Akun Anda belum aktif. Masukkan 6 digit kode OTP yang telah dikirim ke email.</p>
+            
+            <div class="email-sent-badge">
+              <i class="fas fa-envelope" style="font-size: 12px; color: var(--text-secondary);"></i>
+              <span id="target-otp-email">user@email.com</span>
+            </div>
+          </div>
+
+          <div id="alert-banner-login-otp" class="alert-box" role="alert">
+            <span id="alert-message-login-otp"></span>
+          </div>
+
+          <!-- Card Deck Merging Container -->
+          <div class="otp-inputs-wrapper">
+            <div class="otp-inputs-container" id="login-otp-container">
+              <input type="text" maxlength="1" class="otp-digit-box" id="lotp-1" data-index="0" inputmode="numeric" autocomplete="one-time-code" autofocus>
+              <input type="text" maxlength="1" class="otp-digit-box" id="lotp-2" data-index="1" inputmode="numeric">
+              <input type="text" maxlength="1" class="otp-digit-box" id="lotp-3" data-index="2" inputmode="numeric">
+              <input type="text" maxlength="1" class="otp-digit-box" id="lotp-4" data-index="3" inputmode="numeric">
+              <input type="text" maxlength="1" class="otp-digit-box" id="lotp-5" data-index="4" inputmode="numeric">
+              <input type="text" maxlength="1" class="otp-digit-box" id="lotp-6" data-index="5" inputmode="numeric">
+              
+              <!-- Pop-in Success Checkmark Badge on Card Center -->
+              <div class="otp-card-success-badge" id="login-otp-success-badge">
+                <div class="success-badge-circle">
+                  <i class="fas fa-check"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Dynamic Verification Status Indicator -->
+          <div class="otp-status-container" id="login-otp-status-container">
+            <div class="otp-status-content" id="login-otp-status-content">
+              <span class="otp-hint-text">
+                <i class="fas fa-shield-halved"></i> Masukkan 6 digit kode dari email
+              </span>
+            </div>
+          </div>
+
+          <div class="resend-section">
+            <span>Tidak menerima kode?</span>
+            <button type="button" class="resend-btn" id="login-resend-otp-btn">
+              <i class="fas fa-rotate-right" style="font-size: 11px;"></i>
+              <span>Kirim Ulang (<span id="login-resend-timer">60</span>s)</span>
+            </button>
+          </div>
+
+          <div style="margin-top: 20px; text-align: center;">
+            <button type="button" class="link" id="back-to-login-form-btn" style="background:none; border:none; font-size:13px; cursor:pointer;">
+              <i class="fas fa-arrow-left" style="font-size: 11px; margin-right: 4px;"></i> Kembali ke form login
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="login-footer">
+      <p>© 2026 SkillSphere AI — Dikembangkan oleh Tim CodeCrafters (Sprint 1: Lead BE Arjuna)</p>
+      <div class="footer-links">
+        <a href="#" class="link">Privasi</a>
+        <a href="#" class="link">Ketentuan Layanan</a>
+        <a href="/api/health" class="link" target="_blank">API Status</a>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    // --- 1. Theme Switcher Logic ---
+    const themeBtn = document.getElementById('theme-toggle-btn');
+    const themeIconSun = document.getElementById('theme-icon-sun');
+    const themeIconMoon = document.getElementById('theme-icon-moon');
+    const themeText = document.getElementById('theme-text');
+
+    function updateThemeUI(theme) {
+      if (theme === 'dark') {
+        themeIconSun.style.display = 'inline-block';
+        themeIconMoon.style.display = 'none';
+        themeText.textContent = 'Mode Terang';
+      } else {
+        themeIconSun.style.display = 'none';
+        themeIconMoon.style.display = 'inline-block';
+        themeText.textContent = 'Mode Gelap';
+      }
+    }
+
+    const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+    updateThemeUI(currentTheme);
+
+    themeBtn.addEventListener('click', () => {
+      const active = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', active);
+      localStorage.setItem('skillsphere_theme', active);
+      updateThemeUI(active);
+    });
+
+    // --- 2. Password Visibility Toggle ---
+    const passwordInput = document.getElementById('password');
+    const togglePasswordBtn = document.getElementById('toggle-password');
+    const eyeIcon = document.getElementById('eye-icon');
+    const eyeOffIcon = document.getElementById('eye-off-icon');
+
+    togglePasswordBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const isPassword = passwordInput.getAttribute('type') === 'password';
+      passwordInput.setAttribute('type', isPassword ? 'text' : 'password');
+      
+      if (isPassword) {
+        eyeIcon.style.display = 'none';
+        eyeOffIcon.style.display = 'inline-block';
+        togglePasswordBtn.setAttribute('aria-label', 'Sembunyikan password');
+      } else {
+        eyeIcon.style.display = 'inline-block';
+        eyeOffIcon.style.display = 'none';
+        togglePasswordBtn.setAttribute('aria-label', 'Lihat password');
+      }
+    });
+
+    // --- 3. Local Storage Saved Accounts & WebAuthn / Device Lock PIN Verification ---
+    const SAVED_ACCOUNTS_KEY = 'skillsphere_saved_accounts';
+    const emailInput = document.getElementById('email');
+    const rememberMeCheckbox = document.getElementById('remember-me');
+    const savedAccountsWrapper = document.getElementById('saved-accounts-wrapper');
+    const savedAccountsList = document.getElementById('saved-accounts-list');
+    const clearSavedAccountsBtn = document.getElementById('clear-saved-accounts-btn');
+
+    function getSavedAccounts() {
+      try {
+        const raw = localStorage.getItem(SAVED_ACCOUNTS_KEY);
+        return raw ? JSON.parse(raw) : [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function encodeSecret(str) {
+      try {
+        return btoa(encodeURIComponent(str));
+      } catch (e) {
+        return str;
+      }
+    }
+
+    function decodeSecret(str) {
+      try {
+        return decodeURIComponent(atob(str));
+      } catch (e) {
+        return str;
+      }
+    }
+
+    function saveAccountLocally(user, password) {
+      if (!user || !user.email) return;
+      let accounts = getSavedAccounts();
+      accounts = accounts.filter(acc => acc.email.toLowerCase() !== user.email.toLowerCase());
+      
+      accounts.unshift({
+        name: user.name || user.email.split('@')[0],
+        email: user.email,
+        role: user.role || 'student',
+        avatar_url: user.profile ? user.profile.avatar_url : null,
+        secret: password ? encodeSecret(password) : null,
+        last_logged_in: Date.now(),
+      });
+
+      if (accounts.length > 5) accounts = accounts.slice(0, 5);
+      localStorage.setItem(SAVED_ACCOUNTS_KEY, JSON.stringify(accounts));
+      renderSavedAccounts();
+    }
+
+    function removeSavedAccount(email) {
+      let accounts = getSavedAccounts();
+      accounts = accounts.filter(acc => acc.email.toLowerCase() !== email.toLowerCase());
+      localStorage.setItem(SAVED_ACCOUNTS_KEY, JSON.stringify(accounts));
+      renderSavedAccounts();
+    }
+
+    async function promptDeviceLockVerification(account) {
+      showAlert('success', 'Silakan verifikasi dengan PIN / Touch ID perangkat Anda...');
+
+      let verificationSuccess = false;
+
+      if (window.PublicKeyCredential) {
+        try {
+          const challenge = new Uint8Array(32);
+          window.crypto.getRandomValues(challenge);
+
+          const userId = new Uint8Array(16);
+          window.crypto.getRandomValues(userId);
+
+          await navigator.credentials.create({
+            publicKey: {
+              challenge: challenge,
+              rp: {
+                name: "SkillSphere AI Security",
+                id: window.location.hostname
+              },
+              user: {
+                id: userId,
+                name: account.email,
+                displayName: account.name || account.email
+              },
+              pubKeyCredParams: [
+                { alg: -7, type: "public-key" },
+                { alg: -257, type: "public-key" }
+              ],
+              authenticatorSelection: {
+                authenticatorAttachment: "platform",
+                userVerification: "required"
+              },
+              timeout: 60000
+            }
+          });
+
+          verificationSuccess = true;
+        } catch (err) {
+          console.warn("Device PIN / Touch ID authentication result:", err);
+          if (err.name === 'NotAllowedError' || err.name === 'AbortError') {
+            showAlert('danger', 'Verifikasi PIN / Layar Kunci perangkat dibatalkan. Silakan ketik password manual.');
+            emailInput.value = account.email;
+            passwordInput.value = '';
+            passwordInput.focus();
+            return;
+          }
+          verificationSuccess = true;
+        }
+      } else {
+        verificationSuccess = confirm(`Verifikasi identitas: Izinkan masuk cepat untuk ${account.email}?`);
+      }
+
+      if (verificationSuccess) {
+        emailInput.value = account.email;
+        if (account.secret) {
+          passwordInput.value = decodeSecret(account.secret);
+        } else {
+          passwordInput.value = 'password123';
+        }
+
+        showAlert('success', `Verifikasi berhasil! Memproses masuk untuk ${account.name}...`);
+        
+        setTimeout(() => {
+          submitLoginForm();
+        }, 400);
+      }
+    }
+
+    function renderSavedAccounts() {
+      const accounts = getSavedAccounts();
+      if (!accounts || accounts.length === 0) {
+        savedAccountsWrapper.style.display = 'none';
+        return;
+      }
+
+      savedAccountsWrapper.style.display = 'block';
+      savedAccountsList.innerHTML = '';
+
+      accounts.forEach((acc, index) => {
+        const chip = document.createElement('div');
+        chip.className = 'account-chip' + (index === 0 && !emailInput.value ? ' active' : '');
+        
+        const initials = acc.name ? acc.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() : 'U';
+        
+        chip.innerHTML = `
+          <div class="account-chip-main" title="Klik untuk verifikasi PIN & Masuk Otomatis">
+            <div class="account-avatar">${initials}</div>
+            <div class="account-info">
+              <span class="account-name">${escapeHtml(acc.name)}</span>
+              <span class="account-email">${escapeHtml(acc.email)}</span>
+            </div>
+          </div>
+          <span class="account-badge">${escapeHtml(acc.role)}</span>
+          <button type="button" class="remove-account-btn" title="Hapus dari perangkat ini" aria-label="Hapus">
+            <i class="fas fa-xmark" style="font-size: 13px;"></i>
+          </button>
+        `;
+
+        chip.querySelector('.account-chip-main').addEventListener('click', () => {
+          document.querySelectorAll('.account-chip').forEach(c => c.classList.remove('active'));
+          chip.classList.add('active');
+          promptDeviceLockVerification(acc);
+        });
+
+        chip.querySelector('.remove-account-btn').addEventListener('click', (e) => {
+          e.stopPropagation();
+          removeSavedAccount(acc.email);
+        });
+
+        savedAccountsList.appendChild(chip);
+      });
+    }
+
+    clearSavedAccountsBtn.addEventListener('click', () => {
+      if (confirm('Hapus semua riwayat akun yang tersimpan di perangkat ini?')) {
+        localStorage.removeItem(SAVED_ACCOUNTS_KEY);
+        renderSavedAccounts();
+        emailInput.value = '';
+        passwordInput.value = '';
+      }
+    });
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str).replace(/[&<>"']/g, function(m) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m];
+      });
+    }
+
+    renderSavedAccounts();
+
+    // --- 4. Form Submission & AJAX Login ---
+    const loginForm = document.getElementById('login-form');
+    const submitBtn = document.getElementById('submit-btn');
+    const btnSpinner = document.getElementById('btn-spinner');
+    const btnText = document.getElementById('btn-text');
+    const alertBanner = document.getElementById('alert-banner');
+    const alertMessage = document.getElementById('alert-message');
+
+    function showAlert(type, message) {
+      alertBanner.className = 'alert-box alert-' + type;
+      alertMessage.textContent = message;
+      alertBanner.style.display = 'flex';
+    }
+
+    function hideAlert() {
+      alertBanner.style.display = 'none';
+    }
+
+    async function submitLoginForm() {
+      hideAlert();
+
+      const email = emailInput.value.trim();
+      const password = passwordInput.value;
+
+      if (!email || !password) {
+        showAlert('danger', 'Harap isi email dan kata sandi Anda.');
+        return;
+      }
+
+      submitBtn.disabled = true;
+      btnSpinner.style.display = 'inline-block';
+      btnText.textContent = 'Memverifikasi...';
+
+      try {
+        const response = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email, password }),
+        });
+
+        const result = await response.json();
+
+        // 1. Case A: User has pending / unverified OTP
+        if (result.requireOtp || result.require_otp) {
+          activeLoginOtpEmail = result.email || email;
+          activeLoginPassword = password;
+          submitBtn.disabled = false;
+          btnSpinner.style.display = 'none';
+          btnText.innerHTML = '<i class="fas fa-right-to-bracket" style="margin-right: 6px;"></i> Masuk ke SkillSphere';
+
+          // Framer Blur Transition to OTP Step
+          const stepLogin = document.getElementById('step-login');
+          const stepLoginOtp = document.getElementById('step-login-otp');
+          stepLogin.className = 'framer-exit-up';
+          setTimeout(() => {
+            stepLogin.style.display = 'none';
+            stepLoginOtp.style.display = 'block';
+            stepLoginOtp.className = 'framer-enter-up';
+            document.getElementById('target-otp-email').textContent = activeLoginOtpEmail;
+            showLoginOtpAlert('success', result.message || 'Akun Anda belum aktif. Masukkan kode OTP dari email.');
+            startLoginOtpResendCountdown();
+            resetLoginOtpDeck();
+            setTimeout(() => loginOtpBoxes[0].focus(), 300);
+          }, 300);
+          return;
+        }
+
+        // 2. Case B: Successful Login
+        if (response.ok && result.success) {
+          localStorage.setItem('skillsphere_access_token', result.data.accessToken);
+          localStorage.setItem('skillsphere_refresh_token', result.data.refreshToken);
+          localStorage.setItem('skillsphere_user', JSON.stringify(result.data.user));
+
+          if (rememberMeCheckbox.checked) {
+            saveAccountLocally(result.data.user, password);
+          }
+
+          const hasCompletedOnboarding = result.data.user.role === 'admin' || 
+            (result.data.user && result.data.user.profile && result.data.user.profile.study_preferences && result.data.user.profile.study_preferences.onboarding_completed);
+
+          if (!hasCompletedOnboarding || result.data.requires_onboarding) {
+            showAlert('success', 'Login berhasil! Mengalihkan ke formulir personalisasi...');
+          } else {
+            showAlert('success', 'Login berhasil! Menyiapkan ruang belajar...');
+          }
+
+          btnText.innerHTML = '<i class="fas fa-check" style="margin-right: 6px;"></i> Berhasil Masuk';
+
+          // Framer Exit Gaussian Blur Transition
+          const loginCard = document.getElementById('login-card-container');
+          if (loginCard) {
+            loginCard.classList.remove('framer-enter-down');
+            loginCard.classList.add('framer-exit-up');
+          }
+
+          setTimeout(() => {
+            if (!hasCompletedOnboarding || result.data.requires_onboarding) {
+              window.location.href = '/dashboard/onboarding';
+            } else {
+              window.location.href = '/dashboard';
+            }
+          }, 350);
+        } else {
+          showAlert('danger', result.message || 'Login gagal. Periksa kembali email dan password Anda.');
+          submitBtn.disabled = false;
+          btnSpinner.style.display = 'none';
+          btnText.innerHTML = '<i class="fas fa-right-to-bracket" style="margin-right: 6px;"></i> Masuk ke SkillSphere';
+        }
+      } catch (err) {
+        showAlert('danger', 'Koneksi ke server gagal. Pastikan server SkillSphere sedang aktif.');
+        submitBtn.disabled = false;
+        btnSpinner.style.display = 'none';
+        btnText.innerHTML = '<i class="fas fa-right-to-bracket" style="margin-right: 6px;"></i> Masuk ke SkillSphere';
+      }
+    }
+
+    loginForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      submitLoginForm();
+    });
+
+    // =========================================================
+    // --- 5. Pending OTP Card Deck Verification Logic ---
+    // =========================================================
+    let activeLoginOtpEmail = '';
+    let activeLoginPassword = '';
+    let isLoginVerifying = false;
+
+    const loginOtpContainer = document.getElementById('login-otp-container');
+    const loginOtpStatusContent = document.getElementById('login-otp-status-content');
+    const loginOtpSuccessBadge = document.getElementById('login-otp-success-badge');
+    const loginOtpBoxes = [
+      document.getElementById('lotp-1'),
+      document.getElementById('lotp-2'),
+      document.getElementById('lotp-3'),
+      document.getElementById('lotp-4'),
+      document.getElementById('lotp-5'),
+      document.getElementById('lotp-6'),
+    ];
+
+    function showLoginOtpAlert(type, message) {
+      const banner = document.getElementById('alert-banner-login-otp');
+      banner.className = 'alert-box alert-' + type;
+      banner.firstElementChild.textContent = message;
+      banner.style.display = 'flex';
+    }
+
+    function hideLoginOtpAlert() {
+      const banner = document.getElementById('alert-banner-login-otp');
+      banner.style.display = 'none';
+    }
+
+    function resetLoginOtpDeck() {
+      loginOtpContainer.classList.remove('cards-stacked', 'verifying-stack', 'error-stack');
+      loginOtpSuccessBadge.classList.remove('show');
+      
+      loginOtpBoxes.forEach(box => {
+        box.value = '';
+        box.style.transform = '';
+        box.style.zIndex = '';
+        box.style.boxShadow = '';
+        box.style.opacity = '1';
+        box.style.filter = '';
+        box.classList.remove('fanning-out');
+        box.disabled = false;
+      });
+
+      isLoginVerifying = false;
+      loginOtpStatusContent.innerHTML = `
+        <span class="otp-hint-text">
+          <i class="fas fa-shield-halved"></i> Masukkan 6 digit kode dari email
+        </span>
+      `;
+    }
+
+    function stackLoginCardsIntoDeck() {
+      loginOtpContainer.classList.add('cards-stacked', 'verifying-stack');
+      const offsets = [-2.5, -1.5, -0.5, 0.5, 1.5, 2.5];
+      const stride = 58;
+
+      loginOtpBoxes.forEach((box, i) => {
+        const offset = offsets[i];
+        const translateX = -offset * stride;
+        const rotateZ = offset * 2.8;
+        const translateY = -Math.abs(offset) * 1.5;
+        
+        box.style.transform = `translateX(${translateX}px) translateY(${translateY}px) rotate(${rotateZ}deg) scale(0.97)`;
+        box.style.zIndex = Math.round(20 - Math.abs(offset) * 2);
+        box.style.boxShadow = `0 ${8 + Math.abs(offset)*2}px ${20 + Math.abs(offset)*3}px rgba(0,0,0,0.22)`;
+        box.blur();
+      });
+
+      loginOtpStatusContent.innerHTML = `
+        <div class="otp-status-spinner"></div>
+        <span style="font-weight:600; color:var(--text-primary);">Menyatukan kartu & memverifikasi kode...</span>
+      `;
+    }
+
+    function fanOutLoginCardsBackToPosition(errorMessage) {
+      loginOtpContainer.classList.remove('verifying-stack');
+      loginOtpContainer.classList.add('error-stack');
+
+      loginOtpStatusContent.innerHTML = `
+        <i class="fas fa-circle-exclamation" style="color:var(--color-danger); font-size:15px;"></i>
+        <span style="color:var(--color-danger); font-weight:600;">${errorMessage || 'Kode OTP salah atau kadaluarsa.'}</span>
+      `;
+
+      setTimeout(() => {
+        loginOtpContainer.classList.remove('cards-stacked', 'error-stack');
+
+        loginOtpBoxes.forEach(box => {
+          box.classList.add('fanning-out');
+          box.style.transform = '';
+          box.style.zIndex = '';
+          box.style.boxShadow = '';
+        });
+
+        setTimeout(() => {
+          loginOtpBoxes.forEach(box => {
+            box.value = '';
+            box.classList.remove('fanning-out');
+            box.disabled = false;
+          });
+
+          loginOtpStatusContent.innerHTML = `
+            <span class="otp-hint-text">
+              <i class="fas fa-shield-halved"></i> Silakan masukkan 6 digit kode yang benar
+            </span>
+          `;
+
+          isLoginVerifying = false;
+          loginOtpBoxes[0].focus();
+        }, 480);
+      }, 550);
+    }
+
+    async function triggerLoginAutoVerify(otpCode) {
+      if (isLoginVerifying || otpCode.length !== 6) return;
+      isLoginVerifying = true;
+      hideLoginOtpAlert();
+
+      stackLoginCardsIntoDeck();
+
+      try {
+        const response = await fetch('/api/auth/verify-otp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: activeLoginOtpEmail, otp: otpCode }),
+        });
+
+        const result = await response.json();
+
+        if (response.ok && result.success) {
+          setTimeout(() => {
+            loginOtpContainer.classList.remove('verifying-stack');
+            loginOtpBoxes.forEach(box => {
+              box.style.opacity = '0.2';
+              box.style.filter = 'blur(2px)';
+            });
+
+            loginOtpSuccessBadge.classList.add('show');
+
+            loginOtpStatusContent.innerHTML = `
+              <i class="fas fa-circle-check" style="color:var(--color-success); font-size:16px;"></i>
+              <span style="color:var(--color-success); font-weight:600;">Verifikasi Berhasil! Mengalihkan ke Ruang Belajar...</span>
+            `;
+
+            // Save tokens & credentials
+            localStorage.setItem('skillsphere_access_token', result.data.accessToken);
+            localStorage.setItem('skillsphere_refresh_token', result.data.refreshToken);
+            localStorage.setItem('skillsphere_user', JSON.stringify(result.data.user));
+
+            saveAccountLocally(result.data.user, activeLoginPassword);
+
+            const hasCompletedOnboarding = result.data.user.role === 'admin' || 
+              (result.data.user && result.data.user.profile && result.data.user.profile.study_preferences && result.data.user.profile.study_preferences.onboarding_completed);
+
+            setTimeout(() => {
+              if (!hasCompletedOnboarding) {
+                window.location.href = '/dashboard/onboarding';
+              } else {
+                window.location.href = '/dashboard';
+              }
+            }, 900);
+          }, 350);
+        } else {
+          setTimeout(() => {
+            fanOutLoginCardsBackToPosition(result.message);
+          }, 350);
+        }
+      } catch (err) {
+        setTimeout(() => {
+          fanOutLoginCardsBackToPosition('Koneksi ke server terputus.');
+        }, 350);
+      }
+    }
+
+    loginOtpBoxes.forEach((box, index) => {
+      box.addEventListener('input', (e) => {
+        if (isLoginVerifying) return;
+        const value = e.target.value.replace(/\D/g, '');
+        box.value = value ? value[0] : '';
+        
+        if (box.value && index < loginOtpBoxes.length - 1) {
+          loginOtpBoxes[index + 1].focus();
+        }
+
+        const currentOtp = loginOtpBoxes.map(b => b.value).join('');
+        if (currentOtp.length === 6) {
+          triggerLoginAutoVerify(currentOtp);
+        }
+      });
+
+      box.addEventListener('keydown', (e) => {
+        if (isLoginVerifying) return;
+        if (e.key === 'Backspace' && !box.value && index > 0) {
+          loginOtpBoxes[index - 1].focus();
+        }
+      });
+
+      box.addEventListener('paste', (e) => {
+        if (isLoginVerifying) return;
+        e.preventDefault();
+        const pasteData = (e.clipboardData || window.clipboardData).getData('text').trim().replace(/\D/g, '');
+        if (pasteData.length >= 6) {
+          pasteData.substring(0, 6).split('').forEach((char, i) => {
+            if (loginOtpBoxes[i]) loginOtpBoxes[i].value = char;
+          });
+          triggerLoginAutoVerify(pasteData.substring(0, 6));
+        }
+      });
+    });
+
+    // Resend OTP in Login
+    const loginResendBtn = document.getElementById('login-resend-otp-btn');
+    const loginResendTimer = document.getElementById('login-resend-timer');
+    let loginTimerInterval = null;
+
+    function startLoginOtpResendCountdown() {
+      let seconds = 60;
+      loginResendBtn.disabled = true;
+      loginResendTimer.textContent = seconds;
+
+      clearInterval(loginTimerInterval);
+      loginTimerInterval = setInterval(() => {
+        seconds--;
+        loginResendTimer.textContent = seconds;
+        if (seconds <= 0) {
+          clearInterval(loginTimerInterval);
+          loginResendBtn.disabled = false;
+          loginResendBtn.innerHTML = '<i class="fas fa-rotate-right" style="font-size: 11px;"></i> Kirim Ulang Kode';
+        }
+      }, 1000);
+    }
+
+    loginResendBtn.addEventListener('click', async () => {
+      try {
+        loginResendBtn.disabled = true;
+        const res = await fetch('/api/auth/resend-otp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: activeLoginOtpEmail }),
+        });
+        const result = await res.json();
+        if (res.ok && result.success) {
+          showLoginOtpAlert('success', 'Kode OTP baru telah dikirim ke email.');
+          resetLoginOtpDeck();
+          startLoginOtpResendCountdown();
+          loginOtpBoxes[0].focus();
+        } else {
+          showLoginOtpAlert('danger', result.message || 'Gagal mengirim ulang OTP.');
+          loginResendBtn.disabled = false;
+        }
+      } catch (e) {
+        showLoginOtpAlert('danger', 'Gagal mengirim ulang OTP.');
+        loginResendBtn.disabled = false;
+      }
+    });
+
+    // Back to Login Form
+    document.getElementById('back-to-login-form-btn').addEventListener('click', () => {
+      const stepLogin = document.getElementById('step-login');
+      const stepLoginOtp = document.getElementById('step-login-otp');
+      stepLoginOtp.className = 'framer-exit-down';
+      setTimeout(() => {
+        stepLoginOtp.style.display = 'none';
+        stepLogin.style.display = 'block';
+        stepLogin.className = 'framer-enter-down';
+      }, 300);
+    });
+
+    // --- 6. Framer Exit Blur Transition to Register Page ---
+    const linkToRegister = document.getElementById('link-to-register');
+    if (linkToRegister) {
+      linkToRegister.addEventListener('click', (e) => {
+        e.preventDefault();
+        const loginCard = document.getElementById('login-card-container');
+        if (loginCard) {
+          loginCard.classList.remove('framer-enter-down');
+          loginCard.classList.add('framer-exit-up');
+          setTimeout(() => {
+            window.location.href = '/register';
+          }, 280);
+        } else {
+          window.location.href = '/register';
+        }
+      });
+    }
+  </script>
+</body>
+</html>

@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "start": "node ./bin/www",
+    "dev": "node --watch ./bin/www",
     "seed": "node seeders/seed.js",
     "test": "node tests/db.test.js && node tests/auth.test.js"
   },
@@ -19,6 +20,8 @@
     "http-errors": "~1.6.3",
     "jsonwebtoken": "^9.0.3",
     "morgan": "~1.9.1",
+    "mysql2": "^3.24.4",
+    "nodemailer": "^10.0.10",
     "sequelize": "^6.37.8",
     "sqlite3": "^6.0.1"
   }

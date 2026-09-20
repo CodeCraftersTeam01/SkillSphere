@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard | SkillSphere AI</title>
+  <meta name="description" content="Dashboard platform pembelajaran online SkillSphere AI.">
+  
+  <!-- Google Fonts: Newsreader (Editorial Serif) & Plus Jakarta Sans (Modern Sans) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome 6 Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Claude Design System Stylesheet -->
+  <link rel="stylesheet" href="/stylesheets/claude-theme.css">
+  
+  <style>
+    .dashboard-layout {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background-color: var(--bg-app);
+    }
+
+    .navbar {
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 16px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .user-profile-badge {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 14px 6px 8px;
+      border-radius: var(--radius-full);
+      background: var(--bg-surface-subtle);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .user-avatar-sm {
+      width: 28px;
+      height: 28px;
+      border-radius: var(--radius-full);
+      background: var(--accent-primary);
+      color: var(--accent-text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .user-name-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .user-role-tag {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      padding: 2px 6px;
+      border-radius: var(--radius-full);
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+    }
+
+    .logout-btn {
+      background: transparent;
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      padding: 8px 14px;
+      border-radius: var(--radius-full);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+
+    .logout-btn:hover {
+      background: var(--color-danger-bg);
+      border-color: var(--color-danger);
+      color: var(--color-danger);
+    }
+
+    .dashboard-content {
+      max-width: 1060px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 40px 24px;
+      flex: 1;
+    }
+
+    .welcome-hero {
+      margin-bottom: 32px;
+    }
+
+    .welcome-title {
+      font-family: var(--font-serif);
+      font-size: 34px;
+      font-weight: 500;
+      color: var(--text-primary);
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+    }
+
+    .welcome-desc {
+      font-size: 15px;
+      color: var(--text-secondary);
+      max-width: 680px;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 18px;
+      margin-bottom: 32px;
+    }
+
+    .stat-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 22px;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.2s ease;
+    }
+
+    .stat-card:hover {
+      box-shadow: var(--shadow-md);
+      border-color: var(--border-strong);
+      transform: translateY(-2px);
+    }
+
+    .stat-label {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-secondary);
+      font-weight: 600;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .stat-value {
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--text-primary);
+      font-feature-settings: "tnum";
+    }
+
+    .stat-meta {
+      font-size: 12px;
+      color: var(--text-tertiary);
+      margin-top: 6px;
+    }
+
+    .section-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-xl);
+      padding: 28px;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 28px;
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      border-bottom: 1px solid var(--border-subtle);
+      padding-bottom: 14px;
+    }
+
+    .section-title {
+      font-family: var(--font-serif);
+      font-size: 22px;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .sprint-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--accent-primary-light);
+      color: var(--text-primary);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-full);
+      padding: 6px 14px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .table-responsive {
+      overflow-x: auto;
+    }
+
+    .styled-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      text-align: left;
+    }
+
+    .styled-table th {
+      background: var(--bg-surface-subtle);
+      color: var(--text-secondary);
+      font-weight: 600;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .styled-table td {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+    }
+
+    .styled-table tr:hover td {
+      background: var(--bg-surface-subtle);
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 8px;
+      border-radius: var(--radius-full);
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .status-active {
+      background: var(--color-success-bg);
+      color: var(--color-success);
+      border: 1px solid var(--color-success);
+    }
+  </style>
+
+  <script>
+    // Initial Theme Script to prevent flash
+    (function() {
+      const savedTheme = localStorage.getItem('skillsphere_theme') || 
+        (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    })();
+  </script>
+</head>
+<body>
+
+  <div class="dashboard-layout">
+    <!-- Navbar -->
+    <header class="navbar">
+      <a href="/dashboard" class="brand-logo">
+        <div class="brand-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 0L13.8 8.2L22 10L13.8 11.8L12 20L10.2 11.8L2 10L10.2 8.2L12 0Z" />
+          </svg>
+        </div>
+        <span>SkillSphere AI</span>
+      </a>
+
+      <div class="nav-actions">
+        <!-- Theme Toggle -->
+        <button class="theme-toggle-btn" id="theme-toggle-btn" type="button" aria-label="Toggle dark/light mode">
+          <i class="fas fa-sun" id="theme-icon-sun" style="display:none;"></i>
+          <i class="fas fa-moon" id="theme-icon-moon"></i>
+          <span id="theme-text">Mode Gelap</span>
+        </button>
+
+        <!-- User Profile Pill -->
+        <div class="user-profile-badge">
+          <div class="user-avatar-sm" id="nav-avatar">U</div>
+          <span class="user-name-label" id="nav-user-name">Memuat...</span>
+          <span class="user-role-tag" id="nav-user-role">...</span>
+        </div>
+
+        <!-- Logout Button -->
+        <button class="logout-btn" id="logout-btn" type="button">
+          <i class="fas fa-arrow-right-from-bracket"></i>
+          <span>Keluar</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Dashboard Content -->
+    <main class="dashboard-content">
+      <!-- Welcome Hero -->
+      <section class="welcome-hero">
+        <div class="sprint-badge">
+          <i class="fas fa-rocket"></i>
+          <span>Sprint 1: Foundation, MySQL 19 Tables & JWT Security</span>
+        </div>
+        <h1 class="welcome-title" id="welcome-heading">Selamat Datang di SkillSphere</h1>
+        <p class="welcome-desc" id="welcome-subheading">
+          Ekosistem pendidikan cerdas yang menghubungkan tutor ahli dengan peserta didik melalui personalisasi kecerdasan buatan.
+        </p>
+      </section>
+
+      <!-- Dynamic Role Stats Grid -->
+      <div class="stats-grid" id="stats-container">
+        <div class="stat-card">
+          <div class="stat-label">
+            <span>Status Akun</span>
+            <span class="status-pill status-active"><i class="fas fa-circle-check" style="font-size: 10px;"></i> Aktif</span>
+          </div>
+          <div class="stat-value" id="stat-role">-</div>
+          <div class="stat-meta" id="stat-email">-</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-label">
+            <span>Arsitektur DB</span>
+            <i class="fas fa-database" style="color: var(--text-secondary);"></i>
+          </div>
+          <div class="stat-value">19 Tabel</div>
+          <div class="stat-meta">MySQL Relasional (100% Synced)</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-label">
+            <span>Revenue Model</span>
+            <span style="color:var(--accent-amber); font-weight:700;">20% / 80%</span>
+          </div>
+          <div class="stat-value" id="stat-wallet">Rp 0</div>
+          <div class="stat-meta" id="stat-wallet-meta">Saldo Tutor Siap Tarik</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-label">
+            <span>Keamanan API</span>
+            <i class="fas fa-shield-halved" style="color: var(--text-secondary);"></i>
+          </div>
+          <div class="stat-value">JWT + RBAC</div>
+          <div class="stat-meta">Access & Refresh Token Active</div>
+        </div>
+      </div>
+
+      <!-- Quick Action / Core Modules Card -->
+      <section class="section-card">
+        <div class="section-header">
+          <h2 class="section-title">Modul Fondasi & Endpoint API (Sprint 1)</h2>
+          <span style="font-size: 13px; color: var(--text-secondary);"><i class="fas fa-user-shield" style="margin-right: 4px;"></i> Lead BE: Arjuna Lanang</span>
+        </div>
+
+        <div class="table-responsive">
+          <table class="styled-table">
+            <thead>
+              <tr>
+                <th>Fitur / Modul</th>
+                <th>Tanggung Jawab</th>
+                <th>Status</th>
+                <th>Aksi / Verifikasi</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Setup 19 Tabel Relasional</strong></td>
+                <td>Arjuna (Lead BE)</td>
+                <td><span class="status-pill status-active"><i class="fas fa-check" style="font-size: 10px;"></i> Tuntas & Verified</span></td>
+                <td><code style="font-family:var(--font-mono); font-size:12px;">npm test (19/19)</code></td>
+              </tr>
+              <tr>
+                <td><strong>Otentikasi JWT & Role Access</strong></td>
+                <td>Arjuna (Lead BE)</td>
+                <td><span class="status-pill status-active"><i class="fas fa-check" style="font-size: 10px;"></i> Aktif</span></td>
+                <td><code style="font-family:var(--font-mono); font-size:12px;">/api/auth/me</code></td>
+              </tr>
+              <tr>
+                <td><strong>Verifikasi 6-Digit OTP SMTP</strong></td>
+                <td>Arjuna (Lead BE)</td>
+                <td><span class="status-pill status-active"><i class="fas fa-check" style="font-size: 10px;"></i> Gmail SMTP Aktif</span></td>
+                <td><code style="font-family:var(--font-mono); font-size:12px;">/api/auth/verify-otp</code></td>
+              </tr>
+              <tr>
+                <td><strong>Tutor Wallet & 80% Split Logic</strong></td>
+                <td>Arjuna & Tegar</td>
+                <td><span class="status-pill status-active"><i class="fas fa-check" style="font-size: 10px;"></i> Schema Ready</span></td>
+                <td><code style="font-family:var(--font-mono); font-size:12px;">tutor_wallets</code></td>
+              </tr>
+              <tr>
+                <td><strong>Halaman Login & Register Claude Theme</strong></td>
+                <td>CodeCrafters Frontend</td>
+                <td><span class="status-pill status-active"><i class="fas fa-check" style="font-size: 10px;"></i> Aktif</span></td>
+                <td><a href="/login" class="link" style="font-weight:600;"><i class="fas fa-arrow-up-right-from-square" style="font-size: 11px;"></i> Lihat Portal</a></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="login-footer" style="padding-bottom: 24px;">
+      <p>© 2026 SkillSphere AI — Dikembangkan oleh Tim CodeCrafters (Sprint 1: Lead BE Arjuna)</p>
+    </footer>
+  </div>
+
+  <script>
+    // Theme Switcher Logic
+    const themeBtn = document.getElementById('theme-toggle-btn');
+    const themeIconSun = document.getElementById('theme-icon-sun');
+    const themeIconMoon = document.getElementById('theme-icon-moon');
+    const themeText = document.getElementById('theme-text');
+
+    function updateThemeUI(theme) {
+      if (theme === 'dark') {
+        themeIconSun.style.display = 'inline-block';
+        themeIconMoon.style.display = 'none';
+        themeText.textContent = 'Mode Terang';
+      } else {
+        themeIconSun.style.display = 'none';
+        themeIconMoon.style.display = 'inline-block';
+        themeText.textContent = 'Mode Gelap';
+      }
+    }
+
+    const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+    updateThemeUI(currentTheme);
+
+    themeBtn.addEventListener('click', () => {
+      const active = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', active);
+      localStorage.setItem('skillsphere_theme', active);
+      updateThemeUI(active);
+    });
+
+    // Check Authentication & Load Profile
+    const token = localStorage.getItem('skillsphere_access_token');
+    if (!token) {
+      window.location.href = '/login';
+    } else {
+      loadUserProfile(token);
+    }
+
+    async function loadUserProfile(accessToken) {
+      try {
+        const res = await fetch('/api/auth/me', {
+          headers: {
+            'Authorization': 'Bearer ' + accessToken,
+          },
+        });
+
+        if (!res.ok) {
+          localStorage.removeItem('skillsphere_access_token');
+          window.location.href = '/login';
+          return;
+        }
+
+        const json = await res.json();
+        const user = json.data;
+
+        // Enforce completed onboarding for students and tutors
+        const hasCompletedOnboarding = user.role === 'admin' || 
+          (user.profile && user.profile.study_preferences && user.profile.study_preferences.onboarding_completed);
+
+        if (!hasCompletedOnboarding) {
+          window.location.href = '/dashboard/onboarding';
+          return;
+        }
+
+        const initials = user.name ? user.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() : 'U';
+        document.getElementById('nav-avatar').textContent = initials;
+        document.getElementById('nav-user-name').textContent = user.name;
+        document.getElementById('nav-user-role').textContent = user.role;
+
+        document.getElementById('welcome-heading').textContent = `Selamat datang kembali, ${user.name}`;
+        document.getElementById('stat-role').textContent = user.role.toUpperCase();
+        document.getElementById('stat-email').textContent = user.email;
+
+        if (user.role === 'tutor' && user.wallet) {
+          const formatted = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(user.wallet.balance);
+          document.getElementById('stat-wallet').textContent = formatted;
+          document.getElementById('stat-wallet-meta').textContent = `Holding: Rp ${Number(user.wallet.pending_balance).toLocaleString('id-ID')}`;
+        } else if (user.role === 'admin') {
+          document.getElementById('stat-wallet').textContent = '20% Platform';
+          document.getElementById('stat-wallet-meta').textContent = 'Hak Akses Penuh Sistem';
+        } else {
+          document.getElementById('stat-wallet').textContent = 'Siswa';
+          document.getElementById('stat-wallet-meta').textContent = 'Akses Materi & AI Assistant';
+        }
+
+      } catch (err) {
+        console.error('Failed to load user profile:', err);
+      }
+    }
+
+    // Logout Logic
+    document.getElementById('logout-btn').addEventListener('click', async () => {
+      const accessToken = localStorage.getItem('skillsphere_access_token');
+      try {
+        if (accessToken) {
+          await fetch('/api/auth/logout', {
+            method: 'POST',
+            headers: {
+              'Authorization': 'Bearer ' + accessToken,
+            },
+          });
+        }
+      } catch (e) {}
+
+      localStorage.removeItem('skillsphere_access_token');
+      localStorage.removeItem('skillsphere_refresh_token');
+      localStorage.removeItem('skillsphere_user');
+      window.location.href = '/login';
+    });
+  </script>
+</body>
+</html>

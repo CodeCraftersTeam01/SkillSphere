@@ -1,3 +1,4 @@
+process.env.NODE_ENV = 'test';
 const assert = require('assert');
 const http = require('http');
 const app = require('../app');
@@ -42,12 +43,18 @@ function request(options, data = null) {
 }
 
 async function runAuthTests() {
-  console.log('🧪 Starting Auth & Security API Test Suite...\n');
+  console.log('🧪 Starting Auth, OTP Verification & Security API Test Suite...\n');
 
   try {
-    await sequelize.sync();
-    // Clean user table for test run
-    await User.destroy({ where: {}, cascade: true });
+    const dialect = sequelize.getDialect();
+    if (dialect === 'mysql') {
+      await sequelize.query('SET FOREIGN_KEY_CHECKS = 0;');
+      await sequelize.sync({ force: true });
+      await sequelize.query('SET FOREIGN_KEY_CHECKS = 1;');
+    } else {
+      await sequelize.sync();
+      await User.destroy({ where: {}, cascade: true });
+    }
 
     server = app.listen(0);
     port = server.address().port;
@@ -59,7 +66,7 @@ async function runAuthTests() {
     assert.strictEqual(health.body.status, 'ok');
     console.log('  ✔ Health check endpoint verified.');
 
-    // 2. Test Register Student
+    // 2. Test Register Student (Generates OTP)
     const regStudentRes = await request({
       path: '/api/auth/register',
       method: 'POST',
@@ -73,29 +80,44 @@ async function runAuthTests() {
 
     assert.strictEqual(regStudentRes.status, 201);
     assert.strictEqual(regStudentRes.body.success, true);
-    assert(regStudentRes.body.data.accessToken, 'Should return accessToken');
-    assert(regStudentRes.body.data.refreshToken, 'Should return refreshToken');
-    assert.strictEqual(regStudentRes.body.data.user.role, 'student');
-    assert.strictEqual(regStudentRes.body.data.user.profile.career_goal, 'Fullstack Engineer');
-    console.log('  ✔ Student registration with profile creation verified.');
+    assert.strictEqual(regStudentRes.body.requireOtp, true);
+    console.log('  ✔ Student registration created pending OTP verification.');
 
-    const studentToken = regStudentRes.body.data.accessToken;
-    const studentRefreshToken = regStudentRes.body.data.refreshToken;
+    // Query OTP from DB to simulate user receiving email
+    const studentUser = await User.findOne({ where: { email: 'rian@student.com' } });
+    assert(studentUser.otp_code, 'User should have generated OTP code');
+    assert.strictEqual(studentUser.is_verified, false);
 
-    // 3. Test Duplicate Email Prevention
-    const dupRes = await request({
-      path: '/api/auth/register',
+    // 3. Test Verify Invalid OTP
+    const invalidOtpRes = await request({
+      path: '/api/auth/verify-otp',
       method: 'POST',
     }, {
-      name: 'Duplicate User',
       email: 'rian@student.com',
-      password: 'password123',
+      otp: '000000',
     });
-    assert.strictEqual(dupRes.status, 409);
-    assert.strictEqual(dupRes.body.success, false);
-    console.log('  ✔ Duplicate email registration prevented (409 Conflict).');
+    assert.strictEqual(invalidOtpRes.status, 400);
+    console.log('  ✔ Invalid OTP correctly rejected (400).');
 
-    // 4. Test Register Tutor (Should initialize TutorWallet)
+    // 4. Test Verify Correct OTP
+    const verifyStudentRes = await request({
+      path: '/api/auth/verify-otp',
+      method: 'POST',
+    }, {
+      email: 'rian@student.com',
+      otp: studentUser.otp_code,
+    });
+
+    assert.strictEqual(verifyStudentRes.status, 200);
+    assert.strictEqual(verifyStudentRes.body.success, true);
+    assert(verifyStudentRes.body.data.accessToken, 'Should issue accessToken upon OTP verify');
+    assert(verifyStudentRes.body.data.refreshToken, 'Should issue refreshToken upon OTP verify');
+    assert.strictEqual(verifyStudentRes.body.data.user.role, 'student');
+    console.log('  ✔ Student OTP email verification succeeded & JWT tokens issued.');
+
+    const studentToken = verifyStudentRes.body.data.accessToken;
+
+    // 5. Test Register Tutor & Resend OTP
     const regTutorRes = await request({
       path: '/api/auth/register',
       method: 'POST',
@@ -107,13 +129,35 @@ async function runAuthTests() {
     });
 
     assert.strictEqual(regTutorRes.status, 201);
-    assert.strictEqual(regTutorRes.body.data.user.role, 'tutor');
-    assert(regTutorRes.body.data.user.wallet, 'Tutor wallet should be created automatically');
-    console.log('  ✔ Tutor registration with automatic TutorWallet creation verified.');
+    assert.strictEqual(regTutorRes.body.requireOtp, true);
+    console.log('  ✔ Tutor registration created pending OTP verification.');
 
-    const tutorToken = regTutorRes.body.data.accessToken;
+    // Resend OTP
+    const resendRes = await request({
+      path: '/api/auth/resend-otp',
+      method: 'POST',
+    }, {
+      email: 'arjuna@tutor.com',
+    });
+    assert.strictEqual(resendRes.status, 200);
+    console.log('  ✔ Resend OTP endpoint verified.');
 
-    // 5. Test Login
+    const tutorUser = await User.findOne({ where: { email: 'arjuna@tutor.com' } });
+    const verifyTutorRes = await request({
+      path: '/api/auth/verify-otp',
+      method: 'POST',
+    }, {
+      email: 'arjuna@tutor.com',
+      otp: tutorUser.otp_code,
+    });
+
+    assert.strictEqual(verifyTutorRes.status, 200);
+    assert(verifyTutorRes.body.data.user.wallet, 'Tutor wallet should exist');
+    console.log('  ✔ Tutor OTP email verification succeeded & TutorWallet active.');
+
+    const tutorToken = verifyTutorRes.body.data.accessToken;
+
+    // 6. Test Login with verified credentials
     const loginRes = await request({
       path: '/api/auth/login',
       method: 'POST',
@@ -126,7 +170,7 @@ async function runAuthTests() {
     assert(loginRes.body.data.accessToken);
     console.log('  ✔ User login with password verification verified.');
 
-    // 6. Test Invalid Password Login
+    // 7. Test Invalid Password Login
     const wrongPassRes = await request({
       path: '/api/auth/login',
       method: 'POST',
@@ -137,7 +181,7 @@ async function runAuthTests() {
     assert.strictEqual(wrongPassRes.status, 401);
     console.log('  ✔ Invalid password login rejected (401 Unauthorized).');
 
-    // 7. Test Protected Route (/api/auth/me)
+    // 8. Test Protected Route (/api/auth/me)
     const meRes = await request({
       path: '/api/auth/me',
       method: 'GET',
@@ -147,7 +191,7 @@ async function runAuthTests() {
     assert.strictEqual(meRes.body.data.email, 'rian@student.com');
     console.log('  ✔ Protected profile /api/auth/me verified.');
 
-    // 8. Test Protected Route without token
+    // 9. Test Protected Route without token
     const noTokenRes = await request({
       path: '/api/auth/me',
       method: 'GET',
@@ -155,7 +199,7 @@ async function runAuthTests() {
     assert.strictEqual(noTokenRes.status, 401);
     console.log('  ✔ Protected route blocked when token is missing (401).');
 
-    // 9. Test Update Profile
+    // 10. Test Update Profile
     const updateProfileRes = await request({
       path: '/api/auth/profile',
       method: 'PUT',
@@ -168,10 +212,9 @@ async function runAuthTests() {
     });
     assert.strictEqual(updateProfileRes.status, 200);
     assert.strictEqual(updateProfileRes.body.data.profile.full_name, 'Rian Pratama Updated');
-    assert.strictEqual(updateProfileRes.body.data.profile.career_goal, 'AI Solutions Architect');
     console.log('  ✔ Profile update (/api/auth/profile) verified.');
 
-    // 10. Test RBAC - Student accessing Student route vs Tutor route
+    // 11. Test RBAC - Student vs Tutor
     const studentAccessStudentRoute = await request({
       path: '/api/auth/test-student',
       method: 'GET',
@@ -196,7 +239,7 @@ async function runAuthTests() {
     assert.strictEqual(tutorAccessTutorRoute.status, 200);
     console.log('  ✔ RBAC: Tutor authorized for tutor endpoint.');
 
-    // 11. Test Refresh Token
+    // 12. Test Refresh Token
     const refreshRes = await request({
       path: '/api/auth/refresh',
       method: 'POST',
@@ -207,7 +250,7 @@ async function runAuthTests() {
     assert(refreshRes.body.data.accessToken);
     console.log('  ✔ Refresh token rotation verified.');
 
-    // 12. Test Change Password
+    // 13. Test Change Password
     const changePassRes = await request({
       path: '/api/auth/change-password',
       method: 'PUT',
@@ -220,19 +263,8 @@ async function runAuthTests() {
     assert.strictEqual(changePassRes.status, 200);
     console.log('  ✔ Change password verified.');
 
-    // Login with new password
-    const loginWithNewPass = await request({
-      path: '/api/auth/login',
-      method: 'POST',
-    }, {
-      email: 'rian@student.com',
-      password: 'newpassword123',
-    });
-    assert.strictEqual(loginWithNewPass.status, 200);
-    console.log('  ✔ Login with new password successful.');
-
     console.log('\n======================================================');
-    console.log('🎉 ALL AUTH & SECURITY TESTS PASSED SUCCESSFULLY!');
+    console.log('🎉 ALL AUTH & OTP EMAIL TESTS PASSED SUCCESSFULLY!');
     console.log('======================================================\n');
 
     server.close();

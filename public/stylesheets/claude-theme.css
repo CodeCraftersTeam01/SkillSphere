@@ -1,0 +1,590 @@
+/* ==========================================================================
+   SkillSphere AI - Claude.ai Aesthetic Design System
+   Monochrome Accent Edition (Black in Light Mode, White in Dark Mode)
+   ========================================================================== */
+
+:root {
+  /* --- Light Theme (Warm Paper / Stone) --- */
+  --bg-app: #FBF9F5;               /* Warm ivory paper */
+  --bg-surface: #FFFFFF;           /* Card & panel surface */
+  --bg-surface-subtle: #F3EFEA;    /* Hover & secondary background */
+  --bg-sidebar: #F5F2EB;           /* Sidebar warm stone */
+  
+  /* Text Colors */
+  --text-primary: #1F1E1D;         /* High-contrast deep warm charcoal */
+  --text-secondary: #6B665F;       /* Muted label / helper text */
+  --text-tertiary: #9C968D;        /* Placeholder / subtle icons */
+  
+  /* Accent & Brand Colors (Black in Light Mode) */
+  --accent-primary: #000000;       /* High-contrast signature black */
+  --accent-primary-hover: #262523; /* Deep charcoal hover */
+  --accent-primary-light: #EFECE6; /* Light stone tint */
+  --accent-text: #FFFFFF;          /* Text on accent */
+  --accent-amber: #D97706;
+  
+  /* Feedback Colors */
+  --color-danger: #DC2626;
+  --color-danger-bg: #FEF2F2;
+  --color-success: #16A34A;
+  --color-success-bg: #F0FDF4;
+
+  /* Borders & Dividers */
+  --border-subtle: #E8E2D9;        /* Input, card, divider border */
+  --border-strong: #D5CDC0;        /* Hover / active border */
+  
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(45, 41, 38, 0.04);
+  --shadow-md: 0 4px 16px rgba(45, 41, 38, 0.06), 0 1px 3px rgba(45, 41, 38, 0.04);
+  --shadow-floating: 0 12px 32px rgba(45, 41, 38, 0.08), 0 2px 6px rgba(45, 41, 38, 0.04);
+
+  /* Radii */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-full: 9999px;
+
+  /* Fonts */
+  --font-serif: "Newsreader", "Source Serif 4", "Copernicus", "Georgia", serif;
+  --font-sans: "Plus Jakarta Sans", "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: "JetBrains Mono", "Fira Code", monospace;
+}
+
+/* --- Dark Theme (Dark Zinc with White Accent) --- */
+[data-theme="dark"] {
+  --bg-app: #18181B;               /* Deep warm zinc */
+  --bg-surface: #242220;           /* Elevated card surface */
+  --bg-surface-subtle: #2D2B28;    /* Hover / secondary button */
+  --bg-sidebar: #1F1E1D;           /* Dark sidebar */
+  
+  --text-primary: #F5F3EF;
+  --text-secondary: #A8A29A;
+  --text-tertiary: #6E6962;
+  
+  /* Accent & Brand Colors (White in Dark Mode) */
+  --accent-primary: #FFFFFF;       /* Signature White in dark mode */
+  --accent-primary-hover: #E4E4E7; /* Off-white hover */
+  --accent-primary-light: #2D2B28; /* Subtle tint */
+  --accent-text: #000000;          /* Text on accent */
+  
+  --color-danger: #F87171;
+  --color-danger-bg: #2C1818;
+  --color-success: #4ADE80;
+  --color-success-bg: #14281A;
+
+  --border-subtle: #33302C;
+  --border-strong: #45413B;
+  
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
+  --shadow-floating: 0 12px 32px rgba(0, 0, 0, 0.5);
+}
+
+/* --- Base & Reset --- */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--bg-app);
+  color: var(--text-primary);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+/* --- Layout --- */
+.login-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 24px;
+}
+
+.login-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1100px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.brand-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: var(--text-primary);
+  font-family: var(--font-serif);
+  font-size: 20px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+.brand-icon {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent-primary);
+}
+
+.theme-toggle-btn {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  border-radius: var(--radius-full);
+  padding: 8px 14px;
+  font-size: 13px;
+  font-family: var(--font-sans);
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.theme-toggle-btn:hover {
+  background: var(--bg-surface-subtle);
+  border-color: var(--border-strong);
+  color: var(--text-primary);
+}
+
+.login-main {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 24px 0;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 440px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xl);
+  padding: 36px 32px;
+  box-shadow: var(--shadow-md);
+  transition: box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.login-card:hover {
+  box-shadow: var(--shadow-floating);
+}
+
+.login-hero {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.claude-symbol {
+  width: 44px;
+  height: 44px;
+  margin: 0 auto 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-surface-subtle);
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border-subtle);
+  color: var(--accent-primary);
+}
+
+.login-title {
+  font-family: var(--font-serif);
+  font-size: 28px;
+  font-weight: 500;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+  margin-bottom: 6px;
+}
+
+.login-subtitle {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+/* --- Saved Accounts (Local Storage / Device Memory) --- */
+.saved-accounts-container {
+  margin-bottom: 20px;
+  background: var(--bg-surface-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 14px 16px;
+  transition: all 0.2s ease;
+}
+
+.saved-accounts-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.saved-accounts-title {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.clear-accounts-btn {
+  background: none;
+  border: none;
+  font-size: 11px;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: var(--radius-sm);
+  transition: color 0.15s ease;
+}
+
+.clear-accounts-btn:hover {
+  color: var(--color-danger);
+}
+
+.saved-accounts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 190px;
+  overflow-y: auto;
+}
+
+.account-chip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  position: relative;
+}
+
+.account-chip:hover {
+  border-color: var(--border-strong);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+
+.account-chip.active {
+  border-color: var(--text-primary);
+  background: var(--accent-primary-light);
+}
+
+.account-chip-main {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  overflow: hidden;
+}
+
+.account-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-full);
+  background: var(--accent-primary);
+  color: var(--accent-text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.account-info {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  text-align: left;
+}
+
+.account-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.account-email {
+  font-size: 11px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.account-badge {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: var(--radius-full);
+  text-transform: capitalize;
+  background: var(--bg-surface-subtle);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-subtle);
+  margin-right: 6px;
+  flex-shrink: 0;
+}
+
+.remove-account-btn {
+  background: none;
+  border: none;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.remove-account-btn:hover {
+  color: var(--color-danger);
+  background: var(--color-danger-bg);
+}
+
+/* --- Form Fields --- */
+.form-group {
+  margin-bottom: 18px;
+}
+
+.form-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+}
+
+.input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.form-input {
+  width: 100%;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  font-size: 14px;
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  outline: none;
+}
+
+.form-input.has-icon-left {
+  padding-left: 40px;
+}
+
+.input-icon-left {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-tertiary);
+  font-size: 14px;
+  pointer-events: none;
+  transition: color 0.2s ease;
+  z-index: 2;
+}
+
+.input-container:focus-within .input-icon-left {
+  color: var(--text-primary);
+}
+
+.form-input.has-toggle {
+  padding-right: 46px; /* Avoid overlapping with eye icon */
+}
+
+/* Fix safari / webkit credential autofill icon overlap */
+.form-input::-webkit-credentials-auto-fill-button {
+  margin-right: 28px;
+}
+
+.form-input:focus {
+  border-color: var(--text-primary);
+  box-shadow: 0 0 0 2px var(--accent-primary-light);
+}
+
+.toggle-password-btn {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  transition: color 0.15s ease, background-color 0.15s ease;
+  z-index: 5;
+}
+
+.toggle-password-btn:hover {
+  color: var(--text-primary);
+  background: var(--bg-surface-subtle);
+}
+
+.form-options {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 22px;
+  font-size: 13px;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  user-select: none;
+}
+
+.checkbox-label input[type="checkbox"] {
+  accent-color: var(--accent-primary);
+  cursor: pointer;
+  width: 15px;
+  height: 15px;
+}
+
+.link {
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.link:hover {
+  color: var(--text-primary);
+  text-decoration: underline;
+}
+
+/* --- Submit Button --- */
+.submit-btn {
+  width: 100%;
+  background: var(--accent-primary);
+  color: var(--accent-text);
+  border: none;
+  border-radius: var(--radius-full);
+  padding: 13px 20px;
+  font-size: 15px;
+  font-weight: 500;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: background-color 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
+  box-shadow: var(--shadow-sm);
+}
+
+.submit-btn:hover {
+  background: var(--accent-primary-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.submit-btn:active {
+  transform: translateY(0);
+}
+
+.submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* --- Alerts & Notifications --- */
+.alert-box {
+  display: none;
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  margin-bottom: 18px;
+  animation: fadeIn 0.2s ease-in;
+}
+
+.alert-danger {
+  display: flex;
+  background-color: var(--color-danger-bg);
+  border: 1px solid var(--color-danger);
+  color: var(--color-danger);
+}
+
+.alert-success {
+  display: flex;
+  background-color: var(--color-success-bg);
+  border: 1px solid var(--color-success);
+  color: var(--color-success);
+}
+
+/* --- Footer --- */
+.login-footer {
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-tertiary);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.footer-links {
+  margin-top: 6px;
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+}
+
+/* --- Spinner --- */
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: currentColor;
+  animation: spin 0.6s linear infinite;
+  display: none;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}

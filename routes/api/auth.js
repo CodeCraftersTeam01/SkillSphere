@@ -11,12 +11,15 @@ const {
 
 // Public routes
 router.post('/register', validateRegister, authController.register);
+router.post('/verify-otp', authController.verifyOTP);
+router.post('/resend-otp', authController.resendOTP);
 router.post('/login', validateLogin, authController.login);
 router.post('/refresh', authController.refreshToken);
 
 // Protected routes (Requires valid JWT)
 router.get('/me', authenticateJWT, authController.getProfile);
 router.put('/profile', authenticateJWT, validateProfileUpdate, authController.updateProfile);
+router.post('/personalize', authenticateJWT, authController.personalize);
 router.put('/change-password', authenticateJWT, validateChangePassword, authController.changePassword);
 router.post('/logout', authenticateJWT, authController.logout);
 

@@ -32,6 +32,18 @@ const User = sequelize.define('User', {
     type: DataTypes.BOOLEAN,
     defaultValue: true,
   },
+  is_verified: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false,
+  },
+  otp_code: {
+    type: DataTypes.STRING(10),
+    allowNull: true,
+  },
+  otp_expires_at: {
+    type: DataTypes.DATE,
+    allowNull: true,
+  },
   refresh_token: {
     type: DataTypes.TEXT,
     allowNull: true,
