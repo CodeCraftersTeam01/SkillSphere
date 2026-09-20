@@ -1,0 +1,1237 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daftar Akun | SkillSphere AI</title>
+  <meta name="description" content="Daftar akun SkillSphere AI untuk mengakses kursus AI terpersonalisasi, karir masa depan, atau menjadi pengajar ahli.">
+  
+  <!-- Google Fonts: Newsreader (Editorial Serif) & Plus Jakarta Sans (Modern Sans) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome 6 Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Claude Design System Stylesheet -->
+  <link rel="stylesheet" href="/stylesheets/claude-theme.css">
+  
+  <style>
+    /* --- Framer Motion Blur & Spring Transitions --- */
+    @keyframes framerSlideDownBlur {
+      0% {
+        opacity: 0;
+        filter: blur(18px);
+        transform: translateY(-36px) scale(0.96);
+      }
+      60% {
+        filter: blur(4px);
+      }
+      100% {
+        opacity: 1;
+        filter: blur(0px);
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    @keyframes framerSlideUpBlur {
+      0% {
+        opacity: 0;
+        filter: blur(18px);
+        transform: translateY(36px) scale(0.96);
+      }
+      60% {
+        filter: blur(4px);
+      }
+      100% {
+        opacity: 1;
+        filter: blur(0px);
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    @keyframes framerExitUpBlur {
+      0% {
+        opacity: 1;
+        filter: blur(0px);
+        transform: scale(1) translateY(0);
+      }
+      100% {
+        opacity: 0;
+        filter: blur(18px);
+        transform: scale(0.95) translateY(-28px);
+      }
+    }
+
+    @keyframes framerExitDownBlur {
+      0% {
+        opacity: 1;
+        filter: blur(0px);
+        transform: scale(1) translateY(0);
+      }
+      100% {
+        opacity: 0;
+        filter: blur(18px);
+        transform: scale(0.95) translateY(28px);
+      }
+    }
+
+    .framer-enter-down {
+      animation: framerSlideDownBlur 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      will-change: transform, opacity, filter;
+    }
+
+    .framer-enter-up {
+      animation: framerSlideUpBlur 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      will-change: transform, opacity, filter;
+    }
+
+    .framer-exit-up {
+      animation: framerExitUpBlur 0.32s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      will-change: transform, opacity, filter;
+      pointer-events: none;
+    }
+
+    .framer-exit-down {
+      animation: framerExitDownBlur 0.32s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      will-change: transform, opacity, filter;
+      pointer-events: none;
+    }
+
+    /* --- Large Framer Role Cards --- */
+    .role-selection-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin: 24px 0;
+    }
+
+    .role-big-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-xl);
+      padding: 18px 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      text-align: left;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+      user-select: none;
+    }
+
+    .role-big-card:hover {
+      border-color: var(--text-primary);
+      background: var(--bg-surface-subtle);
+      transform: translateY(-3px) scale(1.015);
+      box-shadow: var(--shadow-md);
+    }
+
+    .role-big-card:active {
+      transform: scale(0.985);
+    }
+
+    .role-big-icon-box {
+      width: 48px;
+      height: 48px;
+      border-radius: var(--radius-lg);
+      background: var(--accent-primary-light);
+      border: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      color: var(--text-primary);
+      flex-shrink: 0;
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .role-big-card:hover .role-big-icon-box {
+      transform: scale(1.1);
+    }
+
+    .role-big-info {
+      flex: 1;
+    }
+
+    .role-big-title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 4px;
+    }
+
+    .role-big-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .role-big-badge {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: var(--radius-full);
+      background: var(--bg-surface-subtle);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+    }
+
+    .role-big-desc {
+      font-size: 12.5px;
+      color: var(--text-secondary);
+      line-height: 1.45;
+    }
+
+    .role-big-arrow {
+      color: var(--text-tertiary);
+      font-size: 14px;
+      margin-left: 8px;
+      transition: transform 0.2s ease, color 0.2s ease;
+    }
+
+    .role-big-card:hover .role-big-arrow {
+      color: var(--text-primary);
+      transform: translateX(4px);
+    }
+
+    /* --- Selected Role Banner in Form --- */
+    .selected-role-banner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--bg-surface-subtle);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 10px 14px;
+      margin-bottom: 20px;
+      font-size: 13px;
+    }
+
+    .selected-role-tag {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .change-role-btn {
+      background: none;
+      border: none;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: color 0.2s ease;
+      padding: 4px 6px;
+      border-radius: var(--radius-sm);
+    }
+
+    .change-role-btn:hover {
+      color: var(--text-primary);
+      background: var(--bg-surface);
+    }
+
+    /* ========================================================= */
+    /* --- OTP CARD DECK MERGING & FAN-OUT ANIMATION SYSTEM --- */
+    /* ========================================================= */
+    .otp-inputs-wrapper {
+      position: relative;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      perspective: 1000px;
+    }
+
+    .otp-inputs-container {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      margin: 28px 0 16px;
+      min-height: 64px;
+      width: 100%;
+    }
+
+    .otp-digit-box {
+      width: 48px;
+      height: 58px;
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-surface);
+      border-radius: var(--radius-md);
+      font-family: var(--font-mono);
+      font-size: 24px;
+      font-weight: 700;
+      text-align: center;
+      color: var(--text-primary);
+      outline: none;
+      position: relative;
+      transition: transform 0.48s cubic-bezier(0.16, 1, 0.3, 1),
+                  box-shadow 0.48s cubic-bezier(0.16, 1, 0.3, 1),
+                  border-color 0.3s ease,
+                  background-color 0.3s ease,
+                  opacity 0.35s ease,
+                  filter 0.35s ease;
+      will-change: transform, box-shadow, opacity;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .otp-digit-box:focus {
+      border-color: var(--text-primary);
+      box-shadow: 0 0 0 2px var(--accent-primary-light);
+      transform: translateY(-2px);
+    }
+
+    /* Card Stacked State */
+    .otp-inputs-container.cards-stacked .otp-digit-box {
+      cursor: default;
+      pointer-events: none;
+    }
+
+    /* Shimmer Glow on Merged Card Stack while verifying */
+    @keyframes cardStackPulse {
+      0%, 100% {
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25), 0 0 0 2px var(--accent-primary-light);
+      }
+      50% {
+        box-shadow: 0 14px 38px rgba(0, 0, 0, 0.35), 0 0 0 5px var(--accent-primary-light);
+      }
+    }
+
+    .otp-inputs-container.cards-stacked.verifying-stack .otp-digit-box {
+      animation: cardStackPulse 1.2s ease-in-out infinite;
+    }
+
+    /* Error Shake on Merged Card Stack */
+    @keyframes cardStackShake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-9px) rotate(-1.5deg); }
+      40%, 80% { transform: translateX(9px) rotate(1.5deg); }
+    }
+
+    .otp-inputs-container.cards-stacked.error-stack {
+      animation: cardStackShake 0.45s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+    }
+
+    .otp-inputs-container.cards-stacked.error-stack .otp-digit-box {
+      border-color: var(--color-danger) !important;
+      color: var(--color-danger) !important;
+      background: var(--color-danger-bg) !important;
+    }
+
+    /* Success Card Checkmark Pop Badge */
+    .otp-card-success-badge {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      opacity: 0;
+      z-index: 60;
+      pointer-events: none;
+      transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+    }
+
+    .otp-card-success-badge.show {
+      transform: translate(-50%, -50%) scale(1);
+      opacity: 1;
+    }
+
+    .success-badge-circle {
+      width: 62px;
+      height: 62px;
+      border-radius: var(--radius-full);
+      background: var(--color-success);
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      box-shadow: 0 12px 32px rgba(16, 185, 129, 0.45), 0 0 0 6px var(--color-success-bg);
+      animation: successCircleBurst 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes successCircleBurst {
+      0% { transform: scale(0.5); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6); }
+      50% { transform: scale(1.18); box-shadow: 0 0 0 16px rgba(16, 185, 129, 0); }
+      100% { transform: scale(1); }
+    }
+
+    /* Fan back out transition */
+    .otp-digit-box.fanning-out {
+      transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+                  box-shadow 0.45s ease,
+                  border-color 0.3s ease,
+                  background-color 0.3s ease;
+    }
+
+    /* Verification Status Indicator Container */
+    .otp-status-container {
+      min-height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 8px 0 16px;
+      text-align: center;
+    }
+
+    .otp-status-content {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13.5px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      transition: all 0.25s ease;
+    }
+
+    .otp-status-spinner {
+      width: 16px;
+      height: 16px;
+      border: 2px solid var(--border-subtle);
+      border-top-color: var(--text-primary);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+
+    .otp-hint-text {
+      font-size: 12.5px;
+      color: var(--text-tertiary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .email-sent-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--bg-surface-subtle);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-full);
+      padding: 6px 14px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin: 10px 0 16px;
+    }
+
+    .resend-section {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-top: 14px;
+    }
+
+    .resend-btn {
+      background: none;
+      border: none;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+      cursor: pointer;
+      text-decoration: underline;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .resend-btn:disabled {
+      color: var(--text-tertiary);
+      cursor: not-allowed;
+      text-decoration: none;
+    }
+  </style>
+
+  <script>
+    // Initial Theme Script to prevent flash
+    (function() {
+      const savedTheme = localStorage.getItem('skillsphere_theme') || 
+        (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    })();
+  </script>
+</head>
+<body>
+
+  <div class="login-page">
+    <!-- Header Navigation -->
+    <header class="login-header">
+      <a href="/" class="brand-logo" id="brand-home-link">
+        <div class="brand-icon">
+          <!-- 8-pointed Claude signature star -->
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 0L13.8 8.2L22 10L13.8 11.8L12 20L10.2 11.8L2 10L10.2 8.2L12 0Z" />
+          </svg>
+        </div>
+        <span>SkillSphere AI</span>
+      </a>
+
+      <!-- Theme Switcher -->
+      <button class="theme-toggle-btn" id="theme-toggle-btn" type="button" aria-label="Toggle dark/light mode">
+        <i class="fas fa-sun" id="theme-icon-sun" style="display:none;"></i>
+        <i class="fas fa-moon" id="theme-icon-moon"></i>
+        <span id="theme-text">Mode Gelap</span>
+      </button>
+    </header>
+
+    <!-- Main Card Section -->
+    <main class="login-main">
+      <div class="login-card" style="max-width: 500px;">
+        
+        <!-- ========================================== -->
+        <!-- STEP 1: Framer Animated Role Selection Box -->
+        <!-- ========================================== -->
+        <div id="step-role-selection" class="framer-enter-down">
+          <div class="login-hero">
+            <div class="claude-symbol">
+              <i class="fas fa-compass" style="font-size: 18px;"></i>
+            </div>
+            <h1 class="login-title">Pilih Peran Anda</h1>
+            <p class="login-subtitle">Pilih jalur untuk memulai perjalanan Anda di SkillSphere AI</p>
+          </div>
+
+          <!-- 2 Prominent Interactive Boxes with Framer animations -->
+          <div class="role-selection-stack">
+            <!-- Box 1: Siswa / Peserta Belajar -->
+            <div class="role-big-card" id="card-choose-student" role="button" tabindex="0">
+              <div class="role-big-icon-box">
+                <i class="fas fa-user-graduate"></i>
+              </div>
+              <div class="role-big-info">
+                <div class="role-big-title-row">
+                  <span class="role-big-title">Peserta Belajar</span>
+                  <span class="role-big-badge">Siswa</span>
+                </div>
+                <p class="role-big-desc">Akses kursus AI adaptif, AI mentor karir, kuis interaktif, dan sertifikat digital terverifikasi.</p>
+              </div>
+              <i class="fas fa-arrow-right role-big-arrow"></i>
+            </div>
+
+            <!-- Box 2: Pengajar / Tutor -->
+            <div class="role-big-card" id="card-choose-tutor" role="button" tabindex="0">
+              <div class="role-big-icon-box">
+                <i class="fas fa-chalkboard-user"></i>
+              </div>
+              <div class="role-big-info">
+                <div class="role-big-title-row">
+                  <span class="role-big-title">Pengajar / Tutor</span>
+                  <span class="role-big-badge">Bagi Hasil 80%</span>
+                </div>
+                <p class="role-big-desc">Publikasikan silabus & modul kursus, buka kelas interaktif, dan kelola dompet penghasilan mandiri.</p>
+              </div>
+              <i class="fas fa-arrow-right role-big-arrow"></i>
+            </div>
+          </div>
+
+          <div style="margin-top: 24px; text-align: center; font-size: 13px; color: var(--text-secondary);">
+            Sudah punya akun? <a href="/login" class="link" style="color: var(--text-primary); font-weight: 600;">Masuk Sekarang</a>
+          </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- STEP 2: Framer Animated Registration Form  -->
+        <!-- ========================================== -->
+        <div id="step-register" style="display: none;">
+          <div class="login-hero">
+            <div class="claude-symbol">
+              <i class="fas fa-user-plus" style="font-size: 18px;"></i>
+            </div>
+            <h1 class="login-title">Lengkapi Pendaftaran</h1>
+            <p class="login-subtitle">Bergabung dengan ekosistem pembelajaran cerdas SkillSphere</p>
+          </div>
+
+          <!-- Selected Role Indicator with Change Button -->
+          <div class="selected-role-banner">
+            <div class="selected-role-tag">
+              <i id="selected-role-icon" class="fas fa-user-graduate"></i>
+              <span>Daftar sebagai: <strong id="selected-role-label">Peserta Belajar</strong></span>
+            </div>
+            <button type="button" class="change-role-btn" id="btn-change-role" title="Ganti peran">
+              <i class="fas fa-rotate-left"></i>
+              <span>Ganti</span>
+            </button>
+          </div>
+
+          <!-- Alert Notification Box -->
+          <div id="alert-banner-reg" class="alert-box" role="alert">
+            <span id="alert-message-reg"></span>
+          </div>
+
+          <!-- Registration Form -->
+          <form id="register-form" novalidate>
+            <input type="hidden" id="reg-role" name="role" value="student">
+
+            <div class="form-group">
+              <label for="reg-name" class="form-label">Nama Lengkap</label>
+              <div class="input-container">
+                <i class="fas fa-user input-icon-left"></i>
+                <input 
+                  type="text" 
+                  id="reg-name" 
+                  name="name" 
+                  class="form-input has-icon-left" 
+                  placeholder="Nama Lengkap Anda" 
+                  required
+                  autocomplete="name"
+                >
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="reg-email" class="form-label">Alamat Email</label>
+              <div class="input-container">
+                <i class="fas fa-envelope input-icon-left"></i>
+                <input 
+                  type="email" 
+                  id="reg-email" 
+                  name="email" 
+                  class="form-input has-icon-left" 
+                  placeholder="nama@email.com" 
+                  required
+                  autocomplete="email"
+                >
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="reg-password" class="form-label">Kata Sandi</label>
+              <div class="input-container">
+                <i class="fas fa-lock input-icon-left"></i>
+                <input 
+                  type="password" 
+                  id="reg-password" 
+                  name="password" 
+                  class="form-input has-icon-left has-toggle" 
+                  placeholder="Minimal 6 karakter" 
+                  required
+                  autocomplete="new-password"
+                >
+                <button type="button" class="toggle-password-btn" id="toggle-reg-password" aria-label="Lihat password" tabindex="-1">
+                  <i class="fas fa-eye" id="eye-icon-reg"></i>
+                  <i class="fas fa-eye-slash" id="eye-off-icon-reg" style="display: none;"></i>
+                </button>
+              </div>
+            </div>
+
+            <button type="submit" class="submit-btn" id="reg-submit-btn" style="margin-top: 8px;">
+              <span class="spinner" id="reg-spinner"></span>
+              <span id="reg-btn-text">Daftar & Kirim Kode OTP</span>
+            </button>
+          </form>
+
+          <div style="margin-top: 22px; text-align: center; font-size: 13px; color: var(--text-secondary);">
+            Sudah punya akun? <a href="/login" class="link" style="color: var(--text-primary); font-weight: 600;">Masuk Sekarang</a>
+          </div>
+        </div>
+
+        <!-- ======================================================== -->
+        <!-- STEP 3: Card Deck Merging & Auto Verification OTP Screen -->
+        <!-- ======================================================== -->
+        <div id="step-otp" style="display: none;">
+          <div class="login-hero">
+            <div class="claude-symbol">
+              <i class="fas fa-envelope-open-text" style="font-size: 18px;"></i>
+            </div>
+            <h1 class="login-title">Verifikasi Email</h1>
+            <p class="login-subtitle">Masukkan 6 digit kode OTP yang kami kirimkan ke email Anda.</p>
+            
+            <div class="email-sent-badge">
+              <i class="fas fa-envelope" style="font-size: 12px; color: var(--text-secondary);"></i>
+              <span id="target-email-display">user@email.com</span>
+            </div>
+          </div>
+
+          <!-- Alert Notification Box for OTP -->
+          <div id="alert-banner-otp" class="alert-box" role="alert">
+            <span id="alert-message-otp"></span>
+          </div>
+
+          <!-- Card Deck Merging Container -->
+          <div class="otp-inputs-wrapper">
+            <div class="otp-inputs-container" id="otp-inputs-container">
+              <input type="text" maxlength="1" class="otp-digit-box" id="otp-1" data-index="0" inputmode="numeric" autocomplete="one-time-code" autofocus>
+              <input type="text" maxlength="1" class="otp-digit-box" id="otp-2" data-index="1" inputmode="numeric">
+              <input type="text" maxlength="1" class="otp-digit-box" id="otp-3" data-index="2" inputmode="numeric">
+              <input type="text" maxlength="1" class="otp-digit-box" id="otp-4" data-index="3" inputmode="numeric">
+              <input type="text" maxlength="1" class="otp-digit-box" id="otp-5" data-index="4" inputmode="numeric">
+              <input type="text" maxlength="1" class="otp-digit-box" id="otp-6" data-index="5" inputmode="numeric">
+              
+              <!-- Pop-in Success Checkmark Badge on Card Center -->
+              <div class="otp-card-success-badge" id="otp-card-success-badge">
+                <div class="success-badge-circle">
+                  <i class="fas fa-check"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Dynamic Verification Status Indicator -->
+          <div class="otp-status-container" id="otp-status-container">
+            <div class="otp-status-content" id="otp-status-content">
+              <span class="otp-hint-text">
+                <i class="fas fa-shield-halved"></i> Masukkan 6 digit kode dari email
+              </span>
+            </div>
+          </div>
+
+          <div class="resend-section">
+            <span>Tidak menerima email?</span>
+            <button type="button" class="resend-btn" id="resend-otp-btn">
+              <i class="fas fa-rotate-right" style="font-size: 11px;"></i>
+              <span>Kirim Ulang (<span id="resend-timer">60</span>s)</span>
+            </button>
+          </div>
+
+          <div style="margin-top: 20px; text-align: center;">
+            <button type="button" class="link" id="back-to-reg-btn" style="background:none; border:none; font-size:13px; cursor:pointer;">
+              <i class="fas fa-arrow-left" style="font-size: 11px; margin-right: 4px;"></i> Ganti email pendaftaran
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="login-footer">
+      <p>© 2026 SkillSphere AI — Dikembangkan oleh Tim CodeCrafters (Sprint 1: Lead BE Arjuna)</p>
+      <div class="footer-links">
+        <a href="#" class="link">Privasi</a>
+        <a href="#" class="link">Ketentuan Layanan</a>
+        <a href="/api/health" class="link" target="_blank">API Status</a>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    // --- 1. Theme Switcher Logic ---
+    const themeBtn = document.getElementById('theme-toggle-btn');
+    const themeIconSun = document.getElementById('theme-icon-sun');
+    const themeIconMoon = document.getElementById('theme-icon-moon');
+    const themeText = document.getElementById('theme-text');
+
+    function updateThemeUI(theme) {
+      if (theme === 'dark') {
+        themeIconSun.style.display = 'inline-block';
+        themeIconMoon.style.display = 'none';
+        themeText.textContent = 'Mode Terang';
+      } else {
+        themeIconSun.style.display = 'none';
+        themeIconMoon.style.display = 'inline-block';
+        themeText.textContent = 'Mode Gelap';
+      }
+    }
+
+    const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+    updateThemeUI(currentTheme);
+
+    themeBtn.addEventListener('click', () => {
+      const active = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', active);
+      localStorage.setItem('skillsphere_theme', active);
+      updateThemeUI(active);
+    });
+
+    // --- 2. Framer-Motion Style Transitions Between Screens ---
+    const stepRole = document.getElementById('step-role-selection');
+    const stepRegister = document.getElementById('step-register');
+    const stepOtp = document.getElementById('step-otp');
+
+    const cardChooseStudent = document.getElementById('card-choose-student');
+    const cardChooseTutor = document.getElementById('card-choose-tutor');
+    const btnChangeRole = document.getElementById('btn-change-role');
+
+    const roleInput = document.getElementById('reg-role');
+    const selectedRoleLabel = document.getElementById('selected-role-label');
+    const selectedRoleIcon = document.getElementById('selected-role-icon');
+
+    function selectRoleAndTransition(role) {
+      roleInput.value = role;
+      if (role === 'student') {
+        selectedRoleLabel.textContent = 'Peserta Belajar (Siswa)';
+        selectedRoleIcon.className = 'fas fa-user-graduate';
+      } else {
+        selectedRoleLabel.textContent = 'Pengajar / Tutor Ahli';
+        selectedRoleIcon.className = 'fas fa-chalkboard-user';
+      }
+
+      // Framer exit blur animation
+      stepRole.className = 'framer-exit-up';
+      setTimeout(() => {
+        stepRole.style.display = 'none';
+        stepRegister.style.display = 'block';
+        stepRegister.className = 'framer-enter-up';
+        document.getElementById('reg-name').focus();
+      }, 300);
+    }
+
+    cardChooseStudent.addEventListener('click', () => selectRoleAndTransition('student'));
+    cardChooseTutor.addEventListener('click', () => selectRoleAndTransition('tutor'));
+
+    cardChooseStudent.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        selectRoleAndTransition('student');
+      }
+    });
+
+    cardChooseTutor.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        selectRoleAndTransition('tutor');
+      }
+    });
+
+    // Change role button back to screen 1
+    btnChangeRole.addEventListener('click', () => {
+      stepRegister.className = 'framer-exit-down';
+      setTimeout(() => {
+        stepRegister.style.display = 'none';
+        stepRole.style.display = 'block';
+        stepRole.className = 'framer-enter-down';
+      }, 300);
+    });
+
+    // --- 3. Password Visibility Toggle ---
+    const regPasswordInput = document.getElementById('reg-password');
+    const toggleRegPasswordBtn = document.getElementById('toggle-reg-password');
+    const eyeIconReg = document.getElementById('eye-icon-reg');
+    const eyeOffIconReg = document.getElementById('eye-off-icon-reg');
+
+    toggleRegPasswordBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const isPassword = regPasswordInput.getAttribute('type') === 'password';
+      regPasswordInput.setAttribute('type', isPassword ? 'text' : 'password');
+      if (isPassword) {
+        eyeIconReg.style.display = 'none';
+        eyeOffIconReg.style.display = 'inline-block';
+      } else {
+        eyeIconReg.style.display = 'inline-block';
+        eyeOffIconReg.style.display = 'none';
+      }
+    });
+
+    // --- 4. Alert Helpers ---
+    function showAlert(elementId, type, message) {
+      const banner = document.getElementById(elementId);
+      banner.className = 'alert-box alert-' + type;
+      banner.firstElementChild.textContent = message;
+      banner.style.display = 'flex';
+    }
+
+    function hideAlert(elementId) {
+      const banner = document.getElementById(elementId);
+      banner.style.display = 'none';
+    }
+
+    // --- 5. Local Storage Saved Accounts Helper ---
+    const SAVED_ACCOUNTS_KEY = 'skillsphere_saved_accounts';
+
+    function encodeSecret(str) {
+      try {
+        return btoa(encodeURIComponent(str));
+      } catch (e) {
+        return str;
+      }
+    }
+
+    function saveAccountLocally(user, password) {
+      if (!user || !user.email) return;
+      try {
+        let accounts = [];
+        const raw = localStorage.getItem(SAVED_ACCOUNTS_KEY);
+        if (raw) accounts = JSON.parse(raw);
+        accounts = accounts.filter(acc => acc.email.toLowerCase() !== user.email.toLowerCase());
+
+        accounts.unshift({
+          name: user.name || user.email.split('@')[0],
+          email: user.email,
+          role: user.role || 'student',
+          avatar_url: user.profile ? user.profile.avatar_url : null,
+          secret: password ? encodeSecret(password) : null,
+          last_logged_in: Date.now(),
+        });
+
+        if (accounts.length > 5) accounts = accounts.slice(0, 5);
+        localStorage.setItem(SAVED_ACCOUNTS_KEY, JSON.stringify(accounts));
+      } catch (err) {
+        console.warn('Gagal menyimpan riwayat akun ke localStorage:', err);
+      }
+    }
+
+    // --- 6. Registration Submission ---
+    const registerForm = document.getElementById('register-form');
+    const regSubmitBtn = document.getElementById('reg-submit-btn');
+    const regSpinner = document.getElementById('reg-spinner');
+    const regBtnText = document.getElementById('reg-btn-text');
+    const targetEmailDisplay = document.getElementById('target-email-display');
+
+    let registeredEmail = '';
+    let registeredPassword = '';
+
+    registerForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      hideAlert('alert-banner-reg');
+
+      const name = document.getElementById('reg-name').value.trim();
+      const email = document.getElementById('reg-email').value.trim();
+      const password = document.getElementById('reg-password').value;
+      const role = roleInput.value;
+
+      if (!name || !email || !password) {
+        showAlert('alert-banner-reg', 'danger', 'Harap lengkapi semua data wajib.');
+        return;
+      }
+
+      if (password.length < 6) {
+        showAlert('alert-banner-reg', 'danger', 'Password minimal 6 karakter.');
+        return;
+      }
+
+      regSubmitBtn.disabled = true;
+      regSpinner.style.display = 'inline-block';
+      regBtnText.textContent = 'Mendaftarkan & Mengirim OTP...';
+
+      try {
+        const response = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email, password, role }),
+        });
+
+        const result = await response.json();
+
+        if (response.ok && result.success) {
+          registeredEmail = email;
+          registeredPassword = password;
+          targetEmailDisplay.textContent = email;
+
+          // Pre-save basic registration credentials in localStorage
+          localStorage.setItem('skillsphere_last_registered_email', email);
+
+          // Transition to OTP step with Framer animation
+          stepRegister.className = 'framer-exit-up';
+          setTimeout(() => {
+            stepRegister.style.display = 'none';
+            stepOtp.style.display = 'block';
+            stepOtp.className = 'framer-enter-up';
+            showAlert('alert-banner-otp', 'success', result.message || 'Kode OTP telah dikirim ke email Anda.');
+            startResendCountdown();
+            resetOtpDeck();
+            setTimeout(() => otpBoxes[0].focus(), 300);
+          }, 300);
+        } else {
+          showAlert('alert-banner-reg', 'danger', result.message || 'Pendaftaran gagal. Periksa kembali data Anda.');
+          regSubmitBtn.disabled = false;
+          regSpinner.style.display = 'none';
+          regBtnText.textContent = 'Daftar & Kirim Kode OTP';
+        }
+      } catch (err) {
+        showAlert('alert-banner-reg', 'danger', 'Gagal terhubung ke server.');
+        regSubmitBtn.disabled = false;
+        regSpinner.style.display = 'none';
+        regBtnText.textContent = 'Daftar & Kirim Kode OTP';
+      }
+    });
+
+    // =========================================================
+    // --- 7. Card Deck Merging & Auto Verification Animation ---
+    // =========================================================
+    const otpContainer = document.getElementById('otp-inputs-container');
+    const otpStatusContent = document.getElementById('otp-status-content');
+    const successBadge = document.getElementById('otp-card-success-badge');
+    const otpBoxes = [
+      document.getElementById('otp-1'),
+      document.getElementById('otp-2'),
+      document.getElementById('otp-3'),
+      document.getElementById('otp-4'),
+      document.getElementById('otp-5'),
+      document.getElementById('otp-6'),
+    ];
+
+    let isVerifying = false;
+
+    function resetOtpDeck() {
+      otpContainer.classList.remove('cards-stacked', 'verifying-stack', 'error-stack');
+      successBadge.classList.remove('show');
+      
+      otpBoxes.forEach(box => {
+        box.value = '';
+        box.style.transform = '';
+        box.style.zIndex = '';
+        box.style.boxShadow = '';
+        box.style.opacity = '1';
+        box.style.filter = '';
+        box.classList.remove('fanning-out');
+        box.disabled = false;
+      });
+
+      isVerifying = false;
+      otpStatusContent.innerHTML = `
+        <span class="otp-hint-text">
+          <i class="fas fa-shield-halved"></i> Masukkan 6 digit kode dari email
+        </span>
+      `;
+    }
+
+    function stackCardsIntoDeck() {
+      otpContainer.classList.add('cards-stacked', 'verifying-stack');
+      const offsets = [-2.5, -1.5, -0.5, 0.5, 1.5, 2.5];
+      const stride = 58; // 48px box width + 10px gap
+
+      otpBoxes.forEach((box, i) => {
+        const offset = offsets[i];
+        const translateX = -offset * stride;
+        const rotateZ = offset * 2.8; // subtle dynamic card tilt
+        const translateY = -Math.abs(offset) * 1.5;
+        
+        box.style.transform = `translateX(${translateX}px) translateY(${translateY}px) rotate(${rotateZ}deg) scale(0.97)`;
+        box.style.zIndex = Math.round(20 - Math.abs(offset) * 2);
+        box.style.boxShadow = `0 ${8 + Math.abs(offset)*2}px ${20 + Math.abs(offset)*3}px rgba(0,0,0,0.22)`;
+        box.blur();
+      });
+
+      otpStatusContent.innerHTML = `
+        <div class="otp-status-spinner"></div>
+        <span style="font-weight:600; color:var(--text-primary);">Menyatukan kartu & memverifikasi kode...</span>
+      `;
+    }
+
+    function fanOutCardsBackToPosition(errorMessage) {
+      otpContainer.classList.remove('verifying-stack');
+      otpContainer.classList.add('error-stack');
+
+      otpStatusContent.innerHTML = `
+        <i class="fas fa-circle-exclamation" style="color:var(--color-danger); font-size:15px;"></i>
+        <span style="color:var(--color-danger); font-weight:600;">${errorMessage || 'Kode OTP salah atau kadaluarsa.'}</span>
+      `;
+
+      // Shake for 550ms, then smoothly fan back out to original positions
+      setTimeout(() => {
+        otpContainer.classList.remove('cards-stacked', 'error-stack');
+
+        otpBoxes.forEach(box => {
+          box.classList.add('fanning-out');
+          box.style.transform = '';
+          box.style.zIndex = '';
+          box.style.boxShadow = '';
+        });
+
+        // After card fan-out transition completes (480ms)
+        setTimeout(() => {
+          otpBoxes.forEach(box => {
+            box.value = '';
+            box.classList.remove('fanning-out');
+            box.disabled = false;
+          });
+
+          otpStatusContent.innerHTML = `
+            <span class="otp-hint-text">
+              <i class="fas fa-shield-halved"></i> Silakan masukkan 6 digit kode yang benar
+            </span>
+          `;
+
+          isVerifying = false;
+          otpBoxes[0].focus();
+        }, 480);
+      }, 550);
+    }
+
+    async function triggerAutoVerify(otpCode) {
+      if (isVerifying || otpCode.length !== 6) return;
+      isVerifying = true;
+      hideAlert('alert-banner-otp');
+
+      // 1. Trigger Card Stacking Animation (Slide together into a deck)
+      stackCardsIntoDeck();
+
+      try {
+        const response = await fetch('/api/auth/verify-otp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: registeredEmail, otp: otpCode }),
+        });
+
+        const result = await response.json();
+
+        if (response.ok && result.success) {
+          // 2. Success State: Pop-in Glowing Checkmark on top of Merged Cards
+          setTimeout(() => {
+            otpContainer.classList.remove('verifying-stack');
+            otpBoxes.forEach(box => {
+              box.style.opacity = '0.2';
+              box.style.filter = 'blur(2px)';
+            });
+
+            successBadge.classList.add('show');
+
+            otpStatusContent.innerHTML = `
+              <i class="fas fa-circle-check" style="color:var(--color-success); font-size:16px;"></i>
+              <span style="color:var(--color-success); font-weight:600;">Verifikasi Berhasil! Mengalihkan ke Ruang Belajar...</span>
+            `;
+
+            // Save tokens & credentials to localStorage
+            localStorage.setItem('skillsphere_access_token', result.data.accessToken);
+            localStorage.setItem('skillsphere_refresh_token', result.data.refreshToken);
+            localStorage.setItem('skillsphere_user', JSON.stringify(result.data.user));
+
+            // Save account credentials to saved accounts for Quick Device / TouchID Login
+            saveAccountLocally(result.data.user, registeredPassword);
+
+            // Also persist credentials object for seamless session restoration
+            localStorage.setItem('skillsphere_saved_credentials', JSON.stringify({
+              email: result.data.user.email,
+              name: result.data.user.name,
+              role: result.data.user.role,
+              secret: encodeSecret(registeredPassword)
+            }));
+
+            const hasCompletedOnboarding = result.data.user && result.data.user.profile && result.data.user.profile.study_preferences && result.data.user.profile.study_preferences.onboarding_completed;
+
+            setTimeout(() => {
+              if (result.data.user && result.data.user.role === 'student' && !hasCompletedOnboarding) {
+                window.location.href = '/dashboard/onboarding';
+              } else {
+                window.location.href = '/dashboard';
+              }
+            }, 900);
+          }, 350);
+        } else {
+          // 3. Error State: Shake deck and fan back out to initial positions
+          setTimeout(() => {
+            fanOutCardsBackToPosition(result.message);
+          }, 350);
+        }
+      } catch (err) {
+        setTimeout(() => {
+          fanOutCardsBackToPosition('Koneksi ke server terputus.');
+        }, 350);
+      }
+    }
+
+    otpBoxes.forEach((box, index) => {
+      box.addEventListener('input', (e) => {
+        if (isVerifying) return;
+        const value = e.target.value.replace(/\D/g, '');
+        box.value = value ? value[0] : '';
+        
+        if (box.value && index < otpBoxes.length - 1) {
+          otpBoxes[index + 1].focus();
+        }
+
+        const currentOtp = otpBoxes.map(b => b.value).join('');
+        if (currentOtp.length === 6) {
+          triggerAutoVerify(currentOtp);
+        }
+      });
+
+      box.addEventListener('keydown', (e) => {
+        if (isVerifying) return;
+        if (e.key === 'Backspace' && !box.value && index > 0) {
+          otpBoxes[index - 1].focus();
+        }
+      });
+
+      box.addEventListener('paste', (e) => {
+        if (isVerifying) return;
+        e.preventDefault();
+        const pasteData = (e.clipboardData || window.clipboardData).getData('text').trim().replace(/\D/g, '');
+        if (pasteData.length >= 6) {
+          pasteData.substring(0, 6).split('').forEach((char, i) => {
+            if (otpBoxes[i]) otpBoxes[i].value = char;
+          });
+          triggerAutoVerify(pasteData.substring(0, 6));
+        }
+      });
+    });
+
+    // --- 7. Resend OTP & Countdown Timer ---
+    const resendOtpBtn = document.getElementById('resend-otp-btn');
+    const resendTimer = document.getElementById('resend-timer');
+    let timerInterval = null;
+
+    function startResendCountdown() {
+      let seconds = 60;
+      resendOtpBtn.disabled = true;
+      resendTimer.textContent = seconds;
+
+      clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        seconds--;
+        resendTimer.textContent = seconds;
+        if (seconds <= 0) {
+          clearInterval(timerInterval);
+          resendOtpBtn.disabled = false;
+          resendOtpBtn.innerHTML = '<i class="fas fa-rotate-right" style="font-size: 11px;"></i> Kirim Ulang Kode';
+        }
+      }, 1000);
+    }
+
+    resendOtpBtn.addEventListener('click', async () => {
+      try {
+        resendOtpBtn.disabled = true;
+        const res = await fetch('/api/auth/resend-otp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: registeredEmail }),
+        });
+        const result = await res.json();
+        if (res.ok && result.success) {
+          showAlert('alert-banner-otp', 'success', 'Kode OTP baru telah dikirim ke email.');
+          resetOtpDeck();
+          startResendCountdown();
+          otpBoxes[0].focus();
+        } else {
+          showAlert('alert-banner-otp', 'danger', result.message || 'Gagal mengirim ulang OTP.');
+          resendOtpBtn.disabled = false;
+        }
+      } catch (e) {
+        showAlert('alert-banner-otp', 'danger', 'Gagal mengirim ulang OTP.');
+        resendOtpBtn.disabled = false;
+      }
+    });
+
+    // Back to registration form
+    document.getElementById('back-to-reg-btn').addEventListener('click', () => {
+      stepOtp.className = 'framer-exit-down';
+      setTimeout(() => {
+        stepOtp.style.display = 'none';
+        stepRegister.style.display = 'block';
+        stepRegister.className = 'framer-enter-down';
+        regSubmitBtn.disabled = false;
+        regSpinner.style.display = 'none';
+        regBtnText.textContent = 'Daftar & Kirim Kode OTP';
+      }, 300);
+    });
+
+    // --- 8. Framer Exit Blur Transition to Login Page ---
+    document.querySelectorAll('a[href="/login"]').forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const activeStep = document.getElementById('step-role-selection').style.display !== 'none' 
+          ? document.getElementById('step-role-selection') 
+          : document.getElementById('step-register');
+        
+        if (activeStep) {
+          activeStep.className = 'framer-exit-up';
+          setTimeout(() => {
+            window.location.href = '/login';
+          }, 280);
+        } else {
+          window.location.href = '/login';
+        }
+      });
+    });
+  </script>
+</body>
+</html>

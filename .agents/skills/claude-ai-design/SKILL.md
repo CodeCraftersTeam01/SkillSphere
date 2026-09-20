@@ -1,11 +1,11 @@
 ---
 name: claude-ai-design
-description: Guidelines and design system tokens for building web interfaces with the Claude.ai (Anthropic) aesthetic—featuring warm paper backgrounds, editorial serif typography, terracotta/coral accents, and clean minimalist conversational UI.
+description: Guidelines and design system tokens for building web interfaces with the Claude.ai (Anthropic) aesthetic—featuring warm paper backgrounds, editorial serif typography, monochrome high-contrast accents (black in light mode, white in dark mode), and clean minimalist conversational UI.
 ---
 
 # Claude.ai Design System & UI Skill
 
-This skill provides comprehensive guidelines, design tokens, and reusable component patterns to craft web applications with the signature **Claude.ai** aesthetic created by Anthropic.
+This skill provides comprehensive guidelines, design tokens, and reusable component patterns to craft web applications with the signature **Claude.ai** aesthetic created by Anthropic, customized with clean monochrome high-contrast accents.
 
 ---
 
@@ -14,7 +14,7 @@ This skill provides comprehensive guidelines, design tokens, and reusable compon
 Claude's interface is designed around the feeling of a **warm, thoughtful, editorial notebook**:
 - **Warm Paper Tones**: Soft ivory/linen and stone backgrounds instead of cold, clinical pure white or harsh blues.
 - **Editorial Typography**: Elegant serif headings paired with clean, ultra-readable modern sans-serif body text.
-- **Terracotta & Coral Accents**: Warm earth/amber/coral tones (`#CC785C`, `#D97706`, `#C2410C`) for primary CTAs and active states.
+- **Monochrome Accent Contrast**: Crisp **Black** (`#000000` / `#1F1E1D`) in light mode and Pure **White** (`#FFFFFF`) in dark mode for primary CTAs, active states, and focus rings.
 - **Clean Minimalist Surfaces**: Thin, subtle borders with faint natural shadows, generous breathing room, and rounded pill elements.
 - **Calm, Human-Centric Micro-interactions**: Smooth, gentle transitions (150ms–200ms ease-out) without jarring animations.
 
@@ -26,7 +26,7 @@ Use these variables in your root CSS / Tailwind config:
 
 ```css
 :root {
-  /* --- Light Theme (Warm Paper / Stone) --- */
+  /* --- Light Theme (Warm Paper / Stone with Black Accent) --- */
   --bg-app: #FBF9F5;               /* Warm ivory paper */
   --bg-surface: #FFFFFF;           /* Card & panel surface */
   --bg-surface-subtle: #F3EFEA;    /* Hover & subtle button background */
@@ -37,10 +37,11 @@ Use these variables in your root CSS / Tailwind config:
   --text-secondary: #6B665F;       /* Muted label / helper text */
   --text-tertiary: #9C968D;        /* Placeholder / subtle icons */
   
-  /* Accent & Brand Colors */
-  --accent-primary: #CC785C;       /* Claude signature terracotta/coral */
-  --accent-primary-hover: #BA684D;
-  --accent-primary-light: #FAF0EC; /* Light tint for active pills/badges */
+  /* Accent & Brand Colors (Black in Light Mode) */
+  --accent-primary: #000000;       /* Signature Black accent in light mode */
+  --accent-primary-hover: #2D2B28; /* Charcoal hover */
+  --accent-primary-light: #EFECE6; /* Light stone tint for active pills/badges */
+  --accent-text: #FFFFFF;          /* Text color on primary accent buttons */
   --accent-amber: #D97706;
   
   /* Borders & Dividers */
@@ -65,7 +66,7 @@ Use these variables in your root CSS / Tailwind config:
   --font-mono: "JetBrains Mono", "Fira Code", monospace;
 }
 
-/* --- Dark Theme --- */
+/* --- Dark Theme (Dark Zinc with White Accent) --- */
 [data-theme="dark"] {
   --bg-app: #18181B;               /* Deep warm zinc */
   --bg-surface: #242220;           /* Elevated card surface */
@@ -76,9 +77,11 @@ Use these variables in your root CSS / Tailwind config:
   --text-secondary: #A8A29A;
   --text-tertiary: #6E6962;
   
-  --accent-primary: #E08265;
-  --accent-primary-hover: #EC9276;
-  --accent-primary-light: #34241F;
+  /* Accent & Brand Colors (White in Dark Mode) */
+  --accent-primary: #FFFFFF;       /* Signature White accent in dark mode */
+  --accent-primary-hover: #E4E4E7; /* Light off-white hover */
+  --accent-primary-light: #2D2B28; /* Dark subtle tint for active pills/badges */
+  --accent-text: #000000;          /* Text color on primary accent buttons */
   
   --border-subtle: #33302C;
   --border-strong: #45413B;
@@ -189,7 +192,7 @@ The centerpiece of Claude's interface:
 }
 .send-btn {
   background: var(--accent-primary);
-  color: #ffffff;
+  color: var(--accent-text, #ffffff);
   border: none;
   width: 32px;
   height: 32px;
@@ -266,7 +269,7 @@ The centerpiece of Claude's interface:
 When designing a website in this style:
 1. [ ] **Background**: Never pure `#FFFFFF` across the entire viewport. Use `#FBF9F5` or `#F7F5EE` for the light theme background.
 2. [ ] **Typography**: Use high-quality serif for main titles (`Newsreader`, `Source Serif 4`) and crisp geometric/neo-grotesque sans (`Plus Jakarta Sans`, `Inter`) for body copy.
-3. [ ] **Accent Color**: Use `#CC785C` (terracotta) for primary actions, badges, and focus rings.
+3. [ ] **Accent Color**: Use `#000000` (Black) in light mode and `#FFFFFF` (White) in dark mode for high-contrast primary actions, buttons, and focus rings.
 4. [ ] **Borders & Radii**: Use soft pill curves (`rounded-2xl` or `border-radius: 16px - 24px`) with warm gray/sand borders (`#E8E2D9`).
 5. [ ] **Content Width**: Max-width of centered reading area should be `768px` (`max-w-3xl`) to `896px` (`max-w-4xl`) for optimal editorial reading comfort.
 6. [ ] **Minimalist Chrome**: Keep navigation and toolbars lightweight, understated, and non-distracting.

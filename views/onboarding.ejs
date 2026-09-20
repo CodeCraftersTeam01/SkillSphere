@@ -1,0 +1,1235 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Personalisasi & Verifikasi Profil | SkillSphere AI</title>
+  <meta name="description" content="Personalisasi ruang belajar atau portal instruktur cerdas SkillSphere AI berdasarkan keahlian, institusi kelulusan, sertifikat, dan target karir.">
+  
+  <!-- Google Fonts: Newsreader (Editorial Serif) & Plus Jakarta Sans (Modern Sans) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome 6 Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Claude Design System Stylesheet -->
+  <link rel="stylesheet" href="/stylesheets/claude-theme.css">
+  
+  <style>
+    .onboarding-page {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 24px;
+      max-width: 680px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .onboarding-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .onboarding-progress-wrapper {
+      margin-bottom: 32px;
+    }
+
+    .progress-meta-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      font-size: 13px;
+    }
+
+    .progress-step-counter {
+      font-weight: 600;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .role-indicator-badge {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: var(--radius-full);
+      background: var(--accent-primary-light);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+      text-transform: capitalize;
+    }
+
+    .progress-skip-btn {
+      background: none;
+      border: none;
+      color: var(--text-tertiary);
+      font-size: 13px;
+      cursor: pointer;
+      transition: color 0.2s ease;
+    }
+
+    .progress-skip-btn:hover {
+      color: var(--text-primary);
+      text-decoration: underline;
+    }
+
+    .progress-track {
+      height: 6px;
+      width: 100%;
+      background: var(--bg-surface-subtle);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-full);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: var(--accent-primary);
+      border-radius: var(--radius-full);
+      transition: width 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+      width: 20%;
+    }
+
+    /* --- Framer Blur Animation Keyframes --- */
+    @keyframes framerStepEnter {
+      0% {
+        opacity: 0;
+        filter: blur(16px);
+        transform: translateY(28px) scale(0.97);
+      }
+      60% {
+        filter: blur(3px);
+      }
+      100% {
+        opacity: 1;
+        filter: blur(0px);
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    @keyframes framerStepExit {
+      0% {
+        opacity: 1;
+        filter: blur(0px);
+        transform: translateY(0) scale(1);
+      }
+      100% {
+        opacity: 0;
+        filter: blur(16px);
+        transform: translateY(-24px) scale(0.96);
+      }
+    }
+
+    @keyframes framerStepExitBack {
+      0% {
+        opacity: 1;
+        filter: blur(0px);
+        transform: translateY(0) scale(1);
+      }
+      100% {
+        opacity: 0;
+        filter: blur(16px);
+        transform: translateY(24px) scale(0.96);
+      }
+    }
+
+    .step-enter {
+      animation: framerStepEnter 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      will-change: transform, opacity, filter;
+    }
+
+    .step-exit {
+      animation: framerStepExit 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      will-change: transform, opacity, filter;
+      pointer-events: none;
+    }
+
+    .step-exit-back {
+      animation: framerStepExitBack 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      will-change: transform, opacity, filter;
+      pointer-events: none;
+    }
+
+    /* --- Question Container & Hero --- */
+    .question-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-xl);
+      padding: 36px 32px;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 24px;
+      position: relative;
+    }
+
+    .question-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--accent-primary-light);
+      color: var(--text-primary);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-full);
+      padding: 4px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+
+    .question-title {
+      font-family: var(--font-serif);
+      font-size: 26px;
+      font-weight: 500;
+      color: var(--text-primary);
+      line-height: 1.35;
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+    }
+
+    .question-subtitle {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-bottom: 26px;
+    }
+
+    /* --- Options Grid / Stack --- */
+    .options-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .options-grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    @media (max-width: 600px) {
+      .options-grid-2 {
+        grid-template-columns: 1fr;
+      }
+      .question-card {
+        padding: 24px 20px;
+      }
+    }
+
+    .option-card-btn {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 16px 18px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      text-align: left;
+      transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+      user-select: none;
+      position: relative;
+    }
+
+    .option-card-btn:hover {
+      border-color: var(--text-primary);
+      background: var(--bg-surface-subtle);
+      transform: translateY(-2px) scale(1.01);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .option-card-btn:active {
+      transform: scale(0.985);
+    }
+
+    .option-card-btn.selected {
+      border-color: var(--text-primary);
+      background: var(--accent-primary-light);
+    }
+
+    .option-icon-box {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-md);
+      background: var(--bg-surface-subtle);
+      border: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 17px;
+      color: var(--text-primary);
+      flex-shrink: 0;
+      transition: transform 0.2s ease;
+    }
+
+    .option-card-btn:hover .option-icon-box {
+      transform: scale(1.08);
+    }
+
+    .option-info {
+      flex: 1;
+    }
+
+    .option-label {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 2px;
+    }
+
+    .option-desc {
+      font-size: 12px;
+      color: var(--text-secondary);
+      line-height: 1.4;
+    }
+
+    .option-check-icon {
+      color: var(--text-tertiary);
+      font-size: 14px;
+      opacity: 0;
+      transition: all 0.2s ease;
+    }
+
+    .option-card-btn.selected .option-check-icon {
+      opacity: 1;
+      color: var(--text-primary);
+    }
+
+    /* Form step fields */
+    .form-step-fields {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* --- Navigation Footer Inside Card --- */
+    .question-footer-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 28px;
+      padding-top: 18px;
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .back-step-btn {
+      background: none;
+      border: none;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: color 0.2s ease;
+      padding: 6px 10px;
+      border-radius: var(--radius-md);
+    }
+
+    .back-step-btn:hover {
+      color: var(--text-primary);
+      background: var(--bg-surface-subtle);
+    }
+
+    /* --- AI Persona Generation Final Slide --- */
+    .ai-generating-view {
+      text-align: center;
+      padding: 48px 24px;
+    }
+
+    .ai-pulsing-orb {
+      width: 72px;
+      height: 72px;
+      border-radius: var(--radius-full);
+      background: var(--accent-primary-light);
+      border: 1px solid var(--border-subtle);
+      margin: 0 auto 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      color: var(--text-primary);
+      animation: orbGlow 2s ease-in-out infinite;
+    }
+
+    @keyframes orbGlow {
+      0%, 100% {
+        box-shadow: 0 0 0 4px var(--accent-primary-light), 0 8px 24px rgba(0,0,0,0.1);
+        transform: scale(1);
+      }
+      50% {
+        box-shadow: 0 0 0 12px var(--accent-primary-light), 0 12px 32px rgba(0,0,0,0.2);
+        transform: scale(1.06);
+      }
+    }
+  </style>
+
+  <script>
+    // Initial Theme Script to prevent flash
+    (function() {
+      const savedTheme = localStorage.getItem('skillsphere_theme') || 
+        (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    })();
+  </script>
+</head>
+<body>
+
+  <div class="onboarding-page">
+    <!-- Header Navigation -->
+    <header class="onboarding-header">
+      <a href="/" class="brand-logo" id="brand-home-link">
+        <div class="brand-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 0L13.8 8.2L22 10L13.8 11.8L12 20L10.2 11.8L2 10L10.2 8.2L12 0Z" />
+          </svg>
+        </div>
+        <span>SkillSphere AI</span>
+      </a>
+
+      <!-- Theme Switcher -->
+      <button class="theme-toggle-btn" id="theme-toggle-btn" type="button" aria-label="Toggle dark/light mode">
+        <i class="fas fa-sun" id="theme-icon-sun" style="display:none;"></i>
+        <i class="fas fa-moon" id="theme-icon-moon"></i>
+        <span id="theme-text">Mode Gelap</span>
+      </button>
+    </header>
+
+    <!-- Progress Bar Tracker -->
+    <div class="onboarding-progress-wrapper" id="progress-wrapper">
+      <div class="progress-meta-row">
+        <span class="progress-step-counter" id="progress-counter">
+          <i class="fas fa-wand-magic-sparkles" style="font-size: 12px;"></i>
+          <span>Langkah <strong id="step-number-text">1</strong> dari 5</span>
+          <span class="role-indicator-badge" id="role-badge-display">Peserta</span>
+        </span>
+        <span style="font-size: 12px; color: var(--text-tertiary); display: inline-flex; align-items: center; gap: 5px;">
+          <i class="fas fa-circle-info" style="font-size: 11px;"></i>
+          <span>Wajib dilengkapi untuk membuka dashboard</span>
+        </span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-bar-fill" id="progress-fill" style="width: 20%;"></div>
+      </div>
+    </div>
+
+    <!-- Main Container For Step Questions -->
+    <main id="onboarding-container">
+      
+      <!-- ========================================================================= -->
+      <!-- SECTION A: STUDENT ONBOARDING STEPS (If user role === 'student')           -->
+      <!-- ========================================================================= -->
+      <div id="flow-student">
+        
+        <!-- STUDENT STEP 1: Status Pendidikan & Aktivitas -->
+        <div class="question-card step-enter" id="student-step-1" data-step="1">
+          <div class="question-badge">
+            <i class="fas fa-user-graduate"></i> Latar Belakang
+          </div>
+          <h1 class="question-title">Apa status pendidikan atau aktivitas utama Anda saat ini?</h1>
+          <p class="question-subtitle">AI kami akan menyesuaikan tingkat kesulitan dan kedalaman materi pembelajaran untuk Anda.</p>
+
+          <div class="options-stack">
+            <div class="option-card-btn" data-key="education_status" data-value="Pelajar SMP / SMA / SMK">
+              <div class="option-icon-box"><i class="fas fa-school"></i></div>
+              <div class="option-info">
+                <div class="option-label">Pelajar SMP / SMA / SMK</div>
+                <div class="option-desc">Mempersiapkan dasar logika pemrograman & karir teknologi sejak dini</div>
+              </div>
+              <i class="fas fa-check option-check-icon"></i>
+            </div>
+
+            <div class="option-card-btn" data-key="education_status" data-value="Mahasiswa (D3 / S1 / S2)">
+              <div class="option-icon-box"><i class="fas fa-graduation-cap"></i></div>
+              <div class="option-info">
+                <div class="option-label">Mahasiswa (D3 / S1 / S2)</div>
+                <div class="option-desc">Mendalami skill praktis, proyek akhir, dan persiapan karir profesional</div>
+              </div>
+              <i class="fas fa-check option-check-icon"></i>
+            </div>
+
+            <div class="option-card-btn" data-key="education_status" data-value="Karyawan / Profesional">
+              <div class="option-icon-box"><i class="fas fa-briefcase"></i></div>
+              <div class="option-info">
+                <div class="option-label">Karyawan / Profesional</div>
+                <div class="option-desc">Upgrade keahlian teknologi terkini, efisiensi AI, dan promosi karir</div>
+              </div>
+              <i class="fas fa-check option-check-icon"></i>
+            </div>
+
+            <div class="option-card-btn" data-key="education_status" data-value="Career Switcher / Umum">
+              <div class="option-icon-box"><i class="fas fa-rocket"></i></div>
+              <div class="option-info">
+                <div class="option-label">Career Switcher / Umum</div>
+                <div class="option-desc">Beralih haluan karir dari bidang non-IT menuju ekosistem digital</div>
+              </div>
+              <i class="fas fa-check option-check-icon"></i>
+            </div>
+          </div>
+        </div>
+
+        <!-- STUDENT STEP 2: Rentang Usia -->
+        <div class="question-card" id="student-step-2" data-step="2" style="display: none;">
+          <div class="question-badge">
+            <i class="fas fa-cake-candles"></i> Rentang Usia
+          </div>
+          <h1 class="question-title">Berapa rentang usia Anda?</h1>
+          <p class="question-subtitle">Membantu AI menyesuaikan gaya penyampaian materi dan studi kasus yang relevan.</p>
+
+          <div class="options-grid-2">
+            <div class="option-card-btn" data-key="age_range" data-value="Di bawah 18 Tahun">
+              <div class="option-icon-box"><i class="fas fa-child"></i></div>
+              <div class="option-info">
+                <div class="option-label">< 18 Tahun</div>
+                <div class="option-desc">Eksplorasi minat dasar</div>
+              </div>
+              <i class="fas fa-check option-check-icon"></i>
+            </div>
+
+            <div class="option-card-btn" data-key="age_range" data-value="18 - 24 Tahun">
+              <div class="option-icon-box"><i class="fas fa-user-astronaut"></i></div>
+              <div class="option-info">
+                <div class="option-label">18 - 24 Tahun</div>
+                <div class="option-desc">Pembangunan portofolio</div>
+              </div>
+              <i class="fas fa-check option-check-icon"></i>
+            </div>
+
+            <div class="option-card-btn" data-key="age_range" data-value="25 - 34 Tahun">
+              <div class="option-icon-box"><i class="fas fa-user-tie"></i></div>
+              <div class="option-info">
+                <div class="option-label">25 - 34 Tahun</div>
+                <div class="option-desc">Akselerasi & spesialisasi</div>
+              </div>
+              <i class="fas fa-check option-check-icon"></i>
+            </div>
+
+            <div class="option-card-btn" data-key="age_range" data-value="35+ Tahun">
+              <div class="option-icon-box"><i class="fas fa-compass"></i></div>
+              <div class="option-info">
+                <div class="option-label">35+ Tahun</div>
+                <div class="option-desc">Penguasaan inovasi AI</div>
+              </div>
+              <i class="fas fa-check option-check-icon"></i>
+            </div>
+          </div>
+
+          <div class="question-footer-nav">
+            <button type="button" class="back-step-btn" data-target="1">
+              <i class="fas fa-arrow-left"></i> Kembali
+            </button>
+          </div>
+        </div>
+
+        <!-- STUDENT STEP 3: Target Karir & Cita-Cita -->
+        <div class="question-card" id="student-step-3" data-step="3" style="display: none;">
+          <div class="question-badge">
+            <i class="fas fa-bullseye"></i> Target Karir
+          </div>
+          <h1 class="question-title">Apa cita-cita atau target karir yang ingin Anda capai?</h1>
+          <p class="question-subtitle">AI Roadmap generator akan merancang kurikulum belajar berbasis target ini.</p>
+
+          <div class="options-stack">
+            <div class="option-card-btn" data-key="career_goal" data-value="AI & Machine Learning Engineer">
+              <div class="option-icon-box"><i class="fas fa-brain"></i></div>
+              <div class="option-info">
+                <div class="option-label">AI & Machine Learning Engineer</div>
+                <div class="option-desc">LLM, Deep Learning, PyTorch, dan AI Model Deployment</div>
+              </div>
+              <i class="fas fa-check option-check-icon"></i>
+            </div>
+
+            <div class="option-card-btn" data-key="career_goal" data-value="Backend & Cloud Engineer">
+              <div class="option-icon-box"><i class="fas fa-server"></i></div>
+              <div class="option-info">
+                <div class="option-label">Backend & Cloud Engineer</div>
+                <div class="option-desc">Node.js, Relational DB MySQL, Microservices, API Security</div>
+              </div>
+              <i class="fas fa-check option-check-icon"></i>
+            </div>
+
+            <div class="option-card-btn" data-key="career_goal" data-value="Fullstack Web & Mobile Developer">
+              <div class="option-icon-box"><i class="fas fa-laptop-code"></i></div>
+              <div class="option-info">
+                <div class="option-label">Fullstack Web & Mobile Developer</div>
+                <div class="option-desc">React, Next.js, Flutter, Tailwind, Modern Architecture</div>
+              </div>
+              <i class="fas fa-check option-check-icon"></i>
+            </div>
+
+            <div class="option-card-btn" data-key="career_goal" data-value="Data Scientist & Business Intelligence">
+              <div class="option-icon-box"><i class="fas fa-chart-pie"></i></div>
+              <div class="option-info">
+                <div class="option-label">Data Scientist & Business Intelligence</div>
+                <div class="option-desc">Data Analytics, SQL Querying, Python Pandas, Visualisasi Data</div>
+              </div>
+              <i class="fas fa-check option-check-icon"></i>
+            </div>
+
+            <div class="option-card-btn" data-key="career_goal" data-value="UI/UX Designer & AI Product">
+              <div class="option-icon-box"><i class="fas fa-pen-ruler"></i></div>
+              <div class="option-info">
+                <div class="option-label">UI/UX Designer & AI Product</div>
+                <div class="option-desc">Figma, Design Systems, User Research, AI Product Interaction</div>
+              </div>
+              <i class="fas fa-check option-check-icon"></i>
+            </div>
+          </div>
+
+          <div class="question-footer-nav">
+            <button type="button" class="back-step-btn" data-target="2">
+              <i class="fas fa-arrow-left"></i> Kembali
+            </button>
+          </div>
+        </div>
+
+        <!-- STUDENT STEP 4: Gaya Belajar -->
+        <div class="question-card" id="student-step-4" data-step="4" style="display: none;">
+          <div class="question-badge">
+            <i class="fas fa-chalkboard-user"></i> Gaya Belajar
+          </div>
+          <h1 class="question-title">Bagaimana gaya belajar yang paling Anda sukai?</h1>
+          <p class="question-subtitle">Tutor & AI mentor akan memprioritaskan format materi belajar sesuai kenyamanan Anda.</p>
+
+          <div class="options-stack">
+            <div class="option-card-btn" data-key="learning_style" data-value="Video Praktik & Hands-on Coding">
+              <div class="option-icon-box"><i class="fas fa-video"></i></div>
+              <div class="option-info">
+                <div class="option-label">Video Praktik & Hands-on Coding</div>
+                <div class="option-desc">Menonton tutorial langkah demi langkah sambil mempraktikkan kode</div>
+              </div>
+              <i class="fas fa-check option-check-icon"></i>
+            </div>
+
+            <div class="option-card-btn" data-key="learning_style" data-value="Modul Interaktif & Rangkuman AI">
+              <div class="option-icon-box"><i class="fas fa-book-open"></i></div>
+              <div class="option-info">
+                <div class="option-label">Modul Interaktif, Dokumen & Rangkuman AI</div>
+                <div class="option-desc">Membaca materi terstruktur, panduan PDF, dan poin penting berbasis AI</div>
+              </div>
+              <i class="fas fa-check option-check-icon"></i>
+            </div>
+
+            <div class="option-card-btn" data-key="learning_style" data-value="Kuis Interaktif & Ujian Sertifikasi">
+              <div class="option-icon-box"><i class="fas fa-vial-circle-check"></i></div>
+              <div class="option-info">
+                <div class="option-label">Kuis Interaktif & Ujian Sertifikasi</div>
+                <div class="option-desc">Menguji pemahaman dengan soal berkala dan reward diskon milestone</div>
+              </div>
+              <i class="fas fa-check option-check-icon"></i>
+            </div>
+
+            <div class="option-card-btn" data-key="learning_style" data-value="Live Mentoring & Bimbingan Tutor">
+              <div class="option-icon-box"><i class="fas fa-comments"></i></div>
+              <div class="option-info">
+                <div class="option-label">Live Mentoring & Bimbingan Tutor</div>
+                <div class="option-desc">Konsultasi langsung dan diskusi bersama pengajar ahli</div>
+              </div>
+              <i class="fas fa-check option-check-icon"></i>
+            </div>
+          </div>
+
+          <div class="question-footer-nav">
+            <button type="button" class="back-step-btn" data-target="3">
+              <i class="fas fa-arrow-left"></i> Kembali
+            </button>
+          </div>
+        </div>
+
+        <!-- STUDENT STEP 5: Komitmen Waktu -->
+        <div class="question-card" id="student-step-5" data-step="5" style="display: none;">
+          <div class="question-badge">
+            <i class="fas fa-stopwatch"></i> Komitmen Belajar
+          </div>
+          <h1 class="question-title">Berapa alokasi waktu belajar yang ingin Anda komitmenkan?</h1>
+          <p class="question-subtitle">AI akan menyesuaikan jadwal milestone dan pengingat belajar harian Anda.</p>
+
+          <div class="options-stack">
+            <div class="option-card-btn" data-key="weekly_commitment" data-value="1 - 3 Jam / Minggu">
+              <div class="option-icon-box"><i class="fas fa-feather"></i></div>
+              <div class="option-info">
+                <div class="option-label">1 - 3 Jam / Minggu (Fleksibel)</div>
+                <div class="option-desc">Belajar santai di sela-sela kesibukan aktivitas harian</div>
+              </div>
+              <i class="fas fa-check option-check-icon"></i>
+            </div>
+
+            <div class="option-card-btn" data-key="weekly_commitment" data-value="4 - 7 Jam / Minggu">
+              <div class="option-icon-box"><i class="fas fa-fire"></i></div>
+              <div class="option-info">
+                <div class="option-label">4 - 7 Jam / Minggu (Rekomendasi Ideal)</div>
+                <div class="option-desc">Progres stabil dan optimal untuk menyelesaikan kursus sesuai target</div>
+              </div>
+              <i class="fas fa-check option-check-icon"></i>
+            </div>
+
+            <div class="option-card-btn" data-key="weekly_commitment" data-value="8+ Jam / Minggu">
+              <div class="option-icon-box"><i class="fas fa-bolt"></i></div>
+              <div class="option-info">
+                <div class="option-label">8+ Jam / Minggu (Intensif & Akselerasi)</div>
+                <div class="option-desc">Fokus penuh untuk percepatan penguasaan keahlian dan siap kerja</div>
+              </div>
+              <i class="fas fa-check option-check-icon"></i>
+            </div>
+          </div>
+
+          <div class="question-footer-nav">
+            <button type="button" class="back-step-btn" data-target="4">
+              <i class="fas fa-arrow-left"></i> Kembali
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ========================================================================= -->
+      <!-- SECTION B: TUTOR / INSTRUCTOR ONBOARDING STEPS (If user role === 'tutor') -->
+      <!-- ========================================================================= -->
+      <div id="flow-tutor" style="display: none;">
+        
+        <!-- TUTOR STEP 1: Bidang Spesialisasi Utama Pengajaran -->
+        <div class="question-card step-enter" id="tutor-step-1" data-step="1">
+          <div class="question-badge">
+            <i class="fas fa-chalkboard-user"></i> Spesialisasi Pengajar
+          </div>
+          <h1 class="question-title">Apa bidang spesialisasi utama yang ingin Anda ajarkan?</h1>
+          <p class="question-subtitle">Tentukan rumpun kurikulum dan kategori kelas interaktif yang akan Anda kelola.</p>
+
+          <div class="options-stack">
+            <div class="option-card-btn" data-key="specialization" data-value="Artificial Intelligence, LLM & Machine Learning">
+              <div class="option-icon-box"><i class="fas fa-brain"></i></div>
+              <div class="option-info">
+                <div class="option-label">Artificial Intelligence, LLM & Machine Learning</div>
+                <div class="option-desc">Model Generatif, Prompt Engineering, PyTorch, AI Automation</div>
+              </div>
+              <i class="fas fa-check option-check-icon"></i>
+            </div>
+
+            <div class="option-card-btn" data-key="specialization" data-value="Backend Architecture, Cloud Computing & Relational DBs">
+              <div class="option-icon-box"><i class="fas fa-database"></i></div>
+              <div class="option-info">
+                <div class="option-label">Backend Architecture, Cloud & Relational DBs</div>
+                <div class="option-desc">Node.js, MySQL, PostgreSQL, REST/GraphQL API, Cloud Infrastructure</div>
+              </div>
+              <i class="fas fa-check option-check-icon"></i>
+            </div>
+
+            <div class="option-card-btn" data-key="specialization" data-value="Fullstack Web & Mobile Development">
+              <div class="option-icon-box"><i class="fas fa-code"></i></div>
+              <div class="option-info">
+                <div class="option-label">Fullstack Web & Mobile Development</div>
+                <div class="option-desc">React, Next.js, Flutter, Vue, Modern Fullstack Web Ecosystem</div>
+              </div>
+              <i class="fas fa-check option-check-icon"></i>
+            </div>
+
+            <div class="option-card-btn" data-key="specialization" data-value="Data Science & Big Data Engineering">
+              <div class="option-icon-box"><i class="fas fa-chart-line"></i></div>
+              <div class="option-info">
+                <div class="option-label">Data Science & Big Data Engineering</div>
+                <div class="option-desc">Python Analytics, ETL Pipelines, PowerBI, Big Data Processing</div>
+              </div>
+              <i class="fas fa-check option-check-icon"></i>
+            </div>
+
+            <div class="option-card-btn" data-key="specialization" data-value="Cybersecurity & DevSecOps">
+              <div class="option-icon-box"><i class="fas fa-shield-halved"></i></div>
+              <div class="option-info">
+                <div class="option-label">Cybersecurity & DevSecOps</div>
+                <div class="option-desc">Network Security, Vulnerability Assessment, CI/CD Security</div>
+              </div>
+              <i class="fas fa-check option-check-icon"></i>
+            </div>
+          </div>
+        </div>
+
+        <!-- TUTOR STEP 2: Latar Belakang Pendidikan & Lulusan Institusi -->
+        <div class="question-card" id="tutor-step-2" data-step="2" style="display: none;">
+          <div class="question-badge">
+            <i class="fas fa-building-columns"></i> Institusi & Kelulusan
+          </div>
+          <h1 class="question-title">Dari mana institusi atau latar belakang kelulusan Anda?</h1>
+          <p class="question-subtitle">Informasi institusi akan ditampilkan sebagai lencana kredibilitas profil instruktur Anda.</p>
+
+          <div class="form-step-fields">
+            <div class="form-group">
+              <label for="tutor-institution" class="form-label">Nama Universitas / Institusi / Kampus Kelulusan</label>
+              <div class="input-container">
+                <i class="fas fa-university input-icon-left"></i>
+                <input 
+                  type="text" 
+                  id="tutor-institution" 
+                  class="form-input has-icon-left" 
+                  placeholder="Contoh: Institut Teknologi Bandung / Universitas Indonesia / Praktisi Mandiri" 
+                  required
+                >
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="tutor-degree" class="form-label">Jenjang Pendidikan Terakhir</label>
+              <div class="input-container">
+                <i class="fas fa-graduation-cap input-icon-left"></i>
+                <input 
+                  type="text" 
+                  id="tutor-degree" 
+                  class="form-input has-icon-left" 
+                  placeholder="Contoh: Sarjana Komputer (S1) / Magister Teknik (S2) / Praktisi Senior" 
+                  required
+                >
+              </div>
+            </div>
+
+            <button type="button" class="submit-btn" id="btn-submit-tutor-step2" style="margin-top: 4px;">
+              <span>Simpan Institusi & Lanjutkan <i class="fas fa-arrow-right" style="margin-left: 6px;"></i></span>
+            </button>
+          </div>
+
+          <div class="question-footer-nav">
+            <button type="button" class="back-step-btn" data-target="1">
+              <i class="fas fa-arrow-left"></i> Kembali
+            </button>
+          </div>
+        </div>
+
+        <!-- TUTOR STEP 3: Pengalaman Mengajar & Portofolio Industri -->
+        <div class="question-card" id="tutor-step-3" data-step="3" style="display: none;">
+          <div class="question-badge">
+            <i class="fas fa-briefcase"></i> Pengalaman Industri
+          </div>
+          <h1 class="question-title">Berapa lama pengalaman Anda di bidang spesialisasi ini?</h1>
+          <p class="question-subtitle">Membantu kami menetapkan badge reputasi instruktur dan rekomendasi tingkat kelas.</p>
+
+          <div class="options-stack">
+            <div class="option-card-btn" data-key="experience_years" data-value="1">
+              <div class="option-icon-box"><i class="fas fa-seedling"></i></div>
+              <div class="option-info">
+                <div class="option-label">< 1 Tahun (Instruktur Muda / Fresh Graduate)</div>
+                <div class="option-desc">Memiliki pemahaman teori mutakhir dan antusiasme berbagi ilmu</div>
+              </div>
+              <i class="fas fa-check option-check-icon"></i>
+            </div>
+
+            <div class="option-card-btn" data-key="experience_years" data-value="2">
+              <div class="option-icon-box"><i class="fas fa-user-gear"></i></div>
+              <div class="option-info">
+                <div class="option-label">1 - 3 Tahun (Praktisi Menengah / Intermediate)</div>
+                <div class="option-desc">Telah menangani proyek komersial dan studi kasus nyata</div>
+              </div>
+              <i class="fas fa-check option-check-icon"></i>
+            </div>
+
+            <div class="option-card-btn" data-key="experience_years" data-value="4">
+              <div class="option-icon-box"><i class="fas fa-user-tie"></i></div>
+              <div class="option-info">
+                <div class="option-label">3 - 5 Tahun (Senior Practitioner & Tech Lead)</div>
+                <div class="option-desc">Berpengalaman mendesain arsitektur sistem dan mentoring tim</div>
+              </div>
+              <i class="fas fa-check option-check-icon"></i>
+            </div>
+
+            <div class="option-card-btn" data-key="experience_years" data-value="6">
+              <div class="option-icon-box"><i class="fas fa-award"></i></div>
+              <div class="option-info">
+                <div class="option-label">5+ Tahun (Principal / Konsultan / Dosen Ahli)</div>
+                <div class="option-desc">Tingkat penguasaan mendalam di industri skala besar</div>
+              </div>
+              <i class="fas fa-check option-check-icon"></i>
+            </div>
+          </div>
+
+          <div class="question-footer-nav">
+            <button type="button" class="back-step-btn" data-target="2">
+              <i class="fas fa-arrow-left"></i> Kembali
+            </button>
+          </div>
+        </div>
+
+        <!-- TUTOR STEP 4: Sertifikat Pendukung untuk Verifikasi -->
+        <div class="question-card" id="tutor-step-4" data-step="4" style="display: none;">
+          <div class="question-badge">
+            <i class="fas fa-certificate"></i> Dokumen & Sertifikat Pendukung
+          </div>
+          <h1 class="question-title">Lampirkan sertifikat pendukung untuk verifikasi instruktur</h1>
+          <p class="question-subtitle">Sertifikat terverifikasi akan memunculkan lencana centang biru pada kursus Anda.</p>
+
+          <div class="form-step-fields">
+            <div class="form-group">
+              <label for="tutor-cert-name" class="form-label">Nama Sertifikasi / Lisensi Profesional</label>
+              <div class="input-container">
+                <i class="fas fa-file-signature input-icon-left"></i>
+                <input 
+                  type="text" 
+                  id="tutor-cert-name" 
+                  class="form-input has-icon-left" 
+                  placeholder="Contoh: AWS Certified Solutions Architect / TensorFlow Developer"
+                >
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="tutor-cert-issuer" class="form-label">Lembaga / Organisasi Penerbit Sertifikat</label>
+              <div class="input-container">
+                <i class="fas fa-building input-icon-left"></i>
+                <input 
+                  type="text" 
+                  id="tutor-cert-issuer" 
+                  class="form-input has-icon-left" 
+                  placeholder="Contoh: Amazon Web Services / Google Cloud / BNSP / Coursera"
+                >
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="tutor-cert-url" class="form-label">Link Dokumen Sertifikat / Portofolio (Opsional)</label>
+              <div class="input-container">
+                <i class="fas fa-link input-icon-left"></i>
+                <input 
+                  type="url" 
+                  id="tutor-cert-url" 
+                  class="form-input has-icon-left" 
+                  placeholder="https://credential.net/... atau link Google Drive CV"
+                >
+              </div>
+            </div>
+
+            <button type="button" class="submit-btn" id="btn-submit-tutor-step4" style="margin-top: 4px;">
+              <span>Simpan Sertifikat & Lanjutkan <i class="fas fa-arrow-right" style="margin-left: 6px;"></i></span>
+            </button>
+          </div>
+
+          <div class="question-footer-nav">
+            <button type="button" class="back-step-btn" data-target="3">
+              <i class="fas fa-arrow-left"></i> Kembali
+            </button>
+          </div>
+        </div>
+
+        <!-- TUTOR STEP 5: Komitmen Jam Mengajar & Target Pembagian Hasil 80% -->
+        <div class="question-card" id="tutor-step-5" data-step="5" style="display: none;">
+          <div class="question-badge">
+            <i class="fas fa-sack-dollar"></i> Model Pendapatan & Komitmen
+          </div>
+          <h1 class="question-title">Berapa alokasi waktu mingguan untuk mengelola kursus?</h1>
+          <p class="question-subtitle">Sebagai instruktur terverifikasi, Anda berhak atas bagi hasil 80% penjualan langsung ke TutorWallet.</p>
+
+          <div class="options-stack">
+            <div class="option-card-btn" data-key="weekly_teaching_commitment" data-value="3 - 5 Jam / Minggu (Part-time)">
+              <div class="option-icon-box"><i class="fas fa-clock"></i></div>
+              <div class="option-info">
+                <div class="option-label">3 - 5 Jam / Minggu (Part-time Tutor)</div>
+                <div class="option-desc">Membuat materi secara berkala dan menjawab diskusi tanya jawab kelas</div>
+              </div>
+              <i class="fas fa-check option-check-icon"></i>
+            </div>
+
+            <div class="option-card-btn" data-key="weekly_teaching_commitment" data-value="6 - 10 Jam / Minggu (Dedicated Tutor)">
+              <div class="option-icon-box"><i class="fas fa-fire"></i></div>
+              <div class="option-info">
+                <div class="option-label">6 - 10 Jam / Minggu (Dedicated Tutor)</div>
+                <div class="option-desc">Membuat seri kursus lengkap, kuis interaktif, dan ujian milestone</div>
+              </div>
+              <i class="fas fa-check option-check-icon"></i>
+            </div>
+
+            <div class="option-card-btn" data-key="weekly_teaching_commitment" data-value="15+ Jam / Minggu (Full-time Creator)">
+              <div class="option-icon-box"><i class="fas fa-rocket"></i></div>
+              <div class="option-info">
+                <div class="option-label">15+ Jam / Minggu (Full-time Creator & Mentor)</div>
+                <div class="option-desc">Fokus penuh membangun kurikulum spesialisasi komprehensif di SkillSphere</div>
+              </div>
+              <i class="fas fa-check option-check-icon"></i>
+            </div>
+          </div>
+
+          <div class="question-footer-nav">
+            <button type="button" class="back-step-btn" data-target="4">
+              <i class="fas fa-arrow-left"></i> Kembali
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ========================================================================= -->
+      <!-- FINAL STEP: AI Synthesis Animation & Saving State                          -->
+      <!-- ========================================================================= -->
+      <div class="question-card" id="step-finish" style="display: none;">
+        <div class="ai-generating-view">
+          <div class="ai-pulsing-orb">
+            <i class="fas fa-brain"></i>
+          </div>
+          <h2 class="question-title" style="font-size: 24px;" id="ai-finish-title">Menyiapkan Ruang Belajar Personalisasi AI</h2>
+          <p class="question-subtitle" id="ai-status-text" style="margin-bottom: 0;">
+            Menyimpan profil, mengaktifkan integrasi dompet, dan mengarahkan ke dashboard...
+          </p>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="login-footer">
+      <p>© 2026 SkillSphere AI — Personalisasi Kurikulum Adaptif (Sprint 1: Lead BE Arjuna)</p>
+    </footer>
+  </div>
+
+  <script>
+    // --- 1. Theme Switcher Logic ---
+    const themeBtn = document.getElementById('theme-toggle-btn');
+    const themeIconSun = document.getElementById('theme-icon-sun');
+    const themeIconMoon = document.getElementById('theme-icon-moon');
+    const themeText = document.getElementById('theme-text');
+
+    function updateThemeUI(theme) {
+      if (theme === 'dark') {
+        themeIconSun.style.display = 'inline-block';
+        themeIconMoon.style.display = 'none';
+        themeText.textContent = 'Mode Terang';
+      } else {
+        themeIconSun.style.display = 'none';
+        themeIconMoon.style.display = 'inline-block';
+        themeText.textContent = 'Mode Gelap';
+      }
+    }
+
+    const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+    updateThemeUI(currentTheme);
+
+    themeBtn.addEventListener('click', () => {
+      const active = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', active);
+      localStorage.setItem('skillsphere_theme', active);
+      updateThemeUI(active);
+    });
+
+    // --- 2. Role Detection (Student vs Tutor) ---
+    let currentUserRole = 'student';
+    const activeToken = localStorage.getItem('skillsphere_access_token');
+    if (!activeToken) {
+      window.location.href = '/login';
+    }
+
+    try {
+      const savedUser = localStorage.getItem('skillsphere_user');
+      if (savedUser) {
+        const parsed = JSON.parse(savedUser);
+        if (parsed.role === 'tutor') {
+          currentUserRole = 'tutor';
+        }
+      }
+    } catch (e) {}
+
+    // Query param override if any
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('role') === 'tutor') {
+      currentUserRole = 'tutor';
+    }
+
+    const roleBadgeDisplay = document.getElementById('role-badge-display');
+    const flowStudent = document.getElementById('flow-student');
+    const flowTutor = document.getElementById('flow-tutor');
+
+    if (currentUserRole === 'tutor') {
+      roleBadgeDisplay.textContent = 'Instruktur / Tutor';
+      roleBadgeDisplay.innerHTML = '<i class="fas fa-chalkboard-user" style="margin-right:4px;"></i> Tutor';
+      flowStudent.style.display = 'none';
+      flowTutor.style.display = 'block';
+    } else {
+      roleBadgeDisplay.textContent = 'Peserta Belajar';
+      roleBadgeDisplay.innerHTML = '<i class="fas fa-user-graduate" style="margin-right:4px;"></i> Siswa';
+      flowStudent.style.display = 'block';
+      flowTutor.style.display = 'none';
+    }
+
+    // --- 3. Step Navigation & Data Storage ---
+    const personalizationData = {
+      role: currentUserRole,
+      // Student specific
+      education_status: '',
+      age_range: '',
+      career_goal: '',
+      learning_style: '',
+      weekly_commitment: '',
+      // Tutor specific
+      specialization: '',
+      institution_name: '',
+      experience_years: 0,
+      certificate_name: '',
+      issuer: '',
+      credential_url: '',
+      weekly_teaching_commitment: '',
+    };
+
+    let currentStep = 1;
+    const totalSteps = 5;
+
+    const progressFill = document.getElementById('progress-fill');
+    const stepNumberText = document.getElementById('step-number-text');
+    const progressWrapper = document.getElementById('progress-wrapper');
+
+    function updateProgressBar(step) {
+      const percentage = (step / totalSteps) * 100;
+      progressFill.style.width = percentage + '%';
+      stepNumberText.textContent = step;
+    }
+
+    function getStepElementId(stepNum) {
+      return currentUserRole === 'tutor' ? `tutor-step-${stepNum}` : `student-step-${stepNum}`;
+    }
+
+    function goToStep(nextStep, isBack = false) {
+      const currentEl = document.getElementById(getStepElementId(currentStep));
+      const nextEl = document.getElementById(getStepElementId(nextStep));
+
+      if (!currentEl || !nextEl) return;
+
+      // Framer exit blur animation
+      currentEl.className = isBack ? 'question-card step-exit-back' : 'question-card step-exit';
+
+      setTimeout(() => {
+        currentEl.style.display = 'none';
+        nextEl.style.display = 'block';
+        nextEl.className = 'question-card step-enter';
+        currentStep = nextStep;
+        updateProgressBar(currentStep);
+      }, 300);
+    }
+
+    // Handle Option Card Clicks
+    document.querySelectorAll('.option-card-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const key = btn.getAttribute('data-key');
+        const value = btn.getAttribute('data-value');
+
+        // Highlight selection
+        btn.parentElement.querySelectorAll('.option-card-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+
+        personalizationData[key] = value;
+
+        // Auto transition to next step after brief click effect (280ms)
+        setTimeout(() => {
+          if (currentStep < totalSteps) {
+            goToStep(currentStep + 1);
+          } else {
+            finishPersonalization();
+          }
+        }, 280);
+      });
+    });
+
+    // Handle Back Buttons
+    document.querySelectorAll('.back-step-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const targetStep = parseInt(btn.getAttribute('data-target'));
+        goToStep(targetStep, true);
+      });
+    });
+
+    // Tutor Step 2 Submit: Institution & Degree
+    const btnSubmitTutorStep2 = document.getElementById('btn-submit-tutor-step2');
+    if (btnSubmitTutorStep2) {
+      btnSubmitTutorStep2.addEventListener('click', () => {
+        const inst = document.getElementById('tutor-institution').value.trim();
+        const degree = document.getElementById('tutor-degree').value.trim();
+        if (!inst) {
+          alert('Harap masukkan nama universitas / institusi kelulusan Anda.');
+          return;
+        }
+        personalizationData.institution_name = degree ? `${inst} (${degree})` : inst;
+        goToStep(3);
+      });
+    }
+
+    // Tutor Step 4 Submit: Certificate Verification
+    const btnSubmitTutorStep4 = document.getElementById('btn-submit-tutor-step4');
+    if (btnSubmitTutorStep4) {
+      btnSubmitTutorStep4.addEventListener('click', () => {
+        const certName = document.getElementById('tutor-cert-name').value.trim();
+        const issuer = document.getElementById('tutor-cert-issuer').value.trim();
+        const url = document.getElementById('tutor-cert-url').value.trim();
+
+        personalizationData.certificate_name = certName;
+        personalizationData.issuer = issuer;
+        personalizationData.credential_url = url;
+
+        goToStep(5);
+      });
+    }
+
+    // Skip Button -> Direct to dashboard
+    document.getElementById('btn-skip-onboarding').addEventListener('click', () => {
+      window.location.href = '/dashboard';
+    });
+
+    // --- 4. Final Submission & AI Persona Synthesis ---
+    async function finishPersonalization() {
+      progressWrapper.style.display = 'none';
+      const currentEl = document.getElementById(getStepElementId(currentStep));
+      const finishEl = document.getElementById('step-finish');
+
+      if (currentEl) currentEl.className = 'question-card step-exit';
+      setTimeout(() => {
+        if (currentEl) currentEl.style.display = 'none';
+        finishEl.style.display = 'block';
+        finishEl.className = 'question-card step-enter';
+      }, 300);
+
+      const finishTitle = document.getElementById('ai-finish-title');
+      const finishText = document.getElementById('ai-status-text');
+
+      if (currentUserRole === 'tutor') {
+        finishTitle.textContent = 'Memverifikasi Portal Pengajar Cerdas';
+        finishText.textContent = 'Menyimpan spesialisasi, asal kelulusan, dan dokumen sertifikat Anda...';
+      }
+
+      const token = localStorage.getItem('skillsphere_access_token');
+
+      try {
+        const response = await fetch('/api/auth/personalize', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(token ? { 'Authorization': 'Bearer ' + token } : {}),
+          },
+          body: JSON.stringify(personalizationData),
+        });
+
+        const result = await response.json();
+
+        if (response.ok && result.success) {
+          if (result.data) {
+            localStorage.setItem('skillsphere_user', JSON.stringify(result.data));
+          }
+
+          finishText.innerHTML = `
+            <span style="color:var(--color-success); font-weight:600;">
+              <i class="fas fa-circle-check" style="margin-right:6px;"></i> ${currentUserRole === 'tutor' ? 'Portal tutor siap! Membuka Dashboard...' : 'Ruang belajar siap! Membuka Dashboard...'}
+            </span>
+          `;
+
+          setTimeout(() => {
+            window.location.href = '/dashboard';
+          }, 1000);
+        } else {
+          setTimeout(() => {
+            window.location.href = '/dashboard';
+          }, 1200);
+        }
+      } catch (e) {
+        setTimeout(() => {
+          window.location.href = '/dashboard';
+        }, 1200);
+      }
+    }
+  </script>
+</body>
+</html>

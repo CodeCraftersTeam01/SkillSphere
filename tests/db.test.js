@@ -53,10 +53,19 @@ async function runDatabaseTests() {
     console.log('  ✔ Database connection authenticated.');
 
     // 2. Sync schema
-    await sequelize.query('PRAGMA foreign_keys = OFF;');
-    await sequelize.sync({ force: true });
-    await sequelize.query('PRAGMA foreign_keys = ON;');
-    console.log('  ✔ Database schema synchronized successfully.');
+    const dialect = sequelize.getDialect();
+    if (dialect === 'mysql') {
+      await sequelize.query('SET FOREIGN_KEY_CHECKS = 0;');
+      await sequelize.sync({ force: true });
+      await sequelize.query('SET FOREIGN_KEY_CHECKS = 1;');
+    } else if (dialect === 'sqlite') {
+      await sequelize.query('PRAGMA foreign_keys = OFF;');
+      await sequelize.sync({ force: true });
+      await sequelize.query('PRAGMA foreign_keys = ON;');
+    } else {
+      await sequelize.sync({ force: true });
+    }
+    console.log(`  ✔ Database schema synchronized successfully on ${dialect.toUpperCase()}.`);
 
     // 3. Verify all 19 models exist
     assert.strictEqual(expectedModels.length, 19, 'Must have exactly 19 relational models');

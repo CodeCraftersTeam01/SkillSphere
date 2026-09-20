@@ -25,11 +25,19 @@ const {
 
 async function seedDatabase() {
   try {
-    console.log('🌱 Starting SkillSphere Database Seeder...');
-    await sequelize.query('PRAGMA foreign_keys = OFF;');
-    await sequelize.sync({ force: true });
-    await sequelize.query('PRAGMA foreign_keys = ON;');
-    console.log('✅ Fresh database schema created (19 tables).');
+    const dialect = sequelize.getDialect();
+    if (dialect === 'mysql') {
+      await sequelize.query('SET FOREIGN_KEY_CHECKS = 0;');
+      await sequelize.sync({ force: true });
+      await sequelize.query('SET FOREIGN_KEY_CHECKS = 1;');
+    } else if (dialect === 'sqlite') {
+      await sequelize.query('PRAGMA foreign_keys = OFF;');
+      await sequelize.sync({ force: true });
+      await sequelize.query('PRAGMA foreign_keys = ON;');
+    } else {
+      await sequelize.sync({ force: true });
+    }
+    console.log(`✅ Fresh database schema created on ${dialect.toUpperCase()} (19 tables).`);
 
     const defaultPassword = await bcrypt.hash('password123', 10);
 
@@ -40,6 +48,7 @@ async function seedDatabase() {
       password: defaultPassword,
       role: 'admin',
       is_active: true,
+      is_verified: true,
     });
 
     const tutor = await User.create({
@@ -48,6 +57,7 @@ async function seedDatabase() {
       password: defaultPassword,
       role: 'tutor',
       is_active: true,
+      is_verified: true,
     });
 
     const student = await User.create({
@@ -56,6 +66,7 @@ async function seedDatabase() {
       password: defaultPassword,
       role: 'student',
       is_active: true,
+      is_verified: true,
     });
 
     // 2. Create User Profiles

@@ -38,17 +38,24 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Database connection & sync
 if (process.env.NODE_ENV !== 'test') {
-  sequelize.authenticate()
-    .then(() => {
-      console.log('✅ [Database] Relational Database connected successfully.');
-      return sequelize.sync();
-    })
-    .then(() => {
+  (async () => {
+    try {
+      await sequelize.authenticate();
+      const dialect = sequelize.getDialect();
+      console.log(`✅ [Database] ${dialect.toUpperCase()} Database connected successfully.`);
+      
+      if (dialect === 'mysql') {
+        await sequelize.query('SET FOREIGN_KEY_CHECKS = 0;');
+        await sequelize.sync();
+        await sequelize.query('SET FOREIGN_KEY_CHECKS = 1;');
+      } else {
+        await sequelize.sync();
+      }
       console.log('✅ [Database] 19 Core Relational Tables synchronized successfully.');
-    })
-    .catch((err) => {
-      console.error('❌ [Database] Failed to connect to database:', err);
-    });
+    } catch (err) {
+      console.error('❌ [Database] Failed to connect/sync database:', err);
+    }
+  })();
 }
 
 // Register Web and API routes
