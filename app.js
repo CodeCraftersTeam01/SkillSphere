@@ -1,34 +1,83 @@
-var createError = require('http-errors');
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
+require('dotenv').config();
+const createError = require('http-errors');
+const express = require('express');
+const path = require('path');
+const cookieParser = require('cookie-parser');
+const logger = require('morgan');
+const cors = require('cors');
+const helmet = require('helmet');
 
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
+const { sequelize } = require('./models');
+const indexRouter = require('./routes/index');
+const usersRouter = require('./routes/users');
+const apiRouter = require('./routes/api');
 
-var app = express();
+const app = express();
+
+// Security and utility middleware
+app.use(helmet({
+  contentSecurityPolicy: false, // Allows flexible views & frontend integration
+}));
+app.use(cors({
+  origin: true,
+  credentials: true,
+}));
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
-app.use(logger('dev'));
+if (process.env.NODE_ENV !== 'test') {
+  app.use(logger('dev'));
+}
+
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Database connection & sync
+if (process.env.NODE_ENV !== 'test') {
+  sequelize.authenticate()
+    .then(() => {
+      console.log('✅ [Database] Relational Database connected successfully.');
+      return sequelize.sync();
+    })
+    .then(() => {
+      console.log('✅ [Database] 19 Core Relational Tables synchronized successfully.');
+    })
+    .catch((err) => {
+      console.error('❌ [Database] Failed to connect to database:', err);
+    });
+}
+
+// Register Web and API routes
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+app.use('/api', apiRouter);
 
-// catch 404 and forward to error handler
+// Catch 404 and forward to error handler
 app.use(function(req, res, next) {
+  if (req.path.startsWith('/api')) {
+    return res.status(404).json({
+      success: false,
+      message: `API endpoint '${req.originalUrl}' tidak ditemukan.`,
+    });
+  }
   next(createError(404));
 });
 
-// error handler
+// Global error handler
 app.use(function(err, req, res, next) {
+  // API error JSON response
+  if (req.path.startsWith('/api')) {
+    return res.status(err.status || 500).json({
+      success: false,
+      message: err.message || 'Terjadi kesalahan internal server.',
+      error: req.app.get('env') === 'development' ? err : {},
+    });
+  }
+
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
