@@ -157,6 +157,32 @@ async function runAuthTests() {
 
     const tutorToken = verifyTutorRes.body.data.accessToken;
 
+    // 5b. Test Duplicate Email Prevention
+    const duplicateEmailRes = await request({
+      path: '/api/auth/register',
+      method: 'POST',
+    }, {
+      name: 'Different Name',
+      email: 'rian@student.com',
+      password: 'password123',
+      role: 'student',
+    });
+    assert.strictEqual(duplicateEmailRes.status, 409);
+    console.log('  ✔ Duplicate email registration prevented (409 Conflict).');
+
+    // 5c. Test Duplicate Name Prevention
+    const duplicateNameRes = await request({
+      path: '/api/auth/register',
+      method: 'POST',
+    }, {
+      name: 'Rian Pratama',
+      email: 'unique_rian@student.com',
+      password: 'password123',
+      role: 'student',
+    });
+    assert.strictEqual(duplicateNameRes.status, 409);
+    console.log('  ✔ Duplicate username registration prevented (409 Conflict).');
+
     // 6. Test Login with verified credentials
     const loginRes = await request({
       path: '/api/auth/login',

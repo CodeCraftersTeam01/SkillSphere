@@ -15,10 +15,14 @@ router.post('/verify-otp', authController.verifyOTP);
 router.post('/resend-otp', authController.resendOTP);
 router.post('/login', validateLogin, authController.login);
 router.post('/refresh', authController.refreshToken);
+router.get('/oauth/:provider', authController.oauthRedirect);
+
+const { upload } = require('../../utils/imageHelper');
 
 // Protected routes (Requires valid JWT)
 router.get('/me', authenticateJWT, authController.getProfile);
 router.put('/profile', authenticateJWT, validateProfileUpdate, authController.updateProfile);
+router.post('/upload-certificate', authenticateJWT, upload.single('certificate'), authController.uploadCertificate);
 router.post('/personalize', authenticateJWT, authController.personalize);
 router.put('/change-password', authenticateJWT, validateChangePassword, authController.changePassword);
 router.post('/logout', authenticateJWT, authController.logout);

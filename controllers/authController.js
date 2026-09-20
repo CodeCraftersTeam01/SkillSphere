@@ -2,6 +2,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { User, UserProfile, TutorWallet, TutorApplication, TutorCertification, sequelize } = require('../models');
 const { sendOTPEmail } = require('../config/mailer');
+const { processAndConvertToWebP } = require('../utils/imageHelper');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'skillsphere_super_secret_jwt_key_2026_production_ready';
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '24h';
@@ -33,8 +34,10 @@ const register = async (req, res) => {
   try {
     const { name, email, password, role = 'student', phone_number, career_goal } = req.body;
 
-    const normalizedEmail = email.trim().toLowerCase();
+    const trimmedName = (name || '').trim();
+    const normalizedEmail = (email || '').trim().toLowerCase();
 
+    // 1. Check duplicate email
     const existingUser = await User.findOne({ where: { email: normalizedEmail } });
     if (existingUser) {
       await t.rollback();
@@ -59,6 +62,22 @@ const register = async (req, res) => {
       });
     }
 
+    // 2. Check duplicate name (case-insensitive check)
+    const existingNameUser = await User.findOne({
+      where: sequelize.where(
+        sequelize.fn('LOWER', sequelize.col('name')),
+        trimmedName.toLowerCase()
+      ),
+    });
+
+    if (existingNameUser) {
+      await t.rollback();
+      return res.status(409).json({
+        success: false,
+        message: `Nama "${trimmedName}" sudah digunakan oleh akun lain. Silakan gunakan nama lengkap Anda yang berbeda.`,
+      });
+    }
+
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
@@ -67,7 +86,7 @@ const register = async (req, res) => {
     const otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
 
     const newUser = await User.create({
-      name: name.trim(),
+      name: trimmedName,
       email: normalizedEmail,
       password: hashedPassword,
       role: role || 'student',
@@ -558,6 +577,54 @@ const logout = async (req, res) => {
 };
 
 /**
+ * Upload and Compress Supporting Certificate to WebP format
+ */
+const uploadCertificate = async (req, res) => {
+  try {
+    let inputSource = null;
+
+    if (req.file && req.file.buffer) {
+      inputSource = req.file.buffer;
+    } else if (req.body && req.body.image) {
+      inputSource = req.body.image;
+    }
+
+    if (!inputSource) {
+      return res.status(400).json({
+        success: false,
+        message: 'Tidak ada file gambar sertifikat yang diunggah.',
+      });
+    }
+
+    // Process & compress into lightweight WebP format without losing crisp quality
+    const result = await processAndConvertToWebP(inputSource, 'certificates', {
+      quality: 84,
+      maxWidth: 2048,
+      maxHeight: 2048,
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: 'Sertifikat berhasil diproses dan dikompresi ke WebP!',
+      data: {
+        url: result.relativeUrl,
+        filename: result.filename,
+        originalSizeKB: Math.round(result.originalSize / 1024),
+        compressedSizeKB: Math.round(result.compressedSize / 1024),
+        savingsPercent: result.savingsPercent,
+      },
+    });
+  } catch (error) {
+    console.error('Error in uploadCertificate:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Gagal memproses gambar sertifikat.',
+      error: error.message,
+    });
+  }
+};
+
+/**
  * Save User Personalization / Onboarding Preferences (Student & Tutor)
  */
 const personalize = async (req, res) => {
@@ -580,8 +647,26 @@ const personalize = async (req, res) => {
       issuer,
       credential_url,
       certificate_file_url,
+      certificate_image_base64,
+      linkedin_url,
+      portfolio_url,
       weekly_teaching_commitment,
     } = req.body;
+
+    // Process certificate image if base64 provided
+    let finalCertificateUrl = certificate_file_url || credential_url || null;
+    if (certificate_image_base64 && (!finalCertificateUrl || finalCertificateUrl.startsWith('data:'))) {
+      try {
+        const compressed = await processAndConvertToWebP(certificate_image_base64, 'certificates', {
+          quality: 84,
+          maxWidth: 2048,
+          maxHeight: 2048,
+        });
+        finalCertificateUrl = compressed.relativeUrl;
+      } catch (imgErr) {
+        console.warn('Failed to compress base64 certificate image:', imgErr.message);
+      }
+    }
 
     const study_preferences = {
       role: userRole,
@@ -595,7 +680,10 @@ const personalize = async (req, res) => {
       experience_years: experience_years ? parseInt(experience_years) : 0,
       certificate_name: certificate_name || null,
       issuer: issuer || null,
-      credential_url: credential_url || certificate_file_url || null,
+      credential_url: finalCertificateUrl,
+      certificate_file_url: finalCertificateUrl,
+      linkedin_url: linkedin_url ? linkedin_url.trim() : null,
+      portfolio_url: portfolio_url ? portfolio_url.trim() : null,
       onboarding_completed: true,
       completed_at: new Date(),
     };
@@ -605,11 +693,15 @@ const personalize = async (req, res) => {
       profile = await UserProfile.create({
         user_id: userId,
         career_goal: career_goal || specialization || null,
+        linkedin_url: linkedin_url ? linkedin_url.trim() : null,
+        portfolio_url: portfolio_url ? portfolio_url.trim() : null,
         study_preferences,
       }, { transaction: t });
     } else {
       await profile.update({
         career_goal: career_goal || specialization || profile.career_goal,
+        linkedin_url: linkedin_url ? linkedin_url.trim() : profile.linkedin_url,
+        portfolio_url: portfolio_url ? portfolio_url.trim() : profile.portfolio_url,
         study_preferences,
       }, { transaction: t });
     }
@@ -622,14 +714,18 @@ const personalize = async (req, res) => {
           user_id: userId,
           institution_name: institution_name || null,
           experience_years: experience_years ? parseInt(experience_years) : 0,
-          certificate_document_url: credential_url || certificate_file_url || null,
+          certificate_document_url: finalCertificateUrl,
+          linkedin_url: linkedin_url ? linkedin_url.trim() : null,
+          portfolio_url: portfolio_url ? portfolio_url.trim() : null,
           status: 'pending',
         }, { transaction: t });
       } else {
         await application.update({
           institution_name: institution_name || application.institution_name,
           experience_years: experience_years ? parseInt(experience_years) : application.experience_years,
-          certificate_document_url: credential_url || certificate_file_url || application.certificate_document_url,
+          certificate_document_url: finalCertificateUrl || application.certificate_document_url,
+          linkedin_url: linkedin_url ? linkedin_url.trim() : application.linkedin_url,
+          portfolio_url: portfolio_url ? portfolio_url.trim() : application.portfolio_url,
         }, { transaction: t });
       }
 
@@ -638,7 +734,7 @@ const personalize = async (req, res) => {
           tutor_id: userId,
           certificate_name: certificate_name.trim(),
           issuer: issuer.trim(),
-          credential_url: credential_url || certificate_file_url || null,
+          credential_url: finalCertificateUrl,
           is_verified: false,
         }, { transaction: t });
       }
@@ -670,6 +766,61 @@ const personalize = async (req, res) => {
   }
 };
 
+/**
+ * OAuth Provider Redirection & Informative Handler
+ */
+const oauthRedirect = async (req, res) => {
+  const { provider } = req.params;
+  const { role = 'student' } = req.query;
+
+  const normalizedProvider = (provider || '').toLowerCase();
+  if (!['google', 'github'].includes(normalizedProvider)) {
+    return res.status(400).json({
+      success: false,
+      message: `Penyedia OAuth '${provider}' tidak didukung. Gunakan Google atau GitHub.`,
+    });
+  }
+
+  const clientId = normalizedProvider === 'google' 
+    ? process.env.GOOGLE_CLIENT_ID 
+    : process.env.GITHUB_CLIENT_ID;
+
+  if (!clientId || clientId.includes('your_')) {
+    const providerTitle = normalizedProvider === 'google' ? 'Google' : 'GitHub';
+    return res.send(`
+      <!DOCTYPE html>
+      <html lang="id">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>OAuth ${providerTitle} | SkillSphere AI</title>
+        <link rel="stylesheet" href="/stylesheets/claude-theme.css">
+      </head>
+      <body style="display:flex; align-items:center; justify-content:center; min-height:100vh; padding:20px; font-family:var(--font-sans); background:var(--bg-app);">
+        <div class="login-card" style="max-width:460px; text-align:center; padding:36px 28px;">
+          <div style="font-size:42px; margin-bottom:14px;">🔑</div>
+          <h2 style="font-family:var(--font-serif); font-size:23px; margin-bottom:12px; color:var(--text-primary);">Integrasi OAuth ${providerTitle}</h2>
+          <p style="color:var(--text-secondary); font-size:14px; line-height:1.5; margin-bottom:24px;">
+            Tombol <strong>${providerTitle}</strong> telah terpasang dengan rapi. Untuk menghubungkan akun ke sistem OAuth resmi, tambahkan <code>${providerTitle.toUpperCase()}_CLIENT_ID</code> dan <code>${providerTitle.toUpperCase()}_CLIENT_SECRET</code> pada file <code>.env</code> Anda.
+          </p>
+          <a href="/login" class="submit-btn" style="text-decoration:none; display:inline-flex;">Kembali ke Halaman Masuk</a>
+        </div>
+      </body>
+      </html>
+    `);
+  }
+
+  if (normalizedProvider === 'google') {
+    const redirectUri = encodeURIComponent(`${req.protocol}://${req.get('host')}/api/auth/oauth/google/callback`);
+    const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=openid%20email%20profile&state=${role}`;
+    return res.redirect(googleAuthUrl);
+  } else {
+    const redirectUri = encodeURIComponent(`${req.protocol}://${req.get('host')}/api/auth/oauth/github/callback`);
+    const githubAuthUrl = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&scope=user:email&state=${role}`;
+    return res.redirect(githubAuthUrl);
+  }
+};
+
 module.exports = {
   register,
   verifyOTP,
@@ -677,8 +828,10 @@ module.exports = {
   login,
   getProfile,
   updateProfile,
+  uploadCertificate,
   personalize,
   changePassword,
   refreshToken,
   logout,
+  oauthRedirect,
 };

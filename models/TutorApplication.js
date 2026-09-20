@@ -19,6 +19,14 @@ const TutorApplication = sequelize.define('TutorApplication', {
     type: DataTypes.STRING(255),
     allowNull: true,
   },
+  linkedin_url: {
+    type: DataTypes.STRING(255),
+    allowNull: true,
+  },
+  portfolio_url: {
+    type: DataTypes.STRING(255),
+    allowNull: true,
+  },
   institution_name: {
     type: DataTypes.STRING(150),
     allowNull: true,
