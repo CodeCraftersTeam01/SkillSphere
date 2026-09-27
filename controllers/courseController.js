@@ -65,7 +65,7 @@ exports.getCourseById = async (req, res) => {
         {
           model: User,
           as: 'tutor',
-          attributes: ['id', 'name', 'email', 'avatar_url'],
+          attributes: ['id', 'name', 'email', 'role'],
         },
         {
           model: CourseSection,
@@ -426,7 +426,7 @@ exports.getAllCourses = async (req, res) => {
         {
           model: User,
           as: 'tutor',
-          attributes: ['id', 'name', 'email', 'avatar_url'],
+          attributes: ['id', 'name', 'email', 'role'],
         },
       ],
       order: [['created_at', 'DESC']],
