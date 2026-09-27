@@ -372,11 +372,50 @@
         </div>
       </div>
 
+      <!-- Portal Quick Navigation Grid (Sprint 1 & Sprint 2) -->
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:16px; margin-bottom:28px;" id="portal-quick-nav">
+        <a href="/admin/verification" class="stat-card" style="text-decoration:none; display:flex; flex-direction:column; justify-content:space-between; border-left:4px solid var(--accent-primary);">
+          <div>
+            <div class="stat-label">
+              <span>Admin Portal (Sprint 1)</span>
+              <span class="status-pill status-active"><i class="fas fa-shield-halved"></i> FE: Satrio</span>
+            </div>
+            <div style="font-family:var(--font-serif); font-size:18px; font-weight:600; color:var(--text-primary); margin-bottom:4px;">
+              Verifikasi Pengajar & Dokumen
+            </div>
+            <p style="font-size:12px; color:var(--text-secondary); line-height:1.4;">
+              Validasi pendaftaran calon tutor, berkas CV, link portofolio, dan keaslian sertifikasi instansi resmi.
+            </p>
+          </div>
+          <div style="margin-top:14px; font-size:13px; font-weight:600; color:var(--text-primary); display:flex; align-items:center; gap:6px;">
+            Buka Panel Verifikasi <i class="fas fa-arrow-right" style="font-size:11px;"></i>
+          </div>
+        </a>
+
+        <a href="/tutor/materials" class="stat-card" style="text-decoration:none; display:flex; flex-direction:column; justify-content:space-between; border-left:4px solid #10B981;">
+          <div>
+            <div class="stat-label">
+              <span>Tutor Portal (Sprint 2)</span>
+              <span class="status-pill status-active" style="background:#D1FAE5; color:#065F46; border-color:#6EE7B7;"><i class="fas fa-cloud-arrow-up"></i> FE: Satrio</span>
+            </div>
+            <div style="font-family:var(--font-serif); font-size:18px; font-weight:600; color:var(--text-primary); margin-bottom:4px;">
+              Portal Manajemen & Upload Materi
+            </div>
+            <p style="font-size:12px; color:var(--text-secondary); line-height:1.4;">
+              Unggah materi multi-format (Video, PPT, PDF, DOC, Book), kompresi thumbnail WebP, dan atur struktur bab.
+            </p>
+          </div>
+          <div style="margin-top:14px; font-size:13px; font-weight:600; color:#10B981; display:flex; align-items:center; gap:6px;">
+            Buka Portal Upload <i class="fas fa-arrow-right" style="font-size:11px;"></i>
+          </div>
+        </a>
+      </div>
+
       <!-- Quick Action / Core Modules Card -->
       <section class="section-card">
         <div class="section-header">
-          <h2 class="section-title">Modul Fondasi & Endpoint API (Sprint 1)</h2>
-          <span style="font-size: 13px; color: var(--text-secondary);"><i class="fas fa-user-shield" style="margin-right: 4px;"></i> Lead BE: Arjuna Lanang</span>
+          <h2 class="section-title">Status Implementasi Sprint 1 & Sprint 2</h2>
+          <span style="font-size: 13px; color: var(--text-secondary);"><i class="fas fa-users" style="margin-right: 4px;"></i> Tim Pengembang CodeCrafters</span>
         </div>
 
         <div class="table-responsive">
@@ -384,41 +423,47 @@
             <thead>
               <tr>
                 <th>Fitur / Modul</th>
-                <th>Tanggung Jawab</th>
+                <th>Fase / Sprint</th>
+                <th>Penanggung Jawab</th>
                 <th>Status</th>
-                <th>Aksi / Verifikasi</th>
+                <th>Aksi / Tautan</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td><strong>Setup 19 Tabel Relasional</strong></td>
-                <td>Arjuna (Lead BE)</td>
-                <td><span class="status-pill status-active"><i class="fas fa-check" style="font-size: 10px;"></i> Tuntas & Verified</span></td>
-                <td><code style="font-family:var(--font-mono); font-size:12px;">npm test (19/19)</code></td>
+                <td><strong>Admin Verification UI</strong> (Validasi Tutor & Sertifikat)</td>
+                <td>Sprint 1</td>
+                <td><strong>Satrio</strong> (Tutor FE & QA)</td>
+                <td><span class="status-pill status-active"><i class="fas fa-check" style="font-size: 10px;"></i> Selesai & Verified</span></td>
+                <td><a href="/admin/verification" class="link" style="font-weight:600;"><i class="fas fa-arrow-up-right-from-square" style="font-size: 11px;"></i> Buka Portal</a></td>
               </tr>
               <tr>
-                <td><strong>Otentikasi JWT & Role Access</strong></td>
-                <td>Arjuna (Lead BE)</td>
+                <td><strong>Material Upload Portal</strong> (Multi-Format & WebP)</td>
+                <td>Sprint 2</td>
+                <td><strong>Satrio</strong> (Tutor FE & QA)</td>
+                <td><span class="status-pill status-active"><i class="fas fa-check" style="font-size: 10px;"></i> Selesai & Verified</span></td>
+                <td><a href="/tutor/materials" class="link" style="font-weight:600;"><i class="fas fa-arrow-up-right-from-square" style="font-size: 11px;"></i> Buka Portal</a></td>
+              </tr>
+              <tr>
+                <td><strong>Setup 19 Tabel Relasional & JWT Auth</strong></td>
+                <td>Sprint 1</td>
+                <td>Arjuna (PM & Lead BE)</td>
+                <td><span class="status-pill status-active"><i class="fas fa-check" style="font-size: 10px;"></i> 100% Synced</span></td>
+                <td><code style="font-family:var(--font-mono); font-size:12px;">MySQL 3306</code></td>
+              </tr>
+              <tr>
+                <td><strong>Media Storage Service & HTTP Streaming</strong></td>
+                <td>Sprint 2</td>
+                <td>Arjuna (PM & Lead BE)</td>
                 <td><span class="status-pill status-active"><i class="fas fa-check" style="font-size: 10px;"></i> Aktif</span></td>
-                <td><code style="font-family:var(--font-mono); font-size:12px;">/api/auth/me</code></td>
+                <td><code style="font-family:var(--font-mono); font-size:12px;">/api/media</code></td>
               </tr>
               <tr>
-                <td><strong>Verifikasi 6-Digit OTP SMTP</strong></td>
-                <td>Arjuna (Lead BE)</td>
-                <td><span class="status-pill status-active"><i class="fas fa-check" style="font-size: 10px;"></i> Gmail SMTP Aktif</span></td>
-                <td><code style="font-family:var(--font-mono); font-size:12px;">/api/auth/verify-otp</code></td>
-              </tr>
-              <tr>
-                <td><strong>Tutor Wallet & 80% Split Logic</strong></td>
-                <td>Arjuna & Tegar</td>
-                <td><span class="status-pill status-active"><i class="fas fa-check" style="font-size: 10px;"></i> Schema Ready</span></td>
-                <td><code style="font-family:var(--font-mono); font-size:12px;">tutor_wallets</code></td>
-              </tr>
-              <tr>
-                <td><strong>Halaman Login & Register Claude Theme</strong></td>
-                <td>CodeCrafters Frontend</td>
+                <td><strong>Auth & Profile Pages Claude Theme</strong></td>
+                <td>Sprint 1</td>
+                <td>Fadiyah (Student FE)</td>
                 <td><span class="status-pill status-active"><i class="fas fa-check" style="font-size: 10px;"></i> Aktif</span></td>
-                <td><a href="/login" class="link" style="font-weight:600;"><i class="fas fa-arrow-up-right-from-square" style="font-size: 11px;"></i> Lihat Portal</a></td>
+                <td><a href="/login" class="link" style="font-weight:600;"><i class="fas fa-arrow-up-right-from-square" style="font-size: 11px;"></i> Login Page</a></td>
               </tr>
             </tbody>
           </table>
@@ -428,7 +473,7 @@
 
     <!-- Footer -->
     <footer class="login-footer" style="padding-bottom: 24px;">
-      <p>© 2026 SkillSphere AI — Dikembangkan oleh Tim CodeCrafters (Sprint 1: Lead BE Arjuna)</p>
+      <p>© 2026 SkillSphere AI — Dikembangkan oleh Tim CodeCrafters (Sprint 1 & Sprint 2: Satrio, Arjuna, Tegar, Fadiyah)</p>
     </footer>
   </div>
 
@@ -486,8 +531,8 @@
         const json = await res.json();
         const user = json.data;
 
-        // Enforce completed onboarding for students and tutors
-        const hasCompletedOnboarding = user.role === 'admin' || 
+        // Enforce completed onboarding for new students, allow tutors & admin directly
+        const hasCompletedOnboarding = user.role === 'admin' || user.role === 'tutor' || 
           (user.profile && user.profile.study_preferences && user.profile.study_preferences.onboarding_completed);
 
         if (!hasCompletedOnboarding) {

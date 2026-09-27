@@ -1,0 +1,1244 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portal Manajemen & Upload Materi | Tutor SkillSphere AI</title>
+  <meta name="description" content="Portal upload materi multi-format, struktur kurikulum, dan streaming konten untuk Pengajar SkillSphere.">
+  
+  <!-- PWA Manifest & App Icons -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#1F1E1B">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome 6 Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Claude Design System Stylesheet -->
+  <link rel="stylesheet" href="/stylesheets/claude-theme.css">
+
+  <style>
+    .tutor-layout {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background-color: var(--bg-app);
+    }
+
+    .navbar {
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 14px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .tutor-tag {
+      background: var(--accent-primary);
+      color: var(--accent-text);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: var(--radius-sm);
+    }
+
+    .main-container {
+      max-width: 1140px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 32px 24px 60px;
+      flex: 1;
+    }
+
+    /* Course Banner & Info Card */
+    .course-banner-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-xl);
+      padding: 24px;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 28px;
+      display: flex;
+      gap: 24px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+
+    .course-thumb-container {
+      position: relative;
+      width: 240px;
+      height: 145px;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      background: var(--bg-surface-subtle);
+      border: 1px solid var(--border-subtle);
+      flex-shrink: 0;
+    }
+
+    .course-thumb-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .thumb-edit-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.55);
+      color: #ffffff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      cursor: pointer;
+      transition: opacity 0.2s ease;
+      font-size: 12px;
+      font-weight: 600;
+      gap: 6px;
+    }
+
+    .course-thumb-container:hover .thumb-edit-overlay {
+      opacity: 1;
+    }
+
+    .course-meta-details {
+      flex: 1;
+      min-width: 280px;
+    }
+
+    .course-meta-tags {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+
+    .course-title-display {
+      font-family: var(--font-serif);
+      font-size: 26px;
+      font-weight: 600;
+      color: var(--text-primary);
+      line-height: 1.25;
+      margin-bottom: 8px;
+    }
+
+    .course-stats-row {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .stat-pill-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Section Card & Material Items */
+    .sections-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .section-box {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      transition: border-color 0.2s ease;
+    }
+
+    .section-box:hover {
+      border-color: var(--border-strong);
+    }
+
+    .section-header-bar {
+      padding: 16px 22px;
+      background: var(--bg-surface-subtle);
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .section-title-text {
+      font-family: var(--font-serif);
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .material-list {
+      padding: 8px 16px;
+    }
+
+    .material-item-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 14px;
+      border-radius: var(--radius-md);
+      margin: 4px 0;
+      border: 1px solid transparent;
+      background: var(--bg-surface);
+      transition: all 0.15s ease;
+      gap: 14px;
+    }
+
+    .material-item-row:hover {
+      background: var(--bg-surface-subtle);
+      border-color: var(--border-subtle);
+    }
+
+    .material-icon-box {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+
+    .type-video { background: #EEF2FF; color: #4F46E5; }
+    .type-ppt { background: #FFF7ED; color: #EA580C; }
+    .type-pdf { background: #FEF2F2; color: #DC2626; }
+    .type-doc { background: #EFF6FF; color: #2563EB; }
+    .type-book { background: #ECFDF5; color: #059669; }
+
+    .material-info {
+      flex: 1;
+      min-width: 180px;
+    }
+
+    .material-title-text {
+      font-weight: 600;
+      font-size: 14px;
+      color: var(--text-primary);
+      margin-bottom: 3px;
+    }
+
+    .material-meta-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .badge-preview {
+      background: #D1FAE5;
+      color: #065F46;
+      padding: 2px 7px;
+      border-radius: var(--radius-full);
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .badge-locked {
+      background: #F3F4F6;
+      color: #4B5563;
+      padding: 2px 7px;
+      border-radius: var(--radius-full);
+      font-size: 10px;
+      font-weight: 600;
+    }
+
+    /* Multi-format Drag and Drop Zone */
+    .drop-zone {
+      border: 2px dashed var(--border-strong);
+      border-radius: var(--radius-lg);
+      padding: 28px 20px;
+      text-align: center;
+      background: var(--bg-surface-subtle);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      margin-bottom: 18px;
+    }
+
+    .drop-zone.dragover {
+      border-color: var(--accent-primary);
+      background: var(--accent-primary-light);
+    }
+
+    .drop-zone-icon {
+      font-size: 32px;
+      color: var(--text-secondary);
+      margin-bottom: 10px;
+    }
+
+    .progress-bar-container {
+      width: 100%;
+      height: 6px;
+      background: var(--border-subtle);
+      border-radius: 99px;
+      overflow: hidden;
+      margin-top: 12px;
+      display: none;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: #10B981;
+      width: 0%;
+      transition: width 0.2s ease;
+    }
+
+    /* Modal Styling */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(15, 14, 13, 0.6);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-xl);
+      max-width: 620px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: var(--shadow-floating);
+      padding: 28px;
+      position: relative;
+    }
+
+    .media-player-container {
+      width: 100%;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      background: #000000;
+      margin-bottom: 16px;
+    }
+
+    video {
+      width: 100%;
+      height: auto;
+      display: block;
+      max-height: 380px;
+    }
+
+    .format-selector-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+
+    .format-card-btn {
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-surface);
+      border-radius: var(--radius-md);
+      padding: 10px 6px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      color: var(--text-secondary);
+      font-size: 11px;
+      font-weight: 600;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .format-card-btn i {
+      font-size: 18px;
+    }
+
+    .format-card-btn.active {
+      border-color: var(--accent-primary);
+      background: var(--accent-primary-light);
+      color: var(--text-primary);
+    }
+
+    /* Toast Container */
+    .toast-container {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 2000;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .toast {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      box-shadow: var(--shadow-floating);
+      border-radius: var(--radius-lg);
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-primary);
+      min-width: 280px;
+      max-width: 420px;
+    }
+  </style>
+
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('skillsphere_theme') || 
+        (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    })();
+  </script>
+</head>
+<body>
+
+  <div class="tutor-layout">
+    <!-- Navbar -->
+    <header class="navbar">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <a href="/dashboard" class="brand-logo" style="text-decoration:none;">
+          <div class="brand-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 0L13.8 8.2L22 10L13.8 11.8L12 20L10.2 11.8L2 10L10.2 8.2L12 0Z" />
+            </svg>
+          </div>
+          <span style="font-weight:700; color:var(--text-primary); font-size:16px;">SkillSphere</span>
+        </a>
+        <span class="tutor-tag"><i class="fas fa-chalkboard-user"></i> Portal Tutor</span>
+      </div>
+
+      <div class="nav-actions">
+        <a href="/dashboard" class="btn btn-outline" style="padding: 6px 14px; font-size: 13px; text-decoration:none;">
+          <i class="fas fa-arrow-left"></i> Dashboard
+        </a>
+        <button class="theme-toggle-btn" id="theme-toggle-btn" type="button">
+          <i class="fas fa-sun" id="theme-icon-sun" style="display:none;"></i>
+          <i class="fas fa-moon" id="theme-icon-moon"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="main-container">
+      <!-- Course Selector Bar -->
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
+        <div style="display:flex; align-items:center; gap:12px;">
+          <label style="font-size:13px; font-weight:600; color:var(--text-secondary);">Pilih Kursus:</label>
+          <select id="course-selector" class="input-field" style="max-width:320px; padding:6px 14px; font-size:13px;" onchange="changeActiveCourse(this.value)">
+            <option value="">Memuat kursus...</option>
+          </select>
+        </div>
+
+        <div style="display:flex; gap:10px;">
+          <button class="btn btn-outline" style="padding:8px 16px; font-size:13px;" onclick="openModal('new-section-modal')">
+            <i class="fas fa-folder-plus"></i> Tambah Bab Baru
+          </button>
+          <button class="btn btn-primary" style="padding:8px 18px; font-size:13px;" onclick="openUploadModal()">
+            <i class="fas fa-cloud-arrow-up"></i> Upload Materi Multi-Format
+          </button>
+        </div>
+      </div>
+
+      <!-- Active Course Banner Card -->
+      <div class="course-banner-card" id="course-banner-card">
+        <div class="course-thumb-container">
+          <img src="/icons/icon-512.png" id="course-thumb-preview" class="course-thumb-img" alt="Thumbnail Kursus">
+          <label for="thumb-file-input" class="thumb-edit-overlay">
+            <i class="fas fa-camera" style="font-size: 18px;"></i>
+            <span>Ubah Sampul (WebP)</span>
+          </label>
+          <input type="file" id="thumb-file-input" accept="image/*" style="display:none;" onchange="handleThumbnailUpload(this)">
+        </div>
+
+        <div class="course-meta-details">
+          <div class="course-meta-tags">
+            <span class="status-pill status-active" id="course-status-badge">Published</span>
+            <span class="tab-badge" id="course-category-badge">Web Development</span>
+            <span class="tab-badge" id="course-level-badge">Intermediate</span>
+          </div>
+
+          <h1 class="course-title-display" id="course-title-display">Memuat Detail Kursus...</h1>
+          <p style="font-size:13px; color:var(--text-secondary); line-height:1.5;" id="course-desc-display">-</p>
+
+          <div class="course-stats-row">
+            <div class="stat-pill-item"><i class="fas fa-layer-group"></i> <strong id="stat-sections-count">0</strong> Bab</div>
+            <div class="stat-pill-item"><i class="fas fa-file-video"></i> <strong id="stat-materials-count">0</strong> Materi</div>
+            <div class="stat-pill-item"><i class="fas fa-clock"></i> <strong id="stat-duration-count">0</strong> Menit Belajar</div>
+            <div class="stat-pill-item"><i class="fas fa-tag"></i> <strong id="stat-price-display">Rp 0</strong></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Curriculum Sections List -->
+      <div class="sections-container" id="sections-container">
+        <!-- Dynamically rendered -->
+      </div>
+    </main>
+
+    <!-- Upload Multi-Format Material Modal -->
+    <div class="modal-overlay" id="upload-material-modal">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h3 class="modal-title"><i class="fas fa-cloud-arrow-up" style="margin-right:8px;"></i> Upload Materi Kursus</h3>
+          <button class="modal-close-btn" onclick="closeModal('upload-material-modal')"><i class="fas fa-xmark"></i></button>
+        </div>
+
+        <!-- Section Destination -->
+        <div style="margin-bottom: 16px;">
+          <label style="display:block; font-size:12px; font-weight:600; color:var(--text-primary); margin-bottom:6px;">Pilih Bab Tujuan *</label>
+          <select id="material-section-select" class="input-field" style="width:100%; font-size:13px;"></select>
+        </div>
+
+        <!-- Format Selector -->
+        <label style="display:block; font-size:12px; font-weight:600; color:var(--text-primary); margin-bottom:6px;">Tipe Konten Pembelajaran *</label>
+        <div class="format-selector-grid">
+          <div class="format-card-btn active" data-type="video" onclick="selectFormatType('video')">
+            <i class="fas fa-file-video" style="color:#4F46E5;"></i>
+            <span>Video MP4</span>
+          </div>
+          <div class="format-card-btn" data-type="ppt" onclick="selectFormatType('ppt')">
+            <i class="fas fa-file-powerpoint" style="color:#EA580C;"></i>
+            <span>Slide PPT</span>
+          </div>
+          <div class="format-card-btn" data-type="pdf" onclick="selectFormatType('pdf')">
+            <i class="fas fa-file-pdf" style="color:#DC2626;"></i>
+            <span>Dokumen PDF</span>
+          </div>
+          <div class="format-card-btn" data-type="doc" onclick="selectFormatType('doc')">
+            <i class="fas fa-file-word" style="color:#2563EB;"></i>
+            <span>Word DOC</span>
+          </div>
+          <div class="format-card-btn" data-type="book" onclick="selectFormatType('book')">
+            <i class="fas fa-book-open" style="color:#059669;"></i>
+            <span>E-Book Digital</span>
+          </div>
+        </div>
+
+        <!-- Drag and Drop Zone -->
+        <div class="drop-zone" id="material-drop-zone" onclick="document.getElementById('material-file-input').click()">
+          <i class="fas fa-cloud-arrow-up drop-zone-icon" id="drop-icon"></i>
+          <div style="font-weight:600; font-size:14px; color:var(--text-primary);" id="drop-zone-text">Pilih atau Seret Berkas ke Sini</div>
+          <div style="font-size:12px; color:var(--text-secondary); margin-top:4px;" id="drop-zone-sub">Maksimum ukuran file: 250 MB (Video MP4, PPTX, PDF, DOCX, ePUB)</div>
+          <div class="progress-bar-container" id="upload-progress-container">
+            <div class="progress-bar-fill" id="upload-progress-fill"></div>
+          </div>
+        </div>
+        <input type="file" id="material-file-input" style="display:none;" onchange="handleMaterialFileSelected(this)">
+
+        <!-- Title & Duration Inputs -->
+        <div style="display:grid; grid-template-columns: 2fr 1fr; gap:12px; margin-bottom:16px;">
+          <div>
+            <label style="display:block; font-size:12px; font-weight:600; color:var(--text-primary); margin-bottom:6px;">Judul Materi *</label>
+            <input type="text" id="material-title-input" class="input-field" placeholder="Contoh: Arsitektur RESTful API & Keamanan JWT">
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; font-weight:600; color:var(--text-primary); margin-bottom:6px;">Durasi (Menit)</label>
+            <input type="number" id="material-duration-input" class="input-field" value="15" min="1">
+          </div>
+        </div>
+
+        <!-- Preview Toggle -->
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:24px; padding:12px; background:var(--bg-surface-subtle); border-radius:var(--radius-md);">
+          <input type="checkbox" id="material-is-preview" style="width:16px; height:16px; accent-color:var(--accent-primary);">
+          <div>
+            <label for="material-is-preview" style="font-size:13px; font-weight:600; color:var(--text-primary); cursor:pointer;">Gratis untuk Preview Siswa</label>
+            <div style="font-size:11px; color:var(--text-secondary);">Materi dapat ditonton oleh calon siswa sebelum membeli kursus</div>
+          </div>
+        </div>
+
+        <div style="display:flex; justify-content:flex-end; gap:10px;">
+          <button class="btn btn-outline" style="padding:8px 16px; font-size:13px;" onclick="closeModal('upload-material-modal')">Batal</button>
+          <button class="btn btn-primary" id="btn-submit-upload" style="padding:8px 20px; font-size:13px;" onclick="submitMaterialUpload()">
+            <i class="fas fa-upload"></i> Unggah Materi
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Create Section Modal -->
+    <div class="modal-overlay" id="new-section-modal">
+      <div class="modal-card" style="max-width: 440px;">
+        <div class="modal-header">
+          <h3 class="modal-title">Tambah Bab / Modul Baru</h3>
+          <button class="modal-close-btn" onclick="closeModal('new-section-modal')"><i class="fas fa-xmark"></i></button>
+        </div>
+        <div style="margin-bottom: 20px;">
+          <label style="display:block; font-size:12px; font-weight:600; color:var(--text-primary); margin-bottom:6px;">Judul Bab *</label>
+          <input type="text" id="new-section-title" class="input-field" placeholder="Contoh: Bab 2: Manajemen Basis Data Relasional">
+        </div>
+        <div style="display:flex; justify-content:flex-end; gap:10px;">
+          <button class="btn btn-outline" style="padding:8px 16px; font-size:13px;" onclick="closeModal('new-section-modal')">Batal</button>
+          <button class="btn btn-primary" style="padding:8px 18px; font-size:13px;" onclick="submitCreateSection()">
+            <i class="fas fa-plus"></i> Buat Bab
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Live Media Previewer Modal -->
+    <div class="modal-overlay" id="media-preview-modal">
+      <div class="modal-card" style="max-width: 720px;">
+        <div class="modal-header">
+          <h3 class="modal-title" id="preview-modal-title">Pemutar Materi Pembelajaran</h3>
+          <button class="modal-close-btn" onclick="closePreviewModal()"><i class="fas fa-xmark"></i></button>
+        </div>
+        
+        <div id="media-player-wrapper">
+          <!-- Populated dynamically: Video / PDF / Doc -->
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:16px;">
+          <div style="font-size:12px; color:var(--text-secondary);" id="preview-file-info">-</div>
+          <button class="btn btn-outline" style="padding:6px 14px; font-size:12px;" onclick="closePreviewModal()">Tutup</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div class="toast-container" id="toast-container"></div>
+  </div>
+
+  <script>
+    // Theme Switcher
+    const themeBtn = document.getElementById('theme-toggle-btn');
+    const themeIconSun = document.getElementById('theme-icon-sun');
+    const themeIconMoon = document.getElementById('theme-icon-moon');
+
+    function updateThemeUI(theme) {
+      if (theme === 'dark') {
+        themeIconSun.style.display = 'inline-block';
+        themeIconMoon.style.display = 'none';
+      } else {
+        themeIconSun.style.display = 'none';
+        themeIconMoon.style.display = 'inline-block';
+      }
+    }
+    updateThemeUI(document.documentElement.getAttribute('data-theme') || 'light');
+
+    themeBtn.addEventListener('click', () => {
+      const active = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', active);
+      localStorage.setItem('skillsphere_theme', active);
+      updateThemeUI(active);
+    });
+
+    // Toast Notification
+    function showToast(message, type = 'success') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = 'toast';
+      
+      let icon = '<i class="fas fa-circle-check" style="color: #10B981; font-size: 16px;"></i>';
+      if (type === 'error') icon = '<i class="fas fa-circle-exclamation" style="color: #EF4444; font-size: 16px;"></i>';
+      if (type === 'info') icon = '<i class="fas fa-circle-info" style="color: #3B82F6; font-size: 16px;"></i>';
+
+      toast.innerHTML = `${icon}<span>${message}</span>`;
+      container.appendChild(toast);
+
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(50px)';
+        toast.style.transition = 'all 0.3s ease';
+        setTimeout(() => toast.remove(), 300);
+      }, 4000);
+    }
+
+    // Modal Helpers
+    function openModal(id) { document.getElementById(id).classList.add('active'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+    // State Variables
+    let currentCourses = [];
+    let activeCourse = null;
+    let selectedContentType = 'video';
+    let selectedMaterialFile = null;
+
+    const token = localStorage.getItem('skillsphere_access_token');
+    if (!token) {
+      window.location.href = '/login';
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadTutorCourses();
+      setupDragAndDrop();
+    });
+
+    // Load Tutor's Courses
+    async function loadTutorCourses() {
+      try {
+        const res = await fetch('/api/courses/tutor/my-courses', {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        const json = await res.json();
+
+        if (!res.ok || !json.success) {
+          showToast(json.message || 'Gagal memuat kursus tutor.', 'error');
+          return;
+        }
+
+        currentCourses = json.data;
+        const select = document.getElementById('course-selector');
+
+        if (!currentCourses.length) {
+          select.innerHTML = `<option value="">Belum ada kelas yang diajar</option>`;
+          document.getElementById('course-title-display').textContent = 'Anda belum memiliki kursus.';
+          return;
+        }
+
+        select.innerHTML = currentCourses.map(c => `
+          <option value="${c.id}">${c.title}</option>
+        `).join('');
+
+        // Select first course by default or from query param
+        const urlParams = new URLSearchParams(window.location.search);
+        const courseIdParam = urlParams.get('courseId');
+        const defaultId = courseIdParam ? parseInt(courseIdParam, 10) : currentCourses[0].id;
+        
+        select.value = defaultId;
+        changeActiveCourse(defaultId);
+
+      } catch (err) {
+        console.error('Failed to load courses:', err);
+      }
+    }
+
+    // Change Active Course & Render Details
+    async function changeActiveCourse(courseId) {
+      if (!courseId) return;
+      try {
+        const res = await fetch(`/api/courses/${courseId}`, {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        const json = await res.json();
+        if (!json.success) return;
+
+        activeCourse = json.data;
+        renderActiveCourse(activeCourse);
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    function renderActiveCourse(course) {
+      document.getElementById('course-title-display').textContent = course.title;
+      document.getElementById('course-desc-display').textContent = course.description || 'Tidak ada deskripsi.';
+      document.getElementById('course-status-badge').textContent = (course.status || 'draft').toUpperCase();
+      document.getElementById('course-category-badge').textContent = course.category ? course.category.name : 'Umum';
+      document.getElementById('course-level-badge').textContent = (course.level || 'beginner').toUpperCase();
+
+      if (course.thumbnail_url) {
+        document.getElementById('course-thumb-preview').src = course.thumbnail_url;
+      } else {
+        document.getElementById('course-thumb-preview').src = '/icons/icon-512.png';
+      }
+
+      const sections = course.sections || [];
+      let totalMaterials = 0;
+      let totalDuration = 0;
+
+      sections.forEach(s => {
+        const mats = s.materials || [];
+        totalMaterials += mats.length;
+        mats.forEach(m => totalDuration += (m.duration_minutes || 0));
+      });
+
+      document.getElementById('stat-sections-count').textContent = sections.length;
+      document.getElementById('stat-materials-count').textContent = totalMaterials;
+      document.getElementById('stat-duration-count').textContent = totalDuration;
+      document.getElementById('stat-price-display').textContent = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(course.price || 0);
+
+      // Render Section Selector in Upload Modal
+      const sectionSelect = document.getElementById('material-section-select');
+      sectionSelect.innerHTML = sections.map(s => `
+        <option value="${s.id}">${s.title}</option>
+      `).join('');
+
+      // Render Curriculum Sections
+      const container = document.getElementById('sections-container');
+      if (!sections.length) {
+        container.innerHTML = `
+          <div style="background:var(--bg-surface); border:1px solid var(--border-subtle); border-radius:var(--radius-xl); padding:40px; text-align:center; color:var(--text-secondary);">
+            <i class="fas fa-folder-open" style="font-size:32px; margin-bottom:12px; display:block;"></i>
+            <h3 style="font-family:var(--font-serif); font-size:20px; color:var(--text-primary); margin-bottom:6px;">Belum Ada Bab Materi</h3>
+            <p style="font-size:13px; margin-bottom:16px;">Buat bab pertama Anda untuk mulai mengunggah materi multi-format.</p>
+            <button class="btn btn-primary" onclick="openModal('new-section-modal')"><i class="fas fa-plus"></i> Buat Bab Pertama</button>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = sections.map(sec => {
+        const materials = sec.materials || [];
+        return `
+          <div class="section-box" id="section-box-${sec.id}">
+            <div class="section-header-bar">
+              <div class="section-title-text">
+                <i class="fas fa-folder" style="color:var(--text-secondary);"></i>
+                <span>${sec.title}</span>
+                <span style="font-family:var(--font-sans); font-size:12px; color:var(--text-secondary); font-weight:500;">(${materials.length} Materi)</span>
+              </div>
+              <div style="display:flex; align-items:center; gap:8px;">
+                <button class="btn btn-outline" style="padding:4px 10px; font-size:12px;" onclick="openUploadModalForSection(${sec.id})">
+                  <i class="fas fa-plus"></i> Tambah Materi
+                </button>
+                <button class="btn btn-outline" style="padding:4px 8px; font-size:12px; color:#EF4444;" onclick="deleteSection(${sec.id}, '${sec.title}')" title="Hapus Bab">
+                  <i class="fas fa-trash-can"></i>
+                </button>
+              </div>
+            </div>
+
+            <div class="material-list">
+              ${!materials.length ? `
+                <div style="padding:20px; text-align:center; font-size:13px; color:var(--text-tertiary);">
+                  Belum ada materi di bab ini. Klik "Tambah Materi" untuk mengunggah.
+                </div>
+              ` : materials.map((mat, index) => {
+                let typeIcon = '<i class="fas fa-file-video"></i>';
+                let typeClass = 'type-video';
+                if (mat.content_type === 'ppt') { typeIcon = '<i class="fas fa-file-powerpoint"></i>'; typeClass = 'type-ppt'; }
+                if (mat.content_type === 'pdf') { typeIcon = '<i class="fas fa-file-pdf"></i>'; typeClass = 'type-pdf'; }
+                if (mat.content_type === 'doc') { typeIcon = '<i class="fas fa-file-word"></i>'; typeClass = 'type-doc'; }
+                if (mat.content_type === 'book') { typeIcon = '<i class="fas fa-book-open"></i>'; typeClass = 'type-book'; }
+
+                return `
+                  <div class="material-item-row" id="material-row-${mat.id}">
+                    <div style="display:flex; align-items:center; gap:12px; flex:1;">
+                      <div class="material-icon-box ${typeClass}">
+                        ${typeIcon}
+                      </div>
+                      <div class="material-info">
+                        <div class="material-title-text">${mat.title}</div>
+                        <div class="material-meta-row">
+                          <span><i class="fas fa-clock" style="font-size:10px;"></i> ${mat.duration_minutes || 0} Menit</span>
+                          <span>•</span>
+                          <span>Tipe: ${mat.content_type.toUpperCase()}</span>
+                          <span>•</span>
+                          ${mat.is_preview ? '<span class="badge-preview"><i class="fas fa-unlock"></i> Gratis Preview</span>' : '<span class="badge-locked"><i class="fas fa-lock"></i> Terkunci</span>'}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div style="display:flex; align-items:center; gap:6px;">
+                      <button class="btn btn-outline" style="padding:5px 10px; font-size:12px;" onclick="previewMaterial(${mat.id})">
+                        <i class="fas fa-play"></i> Putar / Lihat
+                      </button>
+                      
+                      <!-- Reorder Buttons -->
+                      <button class="btn btn-outline" style="padding:5px 8px; font-size:11px;" onclick="moveMaterialOrder(${sec.id}, ${mat.id}, 'up')" title="Pindah ke Atas" ${index === 0 ? 'disabled style="opacity:0.4;"' : ''}>
+                        <i class="fas fa-arrow-up"></i>
+                      </button>
+                      <button class="btn btn-outline" style="padding:5px 8px; font-size:11px;" onclick="moveMaterialOrder(${sec.id}, ${mat.id}, 'down')" title="Pindah ke Bawah" ${index === materials.length - 1 ? 'disabled style="opacity:0.4;"' : ''}>
+                        <i class="fas fa-arrow-down"></i>
+                      </button>
+
+                      <button class="btn btn-outline" style="padding:5px 8px; font-size:12px; color:#EF4444;" onclick="deleteMaterial(${mat.id}, '${mat.title}')" title="Hapus Materi">
+                        <i class="fas fa-trash-can"></i>
+                      </button>
+                    </div>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Format Selector in Upload Modal
+    function selectFormatType(type) {
+      selectedContentType = type;
+      document.querySelectorAll('.format-card-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('data-type') === type);
+      });
+    }
+
+    // Drag and Drop Handling
+    function setupDragAndDrop() {
+      const dropZone = document.getElementById('material-drop-zone');
+      ['dragenter', 'dragover'].forEach(name => {
+        dropZone.addEventListener(name, (e) => {
+          e.preventDefault();
+          dropZone.classList.add('dragover');
+        });
+      });
+      ['dragleave', 'drop'].forEach(name => {
+        dropZone.addEventListener(name, (e) => {
+          e.preventDefault();
+          dropZone.classList.remove('dragover');
+        });
+      });
+      dropZone.addEventListener('drop', (e) => {
+        if (e.dataTransfer.files.length) {
+          handleFile(e.dataTransfer.files[0]);
+        }
+      });
+    }
+
+    function handleMaterialFileSelected(input) {
+      if (input.files.length) {
+        handleFile(input.files[0]);
+      }
+    }
+
+    function handleFile(file) {
+      selectedMaterialFile = file;
+      document.getElementById('drop-zone-text').textContent = file.name;
+      document.getElementById('drop-zone-sub').textContent = `Ukuran: ${(file.size / (1024 * 1024)).toFixed(2)} MB`;
+      document.getElementById('drop-icon').className = 'fas fa-file-circle-check drop-zone-icon';
+      document.getElementById('drop-icon').style.color = '#10B981';
+
+      // Auto-detect title and format
+      const nameWithoutExt = file.name.replace(/\.[^/.]+$/, "");
+      if (!document.getElementById('material-title-input').value) {
+        document.getElementById('material-title-input').value = nameWithoutExt;
+      }
+
+      const ext = file.name.split('.').pop().toLowerCase();
+      if (['mp4', 'webm', 'mkv', 'mov'].includes(ext)) selectFormatType('video');
+      else if (['ppt', 'pptx'].includes(ext)) selectFormatType('ppt');
+      else if (['pdf'].includes(ext)) selectFormatType('pdf');
+      else if (['doc', 'docx'].includes(ext)) selectFormatType('doc');
+      else if (['epub', 'mobi'].includes(ext)) selectFormatType('book');
+    }
+
+    function openUploadModal() {
+      selectedMaterialFile = null;
+      document.getElementById('material-file-input').value = '';
+      document.getElementById('drop-zone-text').textContent = 'Pilih atau Seret Berkas ke Sini';
+      document.getElementById('drop-zone-sub').textContent = 'Maksimum ukuran file: 250 MB (Video MP4, PPTX, PDF, DOCX, ePUB)';
+      document.getElementById('drop-icon').className = 'fas fa-cloud-arrow-up drop-zone-icon';
+      document.getElementById('drop-icon').style.color = 'var(--text-secondary)';
+      document.getElementById('material-title-input').value = '';
+      document.getElementById('material-duration-input').value = '15';
+      document.getElementById('material-is-preview').checked = false;
+      document.getElementById('upload-progress-container').style.display = 'none';
+      openModal('upload-material-modal');
+    }
+
+    function openUploadModalForSection(sectionId) {
+      openUploadModal();
+      document.getElementById('material-section-select').value = sectionId;
+    }
+
+    // Submit Material Upload
+    async function submitMaterialUpload() {
+      const sectionId = document.getElementById('material-section-select').value;
+      const title = document.getElementById('material-title-input').value.trim();
+      const duration = document.getElementById('material-duration-input').value;
+      const isPreview = document.getElementById('material-is-preview').checked;
+
+      if (!sectionId) {
+        showToast('Pilih bab tujuan terlebih dahulu.', 'error');
+        return;
+      }
+      if (!title) {
+        showToast('Judul materi wajib diisi.', 'error');
+        return;
+      }
+      if (!selectedMaterialFile) {
+        showToast('Harap pilih berkas materi pembelajaran.', 'error');
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('section_id', sectionId);
+      formData.append('title', title);
+      formData.append('content_type', selectedContentType);
+      formData.append('duration_minutes', duration);
+      formData.append('is_preview', isPreview ? 'true' : 'false');
+      formData.append('file', selectedMaterialFile);
+
+      const btn = document.getElementById('btn-submit-upload');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengunggah...';
+
+      const progressContainer = document.getElementById('upload-progress-container');
+      const progressFill = document.getElementById('upload-progress-fill');
+      progressContainer.style.display = 'block';
+      progressFill.style.width = '35%';
+
+      try {
+        progressFill.style.width = '70%';
+        const res = await fetch('/api/materials', {
+          method: 'POST',
+          headers: { 'Authorization': 'Bearer ' + token },
+          body: formData,
+        });
+
+        const json = await res.json();
+        progressFill.style.width = '100%';
+
+        if (res.ok && json.success) {
+          showToast(`Materi "${title}" berhasil diunggah!`, 'success');
+          closeModal('upload-material-modal');
+          changeActiveCourse(activeCourse.id);
+        } else {
+          showToast(json.message || 'Gagal mengunggah materi.', 'error');
+        }
+      } catch (err) {
+        showToast('Terjadi kesalahan jaringan saat upload.', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-upload"></i> Unggah Materi';
+      }
+    }
+
+    // Submit Create Section
+    async function submitCreateSection() {
+      const title = document.getElementById('new-section-title').value.trim();
+      if (!title) {
+        showToast('Judul bab wajib diisi.', 'error');
+        return;
+      }
+
+      try {
+        const res = await fetch(`/api/courses/${activeCourse.id}/sections`, {
+          method: 'POST',
+          headers: {
+            'Authorization': 'Bearer ' + token,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ title }),
+        });
+
+        const json = await res.json();
+        if (res.ok && json.success) {
+          showToast('Bab baru berhasil ditambahkan!', 'success');
+          closeModal('new-section-modal');
+          document.getElementById('new-section-title').value = '';
+          changeActiveCourse(activeCourse.id);
+        } else {
+          showToast(json.message || 'Gagal membuat bab baru.', 'error');
+        }
+      } catch (e) {
+        showToast('Kesalahan jaringan saat membuat bab.', 'error');
+      }
+    }
+
+    // Delete Section
+    async function deleteSection(sectionId, sectionTitle) {
+      if (!confirm(`Hapus bab "${sectionTitle}" beserta semua materi di dalamnya?`)) return;
+      try {
+        const res = await fetch(`/api/courses/sections/${sectionId}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        const json = await res.json();
+        if (res.ok && json.success) {
+          showToast('Bab berhasil dihapus.', 'info');
+          changeActiveCourse(activeCourse.id);
+        } else {
+          showToast(json.message || 'Gagal menghapus bab.', 'error');
+        }
+      } catch (e) {
+        showToast('Gagal menghapus bab.', 'error');
+      }
+    }
+
+    // Reorder Materials (Up / Down)
+    async function moveMaterialOrder(sectionId, materialId, direction) {
+      const sec = activeCourse.sections.find(s => s.id === sectionId);
+      if (!sec) return;
+      const materials = [...sec.materials];
+      const idx = materials.findIndex(m => m.id === materialId);
+      if (idx === -1) return;
+
+      const targetIdx = direction === 'up' ? idx - 1 : idx + 1;
+      if (targetIdx < 0 || targetIdx >= materials.length) return;
+
+      // Swap elements
+      const temp = materials[idx];
+      materials[idx] = materials[targetIdx];
+      materials[targetIdx] = temp;
+
+      // Prepare items for API
+      const items = materials.map((m, i) => ({ id: m.id, order_index: i + 1 }));
+
+      try {
+        const res = await fetch('/api/materials/reorder', {
+          method: 'PATCH',
+          headers: {
+            'Authorization': 'Bearer ' + token,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ items }),
+        });
+
+        if (res.ok) {
+          showToast('Urutan materi berhasil diperbarui.', 'success');
+          changeActiveCourse(activeCourse.id);
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    // Delete Material
+    async function deleteMaterial(materialId, materialTitle) {
+      if (!confirm(`Apakah Anda yakin ingin menghapus materi "${materialTitle}"? File pada server akan dibersihkan secara otomatis.`)) return;
+      try {
+        const res = await fetch(`/api/materials/${materialId}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        const json = await res.json();
+        if (res.ok && json.success) {
+          showToast('Materi dan berkas terkait berhasil dihapus.', 'info');
+          changeActiveCourse(activeCourse.id);
+        } else {
+          showToast(json.message || 'Gagal menghapus materi.', 'error');
+        }
+      } catch (e) {
+        showToast('Gagal menghapus materi.', 'error');
+      }
+    }
+
+    // Live Media Previewer
+    async function previewMaterial(materialId) {
+      try {
+        const res = await fetch(`/api/materials/${materialId}`, {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        const json = await res.json();
+        if (!json.success) return;
+
+        const mat = json.data;
+        document.getElementById('preview-modal-title').textContent = mat.title;
+        document.getElementById('preview-file-info').textContent = `Tipe: ${mat.content_type.toUpperCase()} • Durasi: ${mat.duration_minutes || 0} Menit • File: ${mat.file_url}`;
+
+        const wrapper = document.getElementById('media-player-wrapper');
+
+        if (mat.content_type === 'video') {
+          wrapper.innerHTML = `
+            <div class="media-player-container">
+              <video controls autoplay poster="${activeCourse.thumbnail_url || ''}">
+                <source src="${mat.file_url}" type="video/mp4">
+                Browser Anda tidak mendukung pemutar video HTML5.
+              </video>
+            </div>
+          `;
+        } else if (mat.content_type === 'pdf') {
+          wrapper.innerHTML = `
+            <div style="width:100%; height:450px; border-radius:var(--radius-lg); overflow:hidden; border:1px solid var(--border-subtle);">
+              <iframe src="${mat.file_url}" style="width:100%; height:100%; border:none;"></iframe>
+            </div>
+          `;
+        } else {
+          let icon = 'fa-file-lines';
+          if (mat.content_type === 'ppt') icon = 'fa-file-powerpoint';
+          if (mat.content_type === 'doc') icon = 'fa-file-word';
+          if (mat.content_type === 'book') icon = 'fa-book-open';
+
+          wrapper.innerHTML = `
+            <div style="background:var(--bg-surface-subtle); border-radius:var(--radius-lg); padding:40px; text-align:center; border:1px solid var(--border-subtle);">
+              <i class="fas ${icon}" style="font-size:48px; color:var(--text-secondary); margin-bottom:14px; display:block;"></i>
+              <h4 style="font-family:var(--font-serif); font-size:18px; margin-bottom:8px;">Dokumen Pembelajaran ${mat.content_type.toUpperCase()}</h4>
+              <p style="font-size:13px; color:var(--text-secondary); margin-bottom:18px;">Berkas siap diunduh atau dipelajari.</p>
+              <a href="${mat.file_url}" target="_blank" class="btn btn-primary" style="display:inline-flex; text-decoration:none;">
+                <i class="fas fa-download"></i> Unduh / Buka Dokumen
+              </a>
+            </div>
+          `;
+        }
+
+        openModal('media-preview-modal');
+      } catch (e) {
+        showToast('Gagal memuat pratinjau materi.', 'error');
+      }
+    }
+
+    function closePreviewModal() {
+      const wrapper = document.getElementById('media-player-wrapper');
+      const video = wrapper.querySelector('video');
+      if (video) video.pause();
+      wrapper.innerHTML = '';
+      closeModal('media-preview-modal');
+    }
+
+    // Handle WebP Course Thumbnail Upload
+    async function handleThumbnailUpload(input) {
+      if (!input.files.length) return;
+      const file = input.files[0];
+
+      const formData = new FormData();
+      formData.append('thumbnail', file);
+      formData.append('quality', '85');
+      formData.append('max_width', '1200');
+
+      showToast('Mengompresi dan mengunggah thumbnail ke format WebP...', 'info');
+
+      try {
+        const uploadRes = await fetch('/api/media/upload/thumbnail', {
+          method: 'POST',
+          headers: { 'Authorization': 'Bearer ' + token },
+          body: formData,
+        });
+        const uploadJson = await uploadRes.json();
+
+        if (uploadRes.ok && uploadJson.success) {
+          const webpUrl = uploadJson.data.relativeUrl;
+
+          // Update course thumbnail
+          await fetch(`/api/courses/${activeCourse.id}`, {
+            method: 'PUT',
+            headers: {
+              'Authorization': 'Bearer ' + token,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ thumbnail_url: webpUrl }),
+          });
+
+          document.getElementById('course-thumb-preview').src = webpUrl;
+          showToast(`Sampul kursus berhasil dikonversi ke WebP (${uploadJson.data.savingsPercent} lebih hemat)!`, 'success');
+        } else {
+          showToast(uploadJson.message || 'Gagal mengunggah thumbnail.', 'error');
+        }
+      } catch (err) {
+        showToast('Gagal memproses thumbnail.', 'error');
+      }
+    }
+  </script>
+</body>
+</html>

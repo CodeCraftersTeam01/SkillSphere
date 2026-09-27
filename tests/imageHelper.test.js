@@ -2,6 +2,7 @@ const assert = require('assert');
 const path = require('path');
 const fs = require('fs');
 const sharp = require('sharp');
+sharp.cache(false);
 const { processAndConvertToWebP } = require('../utils/imageHelper');
 
 async function runImageHelperTests() {

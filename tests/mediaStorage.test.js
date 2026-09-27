@@ -3,6 +3,7 @@ const path = require('path');
 const fs = require('fs');
 const http = require('http');
 const sharp = require('sharp');
+sharp.cache(false);
 const jwt = require('jsonwebtoken');
 
 const app = require('../app');

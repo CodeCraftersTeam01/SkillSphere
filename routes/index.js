@@ -31,4 +31,14 @@ router.get('/dashboard', function(req, res, next) {
   res.render('dashboard', { title: 'Dashboard | SkillSphere AI' });
 });
 
+/* GET Admin Verification UI (Sprint 1 - Satrio) */
+router.get('/admin/verification', function(req, res, next) {
+  res.render('admin/verification', { title: 'Verifikasi Pengajar & Sertifikat | Admin Panel SkillSphere' });
+});
+
+/* GET Tutor Material Upload & Management Portal (Sprint 2 - Satrio) */
+router.get('/tutor/materials', function(req, res, next) {
+  res.render('tutor/materials', { title: 'Portal Manajemen & Upload Materi | Tutor SkillSphere' });
+});
+
 module.exports = router;
