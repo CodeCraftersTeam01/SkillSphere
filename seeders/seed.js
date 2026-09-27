@@ -95,23 +95,81 @@ async function seedDatabase() {
       study_preferences: { topics: ['Node.js', 'React', 'Gemini AI', 'DevOps'] },
     });
 
-    // 3. Tutor Wallet & Certification
+    // 3. Tutor Wallet & Applications / Certifications
     const tutorWallet = await TutorWallet.create({
       tutor_id: tutor.id,
       balance: 1600000.00, // Rp 1.600.000 available
       pending_balance: 400000.00, // Rp 400.000 (holding period 7 days)
     });
 
+    // 3a. Approved application
     await TutorApplication.create({
       user_id: tutor.id,
       cv_url: 'https://storage.skillsphere.id/cv/arjuna_cv.pdf',
       certificate_document_url: 'https://storage.skillsphere.id/certs/aws_pro.pdf',
+      linkedin_url: 'https://linkedin.com/in/arjuna-lanang',
+      portfolio_url: 'https://arjuna.dev',
       institution_name: 'Politeknik Elektronika Negeri Surabaya (PENS)',
       experience_years: 5,
       status: 'approved',
     });
 
-    const tutorCert = await TutorCertification.create({
+    // 3b. Pending applicant candidate 1
+    const candidate1 = await User.create({
+      name: 'Candra Pratama, M.Kom',
+      email: 'candra.candidate@skillsphere.id',
+      password: defaultPassword,
+      role: 'student',
+      is_active: true,
+      is_verified: true,
+    });
+    await UserProfile.create({
+      user_id: candidate1.id,
+      full_name: 'Candra Pratama, M.Kom',
+      bio: 'Dosen Teknik Informatika & AI Researcher dengan 4 tahun pengalaman mengajar.',
+      phone_number: '081234567893',
+      institution: 'Institut Teknologi Sepuluh Nopember (ITS)',
+    });
+    await TutorApplication.create({
+      user_id: candidate1.id,
+      cv_url: 'https://storage.skillsphere.id/cv/candra_cv.pdf',
+      certificate_document_url: 'https://storage.skillsphere.id/certs/google_cloud_architect.pdf',
+      linkedin_url: 'https://linkedin.com/in/candra-pratama-ai',
+      portfolio_url: 'https://candrapratama.io',
+      institution_name: 'Institut Teknologi Sepuluh Nopember (ITS)',
+      experience_years: 4,
+      status: 'pending',
+    });
+
+    // 3c. Pending applicant candidate 2
+    const candidate2 = await User.create({
+      name: 'Dian Permata Sari',
+      email: 'dian.candidate@skillsphere.id',
+      password: defaultPassword,
+      role: 'student',
+      is_active: true,
+      is_verified: true,
+    });
+    await UserProfile.create({
+      user_id: candidate2.id,
+      full_name: 'Dian Permata Sari',
+      bio: 'Lead Mobile UI/UX Designer & Flutter Specialist.',
+      phone_number: '081234567894',
+      institution: 'Universitas Indonesia (UI)',
+    });
+    await TutorApplication.create({
+      user_id: candidate2.id,
+      cv_url: 'https://storage.skillsphere.id/cv/dian_cv.pdf',
+      certificate_document_url: 'https://storage.skillsphere.id/certs/flutter_cert.pdf',
+      linkedin_url: 'https://linkedin.com/in/dian-permata-design',
+      portfolio_url: 'https://dianpermata.dribbble.com',
+      institution_name: 'Universitas Indonesia (UI)',
+      experience_years: 3,
+      status: 'pending',
+    });
+
+    // 3d. Verified & Pending Certifications
+    await TutorCertification.create({
       tutor_id: tutor.id,
       certificate_name: 'AWS Certified Solutions Architect - Professional',
       issuer: 'Amazon Web Services',
@@ -121,6 +179,28 @@ async function seedDatabase() {
       is_verified: true,
       verified_at: new Date(),
       verified_by: admin.id,
+    });
+
+    await TutorCertification.create({
+      tutor_id: tutor.id,
+      certificate_name: 'Google Professional Cloud Security Engineer',
+      issuer: 'Google Cloud Certified',
+      issue_date: '2024-06-20',
+      expiry_date: '2026-06-20',
+      credential_id: 'GCP-SEC-883192',
+      credential_url: 'https://google.accredible.com/verify/GCP-SEC-883192',
+      is_verified: false,
+    });
+
+    await TutorCertification.create({
+      tutor_id: tutor.id,
+      certificate_name: 'Certified Kubernetes Administrator (CKA)',
+      issuer: 'The Linux Foundation & CNCF',
+      issue_date: '2023-11-10',
+      expiry_date: '2026-11-10',
+      credential_id: 'CKA-901128-LF',
+      credential_url: 'https://www.cncf.io/certification/cka/',
+      is_verified: false,
     });
 
     // 4. Categories
