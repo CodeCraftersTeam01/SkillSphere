@@ -258,25 +258,6 @@
       font-weight: 600;
     }
 
-    .header-right-side {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
-
-    .db-status-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: var(--color-success-bg);
-      color: var(--color-success);
-      border: 1px solid var(--color-success);
-      padding: 4px 10px;
-      border-radius: var(--radius-full);
-      font-size: 11px;
-      font-weight: 600;
-    }
-
     .admin-content-body {
       padding: 36px 32px 80px;
       flex: 1;
@@ -301,12 +282,12 @@
 
     /* Welcome Hero Banner */
     .welcome-hero {
-      margin-bottom: 30px;
+      margin-bottom: 28px;
     }
 
     .welcome-title {
       font-family: var(--font-serif);
-      font-size: 32px;
+      font-size: 30px;
       font-weight: 500;
       color: var(--text-primary);
       letter-spacing: -0.02em;
@@ -316,22 +297,8 @@
     .welcome-desc {
       font-size: 14px;
       color: var(--text-secondary);
-      max-width: 760px;
-      line-height: 1.5;
-    }
-
-    .sprint-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: var(--accent-primary-light);
-      color: var(--text-primary);
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-full);
-      padding: 5px 12px;
-      font-size: 12px;
-      font-weight: 600;
-      margin-bottom: 12px;
+      max-width: 720px;
+      line-height: 1.55;
     }
 
     /* Metric Cards Grid */
@@ -722,11 +689,7 @@
         </button>
 
         <button class="sidebar-nav-item" data-view="financial" onclick="switchAdminView('financial')">
-          <span><i class="fas fa-wallet"></i> Finansial & Split 20%/80%</span>
-        </button>
-
-        <button class="sidebar-nav-item" data-view="database" onclick="switchAdminView('database')">
-          <span><i class="fas fa-database"></i> 19 Tabel Relasional</span>
+          <span><i class="fas fa-wallet"></i> Bagi Hasil & Finansial</span>
         </button>
       </nav>
 
@@ -763,11 +726,6 @@
         </div>
 
         <div class="header-right-side">
-          <div class="db-status-pill">
-            <i class="fas fa-circle-check" style="font-size:10px;"></i>
-            <span>MySQL 19 Tabel Aktif</span>
-          </div>
-
           <!-- Theme Toggle -->
           <button class="theme-toggle-btn" id="theme-toggle-btn" type="button" aria-label="Ganti mode gelap/terang">
             <i class="fas fa-sun" id="theme-icon-sun" style="display:none;"></i>
@@ -789,13 +747,9 @@
         <!-- VIEW 1: EXECUTIVE OVERVIEW -->
         <section class="dashboard-view-section active" id="view-overview">
           <div class="welcome-hero">
-            <div class="sprint-badge">
-              <i class="fas fa-shield-halved"></i>
-              <span>SkillSphere AI Core Admin Engine</span>
-            </div>
-            <h1 class="welcome-title">Dashboard Administrator</h1>
+            <h1 class="welcome-title">Panel Administrator</h1>
             <p class="welcome-desc">
-              Pusat kendali ekosistem SkillSphere AI: monitoring pendaftaran tutor, verifikasi sertifikat resmi, arsitektur finansial split revenue 20%/80%, dan integritas 19 tabel relasional.
+              Kelola verifikasi instruktur baru, validasi sertifikasi keahlian resmi, serta pantau performa kursus dan alur finansial platform.
             </p>
           </div>
 
@@ -1033,51 +987,6 @@
           </div>
         </section>
 
-        <!-- VIEW 6: 19 RELATIONAL TABLES STATUS -->
-        <section class="dashboard-view-section" id="view-database">
-          <div class="section-card">
-            <div class="section-header">
-              <h2 class="section-title">
-                <i class="fas fa-database"></i> Arsitektur 19 Tabel Database Relasional (MySQL)
-              </h2>
-              <span class="status-pill status-active"><i class="fas fa-check"></i> 100% Terintegrasi & Synced</span>
-            </div>
-
-            <div class="table-responsive">
-              <table class="styled-table">
-                <thead>
-                  <tr>
-                    <th>#</th>
-                    <th>Nama Tabel Relasional</th>
-                    <th>Domain Entitas</th>
-                    <th>Deskripsi & Relasi</th>
-                    <th>Status Schema</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr><td>1</td><td><code>users</code></td><td>Identity & Security</td><td>Kredensial pengguna inti (Admin, Tutor, Peserta) dengan enkripsi bcrypt.</td><td><span class="status-pill status-active">Aktif</span></td></tr>
-                  <tr><td>2</td><td><code>user_profiles</code></td><td>Identity & Security</td><td>Data biodata, foto avatar WebP, nomor telepon, dan preferensi studi (1:1 ke User).</td><td><span class="status-pill status-active">Aktif</span></td></tr>
-                  <tr><td>3</td><td><code>tutor_applications</code></td><td>Verification Engine</td><td>Pendaftaran pengajar dengan berkas CV dan link portofolio (1:N ke User).</td><td><span class="status-pill status-active">Aktif</span></td></tr>
-                  <tr><td>4</td><td><code>tutor_certifications</code></td><td>Verification Engine</td><td>Data sertifikat resmi pengajar yang divalidasi oleh Admin (1:N ke User).</td><td><span class="status-pill status-active">Aktif</span></td></tr>
-                  <tr><td>5</td><td><code>categories</code></td><td>Curriculum</td><td>Pengelompokan bidang studi dan rumpun karir teknologi.</td><td><span class="status-pill status-active">Aktif</span></td></tr>
-                  <tr><td>6</td><td><code>courses</code></td><td>Curriculum</td><td>Data kursus, deskripsi, thumbnail WebP, harga, dan rating.</td><td><span class="status-pill status-active">Aktif</span></td></tr>
-                  <tr><td>7</td><td><code>course_sections</code></td><td>Curriculum</td><td>Struktur bab dan modul dalam satu kursus (1:N ke Course).</td><td><span class="status-pill status-active">Aktif</span></td></tr>
-                  <tr><td>8</td><td><code>course_materials</code></td><td>Content Delivery</td><td>Materi multi-format: Video, PPT, PDF, DOC, dan Digital Book (1:N ke Section).</td><td><span class="status-pill status-active">Aktif</span></td></tr>
-                  <tr><td>9</td><td><code>ai_career_roadmaps</code></td><td>AI Career Engine</td><td>Rekomendasi jalur belajar personal oleh Gemini AI.</td><td><span class="status-pill status-active">Aktif</span></td></tr>
-                  <tr><td>10</td><td><code>enrollments</code></td><td>Academic Progress</td><td>Pencatatan siswa yang aktif dalam kursus dan pelacakan progres belajar.</td><td><span class="status-pill status-active">Aktif</span></td></tr>
-                  <tr><td>11</td><td><code>course_milestones</code></td><td>Gamification</td><td>Target pencapaian belajar dengan indikator waktu belajar.</td><td><span class="status-pill status-active">Aktif</span></td></tr>
-                  <tr><td>12</td><td><code>exams</code></td><td>Evaluation</td><td>Bank soal dan pengaturan ujian akhir untuk sertifikasi.</td><td><span class="status-pill status-active">Aktif</span></td></tr>
-                  <tr><td>13</td><td><code>exam_results</code></td><td>Evaluation</td><td>Log hasil pengerjaan ujian, nilai, dan status kelulusan.</td><td><span class="status-pill status-active">Aktif</span></td></tr>
-                  <tr><td>14</td><td><code>discounts_earned</code></td><td>Reward Engine</td><td>Voucher diskon reward untuk peserta berprestasi.</td><td><span class="status-pill status-active">Aktif</span></td></tr>
-                  <tr><td>15</td><td><code>certificates</code></td><td>Digital Credentials</td><td>Metadata sertifikat digital kelulusan siswa.</td><td><span class="status-pill status-active">Aktif</span></td></tr>
-                  <tr><td>16</td><td><code>transactions</code></td><td>Payment Gateway</td><td>Log pembayaran real-time terhubung ke Payment Gateway.</td><td><span class="status-pill status-active">Aktif</span></td></tr>
-                  <tr><td>17</td><td><code>tutor_wallets</code></td><td>Financial Engine</td><td>Saldo virtual tutor (80% pendapatan bersih penjualan).</td><td><span class="status-pill status-active">Aktif</span></td></tr>
-                  <tr><td>18</td><td><code>wallet_transactions</code></td><td>Financial Ledger</td><td>Riwayat mutasi saldo masuk dan keluar penarikan dana.</td><td><span class="status-pill status-active">Aktif</span></td></tr>
-                  <tr><td>19</td><td><code>withdrawal_requests</code></td><td>Payout Engine</td><td>Pengajuan penarikan dana dari platform ke rekening bank tutor.</td><td><span class="status-pill status-active">Aktif</span></td></tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
         </section>
 
       </main>
@@ -1251,8 +1160,7 @@
         verification: 'Verifikasi Pengajar',
         certifications: 'Validasi Sertifikat',
         courses: 'Data Kursus & Materi',
-        financial: 'Finansial & Split Revenue',
-        database: '19 Tabel Relasional',
+        financial: 'Bagi Hasil & Finansial',
       };
       document.getElementById('current-view-breadcrumb').textContent = breadcrumbMap[viewName] || 'Admin Panel';
     }
