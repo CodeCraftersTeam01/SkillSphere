@@ -1240,7 +1240,6 @@
         const parsed = JSON.parse(savedUser);
         if (parsed.role === 'admin') {
           window.location.href = '/admin';
-          return;
         } else if (parsed.role === 'tutor') {
           currentUserRole = 'tutor';
         }
