@@ -6,6 +6,9 @@ const { authenticateJWT, authorizeRoles } = require('../../middleware/auth');
 // Public / General categories list
 router.get('/categories/list', courseController.getCategories);
 
+// Public / General courses list
+router.get('/', courseController.getAllCourses);
+
 // Tutor courses list
 router.get('/tutor/my-courses', authenticateJWT, authorizeRoles('tutor', 'admin'), courseController.getMyCourses);
 

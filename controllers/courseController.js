@@ -387,3 +387,67 @@ exports.getCategories = async (req, res) => {
     });
   }
 };
+
+/**
+ * Get all courses across platform (pagination, search, filtering)
+ */
+exports.getAllCourses = async (req, res) => {
+  try {
+    const { category_id, search, limit = 20, page = 1, status } = req.query;
+    const parsedLimit = Math.min(parseInt(limit, 10) || 20, 100);
+    const parsedPage = Math.max(parseInt(page, 10) || 1, 1);
+    const offset = (parsedPage - 1) * parsedLimit;
+
+    const where = {};
+    if (status) {
+      where.status = status;
+    }
+    if (category_id) {
+      where.category_id = category_id;
+    }
+    if (search) {
+      const { Op } = require('sequelize');
+      where[Op.or] = [
+        { title: { [Op.like]: `%${search}%` } },
+        { description: { [Op.like]: `%${search}%` } },
+      ];
+    }
+
+    const { count, rows } = await Course.findAndCountAll({
+      where,
+      limit: parsedLimit,
+      offset,
+      include: [
+        {
+          model: Category,
+          as: 'category',
+          attributes: ['id', 'name', 'slug', 'icon'],
+        },
+        {
+          model: User,
+          as: 'tutor',
+          attributes: ['id', 'name', 'email', 'avatar_url'],
+        },
+      ],
+      order: [['created_at', 'DESC']],
+    });
+
+    return res.status(200).json({
+      success: true,
+      data: {
+        total: count,
+        page: parsedPage,
+        limit: parsedLimit,
+        total_pages: Math.ceil(count / parsedLimit),
+        courses: rows,
+      },
+    });
+  } catch (err) {
+    console.error('Error in getAllCourses:', err);
+    return res.status(500).json({
+      success: false,
+      message: 'Gagal memuat daftar kursus platform.',
+      error: err.message,
+    });
+  }
+};
