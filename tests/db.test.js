@@ -52,19 +52,9 @@ async function runDatabaseTests() {
     await sequelize.authenticate();
     console.log('  ✔ Database connection authenticated.');
 
-    // 2. Sync schema
+    // 2. Sync schema (non-destructive)
+    await sequelize.sync();
     const dialect = sequelize.getDialect();
-    if (dialect === 'mysql') {
-      await sequelize.query('SET FOREIGN_KEY_CHECKS = 0;');
-      await sequelize.sync({ force: true });
-      await sequelize.query('SET FOREIGN_KEY_CHECKS = 1;');
-    } else if (dialect === 'sqlite') {
-      await sequelize.query('PRAGMA foreign_keys = OFF;');
-      await sequelize.sync({ force: true });
-      await sequelize.query('PRAGMA foreign_keys = ON;');
-    } else {
-      await sequelize.sync({ force: true });
-    }
     console.log(`  ✔ Database schema synchronized successfully on ${dialect.toUpperCase()}.`);
 
     // 3. Verify all 19 models exist
@@ -79,9 +69,10 @@ async function runDatabaseTests() {
     console.log('\n  🔗 Testing Model Relationships & Integrity Constraints...');
 
     // User & Profile (1:1)
+    const testEmail = `test.tutor.${Date.now()}@skillsphere.id`;
     const testUser = await User.create({
-      name: 'Test Tutor',
-      email: 'test.tutor@skillsphere.id',
+      name: 'Test Tutor Relational',
+      email: testEmail,
       password: 'hashedpassword',
       role: 'tutor',
     });
@@ -112,16 +103,16 @@ async function runDatabaseTests() {
 
     // Category <-> Course (1:N)
     const cat = await Category.create({
-      name: 'Cloud Computing',
-      slug: 'cloud-computing',
+      name: `Cloud Computing DB Test ${Date.now()}`,
+      slug: `cloud-computing-test-${Date.now()}`,
       description: 'AWS and GCP mastery',
     });
 
     const course = await Course.create({
       tutor_id: testUser.id,
       category_id: cat.id,
-      title: 'Cloud Masterclass',
-      slug: 'cloud-masterclass',
+      title: 'Cloud Masterclass DB Test',
+      slug: `cloud-masterclass-test-${Date.now()}`,
       price: 300000,
     });
 
@@ -131,8 +122,8 @@ async function runDatabaseTests() {
         { model: User, as: 'tutor' },
       ],
     });
-    assert.strictEqual(courseWithCat.category.name, 'Cloud Computing');
-    assert.strictEqual(courseWithCat.tutor.name, 'Test Tutor');
+    assert.strictEqual(courseWithCat.category.id, cat.id);
+    assert.strictEqual(courseWithCat.tutor.name, 'Test Tutor Relational');
     console.log('  ✔ Category & User <-> Course relations verified.');
 
     // Course <-> Section <-> Material (Hierarchical)
@@ -158,6 +149,15 @@ async function runDatabaseTests() {
     });
     assert.strictEqual(courseTree.sections[0].materials[0].title, 'Lecture 1 Video');
     console.log('  ✔ Course -> Section -> Material hierarchy verified.');
+
+    // Clean up only test records so seeded database data is 100% preserved
+    await material.destroy().catch(() => {});
+    await section.destroy().catch(() => {});
+    await course.destroy().catch(() => {});
+    await cat.destroy().catch(() => {});
+    await wallet.destroy().catch(() => {});
+    await testProfile.destroy().catch(() => {});
+    await testUser.destroy().catch(() => {});
 
     console.log('\n======================================================');
     console.log('🎉 ALL 19 DATABASE RELATIONAL TESTS PASSED SUCCESSFULLY!');
