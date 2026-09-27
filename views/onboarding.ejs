@@ -6,6 +6,16 @@
   <title>Personalisasi & Verifikasi Profil | SkillSphere AI</title>
   <meta name="description" content="Personalisasi ruang belajar atau portal instruktur cerdas SkillSphere AI berdasarkan keahlian, institusi kelulusan, sertifikat, dan target karir.">
   
+  <!-- PWA Manifest & App Icons -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#1F1E1B">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="SkillSphere">
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="shortcut icon" href="/favicon.svg">
+  
   <!-- Google Fonts: Newsreader (Editorial Serif) & Plus Jakarta Sans (Modern Sans) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,6 +26,7 @@
   
   <!-- Claude Design System Stylesheet -->
   <link rel="stylesheet" href="/stylesheets/claude-theme.css">
+
   
   <style>
     .onboarding-page {
@@ -37,15 +48,24 @@
     }
 
     .onboarding-progress-wrapper {
-      margin-bottom: 32px;
+      margin-bottom: 28px;
     }
 
     .progress-meta-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
       font-size: 13px;
+      flex-wrap: nowrap;
+      gap: 10px;
+    }
+
+    .progress-left-info {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
     }
 
     .progress-step-counter {
@@ -53,7 +73,8 @@
       color: var(--text-primary);
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 5px;
+      font-size: 13px;
     }
 
     .role-indicator-badge {
@@ -61,24 +82,20 @@
       font-weight: 600;
       padding: 2px 8px;
       border-radius: var(--radius-full);
-      background: var(--accent-primary-light);
+      background: var(--bg-surface-subtle);
       border: 1px solid var(--border-subtle);
-      color: var(--text-primary);
-      text-transform: capitalize;
+      color: var(--text-secondary);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
     }
 
-    .progress-skip-btn {
-      background: none;
-      border: none;
+    .progress-percent-label {
+      font-size: 12px;
+      font-weight: 600;
       color: var(--text-tertiary);
-      font-size: 13px;
-      cursor: pointer;
-      transition: color 0.2s ease;
-    }
-
-    .progress-skip-btn:hover {
-      color: var(--text-primary);
-      text-decoration: underline;
+      font-family: var(--font-mono);
+      flex-shrink: 0;
     }
 
     .progress-track {
@@ -308,6 +325,93 @@
       gap: 16px;
     }
 
+    /* --- Certificate Upload Dropzone & WebP Optimization Styles --- */
+    .file-upload-dropzone {
+      border: 2px dashed var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 22px 16px;
+      text-align: center;
+      background: var(--bg-surface-subtle);
+      cursor: pointer;
+      transition: all 0.22s ease;
+      position: relative;
+    }
+
+    .file-upload-dropzone:hover, .file-upload-dropzone.dragover {
+      border-color: var(--text-primary);
+      background: var(--accent-primary-light);
+    }
+
+    .dropzone-icon {
+      font-size: 28px;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+    }
+
+    .dropzone-title {
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+
+    .dropzone-hint {
+      font-size: 11.5px;
+      color: var(--text-tertiary);
+    }
+
+    .webp-badge-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 3px 10px;
+      border-radius: var(--radius-full);
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-top: 8px;
+    }
+
+    .cert-preview-box {
+      display: none;
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      border: 1px solid var(--border-subtle);
+      margin-top: 10px;
+      background: var(--bg-surface);
+    }
+
+    .cert-preview-img {
+      width: 100%;
+      max-height: 200px;
+      object-fit: contain;
+      display: block;
+      background: rgba(0, 0, 0, 0.05);
+    }
+
+    .cert-preview-info {
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .cert-remove-btn {
+      background: none;
+      border: none;
+      color: var(--color-danger);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
     /* --- Navigation Footer Inside Card --- */
     .question-footer-nav {
       display: flex;
@@ -369,6 +473,74 @@
         transform: scale(1.06);
       }
     }
+
+    /* Mobile Responsive Rules for Onboarding */
+    @media (max-width: 640px) {
+      .onboarding-page {
+        padding: 12px 16px 20px;
+        max-width: 100%;
+      }
+
+      .onboarding-header {
+        margin-bottom: 16px;
+      }
+
+      .onboarding-progress-wrapper {
+        margin-bottom: 20px;
+      }
+
+      .question-card {
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        border-radius: 0 !important;
+      }
+
+      .question-title {
+        font-size: 21px;
+        margin-bottom: 8px;
+        line-height: 1.35;
+      }
+
+      .question-subtitle {
+        font-size: 13px;
+        margin-bottom: 20px;
+      }
+
+      .options-stack {
+        gap: 10px;
+      }
+
+      .options-grid-2 {
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+
+      .option-card-btn {
+        padding: 13px 14px;
+        gap: 12px;
+      }
+
+      .option-icon-box {
+        width: 36px;
+        height: 36px;
+        font-size: 15px;
+      }
+
+      .option-label {
+        font-size: 13.5px;
+      }
+
+      .option-desc {
+        font-size: 11.5px;
+      }
+
+      .question-footer-nav {
+        margin-top: 20px;
+        padding-top: 14px;
+      }
+    }
   </style>
 
   <script>
@@ -405,15 +577,16 @@
     <!-- Progress Bar Tracker -->
     <div class="onboarding-progress-wrapper" id="progress-wrapper">
       <div class="progress-meta-row">
-        <span class="progress-step-counter" id="progress-counter">
-          <i class="fas fa-wand-magic-sparkles" style="font-size: 12px;"></i>
-          <span>Langkah <strong id="step-number-text">1</strong> dari 5</span>
-          <span class="role-indicator-badge" id="role-badge-display">Peserta</span>
-        </span>
-        <span style="font-size: 12px; color: var(--text-tertiary); display: inline-flex; align-items: center; gap: 5px;">
-          <i class="fas fa-circle-info" style="font-size: 11px;"></i>
-          <span>Wajib dilengkapi untuk membuka dashboard</span>
-        </span>
+        <div class="progress-left-info">
+          <span class="progress-step-counter" id="progress-counter">
+            <i class="fas fa-wand-magic-sparkles" style="font-size: 11px;"></i>
+            <span>Langkah <strong id="step-number-text">1</strong>/5</span>
+          </span>
+          <span class="role-indicator-badge" id="role-badge-display">
+            <i class="fas fa-user-graduate" style="font-size: 10px;"></i> Siswa
+          </span>
+        </div>
+        <span class="progress-percent-label" id="progress-percent-label">20% Selesai</span>
       </div>
       <div class="progress-track">
         <div class="progress-bar-fill" id="progress-fill" style="width: 20%;"></div>
@@ -852,17 +1025,17 @@
           </div>
         </div>
 
-        <!-- TUTOR STEP 4: Sertifikat Pendukung untuk Verifikasi -->
+        <!-- TUTOR STEP 4: Sertifikat Pendukung untuk Verifikasi & Portofolio LinkedIn -->
         <div class="question-card" id="tutor-step-4" data-step="4" style="display: none;">
           <div class="question-badge">
-            <i class="fas fa-certificate"></i> Dokumen & Sertifikat Pendukung
+            <i class="fas fa-certificate"></i> Sertifikat & Kredibilitas Pengajar
           </div>
-          <h1 class="question-title">Lampirkan sertifikat pendukung untuk verifikasi instruktur</h1>
-          <p class="question-subtitle">Sertifikat terverifikasi akan memunculkan lencana centang biru pada kursus Anda.</p>
+          <h1 class="question-title">Lampirkan sertifikat pendukung & profil profesional Anda</h1>
+          <p class="question-subtitle">Sertifikat akan diproses & dikompresi ke WebP berkinerja tinggi agar sangat ringan tanpa mengurangi kejernihan dokumen.</p>
 
           <div class="form-step-fields">
             <div class="form-group">
-              <label for="tutor-cert-name" class="form-label">Nama Sertifikasi / Lisensi Profesional</label>
+              <label for="tutor-cert-name" class="form-label">Nama Sertifikasi / Lisensi Profesional (Opsional)</label>
               <div class="input-container">
                 <i class="fas fa-file-signature input-icon-left"></i>
                 <input 
@@ -875,33 +1048,77 @@
             </div>
 
             <div class="form-group">
-              <label for="tutor-cert-issuer" class="form-label">Lembaga / Organisasi Penerbit Sertifikat</label>
+              <label for="tutor-cert-issuer" class="form-label">Lembaga / Organisasi Penerbit</label>
               <div class="input-container">
                 <i class="fas fa-building input-icon-left"></i>
                 <input 
                   type="text" 
                   id="tutor-cert-issuer" 
                   class="form-input has-icon-left" 
-                  placeholder="Contoh: Amazon Web Services / Google Cloud / BNSP / Coursera"
+                  placeholder="Contoh: Amazon Web Services / Google Cloud / BNSP / Dicoding"
+                >
+              </div>
+            </div>
+
+            <!-- Upload Foto Gambar Sertifikat (Dikompresi ke WebP) -->
+            <div class="form-group">
+              <label class="form-label">Foto / Scan Gambar Sertifikat Pendukung</label>
+              <input type="file" id="tutor-cert-file-input" accept="image/*" style="display: none;">
+              <div class="file-upload-dropzone" id="tutor-cert-dropzone">
+                <div class="dropzone-icon"><i class="fas fa-cloud-arrow-up"></i></div>
+                <div class="dropzone-title">Pilih atau letakkan foto sertifikat di sini</div>
+                <div class="dropzone-hint">Mendukung format JPG, PNG, WEBP, HEIC (Maksimal 10MB)</div>
+                <div class="webp-badge-pill">
+                  <i class="fas fa-bolt" style="color:var(--text-primary);"></i>
+                  <span>Dikompresi otomatis via Image Helper ke format WebP</span>
+                </div>
+              </div>
+
+              <!-- Preview Box -->
+              <div class="cert-preview-box" id="cert-preview-box">
+                <img id="cert-preview-image" class="cert-preview-img" alt="Pratinjau Sertifikat">
+                <div class="cert-preview-info">
+                  <span id="cert-file-info" style="font-weight: 500; color: var(--text-primary);"></span>
+                  <button type="button" class="cert-remove-btn" id="cert-remove-btn">
+                    <i class="fas fa-trash-can"></i> Hapus Foto
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Social Media / LinkedIn & Portfolio -->
+            <div class="form-group">
+              <label for="tutor-linkedin-url" class="form-label">
+                <i class="fab fa-linkedin" style="margin-right: 4px; color: #0a66c2;"></i> Link Profil LinkedIn
+              </label>
+              <div class="input-container">
+                <i class="fab fa-linkedin input-icon-left" style="color: #0a66c2;"></i>
+                <input 
+                  type="url" 
+                  id="tutor-linkedin-url" 
+                  class="form-input has-icon-left" 
+                  placeholder="https://www.linkedin.com/in/username"
                 >
               </div>
             </div>
 
             <div class="form-group">
-              <label for="tutor-cert-url" class="form-label">Link Dokumen Sertifikat / Portofolio (Opsional)</label>
+              <label for="tutor-portfolio-url" class="form-label">
+                <i class="fas fa-globe" style="margin-right: 4px;"></i> Link Portofolio Digital / GitHub / Website (Opsional)
+              </label>
               <div class="input-container">
-                <i class="fas fa-link input-icon-left"></i>
+                <i class="fas fa-globe input-icon-left"></i>
                 <input 
                   type="url" 
-                  id="tutor-cert-url" 
+                  id="tutor-portfolio-url" 
                   class="form-input has-icon-left" 
-                  placeholder="https://credential.net/... atau link Google Drive CV"
+                  placeholder="https://github.com/username atau https://portofolio.id"
                 >
               </div>
             </div>
 
-            <button type="button" class="submit-btn" id="btn-submit-tutor-step4" style="margin-top: 4px;">
-              <span>Simpan Sertifikat & Lanjutkan <i class="fas fa-arrow-right" style="margin-left: 6px;"></i></span>
+            <button type="button" class="submit-btn" id="btn-submit-tutor-step4" style="margin-top: 6px;">
+              <span id="btn-tutor-step4-text">Simpan & Lanjutkan <i class="fas fa-arrow-right" style="margin-left: 6px;"></i></span>
             </button>
           </div>
 
@@ -1065,6 +1282,10 @@
       certificate_name: '',
       issuer: '',
       credential_url: '',
+      certificate_file_url: '',
+      certificate_image_base64: '',
+      linkedin_url: '',
+      portfolio_url: '',
       weekly_teaching_commitment: '',
     };
 
@@ -1073,12 +1294,16 @@
 
     const progressFill = document.getElementById('progress-fill');
     const stepNumberText = document.getElementById('step-number-text');
+    const progressPercentLabel = document.getElementById('progress-percent-label');
     const progressWrapper = document.getElementById('progress-wrapper');
 
     function updateProgressBar(step) {
-      const percentage = (step / totalSteps) * 100;
+      const percentage = Math.round((step / totalSteps) * 100);
       progressFill.style.width = percentage + '%';
       stepNumberText.textContent = step;
+      if (progressPercentLabel) {
+        progressPercentLabel.textContent = percentage + '% Selesai';
+      }
     }
 
     function getStepElementId(stepNum) {
@@ -1149,17 +1374,90 @@
       });
     }
 
-    // Tutor Step 4 Submit: Certificate Verification
+    // --- Tutor Step 4: Certificate File Dropzone & Image Handling ---
+    const certDropzone = document.getElementById('tutor-cert-dropzone');
+    const certFileInput = document.getElementById('tutor-cert-file-input');
+    const certPreviewBox = document.getElementById('cert-preview-box');
+    const certPreviewImg = document.getElementById('cert-preview-image');
+    const certFileInfo = document.getElementById('cert-file-info');
+    const certRemoveBtn = document.getElementById('cert-remove-btn');
+    let uploadedCertificateBase64 = '';
+
+    if (certDropzone && certFileInput) {
+      certDropzone.addEventListener('click', () => certFileInput.click());
+
+      certDropzone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        certDropzone.classList.add('dragover');
+      });
+
+      certDropzone.addEventListener('dragleave', () => {
+        certDropzone.classList.remove('dragover');
+      });
+
+      certDropzone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        certDropzone.classList.remove('dragover');
+        if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+          handleCertificateFile(e.dataTransfer.files[0]);
+        }
+      });
+
+      certFileInput.addEventListener('change', (e) => {
+        if (e.target.files && e.target.files[0]) {
+          handleCertificateFile(e.target.files[0]);
+        }
+      });
+    }
+
+    function handleCertificateFile(file) {
+      if (!file.type.startsWith('image/')) {
+        alert('Format file tidak didukung. Harap pilih file gambar sertifikat (JPG, PNG, WEBP).');
+        return;
+      }
+      if (file.size > 10 * 1024 * 1024) {
+        alert('Ukuran file terlalu besar. Maksimal 10MB.');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        uploadedCertificateBase64 = evt.target.result;
+        personalizationData.certificate_image_base64 = uploadedCertificateBase64;
+        
+        certPreviewImg.src = uploadedCertificateBase64;
+        certFileInfo.textContent = `${file.name} (${Math.round(file.size / 1024)} KB) - Siap dikompresi ke WebP`;
+        certPreviewBox.style.display = 'block';
+        certDropzone.style.display = 'none';
+      };
+      reader.readAsDataURL(file);
+    }
+
+    if (certRemoveBtn) {
+      certRemoveBtn.addEventListener('click', () => {
+        uploadedCertificateBase64 = '';
+        personalizationData.certificate_image_base64 = '';
+        personalizationData.certificate_file_url = '';
+        certFileInput.value = '';
+        certPreviewBox.style.display = 'none';
+        certDropzone.style.display = 'block';
+      });
+    }
+
+    // Tutor Step 4 Submit: Certificate, LinkedIn & Portfolio
     const btnSubmitTutorStep4 = document.getElementById('btn-submit-tutor-step4');
     if (btnSubmitTutorStep4) {
       btnSubmitTutorStep4.addEventListener('click', () => {
         const certName = document.getElementById('tutor-cert-name').value.trim();
         const issuer = document.getElementById('tutor-cert-issuer').value.trim();
-        const url = document.getElementById('tutor-cert-url').value.trim();
+        const linkedinUrl = document.getElementById('tutor-linkedin-url').value.trim();
+        const portfolioUrl = document.getElementById('tutor-portfolio-url').value.trim();
 
         personalizationData.certificate_name = certName;
         personalizationData.issuer = issuer;
-        personalizationData.credential_url = url;
+        personalizationData.linkedin_url = linkedinUrl;
+        personalizationData.portfolio_url = portfolioUrl;
+        personalizationData.certificate_image_base64 = uploadedCertificateBase64;
 
         goToStep(5);
       });
@@ -1231,5 +1529,7 @@
       }
     }
   </script>
+  <!-- PWA Service Worker & Install Prompt Banner -->
+  <script src="/javascripts/pwa-installer.js"></script>
 </body>
 </html>

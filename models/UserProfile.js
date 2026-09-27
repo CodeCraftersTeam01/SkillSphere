@@ -32,6 +32,14 @@ const UserProfile = sequelize.define('UserProfile', {
     type: DataTypes.STRING(150),
     allowNull: true,
   },
+  linkedin_url: {
+    type: DataTypes.STRING(255),
+    allowNull: true,
+  },
+  portfolio_url: {
+    type: DataTypes.STRING(255),
+    allowNull: true,
+  },
   study_preferences: {
     type: DataTypes.JSON,
     allowNull: true,

@@ -6,6 +6,16 @@
   <title>Masuk | SkillSphere AI</title>
   <meta name="description" content="Masuk ke platform pembelajaran online SkillSphere AI untuk mengakses kursus, rekomendasi karir cerdas, dan portal tutor.">
   
+  <!-- PWA Manifest & App Icons -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#1F1E1B">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="SkillSphere">
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="shortcut icon" href="/favicon.svg">
+  
   <!-- Google Fonts: Newsreader (Editorial Serif) & Plus Jakarta Sans (Modern Sans) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -132,6 +142,8 @@
       justify-content: center;
       align-items: center;
       perspective: 1000px;
+      overflow: visible;
+      padding: 6px 0;
     }
 
     .otp-inputs-container {
@@ -139,25 +151,28 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      gap: 10px;
-      margin: 28px 0 16px;
+      gap: clamp(6px, 2.2vw, 10px);
+      margin: 22px 0 16px;
       min-height: 64px;
       width: 100%;
+      max-width: 380px;
     }
 
     .otp-digit-box {
-      width: 48px;
-      height: 58px;
+      width: clamp(38px, 12.5vw, 48px);
+      height: clamp(50px, 15.5vw, 58px);
       border: 1px solid var(--border-subtle);
       background: var(--bg-surface);
       border-radius: var(--radius-md);
       font-family: var(--font-mono);
-      font-size: 24px;
+      font-size: clamp(20px, 6vw, 24px);
       font-weight: 700;
       text-align: center;
       color: var(--text-primary);
       outline: none;
       position: relative;
+      flex-shrink: 1;
+      min-width: 0;
       transition: transform 0.48s cubic-bezier(0.16, 1, 0.3, 1),
                   box-shadow 0.48s cubic-bezier(0.16, 1, 0.3, 1),
                   border-color 0.3s ease,
@@ -441,7 +456,31 @@
             </button>
           </form>
 
-          <div class="framer-stagger-5" style="margin-top: 24px; text-align: center; font-size: 13px; color: var(--text-secondary);">
+          <!-- OAuth Social Login Divider & Buttons -->
+          <div class="oauth-divider framer-stagger-5">
+            <span>atau masuk dengan</span>
+          </div>
+
+          <div class="oauth-grid framer-stagger-5">
+            <button type="button" class="oauth-btn" id="btn-oauth-google" onclick="handleOAuthLogin('Google')">
+              <svg class="oauth-icon" viewBox="0 0 24 24">
+                <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/>
+                <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.26v3.15C3.29 21.41 7.37 24 12 24z"/>
+                <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.26C.46 8.16 0 9.94 0 12s.46 3.84 1.26 5.42l4.02-3.15z"/>
+                <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.37 0 3.29 2.59 1.26 6.58l4.02 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
+              </svg>
+              <span>Google</span>
+            </button>
+
+            <button type="button" class="oauth-btn" id="btn-oauth-github" onclick="handleOAuthLogin('GitHub')">
+              <svg class="oauth-icon" viewBox="0 0 24 24" fill="currentColor">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
+              </svg>
+              <span>GitHub</span>
+            </button>
+          </div>
+
+          <div class="framer-stagger-5" style="margin-top: 22px; text-align: center; font-size: 13px; color: var(--text-secondary);">
             Belum punya akun? <a href="/register" id="link-to-register" class="link" style="color: var(--text-primary); font-weight: 600;">Daftar Sekarang</a>
           </div>
         </div>
@@ -935,6 +974,11 @@
         box.disabled = false;
       });
 
+      const loginResendSec = document.querySelector('#step-login-otp .resend-section');
+      if (loginResendSec) loginResendSec.style.visibility = '';
+      const backLoginBtn = document.getElementById('back-to-login-btn');
+      if (backLoginBtn) backLoginBtn.style.visibility = '';
+
       isLoginVerifying = false;
       loginOtpStatusContent.innerHTML = `
         <span class="otp-hint-text">
@@ -945,12 +989,14 @@
 
     function stackLoginCardsIntoDeck() {
       loginOtpContainer.classList.add('cards-stacked', 'verifying-stack');
-      const offsets = [-2.5, -1.5, -0.5, 0.5, 1.5, 2.5];
-      const stride = 58;
+      const containerRect = loginOtpContainer.getBoundingClientRect();
+      const containerCenterX = containerRect.left + containerRect.width / 2;
 
       loginOtpBoxes.forEach((box, i) => {
-        const offset = offsets[i];
-        const translateX = -offset * stride;
+        const boxRect = box.getBoundingClientRect();
+        const boxCenterX = boxRect.left + boxRect.width / 2;
+        const translateX = containerCenterX - boxCenterX;
+        const offset = i - (loginOtpBoxes.length - 1) / 2;
         const rotateZ = offset * 2.8;
         const translateY = -Math.abs(offset) * 1.5;
         
@@ -1030,10 +1076,12 @@
 
             loginOtpSuccessBadge.classList.add('show');
 
-            loginOtpStatusContent.innerHTML = `
-              <i class="fas fa-circle-check" style="color:var(--color-success); font-size:16px;"></i>
-              <span style="color:var(--color-success); font-weight:600;">Verifikasi Berhasil! Mengalihkan ke Ruang Belajar...</span>
-            `;
+            // Clear text below checkmark as requested
+            loginOtpStatusContent.innerHTML = '';
+            const loginResendSec = document.querySelector('#step-login-otp .resend-section');
+            if (loginResendSec) loginResendSec.style.visibility = 'hidden';
+            const backLoginBtn = document.getElementById('back-to-login-btn');
+            if (backLoginBtn) backLoginBtn.style.visibility = 'hidden';
 
             // Save tokens & credentials
             localStorage.setItem('skillsphere_access_token', result.data.accessToken);
@@ -1159,7 +1207,18 @@
       }, 300);
     });
 
-    // --- 6. Framer Exit Blur Transition to Register Page ---
+    // --- 6. OAuth Social Login Handler ---
+    function handleOAuthLogin(provider) {
+      const btn = provider === 'Google' ? document.getElementById('btn-oauth-google') : document.getElementById('btn-oauth-github');
+      if (btn) {
+        btn.style.opacity = '0.7';
+        btn.style.pointerEvents = 'none';
+      }
+      // Redirect or connect to OAuth route
+      window.location.href = `/api/auth/oauth/${provider.toLowerCase()}`;
+    }
+
+    // --- 7. Framer Exit Blur Transition to Register Page ---
     const linkToRegister = document.getElementById('link-to-register');
     if (linkToRegister) {
       linkToRegister.addEventListener('click', (e) => {
@@ -1177,5 +1236,7 @@
       });
     }
   </script>
+  <!-- PWA Service Worker & Install Prompt Banner -->
+  <script src="/javascripts/pwa-installer.js"></script>
 </body>
 </html>

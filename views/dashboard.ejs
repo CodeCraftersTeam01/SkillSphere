@@ -6,6 +6,16 @@
   <title>Dashboard | SkillSphere AI</title>
   <meta name="description" content="Dashboard platform pembelajaran online SkillSphere AI.">
   
+  <!-- PWA Manifest & App Icons -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#1F1E1B">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="SkillSphere">
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="shortcut icon" href="/favicon.svg">
+  
   <!-- Google Fonts: Newsreader (Editorial Serif) & Plus Jakarta Sans (Modern Sans) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,6 +26,7 @@
   
   <!-- Claude Design System Stylesheet -->
   <link rel="stylesheet" href="/stylesheets/claude-theme.css">
+
   
   <style>
     .dashboard-layout {
@@ -530,5 +541,7 @@
       window.location.href = '/login';
     });
   </script>
+  <!-- PWA Service Worker & Install Prompt Banner -->
+  <script src="/javascripts/pwa-installer.js"></script>
 </body>
 </html>
