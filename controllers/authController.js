@@ -352,14 +352,14 @@ const login = async (req, res) => {
     delete userSanitized.refresh_token;
     delete userSanitized.otp_code;
 
-    const hasCompletedOnboarding = user.role === 'admin' || Boolean(user.profile && user.profile.study_preferences && user.profile.study_preferences.onboarding_completed);
+    const hasCompletedOnboarding = user.role === 'admin' || user.role === 'tutor' || Boolean(user.profile && user.profile.study_preferences && user.profile.study_preferences.onboarding_completed);
 
     return res.status(200).json({
       success: true,
       message: 'Login berhasil!',
       data: {
         user: userSanitized,
-        requires_onboarding: !hasCompletedOnboarding,
+        requires_onboarding: user.role === 'student' ? !hasCompletedOnboarding : false,
         accessToken,
         refreshToken,
       },

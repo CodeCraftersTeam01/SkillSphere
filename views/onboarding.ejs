@@ -1238,7 +1238,10 @@
       const savedUser = localStorage.getItem('skillsphere_user');
       if (savedUser) {
         const parsed = JSON.parse(savedUser);
-        if (parsed.role === 'tutor') {
+        if (parsed.role === 'admin') {
+          window.location.href = '/admin';
+          return;
+        } else if (parsed.role === 'tutor') {
           currentUserRole = 'tutor';
         }
       }
