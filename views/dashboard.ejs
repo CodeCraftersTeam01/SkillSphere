@@ -776,65 +776,13 @@
               <h2 class="section-title">
                 <i class="fas fa-book-open"></i> Aktivitas Belajar
               </h2>
-              <span style="font-size:12px; color:var(--text-secondary);">3 Kursus Aktif</span>
+              <span style="font-size:12px; color:var(--text-secondary);" id="active-courses-count-label">Memuat aktivitas...</span>
             </div>
 
-            <div class="activity-course-list">
-              
-              <!-- Item 1 -->
-              <div class="activity-course-item">
-                <div class="activity-info">
-                  <div class="activity-badge-text">Sedang dipelajari • Web Development</div>
-                  <div class="activity-title">Fullstack Node.js & React Architecture</div>
-                  <div style="font-size:12px; color:var(--text-secondary); display:flex; justify-content:space-between;">
-                    <span>12 dari 24 materi selesai</span>
-                    <span>50%</span>
-                  </div>
-                  <div class="activity-progress-bar">
-                    <div class="activity-progress-fill" style="width:50%;"></div>
-                  </div>
-                </div>
-                <a href="/courses/1" class="btn-continue-learning">
-                  Lanjutkan <i class="fas fa-arrow-right"></i>
-                </a>
+            <div class="activity-course-list" id="activities-container">
+              <div style="text-align: center; padding: 24px; color: var(--text-secondary); font-size: 13px;">
+                <i class="fas fa-spinner fa-spin" style="margin-right: 8px;"></i> Memuat daftar kursus yang sedang Anda pelajari...
               </div>
-
-              <!-- Item 2 -->
-              <div class="activity-course-item">
-                <div class="activity-info">
-                  <div class="activity-badge-text">Sedang dipelajari • Cloud Computing</div>
-                  <div class="activity-title">Mastering Kubernetes and Cloud Native</div>
-                  <div style="font-size:12px; color:var(--text-secondary); display:flex; justify-content:space-between;">
-                    <span>4 dari 18 materi selesai</span>
-                    <span>22%</span>
-                  </div>
-                  <div class="activity-progress-bar">
-                    <div class="activity-progress-fill" style="width:22%;"></div>
-                  </div>
-                </div>
-                <a href="/courses/2" class="btn-continue-learning">
-                  Lanjutkan <i class="fas fa-arrow-right"></i>
-                </a>
-              </div>
-
-              <!-- Item 3 -->
-              <div class="activity-course-item">
-                <div class="activity-info">
-                  <div class="activity-badge-text">Sedang dipelajari • Artificial Intelligence</div>
-                  <div class="activity-title">Dasar Pemrograman & Machine Learning AI</div>
-                  <div style="font-size:12px; color:var(--text-secondary); display:flex; justify-content:space-between;">
-                    <span>Baru dimulai</span>
-                    <span>10%</span>
-                  </div>
-                  <div class="activity-progress-bar">
-                    <div class="activity-progress-fill" style="width:10%;"></div>
-                  </div>
-                </div>
-                <a href="#courses-catalog-section" class="btn-continue-learning">
-                  Lanjutkan <i class="fas fa-arrow-right"></i>
-                </a>
-              </div>
-
             </div>
           </div>
 
@@ -891,6 +839,9 @@
     </footer>
   </div>
 
+  <!-- Global Toast Notification -->
+  <div id="toast-container" style="position:fixed; bottom:24px; right:24px; z-index:9999; display:flex; flex-direction:column; gap:8px;"></div>
+
   <script>
     // 1. Theme Switcher Logic
     const themeBtn = document.getElementById('theme-toggle-btn');
@@ -920,13 +871,21 @@
       updateThemeUI(active);
     });
 
-    // 2. Check Authentication & Load Profile
+    // 2. Check Authentication & Load Data
     const token = localStorage.getItem('skillsphere_access_token');
+    let currentUser = null;
+
     if (!token) {
       window.location.href = '/login';
     } else {
-      loadUserProfile(token);
-      loadCoursesCatalog();
+      initStudentDashboard(token);
+    }
+
+    async function initStudentDashboard(accessToken) {
+      await loadUserProfile(accessToken);
+      await loadStudentActivities(accessToken);
+      await loadCoursesCatalog();
+      initStreakAndCheckin();
     }
 
     async function loadUserProfile(accessToken) {
@@ -945,6 +904,7 @@
 
         const json = await res.json();
         const user = json.data;
+        currentUser = user;
 
         // Enforce completed onboarding for new students, allow tutors & admin directly
         const hasCompletedOnboarding = user.role === 'admin' || user.role === 'tutor' || 
@@ -963,6 +923,18 @@
         if (user.role === 'tutor') roleDisplay = 'Tutor';
         if (user.role === 'admin') roleDisplay = 'Admin';
         document.getElementById('nav-user-role').textContent = roleDisplay;
+
+        // Dynamic Profile Completeness calculation
+        let percent = 30; // base account
+        if (user.profile) {
+          if (user.profile.bio) percent += 20;
+          if (user.profile.phone_number) percent += 15;
+          if (user.profile.career_goal) percent += 20;
+          if (user.profile.study_preferences) percent += 15;
+        }
+        percent = Math.min(percent, 100);
+        const percentBadge = document.getElementById('profile-percent-badge');
+        if (percentBadge) percentBadge.textContent = percent + '%';
 
         // Role-based banners
         if (user.role === 'admin') {
@@ -984,7 +956,87 @@
       }
     }
 
-    // 3. Load Courses Catalog
+    // 3. Load Dynamic Student Learning Activities
+    async function loadStudentActivities(accessToken) {
+      const container = document.getElementById('activities-container');
+      const countLabel = document.getElementById('active-courses-count-label');
+      try {
+        const res = await fetch('/api/courses/student/my-learning', {
+          headers: {
+            'Authorization': 'Bearer ' + accessToken,
+          },
+        });
+        const json = await res.json();
+        const enrollments = (json.success && Array.isArray(json.data)) ? json.data : [];
+
+        if (countLabel) {
+          countLabel.textContent = `${enrollments.length} Kursus Aktif`;
+        }
+
+        if (!enrollments.length) {
+          container.innerHTML = `
+            <div style="text-align:center; padding:32px 16px; background:var(--bg-surface-subtle); border-radius:var(--radius-md); border:1px dashed var(--border-subtle);">
+              <div style="font-size:32px; color:var(--text-secondary); margin-bottom:12px;">
+                <i class="fas fa-book-open-reader"></i>
+              </div>
+              <div style="font-size:15px; font-weight:600; color:var(--text-primary); margin-bottom:6px;">
+                Belum Ada Kursus yang Diikuti
+              </div>
+              <p style="font-size:13px; color:var(--text-secondary); max-width:440px; margin:0 auto 16px; line-height:1.5;">
+                Pilih kursus unggulan dari instruktur ahli di katalog rekomendasi bawah untuk memulai pembelajaran adaptif Anda.
+              </p>
+              <a href="#courses-catalog-section" class="btn btn-primary" style="font-size:12px; padding:8px 18px; text-decoration:none; display:inline-flex; align-items:center; gap:8px;">
+                <i class="fas fa-compass"></i> Telusuri Katalog Kursus
+              </a>
+            </div>
+          `;
+          return;
+        }
+
+        container.innerHTML = enrollments.map(en => {
+          const course = en.course || {};
+          const categoryName = course.category ? course.category.name : 'Umum';
+          const progress = Math.round(en.progress_percentage || 0);
+
+          let totalMaterials = 0;
+          if (course.sections) {
+            course.sections.forEach(s => {
+              if (s.materials) totalMaterials += s.materials.length;
+            });
+          }
+          const subtitle = totalMaterials > 0 ? `${totalMaterials} modul materi terstruktur` : (en.status === 'completed' ? 'Selesai 100%' : 'Sedang dipelajari');
+
+          return `
+            <div class="activity-course-item">
+              <div class="activity-info">
+                <div class="activity-badge-text">Sedang dipelajari • ${escapeHtml(categoryName)}</div>
+                <div class="activity-title">${escapeHtml(course.title || 'Kursus')}</div>
+                <div style="font-size:12px; color:var(--text-secondary); display:flex; justify-content:space-between; margin-bottom:6px;">
+                  <span>${subtitle}</span>
+                  <span style="font-weight:600;">${progress}%</span>
+                </div>
+                <div class="activity-progress-bar">
+                  <div class="activity-progress-fill" style="width:${progress}%;"></div>
+                </div>
+              </div>
+              <a href="/tutor/materials" class="btn-continue-learning">
+                Lanjutkan <i class="fas fa-arrow-right"></i>
+              </a>
+            </div>
+          `;
+        }).join('');
+
+      } catch (e) {
+        console.error('Failed to load student learning activities:', e);
+        container.innerHTML = `
+          <div style="text-align:center; padding:24px; color:var(--text-tertiary); font-size:13px;">
+            Gagal memuat aktivitas belajar. Silakan refresh halaman.
+          </div>
+        `;
+      }
+    }
+
+    // 4. Load Courses Catalog with Instant Enrollment
     async function loadCoursesCatalog() {
       const container = document.getElementById('courses-container');
       try {
@@ -1012,11 +1064,16 @@
               </span>
               <div class="course-mini-title">${escapeHtml(c.title)}</div>
               <div class="course-mini-tutor"><i class="fas fa-chalkboard-user" style="font-size:11px; margin-right:4px;"></i> ${c.tutor ? escapeHtml(c.tutor.name) : 'Instruktur'}</div>
-              <div class="course-mini-footer">
+              <div class="course-mini-footer" style="margin-top:10px;">
                 <span class="course-mini-price">Rp ${(c.price || 0).toLocaleString('id-ID')}</span>
-                <a href="/courses/${c.id}" style="font-size:12px; font-weight:600; color:var(--text-primary); text-decoration:none;">
-                  Lihat Detail <i class="fas fa-arrow-right" style="font-size:10px;"></i>
-                </a>
+                <div style="display:flex; gap:6px;">
+                  <button class="btn btn-outline" style="font-size:11px; padding:4px 8px;" onclick="enrollInCourse(${c.id}, '${escapeHtml(c.title)}')">
+                    <i class="fas fa-plus"></i> Ikuti
+                  </button>
+                  <a href="/tutor/materials" style="font-size:11px; font-weight:600; color:var(--text-primary); text-decoration:none; display:flex; align-items:center; gap:4px;">
+                    Materi <i class="fas fa-arrow-right" style="font-size:9px;"></i>
+                  </a>
+                </div>
               </div>
             </div>
           </div>
@@ -1024,6 +1081,100 @@
       } catch (e) {
         console.error('Failed to load courses catalog:', e);
       }
+    }
+
+    // 5. Enroll in Course Action
+    async function enrollInCourse(courseId, courseTitle) {
+      if (!token) {
+        window.location.href = '/login';
+        return;
+      }
+      try {
+        const res = await fetch(`/api/courses/${courseId}/enroll`, {
+          method: 'POST',
+          headers: {
+            'Authorization': 'Bearer ' + token,
+            'Content-Type': 'application/json',
+          },
+        });
+        const json = await res.json();
+        if (res.ok && json.success) {
+          showToast(json.message || `Berhasil mendaftar kursus "${courseTitle}"!`, 'success');
+          loadStudentActivities(token);
+        } else {
+          showToast(json.message || 'Gagal mendaftar kursus.', 'error');
+        }
+      } catch (e) {
+        showToast('Kesalahan jaringan saat mendaftar.', 'error');
+      }
+    }
+
+    // 6. Dynamic Daily Streak & Check-in
+    function initStreakAndCheckin() {
+      const today = new Date();
+      const dayIndex = (today.getDay() + 6) % 7; // Mon=0, Sun=6
+      const streakCircles = document.querySelectorAll('.streak-day-row .streak-day-item .streak-circle');
+      
+      streakCircles.forEach((circle, idx) => {
+        if (idx <= dayIndex) {
+          circle.classList.add('active');
+        } else {
+          circle.classList.remove('active');
+        }
+      });
+
+      const todayKey = 'skillsphere_checkin_' + (today.toISOString().split('T')[0]);
+      const hasCheckedIn = localStorage.getItem(todayKey);
+      const checkinBtn = document.querySelector('button[onclick*="handleDailyCheckin"]');
+      if (hasCheckedIn && checkinBtn) {
+        checkinBtn.innerHTML = '<i class="fas fa-circle-check" style="margin-right:6px; color:var(--color-success);"></i> Sudah Check-in Hari Ini';
+        checkinBtn.disabled = true;
+      }
+    }
+
+    function handleDailyCheckin(btn) {
+      const today = new Date();
+      const todayKey = 'skillsphere_checkin_' + (today.toISOString().split('T')[0]);
+      localStorage.setItem(todayKey, 'true');
+      btn.innerHTML = '<i class="fas fa-circle-check" style="margin-right:6px; color:var(--color-success);"></i> Berhasil Check-in!';
+      btn.disabled = true;
+      showToast('Check-in harian berhasil! Streak belajar Anda bertambah +1.', 'success');
+    }
+
+    function copyReferralCode(btn) {
+      navigator.clipboard.writeText('SKILLSPHERE-BELAJAR-2026');
+      btn.innerHTML = '<i class="fas fa-check" style="margin-right:6px; color:var(--color-success);"></i> Kode Tersalin!';
+      showToast('Kode referral berhasil disalin ke papan klip!', 'success');
+      setTimeout(() => {
+        btn.innerHTML = '<i class="fas fa-copy" style="margin-right:6px;"></i> Salin Kode Referral';
+      }, 2000);
+    }
+
+    function showToast(message, type = 'success') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.style.cssText = `
+        background: var(--bg-surface);
+        color: var(--text-primary);
+        padding: 12px 18px;
+        border-radius: var(--radius-md);
+        border: 1px solid ${type === 'error' ? 'var(--color-danger, #ef4444)' : 'var(--border-subtle)'};
+        box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        font-size: 13px;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        animation: slideIn 0.2s ease-out;
+      `;
+      const icon = type === 'error' ? '<i class="fas fa-circle-exclamation" style="color:var(--color-danger,#ef4444);"></i>' : '<i class="fas fa-circle-check" style="color:var(--color-success,#10b981);"></i>';
+      toast.innerHTML = `${icon} <span>${escapeHtml(message)}</span>`;
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transition = 'opacity 0.3s ease';
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
     }
 
     function escapeHtml(str) {
@@ -1036,20 +1187,7 @@
         .replace(/'/g, '&#039;');
     }
 
-    function handleDailyCheckin(btn) {
-      btn.innerHTML = '<i class="fas fa-circle-check" style="margin-right:6px; color:var(--color-success);"></i> Berhasil Check-in!';
-      btn.disabled = true;
-    }
-
-    function copyReferralCode(btn) {
-      navigator.clipboard.writeText('SKILLSPHERE-BELAJAR-2026');
-      btn.innerHTML = '<i class="fas fa-check" style="margin-right:6px; color:var(--color-success);"></i> Kode Tersalin!';
-      setTimeout(() => {
-        btn.innerHTML = '<i class="fas fa-copy" style="margin-right:6px;"></i> Salin Kode Referral';
-      }, 2000);
-    }
-
-    // 4. Logout Logic
+    // 7. Logout Logic
     document.getElementById('logout-btn').addEventListener('click', async () => {
       const accessToken = localStorage.getItem('skillsphere_access_token');
       try {
@@ -1068,6 +1206,7 @@
       localStorage.removeItem('skillsphere_user');
       window.location.href = '/login';
     });
+
   </script>
   <!-- PWA Service Worker & Install Prompt Banner -->
   <script src="/javascripts/pwa-installer.js"></script>

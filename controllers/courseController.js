@@ -451,3 +451,98 @@ exports.getAllCourses = async (req, res) => {
     });
   }
 };
+
+/**
+ * Get courses enrolled by current student
+ */
+exports.getMyLearning = async (req, res) => {
+  try {
+    const studentId = req.user.id;
+    const enrollments = await Enrollment.findAll({
+      where: { user_id: studentId },
+      include: [
+        {
+          model: Course,
+          as: 'course',
+          include: [
+            {
+              model: Category,
+              as: 'category',
+              attributes: ['id', 'name', 'slug', 'icon'],
+            },
+            {
+              model: User,
+              as: 'tutor',
+              attributes: ['id', 'name', 'email'],
+            },
+            {
+              model: CourseSection,
+              as: 'sections',
+              include: [
+                {
+                  model: CourseMaterial,
+                  as: 'materials',
+                  attributes: ['id', 'title', 'content_type', 'duration_minutes', 'is_preview', 'order_index'],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+      order: [['updated_at', 'DESC']],
+    });
+
+    return res.status(200).json({
+      success: true,
+      data: enrollments,
+    });
+  } catch (err) {
+    console.error('Error in getMyLearning:', err);
+    return res.status(500).json({
+      success: false,
+      message: 'Gagal memuat aktivitas belajar.',
+      error: err.message,
+    });
+  }
+};
+
+/**
+ * Enroll student into a course
+ */
+exports.enrollCourse = async (req, res) => {
+  try {
+    const studentId = req.user.id;
+    const courseId = req.params.id;
+
+    const course = await Course.findByPk(courseId);
+    if (!course) {
+      return res.status(404).json({
+        success: false,
+        message: 'Kursus tidak ditemukan.',
+      });
+    }
+
+    const [enrollment, created] = await Enrollment.findOrCreate({
+      where: { user_id: studentId, course_id: courseId },
+      defaults: {
+        progress_percentage: 0.0,
+        status: 'active',
+        enrolled_at: new Date(),
+      },
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: created ? 'Berhasil mendaftar ke kursus!' : 'Anda sudah terdaftar di kursus ini.',
+      data: enrollment,
+    });
+  } catch (err) {
+    console.error('Error in enrollCourse:', err);
+    return res.status(500).json({
+      success: false,
+      message: 'Gagal mendaftar ke kursus.',
+      error: err.message,
+    });
+  }
+};
+
