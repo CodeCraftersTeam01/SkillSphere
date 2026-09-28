@@ -8,11 +8,17 @@ const cors = require('cors');
 const helmet = require('helmet');
 
 const { sequelize } = require('./models');
+const compressionMiddleware = require('./middleware/compression');
+require('./config/redis'); // Initialize Redis connection
+
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
 const apiRouter = require('./routes/api');
 
 const app = express();
+
+// Enable Gzip/Deflate compression for all responses
+app.use(compressionMiddleware);
 
 // Security and utility middleware
 app.use(helmet({
@@ -34,7 +40,10 @@ if (process.env.NODE_ENV !== 'test') {
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'public'), {
+  maxAge: '1d', // 1 day client cache for static assets
+  etag: true,
+}));
 
 // Database connection & sync
 if (process.env.NODE_ENV !== 'test') {

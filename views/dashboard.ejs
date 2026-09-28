@@ -25,7 +25,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   
   <!-- Claude Design System Stylesheet -->
-  <link rel="stylesheet" href="/stylesheets/claude-theme.css">
+  <link rel="stylesheet" href="/stylesheets/claude-theme.css?v=2.0">
 
   <style>
     .dashboard-layout {
@@ -562,6 +562,176 @@
       justify-content: space-between;
       gap: 16px;
     }
+
+    /* ========================================================= */
+    /* --- DASHBOARD MOBILE & TABLET RESPONSIVE STYLES --------- */
+    /* ========================================================= */
+    .nav-main-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      gap: 20px;
+    }
+
+    .desktop-only {
+      display: flex;
+    }
+
+    .mobile-only {
+      display: none;
+    }
+
+    @media (max-width: 1024px) {
+      .dashboard-container {
+        padding: 20px 16px 60px;
+      }
+
+      .dashboard-grid-layout {
+        grid-template-columns: 1fr;
+        gap: 24px;
+      }
+    }
+
+    @media (max-width: 860px) {
+      .navbar {
+        padding: 10px 16px 8px;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+      }
+
+      .desktop-only {
+        display: none !important;
+      }
+
+      .mobile-only {
+        display: block !important;
+        width: 100%;
+      }
+
+      .nav-mobile-row {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+      }
+
+      .nav-mobile-row::-webkit-scrollbar {
+        display: none;
+      }
+
+      .nav-links-menu.mobile-scroll {
+        display: flex;
+        gap: 6px;
+        list-style: none;
+        margin: 0;
+        padding: 2px 0;
+        width: max-content;
+      }
+
+      .nav-links-menu.mobile-scroll .nav-link-item {
+        font-size: 12px;
+        padding: 6px 12px;
+        white-space: nowrap;
+        background: var(--bg-surface-subtle);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-full);
+      }
+
+      .nav-links-menu.mobile-scroll .nav-link-item.active {
+        background: var(--accent-primary);
+        color: var(--accent-text);
+        border-color: var(--accent-primary);
+      }
+
+      .nav-actions {
+        gap: 8px;
+      }
+
+      .theme-toggle-btn #theme-text {
+        display: none;
+      }
+
+      .theme-toggle-btn {
+        padding: 6px 10px;
+      }
+
+      .user-profile-badge {
+        padding: 3px 8px 3px 3px;
+        gap: 6px;
+      }
+
+      .user-name-label {
+        max-width: 80px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-size: 12px;
+      }
+
+      .logout-btn span {
+        display: none;
+      }
+
+      .logout-btn {
+        padding: 6px 10px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .brand-logo span {
+        font-size: 17px;
+      }
+
+      .streak-badge {
+        padding: 4px 8px;
+        font-size: 11px;
+      }
+
+      .welcome-hero {
+        padding: 18px 16px;
+      }
+
+      .welcome-title {
+        font-size: 22px;
+      }
+
+      .welcome-desc {
+        font-size: 13px;
+      }
+
+      .courses-recommend-grid {
+        grid-template-columns: 1fr !important;
+        gap: 12px;
+      }
+
+      .activity-course-item {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+        padding: 14px;
+      }
+
+      .btn-continue-learning {
+        width: 100%;
+        justify-content: center;
+      }
+
+      .streak-day-row {
+        gap: 4px;
+      }
+
+      .streak-circle {
+        width: 32px;
+        height: 32px;
+        font-size: 11px;
+      }
+
+      .user-name-label {
+        display: none;
+      }
+    }
   </style>
 
   <script>
@@ -578,7 +748,7 @@
   <div class="dashboard-layout">
     <!-- Navbar -->
     <header class="navbar">
-      <div class="nav-brand-group">
+      <div class="nav-main-row">
         <a href="/dashboard" class="brand-logo" style="text-decoration:none;">
           <div class="brand-icon">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
@@ -588,60 +758,56 @@
           <span>SkillSphere AI</span>
         </a>
 
-        <!-- Main Navigation Links -->
-        <ul class="nav-links-menu">
+        <!-- Desktop Navigation Links -->
+        <ul class="nav-links-menu desktop-only">
+          <li><a href="/dashboard" class="nav-link-item active">Beranda</a></li>
+          <li><a href="#courses-catalog-section" class="nav-link-item">Katalog Kursus</a></li>
+          <li><a href="/dashboard/onboarding" class="nav-link-item">Jalur Belajar AI</a></li>
+          <li><a href="#activities-section" class="nav-link-item">Tantangan</a></li>
+        </ul>
+
+        <div class="nav-actions">
+          <!-- Streak Indicator -->
+          <div class="streak-badge" title="Runtutan Belajar Aktif">
+            <i class="fas fa-bolt" style="color:var(--text-primary); font-size:13px;"></i>
+            <span id="nav-streak-count">1</span>
+          </div>
+
+          <!-- Theme Toggle -->
+          <button class="theme-toggle-btn" id="theme-toggle-btn" type="button" aria-label="Toggle dark/light mode">
+            <i class="fas fa-sun" id="theme-icon-sun" style="display:none;"></i>
+            <i class="fas fa-moon" id="theme-icon-moon"></i>
+            <span id="theme-text">Mode Gelap</span>
+          </button>
+
+          <!-- User Profile Pill -->
+          <div class="user-profile-badge">
+            <div class="user-avatar-sm" id="nav-avatar">U</div>
+            <span class="user-name-label" id="nav-user-name">Memuat...</span>
+            <span class="user-role-tag" id="nav-user-role">Siswa</span>
+          </div>
+
+          <!-- Logout Button -->
+          <button class="logout-btn" id="logout-btn" type="button" title="Keluar">
+            <i class="fas fa-arrow-right-from-bracket"></i>
+            <span>Keluar</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Mobile Scrollable Subnav Menu -->
+      <div class="nav-mobile-row mobile-only">
+        <ul class="nav-links-menu mobile-scroll">
           <li><a href="/dashboard" class="nav-link-item active">Beranda</a></li>
           <li><a href="#courses-catalog-section" class="nav-link-item">Katalog Kursus</a></li>
           <li><a href="/dashboard/onboarding" class="nav-link-item">Jalur Belajar AI</a></li>
           <li><a href="#activities-section" class="nav-link-item">Tantangan</a></li>
         </ul>
       </div>
-
-      <div class="nav-actions">
-        <!-- Streak Indicator -->
-        <div class="streak-badge" title="Runtutan Belajar Aktif">
-          <i class="fas fa-bolt" style="color:var(--text-primary); font-size:13px;"></i>
-          <span id="nav-streak-count">1</span>
-        </div>
-
-        <!-- Theme Toggle -->
-        <button class="theme-toggle-btn" id="theme-toggle-btn" type="button" aria-label="Toggle dark/light mode">
-          <i class="fas fa-sun" id="theme-icon-sun" style="display:none;"></i>
-          <i class="fas fa-moon" id="theme-icon-moon"></i>
-          <span id="theme-text">Mode Gelap</span>
-        </button>
-
-        <!-- User Profile Pill -->
-        <div class="user-profile-badge">
-          <div class="user-avatar-sm" id="nav-avatar">U</div>
-          <span class="user-name-label" id="nav-user-name">Memuat...</span>
-          <span class="user-role-tag" id="nav-user-role">Siswa</span>
-        </div>
-
-        <!-- Logout Button -->
-        <button class="logout-btn" id="logout-btn" type="button" title="Keluar">
-          <i class="fas fa-arrow-right-from-bracket"></i>
-          <span>Keluar</span>
-        </button>
-      </div>
     </header>
 
     <!-- Main Dashboard Container -->
     <main class="dashboard-container">
-
-      <!-- Admin Quick Navigation Banner (If role === 'admin') -->
-      <div class="admin-redirect-banner" id="admin-banner">
-        <div style="display:flex; align-items:center; gap:12px;">
-          <div style="font-size:20px;"><i class="fas fa-shield-halved"></i></div>
-          <div>
-            <strong style="font-size:14px; color:var(--text-primary); display:block;">Akses Administrator Terdeteksi</strong>
-            <span style="font-size:13px; color:var(--text-secondary);">Kelola verifikasi pengajar, validasi sertifikat, dan pengaturan platform di Admin Portal.</span>
-          </div>
-        </div>
-        <a href="/admin" class="btn btn-primary" style="font-size:13px; padding:8px 16px;">
-          Buka Panel Admin <i class="fas fa-arrow-right" style="margin-left:6px;"></i>
-        </a>
-      </div>
 
       <!-- Tutor Studio Quick Banner (If role === 'tutor') -->
       <div class="tutor-studio-banner" id="tutor-banner">
@@ -878,6 +1044,17 @@
     if (!token) {
       window.location.href = '/login';
     } else {
+      // Early check: if user is admin, route immediately to Admin Portal
+      try {
+        const savedUser = localStorage.getItem('skillsphere_user');
+        if (savedUser) {
+          const parsed = JSON.parse(savedUser);
+          if (parsed.role === 'admin') {
+            window.location.href = '/admin';
+          }
+        }
+      } catch (e) {}
+
       initStudentDashboard(token);
     }
 
@@ -906,8 +1083,14 @@
         const user = json.data;
         currentUser = user;
 
-        // Enforce completed onboarding for new students, allow tutors & admin directly
-        const hasCompletedOnboarding = user.role === 'admin' || user.role === 'tutor' || 
+        // Admin role check: Admin only uses Admin Dashboard
+        if (user.role === 'admin') {
+          window.location.href = '/admin';
+          return;
+        }
+
+        // Enforce completed onboarding for new students, allow tutors directly
+        const hasCompletedOnboarding = user.role === 'tutor' || 
           (user.profile && user.profile.study_preferences && user.profile.study_preferences.onboarding_completed);
 
         if (!hasCompletedOnboarding) {
@@ -921,7 +1104,6 @@
         
         let roleDisplay = 'Siswa';
         if (user.role === 'tutor') roleDisplay = 'Tutor';
-        if (user.role === 'admin') roleDisplay = 'Admin';
         document.getElementById('nav-user-role').textContent = roleDisplay;
 
         // Dynamic Profile Completeness calculation
@@ -936,11 +1118,8 @@
         const percentBadge = document.getElementById('profile-percent-badge');
         if (percentBadge) percentBadge.textContent = percent + '%';
 
-        // Role-based banners
-        if (user.role === 'admin') {
-          const adminBanner = document.getElementById('admin-banner');
-          if (adminBanner) adminBanner.style.display = 'flex';
-        } else if (user.role === 'tutor') {
+        // Tutor studio banner
+        if (user.role === 'tutor') {
           const tutorBanner = document.getElementById('tutor-banner');
           if (tutorBanner) {
             tutorBanner.style.display = 'block';

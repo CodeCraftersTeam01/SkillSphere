@@ -41,4 +41,14 @@ router.get('/tutor/materials', function(req, res, next) {
   res.render('tutor/materials', { title: 'Portal Manajemen & Upload Materi | Tutor SkillSphere' });
 });
 
+/* GET Terms of Service page */
+router.get(['/terms', '/terms-of-service', '/syarat-ketentuan'], function(req, res, next) {
+  res.render('terms', { title: 'Syarat dan Ketentuan Layanan | SkillSphere AI' });
+});
+
+/* GET Privacy Policy page */
+router.get(['/privacy', '/privacy-policy', '/kebijakan-privasi'], function(req, res, next) {
+  res.render('privacy', { title: 'Kebijakan Privasi | SkillSphere AI' });
+});
+
 module.exports = router;
