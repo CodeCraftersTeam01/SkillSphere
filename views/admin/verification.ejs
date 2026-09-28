@@ -549,17 +549,131 @@
       font-size: 13px;
       font-weight: 500;
       cursor: pointer;
-      display: flex;
+      display: inline-flex;
       align-items: center;
       gap: 8px;
       transition: all 0.2s ease;
       text-decoration: none;
+      font-family: var(--font-sans);
     }
 
     .logout-btn:hover {
       background: var(--color-danger-bg);
       border-color: var(--color-danger);
       color: var(--color-danger);
+    }
+
+    /* Claude Button System */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      font-family: var(--font-sans);
+      font-size: 13px;
+      font-weight: 600;
+      padding: 8px 16px;
+      border-radius: var(--radius-full);
+      cursor: pointer;
+      transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+      border: 1px solid transparent;
+      text-decoration: none;
+      line-height: 1.25;
+      user-select: none;
+      white-space: nowrap;
+    }
+
+    .btn:active {
+      transform: scale(0.97);
+    }
+
+    .btn-sm {
+      padding: 6px 12px;
+      font-size: 12px;
+      gap: 5px;
+    }
+
+    .btn-xs {
+      padding: 4px 9px;
+      font-size: 11px;
+      gap: 4px;
+    }
+
+    .btn-primary {
+      background: var(--accent-primary);
+      color: var(--accent-text);
+      border-color: var(--accent-primary);
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-primary-hover);
+      border-color: var(--accent-primary-hover);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .btn-outline {
+      background: var(--bg-surface);
+      color: var(--text-primary);
+      border-color: var(--border-subtle);
+    }
+
+    .btn-outline:hover {
+      background: var(--bg-surface-subtle);
+      border-color: var(--border-strong);
+      color: var(--text-primary);
+    }
+
+    .btn-success {
+      background: var(--color-success-bg);
+      color: var(--color-success);
+      border-color: rgba(22, 163, 74, 0.3);
+    }
+
+    .btn-success:hover {
+      background: var(--color-success);
+      color: #FFFFFF;
+      border-color: var(--color-success);
+      box-shadow: 0 2px 8px rgba(22, 163, 74, 0.25);
+    }
+
+    .btn-danger {
+      background: var(--color-danger-bg);
+      color: var(--color-danger);
+      border-color: rgba(220, 38, 38, 0.3);
+    }
+
+    .btn-danger:hover {
+      background: var(--color-danger);
+      color: #FFFFFF;
+      border-color: var(--color-danger);
+      box-shadow: 0 2px 8px rgba(220, 38, 38, 0.25);
+    }
+
+    .action-cell-group {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: nowrap;
+      white-space: nowrap;
+    }
+
+    .input-field {
+      width: 100%;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 10px 14px;
+      font-family: var(--font-sans);
+      font-size: 13.5px;
+      color: var(--text-primary);
+      transition: all 0.15s ease;
+      outline: none;
+      resize: vertical;
+    }
+
+    .input-field:focus {
+      border-color: var(--accent-primary);
+      box-shadow: 0 0 0 3px var(--accent-primary-light);
     }
 
     /* Filter Controls */
@@ -597,6 +711,153 @@
       background: var(--bg-surface);
       color: var(--text-primary);
       box-shadow: var(--shadow-sm);
+    }
+
+    /* Verification Sub-navigation Segmented Control */
+    .view-subnav-tabs {
+      display: inline-flex;
+      gap: 6px;
+      background: var(--bg-surface-subtle);
+      padding: 5px;
+      border-radius: var(--radius-full);
+      border: 1px solid var(--border-subtle);
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+
+    .view-subnav-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 18px;
+      border-radius: var(--radius-full);
+      font-family: var(--font-sans);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+      user-select: none;
+      white-space: nowrap;
+    }
+
+    .view-subnav-btn:hover {
+      color: var(--text-primary);
+      background: rgba(0, 0, 0, 0.04);
+    }
+    [data-theme="dark"] .view-subnav-btn:hover {
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .view-subnav-btn.active {
+      background: var(--bg-surface);
+      color: var(--text-primary);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .verification-subpanel {
+      display: none;
+      animation: fadeIn 0.2s ease forwards;
+    }
+
+    .verification-subpanel.active {
+      display: block;
+    }
+
+    /* Custom Professional Confirmation / Alert Dialog */
+    .custom-dialog-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-xl);
+      max-width: 440px;
+      width: 100%;
+      padding: 28px 24px 22px;
+      box-shadow: var(--shadow-floating);
+      position: relative;
+      animation: dialogPop 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      text-align: center;
+    }
+
+    @keyframes dialogPop {
+      from {
+        opacity: 0;
+        transform: scale(0.94) translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+
+    .dialog-icon-wrapper {
+      width: 52px;
+      height: 52px;
+      border-radius: var(--radius-full);
+      margin: 0 auto 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+    }
+
+    .dialog-icon-wrapper.success {
+      background: var(--color-success-bg);
+      color: var(--color-success);
+      border: 1px solid rgba(22, 163, 74, 0.25);
+    }
+
+    .dialog-icon-wrapper.danger {
+      background: var(--color-danger-bg);
+      color: var(--color-danger);
+      border: 1px solid rgba(220, 38, 38, 0.25);
+    }
+
+    .dialog-icon-wrapper.warning {
+      background: #FFFBEB;
+      color: #D97706;
+      border: 1px solid rgba(217, 119, 6, 0.25);
+    }
+    [data-theme="dark"] .dialog-icon-wrapper.warning {
+      background: #2D2514;
+      color: #FBBF24;
+      border-color: rgba(251, 191, 36, 0.25);
+    }
+
+    .dialog-icon-wrapper.primary,
+    .dialog-icon-wrapper.info {
+      background: var(--accent-primary-light);
+      color: var(--text-primary);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .dialog-title {
+      font-family: var(--font-serif);
+      font-size: 20px;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+      letter-spacing: -0.01em;
+    }
+
+    .dialog-message {
+      font-size: 13.5px;
+      color: var(--text-secondary);
+      line-height: 1.55;
+      margin-bottom: 22px;
+    }
+
+    .dialog-actions {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .dialog-actions .btn {
+      flex: 1;
+      padding: 9px 16px;
     }
 
     /* Modals & Drawers */
@@ -841,6 +1102,7 @@
         <a href="/admin/dashboard">
           <div class="brand-icon">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+              <path opacity="0.38" d="M12 7.6L17.3 4.7L14.4 10L17.3 15.3L12 12.4L6.7 15.3L9.6 10L6.7 4.7Z" />
               <path d="M12 0L13.8 8.2L22 10L13.8 11.8L12 20L10.2 11.8L2 10L10.2 8.2L12 0Z" />
             </svg>
           </div>
@@ -857,13 +1119,8 @@
         </button>
 
         <button class="sidebar-nav-item" data-view="verification" onclick="switchAdminView('verification')">
-          <span><i class="fas fa-user-shield"></i> Verifikasi Pengajar</span>
-          <span class="sidebar-count-badge alert" id="badge-pending-tutors">0</span>
-        </button>
-
-        <button class="sidebar-nav-item" data-view="certifications" onclick="switchAdminView('certifications')">
-          <span><i class="fas fa-certificate"></i> Validasi Sertifikat</span>
-          <span class="sidebar-count-badge" id="badge-pending-certs">0</span>
+          <span><i class="fas fa-user-shield"></i> Verifikasi & Sertifikasi</span>
+          <span class="sidebar-count-badge alert" id="badge-pending-verification-total">0</span>
         </button>
 
         <div class="nav-group-label">Manajemen Sistem</div>
@@ -985,7 +1242,7 @@
 
           <!-- Quick Action Modules -->
           <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:18px; margin-bottom:28px;">
-            <div class="section-card" style="margin-bottom:0; cursor:pointer;" onclick="switchAdminView('verification')">
+            <div class="section-card" style="margin-bottom:0; cursor:pointer;" onclick="switchAdminView('verification', 'applications')">
               <div class="section-title" style="margin-bottom:8px;">
                 <i class="fas fa-user-shield"></i> Pendaftaran Tutor Baru
               </div>
@@ -997,7 +1254,7 @@
               </div>
             </div>
 
-            <div class="section-card" style="margin-bottom:0; cursor:pointer;" onclick="switchAdminView('certifications')">
+            <div class="section-card" style="margin-bottom:0; cursor:pointer;" onclick="switchAdminView('verification', 'certifications')">
               <div class="section-title" style="margin-bottom:8px;">
                 <i class="fas fa-certificate"></i> Validasi Sertifikat Resmi
               </div>
@@ -1011,85 +1268,109 @@
           </div>
         </section>
 
-        <!-- VIEW 2: TUTOR APPLICATIONS VERIFICATION -->
+        <!-- VIEW 2: UNIFIED VERIFICATION & CERTIFICATIONS -->
         <section class="dashboard-view-section" id="view-verification">
-          <div class="section-card">
-            <div class="section-header">
-              <h2 class="section-title">
-                <i class="fas fa-user-shield"></i> Verifikasi Pendaftaran Pengajar (Tutor)
-              </h2>
-              <div class="filter-bar" style="margin-bottom:0;">
-                <div class="filter-btn-group">
-                  <button class="filter-btn active" onclick="filterApplications('all', this)">Semua</button>
-                  <button class="filter-btn" onclick="filterApplications('pending', this)">Menunggu Review</button>
-                  <button class="filter-btn" onclick="filterApplications('approved', this)">Disetujui</button>
-                  <button class="filter-btn" onclick="filterApplications('rejected', this)">Ditolak</button>
+          <div class="welcome-hero" style="margin-bottom: 20px;">
+            <h1 class="welcome-title" style="font-size: 26px;">Verifikasi & Sertifikasi Pengajar</h1>
+            <p class="welcome-desc">
+              Kelola persetujuan pendaftaran calon instruktur baru dan validasi keaslian berkas sertifikasi resmi pengajar dalam satu panel terpadu.
+            </p>
+          </div>
+
+          <!-- Segmented Sub-navigation Tabs -->
+          <div class="view-subnav-tabs">
+            <button class="view-subnav-btn active" id="subtab-btn-applications" onclick="switchVerificationSubTab('applications')">
+              <i class="fas fa-user-check"></i>
+              <span>Pendaftaran Tutor</span>
+              <span class="sidebar-count-badge alert" id="subtab-badge-apps" style="font-size: 11px; padding: 2px 7px;">0</span>
+            </button>
+            <button class="view-subnav-btn" id="subtab-btn-certifications" onclick="switchVerificationSubTab('certifications')">
+              <i class="fas fa-certificate"></i>
+              <span>Validasi Sertifikat Resmi</span>
+              <span class="sidebar-count-badge" id="subtab-badge-certs" style="font-size: 11px; padding: 2px 7px;">0</span>
+            </button>
+          </div>
+
+          <!-- Subpanel 1: Tutor Applications -->
+          <div id="subpanel-applications" class="verification-subpanel active">
+            <div class="section-card">
+              <div class="section-header">
+                <h2 class="section-title">
+                  <i class="fas fa-user-shield"></i> Pendaftaran Pengajar (Tutor)
+                </h2>
+                <div class="filter-bar" style="margin-bottom:0;">
+                  <div class="filter-btn-group">
+                    <button class="filter-btn active" onclick="filterApplications('all', this)">Semua</button>
+                    <button class="filter-btn" onclick="filterApplications('pending', this)">Menunggu Review</button>
+                    <button class="filter-btn" onclick="filterApplications('approved', this)">Disetujui</button>
+                    <button class="filter-btn" onclick="filterApplications('rejected', this)">Ditolak</button>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <div class="table-responsive">
-              <table class="styled-table">
-                <thead>
-                  <tr>
-                    <th>Pelamar</th>
-                    <th>Bidang Keahlian</th>
-                    <th>Pengalaman</th>
-                    <th>Berkas & Portofolio</th>
-                    <th>Tanggal Daftar</th>
-                    <th>Status</th>
-                    <th>Aksi</th>
-                  </tr>
-                </thead>
-                <tbody id="applications-table-body">
-                  <tr>
-                    <td colspan="7" style="text-align:center; padding:32px; color:var(--text-secondary);">
-                      <i class="fas fa-spinner fa-spin" style="margin-right:8px;"></i> Memuat data pendaftaran tutor...
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+              <div class="table-responsive">
+                <table class="styled-table">
+                  <thead>
+                    <tr>
+                      <th>Pelamar</th>
+                      <th>Bidang Keahlian</th>
+                      <th>Pengalaman</th>
+                      <th>Berkas & Portofolio</th>
+                      <th>Tanggal Daftar</th>
+                      <th>Status</th>
+                      <th style="min-width: 220px; width: 220px;">Aksi</th>
+                    </tr>
+                  </thead>
+                  <tbody id="applications-table-body">
+                    <tr>
+                      <td colspan="7" style="text-align:center; padding:32px; color:var(--text-secondary);">
+                        <i class="fas fa-spinner fa-spin" style="margin-right:8px;"></i> Memuat data pendaftaran tutor...
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
-        </section>
 
-        <!-- VIEW 3: TUTOR CERTIFICATIONS VALIDATION -->
-        <section class="dashboard-view-section" id="view-certifications">
-          <div class="section-card">
-            <div class="section-header">
-              <h2 class="section-title">
-                <i class="fas fa-certificate"></i> Validasi Sertifikasi Pengajar
-              </h2>
-              <div class="filter-bar" style="margin-bottom:0;">
-                <div class="filter-btn-group">
-                  <button class="filter-btn active" onclick="filterCerts('all', this)">Semua</button>
-                  <button class="filter-btn" onclick="filterCerts('pending', this)">Belum Terverifikasi</button>
-                  <button class="filter-btn" onclick="filterCerts('verified', this)">Sudah Terverifikasi</button>
+          <!-- Subpanel 2: Tutor Certifications -->
+          <div id="subpanel-certifications" class="verification-subpanel" style="display: none;">
+            <div class="section-card">
+              <div class="section-header">
+                <h2 class="section-title">
+                  <i class="fas fa-certificate"></i> Validasi Sertifikasi Pengajar
+                </h2>
+                <div class="filter-bar" style="margin-bottom:0;">
+                  <div class="filter-btn-group">
+                    <button class="filter-btn active" onclick="filterCerts('all', this)">Semua</button>
+                    <button class="filter-btn" onclick="filterCerts('pending', this)">Belum Terverifikasi</button>
+                    <button class="filter-btn" onclick="filterCerts('verified', this)">Sudah Terverifikasi</button>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <div class="table-responsive">
-              <table class="styled-table">
-                <thead>
-                  <tr>
-                    <th>Nama Tutor</th>
-                    <th>Nama Sertifikasi</th>
-                    <th>Instansi Penerbit</th>
-                    <th>ID Kredensial</th>
-                    <th>Berkas Sertifikat</th>
-                    <th>Status Verifikasi</th>
-                    <th>Aksi</th>
-                  </tr>
-                </thead>
-                <tbody id="certifications-table-body">
-                  <tr>
-                    <td colspan="7" style="text-align:center; padding:32px; color:var(--text-secondary);">
-                      <i class="fas fa-spinner fa-spin" style="margin-right:8px;"></i> Memuat data sertifikasi pengajar...
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+              <div class="table-responsive">
+                <table class="styled-table">
+                  <thead>
+                    <tr>
+                      <th>Nama Tutor</th>
+                      <th>Nama Sertifikasi</th>
+                      <th>Instansi Penerbit</th>
+                      <th>ID Kredensial</th>
+                      <th>Berkas Sertifikat</th>
+                      <th>Status Verifikasi</th>
+                      <th style="min-width: 170px; width: 170px;">Aksi</th>
+                    </tr>
+                  </thead>
+                  <tbody id="certifications-table-body">
+                    <tr>
+                      <td colspan="7" style="text-align:center; padding:32px; color:var(--text-secondary);">
+                        <i class="fas fa-spinner fa-spin" style="margin-right:8px;"></i> Memuat data sertifikasi pengajar...
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         </section>
@@ -1304,6 +1585,21 @@
       </div>
     </div>
 
+    <!-- Custom Professional Modal Dialog (Confirm & Alert) -->
+    <div class="modal-overlay" id="custom-dialog-modal" style="z-index: 2200;">
+      <div class="custom-dialog-card" id="custom-dialog-card">
+        <div class="dialog-icon-wrapper" id="dialog-icon-wrapper">
+          <i class="fas fa-circle-question" id="dialog-icon"></i>
+        </div>
+        <h3 class="dialog-title" id="dialog-title">Konfirmasi</h3>
+        <p class="dialog-message" id="dialog-message">Pesan konfirmasi dialog.</p>
+        <div class="dialog-actions" id="dialog-actions">
+          <button class="btn btn-outline" id="dialog-btn-cancel">Batal</button>
+          <button class="btn btn-primary" id="dialog-btn-confirm">Lanjutkan</button>
+        </div>
+      </div>
+    </div>
+
     <!-- Toast Notifications -->
     <div class="toast-container" id="toast-container"></div>
   </div>
@@ -1352,6 +1648,123 @@
     function openModal(id) { document.getElementById(id).classList.add('active'); }
     function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 
+    // Custom Professional Dialog System (Alert & Confirm)
+    let dialogResolve = null;
+
+    function showCustomConfirm({
+      title = 'Konfirmasi Tindakan',
+      message = 'Apakah Anda yakin ingin melanjutkan tindakan ini?',
+      confirmText = 'Konfirmasi',
+      cancelText = 'Batal',
+      type = 'primary', // 'primary' | 'success' | 'danger' | 'warning' | 'info'
+      icon = null
+    } = {}) {
+      return new Promise((resolve) => {
+        dialogResolve = resolve;
+        const modal = document.getElementById('custom-dialog-modal');
+        const iconWrapper = document.getElementById('dialog-icon-wrapper');
+        const iconEl = document.getElementById('dialog-icon');
+        const titleEl = document.getElementById('dialog-title');
+        const messageEl = document.getElementById('dialog-message');
+        const cancelBtn = document.getElementById('dialog-btn-cancel');
+        const confirmBtn = document.getElementById('dialog-btn-confirm');
+
+        titleEl.textContent = title;
+        messageEl.textContent = message;
+        cancelBtn.textContent = cancelText;
+        cancelBtn.style.display = 'inline-flex';
+        confirmBtn.textContent = confirmText;
+
+        // Reset & apply type styles
+        iconWrapper.className = `dialog-icon-wrapper ${type}`;
+        confirmBtn.className = `btn btn-${type === 'info' ? 'primary' : type}`;
+
+        let iconClass = 'fas fa-circle-question';
+        if (icon) {
+          iconClass = `fas ${icon}`;
+        } else if (type === 'success') {
+          iconClass = 'fas fa-circle-check';
+        } else if (type === 'danger') {
+          iconClass = 'fas fa-triangle-exclamation';
+        } else if (type === 'warning') {
+          iconClass = 'fas fa-circle-exclamation';
+        } else if (type === 'info') {
+          iconClass = 'fas fa-circle-info';
+        }
+        iconEl.className = iconClass;
+
+        cancelBtn.onclick = () => {
+          closeModal('custom-dialog-modal');
+          if (dialogResolve) {
+            dialogResolve(false);
+            dialogResolve = null;
+          }
+        };
+
+        confirmBtn.onclick = () => {
+          closeModal('custom-dialog-modal');
+          if (dialogResolve) {
+            dialogResolve(true);
+            dialogResolve = null;
+          }
+        };
+
+        openModal('custom-dialog-modal');
+      });
+    }
+
+    function showCustomAlert({
+      title = 'Pemberitahuan',
+      message = '',
+      confirmText = 'Mengerti',
+      type = 'primary',
+      icon = null
+    } = {}) {
+      return new Promise((resolve) => {
+        dialogResolve = resolve;
+        const modal = document.getElementById('custom-dialog-modal');
+        const iconWrapper = document.getElementById('dialog-icon-wrapper');
+        const iconEl = document.getElementById('dialog-icon');
+        const titleEl = document.getElementById('dialog-title');
+        const messageEl = document.getElementById('dialog-message');
+        const cancelBtn = document.getElementById('dialog-btn-cancel');
+        const confirmBtn = document.getElementById('dialog-btn-confirm');
+
+        titleEl.textContent = title;
+        messageEl.textContent = message;
+        cancelBtn.style.display = 'none';
+        confirmBtn.textContent = confirmText;
+
+        iconWrapper.className = `dialog-icon-wrapper ${type}`;
+        confirmBtn.className = `btn btn-${type === 'info' ? 'primary' : type}`;
+
+        let iconClass = 'fas fa-circle-info';
+        if (icon) {
+          iconClass = `fas ${icon}`;
+        } else if (type === 'success') {
+          iconClass = 'fas fa-circle-check';
+        } else if (type === 'danger') {
+          iconClass = 'fas fa-triangle-exclamation';
+        }
+        iconEl.className = iconClass;
+
+        confirmBtn.onclick = () => {
+          closeModal('custom-dialog-modal');
+          if (dialogResolve) {
+            dialogResolve(true);
+            dialogResolve = null;
+          }
+        };
+
+        openModal('custom-dialog-modal');
+      });
+    }
+
+    // Intercept native alert calls as fallback
+    window.alert = function(msg) {
+      showCustomAlert({ title: 'Pemberitahuan', message: String(msg) });
+    };
+
     // Toast Notification
     function showToast(message, type = 'success') {
       const container = document.getElementById('toast-container');
@@ -1396,7 +1809,7 @@
     });
 
     // Switch Admin View Tabs
-    function switchAdminView(viewName) {
+    function switchAdminView(viewName, subTab = null) {
       toggleMobileSidebar(false);
 
       document.querySelectorAll('.sidebar-nav-item').forEach(item => {
@@ -1409,15 +1822,38 @@
 
       const breadcrumbMap = {
         overview: 'Ringkasan Platform',
-        verification: 'Verifikasi Pengajar',
-        certifications: 'Validasi Sertifikat',
+        verification: 'Verifikasi & Sertifikasi',
         courses: 'Data Kursus & Materi',
         financial: 'Bagi Hasil & Finansial',
       };
       document.getElementById('current-view-breadcrumb').textContent = breadcrumbMap[viewName] || 'Admin Panel';
 
+      if (viewName === 'verification' && subTab) {
+        switchVerificationSubTab(subTab);
+      }
+
       if (viewName === 'financial') {
         fetchFinancialData();
+      }
+    }
+
+    // Switch Verification Sub-tabs (Applications vs Certifications)
+    function switchVerificationSubTab(subTabName) {
+      const btnApps = document.getElementById('subtab-btn-applications');
+      const btnCerts = document.getElementById('subtab-btn-certifications');
+      const panelApps = document.getElementById('subpanel-applications');
+      const panelCerts = document.getElementById('subpanel-certifications');
+
+      if (subTabName === 'certifications') {
+        if (btnApps) btnApps.classList.remove('active');
+        if (btnCerts) btnCerts.classList.add('active');
+        if (panelApps) panelApps.style.display = 'none';
+        if (panelCerts) panelCerts.style.display = 'block';
+      } else {
+        if (btnApps) btnApps.classList.add('active');
+        if (btnCerts) btnCerts.classList.remove('active');
+        if (panelApps) panelApps.style.display = 'block';
+        if (panelCerts) panelCerts.style.display = 'none';
       }
     }
 
@@ -1431,7 +1867,12 @@
         if (json.success && json.data) {
           const user = json.data;
           if (user.role !== 'admin') {
-            alert('Akses khusus administrator. Mengalihkan ke dashboard...');
+            await showCustomAlert({
+              title: 'Akses Ditolak',
+              message: 'Halaman ini khusus untuk administrator platform. Anda akan dialihkan ke dashboard.',
+              type: 'danger',
+              icon: 'fa-shield-halved'
+            });
             window.location.href = '/dashboard';
             return;
           }
@@ -1457,6 +1898,16 @@
 
     function setupLogout() {
       const performLogout = async () => {
+        const confirmed = await showCustomConfirm({
+          title: 'Konfirmasi Keluar',
+          message: 'Apakah Anda yakin ingin keluar dari sesi Administrator SkillSphere?',
+          confirmText: 'Ya, Keluar',
+          cancelText: 'Batal',
+          type: 'danger',
+          icon: 'fa-arrow-right-from-bracket'
+        });
+        if (!confirmed) return;
+
         try {
           await fetch('/api/auth/logout', {
             method: 'POST',
@@ -1494,11 +1945,14 @@
           const totalStudents = stats.system ? stats.system.totalStudents : 0;
           const totalCourses = stats.system ? stats.system.totalCourses : 0;
 
-          const badgeTutors = document.getElementById('badge-pending-tutors');
-          if (badgeTutors) badgeTutors.textContent = pendingApps;
+          const badgeSidebar = document.getElementById('badge-pending-verification-total');
+          if (badgeSidebar) badgeSidebar.textContent = pendingApps + pendingCerts;
 
-          const badgeCerts = document.getElementById('badge-pending-certs');
-          if (badgeCerts) badgeCerts.textContent = pendingCerts;
+          const subtabBadgeApps = document.getElementById('subtab-badge-apps');
+          if (subtabBadgeApps) subtabBadgeApps.textContent = pendingApps;
+
+          const subtabBadgeCerts = document.getElementById('subtab-badge-certs');
+          if (subtabBadgeCerts) subtabBadgeCerts.textContent = pendingCerts;
 
           const statPendingTotal = document.getElementById('stat-pending-total');
           if (statPendingTotal) statPendingTotal.textContent = pendingApps + pendingCerts;
@@ -1525,7 +1979,6 @@
         });
         const json = await res.json();
         if (json.success && json.data) {
-          // API returns { total, applications } or an array
           if (Array.isArray(json.data)) {
             allApplications = json.data;
           } else if (Array.isArray(json.data.applications)) {
@@ -1594,15 +2047,15 @@
             <td>${dateStr}</td>
             <td>${statusBadge}</td>
             <td>
-              <div style="display:flex; gap:6px; flex-wrap:wrap;">
-                <button class="btn btn-outline" style="padding:4px 10px; font-size:12px;" onclick="viewApplicationDetail(${app.id})">
+              <div class="action-cell-group">
+                <button class="btn btn-outline btn-sm" onclick="viewApplicationDetail(${app.id})">
                   <i class="fas fa-eye"></i> Review
                 </button>
                 ${app.status === 'pending' ? `
-                  <button class="btn btn-primary" style="padding:4px 10px; font-size:12px;" onclick="approveApplication(${app.id}, '${escapeHtml(applicantName)}')">
+                  <button class="btn btn-success btn-sm" onclick="approveApplication(${app.id}, '${escapeHtml(applicantName)}')">
                     <i class="fas fa-check"></i> Setujui
                   </button>
-                  <button class="logout-btn" style="padding:4px 10px; font-size:12px;" onclick="openRejectModal(${app.id})">
+                  <button class="btn btn-danger btn-sm" onclick="openRejectModal(${app.id})">
                     <i class="fas fa-ban"></i> Tolak
                   </button>
                 ` : ''}
@@ -1653,8 +2106,10 @@
       if (app.status === 'pending') {
         actionsContainer.innerHTML = `
           <button class="btn btn-outline" onclick="closeModal('application-detail-modal')">Tutup</button>
-          <button class="logout-btn" onclick="closeModal('application-detail-modal'); openRejectModal(${app.id})">Tolak</button>
-          <button class="btn btn-primary" onclick="closeModal('application-detail-modal'); approveApplication(${app.id}, '${escapeHtml(applicantName)}')">
+          <button class="btn btn-danger" onclick="closeModal('application-detail-modal'); openRejectModal(${app.id})">
+            <i class="fas fa-ban"></i> Tolak
+          </button>
+          <button class="btn btn-success" onclick="closeModal('application-detail-modal'); approveApplication(${app.id}, '${escapeHtml(applicantName)}')">
             <i class="fas fa-check"></i> Setujui Jadi Tutor
           </button>
         `;
@@ -1667,7 +2122,16 @@
 
     // Approve Application
     async function approveApplication(id, name) {
-      if (!confirm(`Setujui pendaftaran "${name}"? Peran akun akan diubah menjadi Tutor dan Dompet Virtual diaktifkan.`)) return;
+      const confirmed = await showCustomConfirm({
+        title: 'Setujui Pendaftaran Tutor',
+        message: `Setujui pendaftaran "${name}"? Peran akun akan diubah menjadi Tutor dan Dompet Virtual diaktifkan secara otomatis.`,
+        confirmText: 'Ya, Setujui',
+        cancelText: 'Batal',
+        type: 'success',
+        icon: 'fa-user-check'
+      });
+
+      if (!confirmed) return;
 
       try {
         const res = await fetch(`/api/admin/tutor-applications/${id}/approve`, {
@@ -1736,7 +2200,6 @@
         });
         const json = await res.json();
         if (json.success && json.data) {
-          // API returns { total, certifications } or an array
           if (Array.isArray(json.data)) {
             allCertifications = json.data;
           } else if (Array.isArray(json.data.certifications)) {
@@ -1795,22 +2258,24 @@
             <td><code>${escapeHtml(cert.credential_id || '-')}</code></td>
             <td>
               ${fileUrl ? `
-                <button class="btn btn-outline" style="padding:4px 10px; font-size:12px;" onclick="previewCertificateImage('${fileUrl}', '${escapeHtml(certName)}')">
+                <button class="btn btn-outline btn-sm" onclick="previewCertificateImage('${fileUrl}', '${escapeHtml(certName)}')">
                   <i class="fas fa-image"></i> Lihat Berkas
                 </button>
               ` : '<span style="color:var(--text-secondary); font-size:12px;">Tidak ada berkas</span>'}
             </td>
             <td>${statusBadge}</td>
             <td>
-              ${!isVerified ? `
-                <button class="btn btn-primary" style="padding:4px 10px; font-size:12px;" onclick="verifyCertificate(${cert.id}, true)">
-                  <i class="fas fa-check-double"></i> Validasi
-                </button>
-              ` : `
-                <button class="logout-btn" style="padding:4px 10px; font-size:12px;" onclick="verifyCertificate(${cert.id}, false)">
-                  <i class="fas fa-rotate-left"></i> Batalkan
-                </button>
-              `}
+              <div class="action-cell-group">
+                ${!isVerified ? `
+                  <button class="btn btn-success btn-sm" onclick="verifyCertificate(${cert.id}, true)">
+                    <i class="fas fa-check-double"></i> Validasi
+                  </button>
+                ` : `
+                  <button class="btn btn-danger btn-sm" onclick="verifyCertificate(${cert.id}, false)">
+                    <i class="fas fa-rotate-left"></i> Batalkan
+                  </button>
+                `}
+              </div>
             </td>
           </tr>
         `;
@@ -1834,8 +2299,16 @@
 
     async function verifyCertificate(id, shouldVerify) {
       const action = shouldVerify ? 'verify' : 'unverify';
-      const promptText = shouldVerify ? 'Verifikasi dan tandai sertifikat ini sebagai Resmi?' : 'Batalkan status verifikasi sertifikat ini?';
-      if (!confirm(promptText)) return;
+      const confirmed = await showCustomConfirm({
+        title: shouldVerify ? 'Validasi Sertifikat Resmi' : 'Batalkan Validasi Sertifikat',
+        message: shouldVerify ? 'Verifikasi dan tandai sertifikat ini sebagai berkas keahlian resmi?' : 'Batalkan status verifikasi berkas sertifikat ini?',
+        confirmText: shouldVerify ? 'Ya, Validasi' : 'Ya, Batalkan',
+        cancelText: 'Batal',
+        type: shouldVerify ? 'success' : 'warning',
+        icon: shouldVerify ? 'fa-certificate' : 'fa-triangle-exclamation'
+      });
+
+      if (!confirmed) return;
 
       try {
         const res = await fetch(`/api/admin/tutor-certifications/${id}/${action}`, {

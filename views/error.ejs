@@ -1,3 +1,153 @@
-<h1><%= message %></h1>
-<h2><%= error.status %></h2>
-<pre><%= error.stack %></pre>
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= error.status || 500 %> - Terjadi Kesalahan | SkillSphere AI</title>
+  
+  <!-- PWA Manifest & App Icons -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#1F1E1B">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  
+  <!-- Google Fonts: Newsreader (Editorial Serif) & Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome 6 Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Claude Design System Stylesheet -->
+  <link rel="stylesheet" href="/stylesheets/claude-theme.css?v=2.1">
+
+  <style>
+    .error-page {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 24px;
+      background-color: var(--bg-app);
+    }
+
+    .error-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 1040px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    .error-main {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 16px;
+    }
+
+    .error-card {
+      max-width: 600px;
+      width: 100%;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-xl);
+      padding: 44px 36px;
+      box-shadow: var(--shadow-floating);
+      text-align: center;
+    }
+
+    .error-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 14px;
+      border-radius: var(--radius-full);
+      background: var(--color-danger-bg);
+      border: 1px solid var(--color-danger);
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--color-danger);
+      margin-bottom: 20px;
+      text-transform: uppercase;
+    }
+
+    .error-code {
+      font-family: var(--font-serif);
+      font-size: 72px;
+      font-weight: 400;
+      line-height: 1;
+      color: var(--text-primary);
+      margin-bottom: 12px;
+    }
+
+    .error-title {
+      font-family: var(--font-serif);
+      font-size: 24px;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin-bottom: 12px;
+    }
+
+    .error-desc {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      margin-bottom: 28px;
+    }
+  </style>
+
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('skillsphere_theme') || 
+        (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    })();
+  </script>
+</head>
+<body>
+
+  <div class="error-page">
+    <header class="error-header">
+      <a href="/" class="brand-logo" style="text-decoration: none;">
+        <div class="brand-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+            <path opacity="0.38" d="M12 7.6L17.3 4.7L14.4 10L17.3 15.3L12 12.4L6.7 15.3L9.6 10L6.7 4.7Z" />
+            <path d="M12 0L13.8 8.2L22 10L13.8 11.8L12 20L10.2 11.8L2 10L10.2 8.2L12 0Z" />
+          </svg>
+        </div>
+        <span>SkillSphere AI</span>
+      </a>
+    </header>
+
+    <main class="error-main">
+      <div class="error-card">
+        <div class="error-badge">
+          <i class="fas fa-triangle-exclamation"></i>
+          <span>Status <%= error.status || 500 %></span>
+        </div>
+
+        <div class="error-code"><%= error.status || 500 %></div>
+        <h1 class="error-title"><%= message || 'Terjadi Gangguan pada Server' %></h1>
+        <p class="error-desc">
+          Sistem sedang mengalami kendala saat memproses permintaan ini. Silakan coba beberapa saat lagi atau kembali ke halaman beranda.
+        <div style="display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;">
+          <a href="/" class="btn btn-outline">
+            <i class="fas fa-house"></i> Beranda Utama
+          </a>
+          <a href="/dashboard" class="btn btn-primary">
+            <i class="fas fa-compass"></i> Buka Dashboard
+          </a>
+        </div>
+      </div>
+    </main>
+
+    <footer style="text-align: center; font-size: 12px; color: var(--text-tertiary);">
+      <p>&copy; <%= new Date().getFullYear() %> SkillSphere AI</p>
+    </footer>
+  </div>
+
+</body>
+</html>

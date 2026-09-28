@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>404 - Halaman Tidak Ditemukan | SkillSphere AI</title>
+  <meta name="description" content="Halaman yang Anda cari tidak ditemukan di platform SkillSphere AI.">
+  
+  <!-- PWA Manifest & App Icons -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#1F1E1B">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="SkillSphere AI">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  
+  <!-- Google Fonts: Newsreader (Editorial Serif) & Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome 6 Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Claude Design System Stylesheet -->
+  <link rel="stylesheet" href="/stylesheets/claude-theme.css?v=2.1">
+
+  <style>
+    /* Background Canvas & Ambient Container */
+    .notfound-page {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 24px 32px;
+      background-color: var(--bg-app);
+      color: var(--text-primary);
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    #ambient-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.65;
+      transition: opacity 0.4s ease;
+    }
+
+    .notfound-header,
+    .notfound-main,
+    .notfound-footer {
+      position: relative;
+      z-index: 1;
+    }
+
+    .notfound-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 1040px;
+      width: 100%;
+      margin: 0 auto;
+      padding-bottom: 20px;
+      animation: animFadeInDown 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .notfound-main {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      max-width: 920px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 32px 0;
+    }
+
+    .notfound-layout {
+      display: grid;
+      grid-template-columns: 1fr 280px;
+      gap: 48px;
+      align-items: center;
+      width: 100%;
+    }
+
+    /* Left Editorial Content */
+    .notfound-editorial {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .notfound-path-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      border-radius: var(--radius-full);
+      background: var(--bg-surface-subtle);
+      border: 1px solid var(--border-subtle);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--text-secondary);
+      width: fit-content;
+      margin-bottom: 16px;
+      box-shadow: var(--shadow-xs);
+      animation: animFadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both;
+    }
+
+    .path-pulse-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent-amber);
+      box-shadow: 0 0 8px var(--accent-amber);
+      animation: pulseDot 2s infinite ease-in-out;
+    }
+
+    @keyframes pulseDot {
+      0%, 100% { transform: scale(1); opacity: 0.7; }
+      50% { transform: scale(1.4); opacity: 1; }
+    }
+
+    .notfound-numeral {
+      font-family: var(--font-serif);
+      font-size: clamp(3.5rem, 8vw, 5.5rem);
+      font-weight: 400;
+      font-style: italic;
+      line-height: 1;
+      color: var(--text-tertiary);
+      letter-spacing: -0.04em;
+      margin-bottom: 8px;
+      user-select: none;
+      display: inline-block;
+      animation: animFadeInUp 0.65s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both;
+    }
+
+    .notfound-title {
+      font-family: var(--font-serif);
+      font-size: clamp(1.85rem, 4vw, 2.65rem);
+      font-weight: 500;
+      line-height: 1.2;
+      color: var(--text-primary);
+      letter-spacing: -0.02em;
+      margin: 0 0 16px 0;
+      animation: animFadeInUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both;
+    }
+
+    .notfound-desc {
+      font-size: 15px;
+      line-height: 1.65;
+      color: var(--text-secondary);
+      max-width: 520px;
+      margin: 0 0 28px 0;
+      animation: animFadeInUp 0.75s cubic-bezier(0.16, 1, 0.3, 1) 0.25s both;
+    }
+
+    .notfound-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 32px;
+      animation: animFadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both;
+    }
+
+    .btn-action-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      border-radius: var(--radius-md);
+      background: var(--btn-primary-bg);
+      color: var(--btn-primary-text);
+      font-size: 14px;
+      font-weight: 600;
+      text-decoration: none;
+      border: 1px solid var(--btn-primary-bg);
+      cursor: pointer;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .btn-action-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+    }
+
+    .btn-action-primary:active {
+      transform: translateY(0);
+    }
+
+    .btn-action-outline {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      border-radius: var(--radius-md);
+      background: var(--bg-surface);
+      color: var(--text-primary);
+      font-size: 14px;
+      font-weight: 600;
+      text-decoration: none;
+      border: 1px solid var(--border-subtle);
+      cursor: pointer;
+      transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .btn-action-outline:hover {
+      border-color: var(--border-strong);
+      background: var(--bg-surface-subtle);
+      transform: translateY(-2px);
+    }
+
+    /* Interactive Radar Orb Illustration */
+    .notfound-visual-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      perspective: 800px;
+      animation: animScaleIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both;
+    }
+
+    .radar-orb-card {
+      width: 240px;
+      height: 240px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, var(--bg-surface-subtle), var(--bg-surface));
+      border: 1px solid var(--border-subtle);
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--shadow-floating);
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      cursor: default;
+    }
+
+    .orb-ring {
+      position: absolute;
+      border-radius: 50%;
+      border: 1px dashed var(--border-subtle);
+      pointer-events: none;
+    }
+
+    .orb-ring-1 {
+      width: 190px;
+      height: 190px;
+      animation: spinClockwise 26s linear infinite;
+    }
+
+    .orb-ring-2 {
+      width: 140px;
+      height: 140px;
+      border: 1px solid var(--border-subtle);
+      animation: spinCounterClockwise 18s linear infinite;
+    }
+
+    .orb-radar-beam {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: conic-gradient(from 0deg at 50% 50%, rgba(217, 119, 6, 0.15) 0deg, rgba(217, 119, 6, 0) 60deg);
+      animation: radarSweep 6s linear infinite;
+      pointer-events: none;
+    }
+
+    .orb-center-mark {
+      position: relative;
+      z-index: 2;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-strong);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-primary);
+      box-shadow: var(--shadow-sm);
+      animation: floatBreath 4s ease-in-out infinite;
+    }
+
+    .orb-satellite {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--text-primary);
+      box-shadow: 0 0 6px var(--border-strong);
+    }
+
+    .sat-1 {
+      top: 24px;
+      right: 48px;
+      animation: pulseSat 3s ease-in-out infinite;
+    }
+
+    .sat-2 {
+      bottom: 36px;
+      left: 32px;
+      background: var(--accent-amber);
+      animation: pulseSat 4s ease-in-out infinite 1.5s;
+    }
+
+    /* Keyframes */
+    @keyframes spinClockwise {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes spinCounterClockwise {
+      from { transform: rotate(360deg); }
+      to { transform: rotate(0deg); }
+    }
+
+    @keyframes radarSweep {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes floatBreath {
+      0%, 100% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(-4px) scale(1.04); }
+    }
+
+    @keyframes pulseSat {
+      0%, 100% { transform: scale(1); opacity: 0.6; }
+      50% { transform: scale(1.35); opacity: 1; }
+    }
+
+    @keyframes animFadeInUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes animFadeInDown {
+      from { opacity: 0; transform: translateY(-14px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes animScaleIn {
+      from { opacity: 0; transform: scale(0.92); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    /* Suggested Navigation Links */
+    .notfound-nav-section {
+      border-top: 1px solid var(--border-subtle);
+      padding-top: 24px;
+      animation: animFadeInUp 0.85s cubic-bezier(0.16, 1, 0.3, 1) 0.35s both;
+    }
+
+    .notfound-nav-heading {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--text-tertiary);
+      margin-bottom: 14px;
+    }
+
+    .notfound-links-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+    }
+
+    .nav-anchor {
+      display: block;
+      text-decoration: none;
+      padding: 12px 14px;
+      border-radius: var(--radius-md);
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .nav-anchor:hover {
+      border-color: var(--border-strong);
+      background: var(--bg-surface-subtle);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .nav-anchor:focus-visible {
+      outline: 2px solid var(--accent-primary);
+      outline-offset: 2px;
+    }
+
+    .nav-anchor-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 3px;
+    }
+
+    .nav-anchor-title i {
+      font-size: 11px;
+      color: var(--text-secondary);
+      transition: transform 0.2s ease;
+    }
+
+    .nav-anchor:hover .nav-anchor-title i {
+      transform: translateX(2px);
+    }
+
+    .nav-anchor-desc {
+      font-size: 11.5px;
+      color: var(--text-secondary);
+      line-height: 1.35;
+    }
+
+    /* Footer */
+    .notfound-footer {
+      max-width: 1040px;
+      width: 100%;
+      margin: 0 auto;
+      padding-top: 20px;
+      border-top: 1px solid var(--border-subtle);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      color: var(--text-tertiary);
+      flex-wrap: wrap;
+      gap: 12px;
+      animation: animFadeInUp 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.4s both;
+    }
+
+    @media (max-width: 840px) {
+      .notfound-layout {
+        grid-template-columns: 1fr;
+        gap: 32px;
+      }
+      .notfound-visual-container {
+        order: -1;
+        margin-bottom: 8px;
+      }
+      .radar-orb-card {
+        width: 180px;
+        height: 180px;
+      }
+      .orb-ring-1 {
+        width: 140px;
+        height: 140px;
+      }
+      .orb-ring-2 {
+        width: 100px;
+        height: 100px;
+      }
+      .notfound-page {
+        padding: 20px 16px;
+      }
+      .notfound-main {
+        padding: 24px 0;
+      }
+    }
+  </style>
+
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('skillsphere_theme') || 
+        (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    })();
+  </script>
+</head>
+<body>
+
+  <div class="notfound-page">
+    <!-- Ambient Interactive Background Canvas -->
+    <canvas id="ambient-canvas"></canvas>
+
+    <!-- Header Navigation -->
+    <header class="notfound-header">
+      <a href="/" class="brand-logo" id="brand-home-link" style="text-decoration: none;">
+        <div class="brand-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+            <path opacity="0.38" d="M12 7.6L17.3 4.7L14.4 10L17.3 15.3L12 12.4L6.7 15.3L9.6 10L6.7 4.7Z" />
+            <path d="M12 0L13.8 8.2L22 10L13.8 11.8L12 20L10.2 11.8L2 10L10.2 8.2L12 0Z" />
+          </svg>
+        </div>
+        <span>SkillSphere AI</span>
+      </a>
+
+      <!-- Theme Switcher -->
+      <button class="theme-toggle-btn" id="theme-toggle-btn" type="button" aria-label="Ganti mode tema">
+        <i class="fas fa-sun" id="theme-icon-sun" style="display:none;"></i>
+        <i class="fas fa-moon" id="theme-icon-moon"></i>
+        <span id="theme-text">Mode Gelap</span>
+      </button>
+    </header>
+
+    <!-- Main Editorial Content with Interactive Orb -->
+    <main class="notfound-main">
+      <div class="notfound-layout">
+        <!-- Left Column: Editorial & Actions -->
+        <div class="notfound-editorial">
+          <div class="notfound-path-chip" id="path-chip">
+            <span class="path-pulse-dot"></span>
+            <span id="current-url-display">URL: /404</span>
+          </div>
+
+          <div class="notfound-numeral">404</div>
+          <h1 class="notfound-title">Halaman yang Anda tuju tidak ditemukan</h1>
+          <p class="notfound-desc">
+            Tautan yang Anda ikuti mungkin sudah tidak aktif, dipindahkan ke rute lain, atau alamat URL yang dimasukkan kurang tepat.
+          </p>
+
+          <div class="notfound-actions">
+            <button type="button" class="btn-action-primary" onclick="if (window.history.length > 1) { window.history.back(); } else { window.location.href = '/'; }">
+              <i class="fas fa-arrow-left"></i> Kembali Sebelumnya
+            </button>
+            <a href="/dashboard" class="btn-action-outline">
+              <i class="fas fa-compass"></i> Buka Dashboard
+            </a>
+          </div>
+
+          <!-- Suggested Destinations -->
+          <section class="notfound-nav-section">
+            <h2 class="notfound-nav-heading">Tautan Pembelajaran Utama</h2>
+            <div class="notfound-links-grid">
+              <a href="/dashboard" class="nav-anchor">
+                <span class="nav-anchor-title"><i class="fas fa-book-open"></i> Katalog Kursus</span>
+                <span class="nav-anchor-desc">Akses kurikulum dan materi pembelajaran adaptif.</span>
+              </a>
+              <a href="/login" class="nav-anchor">
+                <span class="nav-anchor-title"><i class="fas fa-right-to-bracket"></i> Masuk Akun</span>
+                <span class="nav-anchor-desc">Akses ruang belajar siswa atau studio pengajar.</span>
+              </a>
+              <a href="/" class="nav-anchor">
+                <span class="nav-anchor-title"><i class="fas fa-house"></i> Beranda Utama</span>
+                <span class="nav-anchor-desc">Kembali ke halaman informasi awal platform.</span>
+              </a>
+            </div>
+          </section>
+        </div>
+
+        <!-- Right Column: Interactive Radar Orb Visual -->
+        <div class="notfound-visual-container">
+          <div class="radar-orb-card" id="radar-orb">
+            <div class="orb-radar-beam"></div>
+            <div class="orb-ring orb-ring-1"></div>
+            <div class="orb-ring orb-ring-2"></div>
+            <div class="orb-satellite sat-1"></div>
+            <div class="orb-satellite sat-2"></div>
+            <div class="orb-center-mark">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+                <path opacity="0.4" d="M12 7.6L17.3 4.7L14.4 10L17.3 15.3L12 12.4L6.7 15.3L9.6 10L6.7 4.7Z" />
+                <path d="M12 0L13.8 8.2L22 10L13.8 11.8L12 20L10.2 11.8L2 10L10.2 8.2L12 0Z" />
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="notfound-footer">
+      <span>&copy; <%= new Date().getFullYear() %> SkillSphere AI. Seluruh hak cipta dilindungi.</span>
+      <span style="font-family: var(--font-mono); font-size: 11px;">HTTP 404 NOT FOUND</span>
+    </footer>
+  </div>
+
+  <script>
+    // Theme Switcher Logic
+    const themeBtn = document.getElementById('theme-toggle-btn');
+    const themeIconSun = document.getElementById('theme-icon-sun');
+    const themeIconMoon = document.getElementById('theme-icon-moon');
+    const themeText = document.getElementById('theme-text');
+
+    function updateThemeUI(theme) {
+      if (theme === 'dark') {
+        themeIconSun.style.display = 'inline-block';
+        themeIconMoon.style.display = 'none';
+        if (themeText) themeText.textContent = 'Mode Terang';
+      } else {
+        themeIconSun.style.display = 'none';
+        themeIconMoon.style.display = 'inline-block';
+        if (themeText) themeText.textContent = 'Mode Gelap';
+      }
+    }
+    updateThemeUI(document.documentElement.getAttribute('data-theme') || 'light');
+
+    if (themeBtn) {
+      themeBtn.addEventListener('click', () => {
+        const active = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', active);
+        localStorage.setItem('skillsphere_theme', active);
+        updateThemeUI(active);
+      });
+    }
+
+    // Set current path text
+    try {
+      const displayChip = document.getElementById('current-url-display');
+      if (displayChip && window.location.pathname) {
+        displayChip.textContent = 'Rute: ' + window.location.pathname;
+      }
+    } catch(e) {}
+
+    // Interactive 3D Card Tilt Effect on Mouse Move
+    const orb = document.getElementById('radar-orb');
+    if (orb) {
+      document.addEventListener('mousemove', (e) => {
+        const rect = orb.getBoundingClientRect();
+        const orbX = rect.left + rect.width / 2;
+        const orbY = rect.top + rect.height / 2;
+        const deltaX = (e.clientX - orbX) / 30;
+        const deltaY = (e.clientY - orbY) / 30;
+        orb.style.transform = `perspective(600px) rotateY(${deltaX}deg) rotateX(${-deltaY}deg)`;
+      });
+      document.addEventListener('mouseleave', () => {
+        orb.style.transform = 'perspective(600px) rotateY(0deg) rotateX(0deg)';
+      });
+    }
+
+    // Interactive Ambient Constellation Canvas
+    const canvas = document.getElementById('ambient-canvas');
+    if (canvas) {
+      const ctx = canvas.getContext('2d');
+      let width, height;
+      let particles = [];
+      let mouse = { x: null, y: null, radius: 120 };
+
+      function resize() {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+      }
+      window.addEventListener('resize', resize);
+      resize();
+
+      class Particle {
+        constructor() {
+          this.x = Math.random() * width;
+          this.y = Math.random() * height;
+          this.vx = (Math.random() - 0.5) * 0.45;
+          this.vy = (Math.random() - 0.5) * 0.45;
+          this.radius = Math.random() * 1.8 + 0.8;
+        }
+        update() {
+          this.x += this.vx;
+          this.y += this.vy;
+          if (this.x < 0 || this.x > width) this.vx *= -1;
+          if (this.y < 0 || this.y > height) this.vy *= -1;
+
+          // Mouse interaction
+          if (mouse.x !== null) {
+            const dx = mouse.x - this.x;
+            const dy = mouse.y - this.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < mouse.radius) {
+              const force = (mouse.radius - dist) / mouse.radius;
+              this.x -= (dx / dist) * force * 1.2;
+              this.y -= (dy / dist) * force * 1.2;
+            }
+          }
+        }
+        draw(isDark) {
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+          ctx.fillStyle = isDark ? 'rgba(255, 255, 255, 0.22)' : 'rgba(30, 30, 30, 0.16)';
+          ctx.fill();
+        }
+      }
+
+      const particleCount = Math.min(Math.floor(window.innerWidth / 30), 45);
+      for (let i = 0; i < particleCount; i++) {
+        particles.push(new Particle());
+      }
+
+      window.addEventListener('mousemove', (e) => {
+        mouse.x = e.clientX;
+        mouse.y = e.clientY;
+      });
+
+      window.addEventListener('mouseleave', () => {
+        mouse.x = null;
+        mouse.y = null;
+      });
+
+      function animate() {
+        ctx.clearRect(0, 0, width, height);
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+
+        for (let i = 0; i < particles.length; i++) {
+          particles[i].update();
+          particles[i].draw(isDark);
+
+          for (let j = i + 1; j < particles.length; j++) {
+            const dx = particles[i].x - particles[j].x;
+            const dy = particles[i].y - particles[j].y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+
+            if (dist < 110) {
+              const alpha = (1 - dist / 110) * (isDark ? 0.14 : 0.09);
+              ctx.beginPath();
+              ctx.moveTo(particles[i].x, particles[i].y);
+              ctx.lineTo(particles[j].x, particles[j].y);
+              ctx.strokeStyle = isDark ? `rgba(255, 255, 255, ${alpha})` : `rgba(30, 30, 30, ${alpha})`;
+              ctx.lineWidth = 0.8;
+              ctx.stroke();
+            }
+          }
+        }
+        requestAnimationFrame(animate);
+      }
+      animate();
+    }
+  </script>
+</body>
+</html>
