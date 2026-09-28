@@ -575,6 +575,120 @@
       flex-shrink: 0 !important;
       vertical-align: middle !important;
     }
+
+    /* --- Legal Terms & Privacy Modal Styles --- */
+    .legal-modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.65);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      z-index: 9999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      opacity: 0;
+      transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .legal-modal-overlay.active {
+      display: flex;
+      opacity: 1;
+    }
+
+    .legal-modal-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-2xl);
+      max-width: 660px;
+      width: 100%;
+      max-height: 86vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 24px 48px -12px rgba(0, 0, 0, 0.35);
+      overflow: hidden;
+      transform: scale(0.94) translateY(12px);
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .legal-modal-overlay.active .legal-modal-card {
+      transform: scale(1) translateY(0);
+    }
+
+    .legal-tab-btn {
+      flex: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 9px 14px;
+      border-radius: var(--radius-md);
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text-secondary);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: var(--font-sans);
+    }
+
+    .legal-tab-btn.active {
+      background: var(--bg-surface);
+      border-color: var(--border-subtle);
+      color: var(--text-primary);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .legal-doc-section {
+      margin-bottom: 22px;
+    }
+
+    .legal-doc-section h4 {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin: 0 0 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .legal-doc-section p,
+    .legal-doc-section li {
+      font-size: 12.8px;
+      color: var(--text-secondary);
+      line-height: 1.65;
+      margin: 0 0 6px;
+    }
+
+    .legal-doc-section ul {
+      margin: 6px 0 10px 18px;
+      padding: 0;
+    }
+
+    .terms-agree-box {
+      margin-top: 14px;
+      margin-bottom: 14px;
+      padding: 12px 14px;
+      border-radius: var(--radius-md);
+      background: var(--bg-surface-subtle);
+      border: 1px solid var(--border-subtle);
+      transition: border-color 0.2s ease;
+    }
+
+    .terms-agree-box:hover {
+      border-color: var(--border-strong);
+    }
+
+    @keyframes bounceSoft {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(3px); }
+    }
   </style>
 
   <script>
@@ -748,7 +862,23 @@
               </div>
             </div>
 
-            <button type="submit" class="submit-btn" id="reg-submit-btn" style="margin-top: 8px;">
+            <!-- Terms and Privacy Policy Acceptance Checkbox -->
+            <div class="terms-agree-box" id="terms-agree-box">
+              <label style="display: flex; align-items: flex-start; gap: 10px; cursor: pointer; font-size: 12px; color: var(--text-secondary); line-height: 1.5; margin: 0; user-select: none;">
+                <input 
+                  type="checkbox" 
+                  id="terms-agree-checkbox" 
+                  name="terms_agree" 
+                  required
+                  style="margin-top: 2px; width: 16px; height: 16px; accent-color: var(--accent-primary); cursor: pointer; flex-shrink: 0;"
+                >
+                <span>
+                  Saya telah membaca dan menyetujui <a href="javascript:void(0)" onclick="event.stopPropagation(); openLegalModal('terms')" class="link" style="color: var(--text-primary); font-weight: 600; text-decoration: underline;">Ketentuan Layanan</a> serta <a href="javascript:void(0)" onclick="event.stopPropagation(); openLegalModal('privacy')" class="link" style="color: var(--text-primary); font-weight: 600; text-decoration: underline;">Kebijakan Privasi</a> SkillSphere AI.
+                </span>
+              </label>
+            </div>
+
+            <button type="submit" class="submit-btn" id="reg-submit-btn" style="margin-top: 4px;">
               <span class="spinner" id="reg-spinner"></span>
               <span id="reg-btn-text">Daftar & Kirim Kode OTP</span>
             </button>
@@ -778,7 +908,7 @@
             </button>
           </div>
 
-          <div style="margin-top: 22px; text-align: center; font-size: 13px; color: var(--text-secondary);">
+          <div style="margin-top: 18px; text-align: center; font-size: 13px; color: var(--text-secondary);">
             Sudah punya akun? <a href="/login" class="link" style="color: var(--text-primary); font-weight: 600;">Masuk Sekarang</a>
           </div>
         </div>
@@ -851,12 +981,154 @@
       </div>
     </main>
 
+    <!-- ======================================================== -->
+    <!-- INTERACTIVE LEGAL MODAL (Terms & Privacy Scroll Acceptance) -->
+    <!-- ======================================================== -->
+    <div class="legal-modal-overlay" id="legal-doc-modal" role="dialog" aria-modal="true" aria-labelledby="legal-modal-title">
+      <div class="legal-modal-card">
+        
+        <!-- Modal Top Navigation Bar -->
+        <div style="padding: 16px 20px; border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: space-between; background: var(--bg-surface);">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <div style="width: 32px; height: 32px; border-radius: var(--radius-md); background: var(--accent-primary-light); color: var(--accent-primary); display: flex; align-items: center; justify-content: center; font-size: 15px;">
+              <i class="fas fa-file-shield"></i>
+            </div>
+            <div>
+              <h3 style="font-size: 15px; font-weight: 700; color: var(--text-primary); margin: 0;" id="legal-modal-title">Dokumen Hukum & Privasi</h3>
+              <p style="font-size: 11.5px; color: var(--text-secondary); margin: 2px 0 0;" id="legal-modal-subtitle">SkillSphere AI • UU PDP No. 27/2022</p>
+            </div>
+          </div>
+          <button type="button" onclick="closeLegalModal()" style="background: transparent; border: none; font-size: 18px; color: var(--text-secondary); cursor: pointer; padding: 4px 8px; border-radius: var(--radius-md); transition: color 0.2s;" aria-label="Tutup modal">
+            <i class="fas fa-xmark"></i>
+          </button>
+        </div>
+
+        <!-- Document Selector Tabs -->
+        <div style="display: flex; padding: 8px 16px; background: var(--bg-surface-subtle); border-bottom: 1px solid var(--border-subtle); gap: 8px;">
+          <button type="button" class="legal-tab-btn active" id="tab-btn-terms" onclick="switchLegalDocTab('terms')">
+            <i class="fas fa-scale-balanced"></i>
+            <span>Ketentuan Layanan</span>
+          </button>
+          <button type="button" class="legal-tab-btn" id="tab-btn-privacy" onclick="switchLegalDocTab('privacy')">
+            <i class="fas fa-shield-halved"></i>
+            <span>Kebijakan Privasi</span>
+          </button>
+        </div>
+
+        <!-- Real-time Reading Progress Bar -->
+        <div style="height: 3px; background: var(--bg-surface-subtle); width: 100%;">
+          <div id="legal-scroll-progress" style="height: 100%; width: 0%; background: var(--accent-primary); transition: width 0.1s ease;"></div>
+        </div>
+
+        <!-- Scrollable Document Body -->
+        <div id="legal-modal-body" style="padding: 22px 24px; overflow-y: auto; flex: 1; font-size: 13px; line-height: 1.65; color: var(--text-secondary);">
+          
+          <!-- DOC 1: KETENTUAN LAYANAN -->
+          <div id="legal-content-terms">
+            <div class="legal-doc-section">
+              <h4><i class="fas fa-circle-info" style="color:var(--text-primary); font-size:13px;"></i> 1. Ketentuan Umum & Penerimaan Layanan</h4>
+              <p>Selamat datang di SkillSphere AI. Dokumen ini mengatur penggunaan platform pembelajaran online, modul adaptif kecerdasan buatan, serta transaksi kursus antara siswa, instruktur (tutor), dan platform.</p>
+              <p>Dengan mendaftarkan akun di SkillSphere AI, Anda menyatakan telah berusia sekurang-kurangnya 13 tahun (atau memperoleh persetujuan wali/orang tua) dan menyetujui seluruh ketentuan yang tercantum di sini.</p>
+            </div>
+
+            <div class="legal-doc-section">
+              <h4><i class="fas fa-user-check" style="color:var(--text-primary); font-size:13px;"></i> 2. Pendaftaran Akun & Verifikasi Identitas</h4>
+              <ul>
+                <li><strong>Keakuratan Informasi:</strong> Anda wajib memberikan alamat email yang sah dan data nama yang benar guna penerbitan sertifikat digital.</li>
+                <li><strong>Kerahasiaan Kredensial:</strong> Anda bertanggung jawab penuh atas keamanan kata sandi dan token otorisasi akun Anda.</li>
+                <li><strong>Pendaftaran Pengajar:</strong> Akun pengajar (tutor) wajib melewati verifikasi administrasi dan validasi sertifikasi keahlian resmi oleh tim kurasi platform sebelum dapat mempublikasikan materi berbayar.</li>
+              </ul>
+            </div>
+
+            <div class="legal-doc-section">
+              <h4><i class="fas fa-brain" style="color:var(--text-primary); font-size:13px;"></i> 3. Hak Kekayaan Intelektual & Layanan AI</h4>
+              <p>Seluruh materi kursus, video, slide, dan materi latihan adalah milik instruktur atau SkillSphere AI yang dilindungi oleh Undang-Undang Hak Cipta No. 28 Tahun 2014. Dilarang keras merekam ulang, menjual kembali, atau menyebarluaskan materi tanpa izin tertulis.</p>
+              <p>Fitur AI Roadmap dan rekomendasi materi menggunakan model LLM Gemini API untuk tujuan pendidikan adaptif. Anda tidak diperkenankan menggunakan AI untuk menghasilkan konten berbahaya atau melanggar hukum.</p>
+            </div>
+
+            <div class="legal-doc-section">
+              <h4><i class="fas fa-money-bill-transfer" style="color:var(--text-primary); font-size:13px;"></i> 4. Model Finansial & Bagi Hasil 80% / 20%</h4>
+              <p>Platform menerapkan sistem bagi hasil yang adil:</p>
+              <ul>
+                <li><strong>80% Pendapatan Bersih:</strong> Diberikan langsung ke Dompet Virtual Pengajar (Tutor Wallet).</li>
+                <li><strong>20% Biaya Platform:</strong> Dialokasikan untuk pemeliharaan server, kuota AI LLM API, dan operasional platform.</li>
+                <li><strong>Penarikan Dana:</strong> Batas minimum penarikan dana adalah Rp 100.000 dengan masa holding 7 hari untuk mitigasi sengketa transaksi.</li>
+              </ul>
+            </div>
+
+            <div class="legal-doc-section">
+              <h4><i class="fas fa-handshake-angle" style="color:var(--text-primary); font-size:13px;"></i> 5. Batasan Tanggung Jawab & Penyelesaian Sengketa</h4>
+              <p>SkillSphere AI menyediakan layanan sebagaimana adanya (as-is). Segala perselisihan yang timbul akan diselesaikan secara musyawarah untuk mufakat, atau melalui yurisdiksi Pengadilan Negeri yang berwenang di Republik Indonesia.</p>
+            </div>
+          </div>
+
+          <!-- DOC 2: KEBIJAKAN PRIVASI -->
+          <div id="legal-content-privacy" style="display: none;">
+            <div class="legal-doc-section">
+              <h4><i class="fas fa-shield-halved" style="color:var(--text-primary); font-size:13px;"></i> 1. Kepatuhan Undang-Undang Perlindungan Data Pribadi (UU PDP No. 27/2022)</h4>
+              <p>SkillSphere AI berkomitmen penuh melindungi hak privasi Anda sesuai dengan Undang-Undang Nomor 27 Tahun 2022 tentang Perlindungan Data Pribadi (UU PDP) dan standar privasi internasional.</p>
+            </div>
+
+            <div class="legal-doc-section">
+              <h4><i class="fas fa-database" style="color:var(--text-primary); font-size:13px;"></i> 2. Data Pribadi yang Kami Kumpulkan</h4>
+              <ul>
+                <li><strong>Data Identitas:</strong> Nama lengkap, alamat email, nomor telepon, dan foto profil.</li>
+                <li><strong>Data Akademik & Preferensi:</strong> Riwayat kemajuan belajar, skor kuis/ujian, minat karir, dan sertifikat yang diraih.</li>
+                <li><strong>Data Pengajar:</strong> CV, portofolio, nomor rekening bank/e-wallet untuk pencairan dana bagi hasil.</li>
+                <li><strong>Data Teknis:</strong> Alamat IP, user-agent peramban, dan cookie sesi untuk otentikasi JWT yang aman.</li>
+              </ul>
+            </div>
+
+            <div class="legal-doc-section">
+              <h4><i class="fas fa-lock" style="color:var(--text-primary); font-size:13px;"></i> 3. Keamanan Data & Enkripsi</h4>
+              <p>Kata sandi pengguna dienkripsi dengan algoritma <code>bcrypt (salt rounds 10)</code>. Token otentikasi JWT dan komunikasi data dilindungi melalui enkripsi protokol TLS/HTTPS dan reverse-proxy Cloudflare dengan mitigasi serangan DDoS.</p>
+              <p>SkillSphere AI tidak akan pernah menjual atau menyewakan data pribadi Anda kepada pihak ketiga manapun untuk kepentingan pemasaran eksternal tanpa persetujuan eksplisit Anda.</p>
+            </div>
+
+            <div class="legal-doc-section">
+              <h4><i class="fas fa-scale-unbalanced-flip" style="color:var(--text-primary); font-size:13px;"></i> 4. Hak-Hak Subjek Data Anda</h4>
+              <p>Sesuai UU PDP, Anda memiliki hak untuk:</p>
+              <ul>
+                <li>Mengakses dan memperbarui data profil Anda kapan saja melalui menu Pengaturan.</li>
+                <li>Menarik kembali persetujuan pemrosesan data dan meminta penghapusan akun secara permanen (*Right to be Forgotten*).</li>
+                <li>Mengunduh ringkasan data portofolio sertifikat dan riwayat belajar Anda.</li>
+              </ul>
+            </div>
+
+            <div class="legal-doc-section">
+              <h4><i class="fas fa-envelope-shield" style="color:var(--text-primary); font-size:13px;"></i> 5. Kontak Petugas Perlindungan Data (DPO)</h4>
+              <p>Jika Anda memiliki pertanyaan mengenai pemrosesan data pribadi Anda, silakan hubungi tim hukum kami melalui email: <a href="mailto:privacy@skillsphere.id" class="link" style="font-weight:600;">privacy@skillsphere.id</a>.</p>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Scroll Guidance Notice Banner -->
+        <div id="legal-scroll-notice" style="padding: 10px 20px; font-size: 12px; display: flex; align-items: center; justify-content: space-between; gap: 10px; border-top: 1px solid var(--border-subtle); background: var(--bg-surface-subtle);">
+          <div style="display: flex; align-items: center; gap: 8px;" id="legal-scroll-notice-text">
+            <i class="fas fa-arrow-down" style="color: var(--text-secondary); animation: bounceSoft 1.5s infinite;"></i>
+            <span>Gulir sampai ke paling bawah untuk mengaktifkan tombol setujui.</span>
+          </div>
+          <span style="font-weight: 700; font-size: 11.5px; color: var(--text-primary); font-family: var(--font-mono);" id="legal-scroll-percent">0%</span>
+        </div>
+
+        <!-- Modal Bottom Actions -->
+        <div style="padding: 14px 20px; border-top: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: flex-end; gap: 10px; background: var(--bg-surface);">
+          <button type="button" class="oauth-btn" onclick="closeLegalModal()" style="width: auto !important; padding: 8px 16px !important; font-size: 13px !important;">Tutup</button>
+          <button type="button" class="submit-btn" id="btn-accept-legal" onclick="acceptLegalTerms()" disabled style="width: auto !important; padding: 8px 20px !important; font-size: 13px !important; opacity: 0.45; cursor: not-allowed; pointer-events: none; transition: all 0.25s ease;">
+            <i class="fas fa-check" style="margin-right: 6px;"></i> Saya Mengerti & Setujui
+          </button>
+        </div>
+
+      </div>
+    </div>
+
     <!-- Footer -->
     <footer class="login-footer">
-      <p>© 2026 SkillSphere AI — Dikembangkan oleh Tim CodeCrafters (Sprint 1: Lead BE Arjuna)</p>
+      <p>© 2026 SkillSphere AI. Dikembangkan oleh Tim CodeCrafters (Sprint 1: Lead BE Arjuna)</p>
       <div class="footer-links">
-        <a href="#" class="link">Privasi</a>
-        <a href="#" class="link">Ketentuan Layanan</a>
+        <a href="/privacy" class="link">Privasi</a>
+        <a href="/terms" class="link">Ketentuan Layanan</a>
         <a href="/api/health" class="link" target="_blank">API Status</a>
       </div>
     </footer>
@@ -1044,6 +1316,13 @@
 
       if (password.length < 6) {
         showAlert('alert-banner-reg', 'danger', 'Password minimal 6 karakter.');
+        return;
+      }
+
+      const termsCheckbox = document.getElementById('terms-agree-checkbox');
+      if (termsCheckbox && !termsCheckbox.checked) {
+        showAlert('alert-banner-reg', 'danger', 'Anda wajib membaca dan menyetujui Ketentuan Layanan serta Kebijakan Privasi.');
+        openLegalModal('terms');
         return;
       }
 
@@ -1400,6 +1679,163 @@
           }, 280);
         } else {
           window.location.href = '/login';
+        }
+      });
+    });
+
+    // --- 10. Interactive Legal Modal & Scroll-To-Bottom Detection ---
+    let currentLegalTab = 'terms';
+    const hasReadDoc = {
+      terms: false,
+      privacy: false,
+    };
+
+    function openLegalModal(tab = 'terms') {
+      const modal = document.getElementById('legal-doc-modal');
+      if (!modal) return;
+      modal.classList.add('active');
+      modal.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+      switchLegalDocTab(tab);
+    }
+
+    function closeLegalModal() {
+      const modal = document.getElementById('legal-doc-modal');
+      if (!modal) return;
+      modal.classList.remove('active');
+      setTimeout(() => {
+        modal.style.display = 'none';
+        document.body.style.overflow = '';
+      }, 250);
+    }
+
+    function switchLegalDocTab(tab) {
+      currentLegalTab = tab;
+      const tabTerms = document.getElementById('tab-btn-terms');
+      const tabPrivacy = document.getElementById('tab-btn-privacy');
+      const contentTerms = document.getElementById('legal-content-terms');
+      const contentPrivacy = document.getElementById('legal-content-privacy');
+      const modalSubtitle = document.getElementById('legal-modal-subtitle');
+      const scrollContainer = document.getElementById('legal-modal-body');
+
+      if (tab === 'terms') {
+        if (tabTerms) tabTerms.classList.add('active');
+        if (tabPrivacy) tabPrivacy.classList.remove('active');
+        if (contentTerms) contentTerms.style.display = 'block';
+        if (contentPrivacy) contentPrivacy.style.display = 'none';
+        if (modalSubtitle) modalSubtitle.textContent = 'Syarat dan Ketentuan Penggunaan Layanan SkillSphere AI';
+      } else {
+        if (tabTerms) tabTerms.classList.remove('active');
+        if (tabPrivacy) tabPrivacy.classList.add('active');
+        if (contentTerms) contentTerms.style.display = 'none';
+        if (contentPrivacy) contentPrivacy.style.display = 'block';
+        if (modalSubtitle) modalSubtitle.textContent = 'Kebijakan Privasi & Perlindungan Data Pribadi (UU PDP No. 27/2022)';
+      }
+
+      if (scrollContainer) {
+        scrollContainer.scrollTop = 0;
+      }
+      updateScrollProgress();
+    }
+
+    function updateScrollProgress() {
+      const scrollContainer = document.getElementById('legal-modal-body');
+      const progressBar = document.getElementById('legal-scroll-progress');
+      const percentLabel = document.getElementById('legal-scroll-percent');
+      const noticeText = document.getElementById('legal-scroll-notice-text');
+      const acceptBtn = document.getElementById('btn-accept-legal');
+
+      if (!scrollContainer) return;
+
+      const scrollTotal = scrollContainer.scrollHeight - scrollContainer.clientHeight;
+      const currentScroll = scrollContainer.scrollTop;
+      const percent = scrollTotal > 0 ? Math.min(Math.round((currentScroll / scrollTotal) * 100), 100) : 100;
+
+      if (progressBar) progressBar.style.width = percent + '%';
+      if (percentLabel) percentLabel.textContent = percent + '%';
+
+      if (percent >= 94 || scrollTotal <= 20) {
+        hasReadDoc[currentLegalTab] = true;
+      }
+
+      // If user has read the document in the current tab
+      if (hasReadDoc[currentLegalTab]) {
+        if (acceptBtn) {
+          acceptBtn.disabled = false;
+          acceptBtn.style.opacity = '1';
+          acceptBtn.style.cursor = 'pointer';
+          acceptBtn.style.pointerEvents = 'auto';
+        }
+        if (noticeText) {
+          noticeText.innerHTML = '<i class="fas fa-circle-check" style="color: var(--color-success, #10b981); font-size: 14px;"></i> <span style="color: var(--text-primary); font-weight: 600;">Anda telah membaca seluruh dokumen ini. Silakan klik tombol setujui di bawah.</span>';
+        }
+      } else {
+        if (acceptBtn) {
+          acceptBtn.disabled = true;
+          acceptBtn.style.opacity = '0.45';
+          acceptBtn.style.cursor = 'not-allowed';
+          acceptBtn.style.pointerEvents = 'none';
+        }
+        if (noticeText) {
+          noticeText.innerHTML = '<i class="fas fa-arrow-down" style="color: var(--text-secondary); animation: bounceSoft 1.5s infinite;"></i> <span>Gulir sampai ke paling bawah untuk mengaktifkan tombol setujui.</span>';
+        }
+      }
+    }
+
+    function acceptLegalTerms() {
+      const checkbox = document.getElementById('terms-agree-checkbox');
+      hasReadDoc.terms = true;
+      hasReadDoc.privacy = true;
+      if (checkbox) {
+        checkbox.checked = true;
+      }
+      closeLegalModal();
+      showAlert('alert-banner-reg', 'success', 'Ketentuan Layanan dan Kebijakan Privasi telah disetujui.');
+      setTimeout(() => hideAlert('alert-banner-reg'), 4000);
+    }
+
+    // Attach scroll and checkbox event listeners
+    document.addEventListener('DOMContentLoaded', () => {
+      const scrollBody = document.getElementById('legal-modal-body');
+      if (scrollBody) {
+        scrollBody.addEventListener('scroll', () => {
+          window.requestAnimationFrame(updateScrollProgress);
+        });
+      }
+
+      // Checkbox click listener: triggers modal popup immediately when user attempts to check it
+      const termsCheckbox = document.getElementById('terms-agree-checkbox');
+      if (termsCheckbox) {
+        termsCheckbox.addEventListener('click', (e) => {
+          if (!hasReadDoc.terms) {
+            e.preventDefault();
+            termsCheckbox.checked = false;
+            openLegalModal('terms');
+          } else if (!termsCheckbox.checked) {
+            // User manually unchecked
+            hasReadDoc.terms = false;
+            hasReadDoc.privacy = false;
+          }
+        });
+      }
+
+      // Close modal when clicking on backdrop
+      const modalOverlay = document.getElementById('legal-doc-modal');
+      if (modalOverlay) {
+        modalOverlay.addEventListener('click', (e) => {
+          if (e.target === modalOverlay) {
+            closeLegalModal();
+          }
+        });
+      }
+
+      // Close on ESC key
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          const modal = document.getElementById('legal-doc-modal');
+          if (modal && modal.classList.contains('active')) {
+            closeLegalModal();
+          }
         }
       });
     });

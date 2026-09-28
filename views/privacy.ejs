@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= typeof title !== 'undefined' ? title : 'Kebijakan Privasi | SkillSphere AI' %></title>
+  <meta name="description" content="Kebijakan Privasi resmi platform SkillSphere AI. Pelajari bagaimana kami melindungi data pribadi Anda sesuai UU PDP No. 27/2022 dan standar Google API Services User Data Policy.">
+  
+  <!-- PWA Manifest & Icons -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#1F1E1B">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="SkillSphere">
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="shortcut icon" href="/favicon.svg">
+  
+  <!-- Google Fonts: Newsreader (Editorial Serif) & Plus Jakarta Sans (Modern Sans) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome 6 Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Claude Design System Stylesheet -->
+  <link rel="stylesheet" href="/stylesheets/claude-theme.css?v=2.0">
+  
+  <style>
+    .legal-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 32px 24px 80px;
+    }
+
+    .legal-header-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 0 24px;
+      border-bottom: 1px solid var(--border-subtle);
+      margin-bottom: 36px;
+    }
+
+    .legal-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--text-primary);
+    }
+
+    .legal-brand-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-md);
+      background: var(--accent-primary);
+      color: var(--accent-text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+
+    .legal-brand-title {
+      font-family: var(--font-serif);
+      font-size: 22px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+
+    .legal-nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn-nav-outline {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border-radius: var(--radius-full);
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+      font-size: 13.5px;
+      font-weight: 500;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+
+    .btn-nav-outline:hover {
+      background: var(--bg-surface-subtle);
+      border-color: var(--border-strong);
+    }
+
+    .btn-nav-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 18px;
+      border-radius: var(--radius-full);
+      background: var(--accent-primary);
+      border: 1px solid var(--accent-primary);
+      color: var(--accent-text);
+      font-size: 13.5px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+
+    .btn-nav-primary:hover {
+      background: var(--accent-primary-hover);
+    }
+
+    .legal-hero {
+      margin-bottom: 40px;
+      max-width: 840px;
+    }
+
+    .legal-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: var(--radius-full);
+      background: var(--bg-surface-subtle);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 16px;
+    }
+
+    .legal-title {
+      font-family: var(--font-serif);
+      font-size: 38px;
+      font-weight: 500;
+      line-height: 1.2;
+      color: var(--text-primary);
+      margin-bottom: 14px;
+      letter-spacing: -0.02em;
+    }
+
+    .legal-subtitle {
+      font-size: 16px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    .legal-meta-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 20px;
+      margin-top: 20px;
+      padding: 12px 18px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      font-size: 13.5px;
+      color: var(--text-secondary);
+    }
+
+    .legal-meta-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .legal-meta-item strong {
+      color: var(--text-primary);
+    }
+
+    .legal-layout-grid {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 40px;
+      align-items: start;
+    }
+
+    /* Sticky Table of Contents */
+    .legal-sidebar {
+      position: sticky;
+      top: 24px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      max-height: calc(100vh - 48px);
+      overflow-y: auto;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .toc-title {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-secondary);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .toc-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .toc-link {
+      display: block;
+      padding: 8px 12px;
+      border-radius: var(--radius-sm);
+      color: var(--text-secondary);
+      font-size: 13.5px;
+      text-decoration: none;
+      line-height: 1.4;
+      transition: all 0.15s ease;
+    }
+
+    .toc-link:hover {
+      color: var(--text-primary);
+      background: var(--bg-surface-subtle);
+    }
+
+    .toc-link.active {
+      color: var(--accent-text);
+      background: var(--accent-primary);
+      font-weight: 600;
+    }
+
+    .toc-search {
+      margin-bottom: 16px;
+      position: relative;
+    }
+
+    .toc-search-input {
+      width: 100%;
+      padding: 8px 12px 8px 34px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-surface-subtle);
+      color: var(--text-primary);
+      font-size: 13px;
+      outline: none;
+      transition: border-color 0.2s ease;
+    }
+
+    .toc-search-input:focus {
+      border-color: var(--border-strong);
+      background: var(--bg-surface);
+    }
+
+    .toc-search-icon {
+      position: absolute;
+      left: 11px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 12px;
+      color: var(--text-tertiary);
+    }
+
+    /* Content Body */
+    .legal-content {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-xl);
+      padding: 40px 48px;
+      box-shadow: var(--shadow-sm);
+      line-height: 1.75;
+      color: var(--text-primary);
+    }
+
+    .legal-section {
+      margin-bottom: 40px;
+      scroll-margin-top: 32px;
+    }
+
+    .legal-section:last-child {
+      margin-bottom: 0;
+    }
+
+    .legal-section-heading {
+      font-family: var(--font-serif);
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 16px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .legal-section-number {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: var(--radius-full);
+      background: var(--bg-surface-subtle);
+      border: 1px solid var(--border-subtle);
+      font-size: 13px;
+      font-family: var(--font-sans);
+      font-weight: 700;
+      color: var(--text-secondary);
+    }
+
+    .legal-content p {
+      margin-bottom: 16px;
+      font-size: 15px;
+      color: var(--text-primary);
+    }
+
+    .legal-content ul, .legal-content ol {
+      margin: 12px 0 20px 24px;
+      font-size: 15px;
+      color: var(--text-primary);
+    }
+
+    .legal-content li {
+      margin-bottom: 8px;
+    }
+
+    .legal-box-highlight {
+      background: var(--bg-surface-subtle);
+      border: 1px solid var(--border-subtle);
+      border-left: 4px solid var(--accent-primary);
+      border-radius: var(--radius-md);
+      padding: 16px 20px;
+      margin: 20px 0;
+      font-size: 14.5px;
+    }
+
+    .legal-box-compliance {
+      background: rgba(16, 185, 129, 0.08);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      border-left: 4px solid #10B981;
+      border-radius: var(--radius-md);
+      padding: 18px 22px;
+      margin: 22px 0;
+      font-size: 14.5px;
+    }
+
+    .legal-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 14px;
+    }
+
+    .legal-table th, .legal-table td {
+      padding: 12px 16px;
+      border: 1px solid var(--border-subtle);
+      text-align: left;
+    }
+
+    .legal-table th {
+      background: var(--bg-surface-subtle);
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .legal-footer {
+      margin-top: 60px;
+      padding-top: 32px;
+      border-top: 1px solid var(--border-subtle);
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      font-size: 13.5px;
+      color: var(--text-secondary);
+    }
+
+    .legal-footer-links {
+      display: flex;
+      gap: 20px;
+    }
+
+    .legal-footer-links a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: color 0.15s ease;
+    }
+
+    .legal-footer-links a:hover {
+      color: var(--text-primary);
+    }
+
+    @media (max-width: 900px) {
+      .legal-layout-grid {
+        grid-template-columns: 1fr;
+      }
+      .legal-sidebar {
+        position: relative;
+        top: 0;
+        max-height: none;
+      }
+      .legal-content {
+        padding: 24px 20px;
+      }
+      .legal-title {
+        font-size: 28px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .legal-container {
+        padding: 16px 14px 60px;
+      }
+      .legal-header-nav {
+        padding: 8px 0 16px;
+        margin-bottom: 20px;
+      }
+      .legal-brand-title {
+        font-size: 18px;
+      }
+      .legal-brand-icon {
+        width: 30px;
+        height: 30px;
+        font-size: 15px;
+      }
+      .btn-nav-outline, .btn-nav-primary {
+        padding: 6px 10px;
+        font-size: 12px;
+      }
+    }
+
+    @media print {
+      .legal-header-nav, .legal-sidebar, .legal-nav-actions, .legal-footer-links, #theme-toggle-btn, .toc-search {
+        display: none !important;
+      }
+      .legal-layout-grid {
+        display: block !important;
+      }
+      .legal-content {
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+      }
+      body {
+        background: #fff !important;
+        color: #000 !important;
+      }
+    }
+  </style>
+
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('skillsphere_theme') || 
+        (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    })();
+  </script>
+</head>
+<body>
+
+  <div class="legal-container">
+    
+    <!-- Top Navigation -->
+    <header class="legal-header-nav">
+      <a href="/" class="legal-brand" title="Kembali ke Beranda SkillSphere">
+        <div class="legal-brand-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 0L13.8 8.2L22 10L13.8 11.8L12 20L10.2 11.8L2 10L10.2 8.2L12 0Z" />
+          </svg>
+        </div>
+        <span class="legal-brand-title">SkillSphere</span>
+      </a>
+
+      <div class="legal-nav-actions">
+        <button id="theme-toggle-btn" class="btn-nav-outline" aria-label="Ganti mode tema">
+          <i class="fas fa-sun" id="theme-icon-sun" style="display: none;"></i>
+          <i class="fas fa-moon" id="theme-icon-moon"></i>
+          <span id="theme-text">Mode Tema</span>
+        </button>
+        <button onclick="window.print()" class="btn-nav-outline" aria-label="Cetak Kebijakan Privasi">
+          <i class="fas fa-print"></i>
+          <span>Cetak</span>
+        </button>
+        <a href="/login" class="btn-nav-primary">
+          <i class="fas fa-arrow-right-to-bracket"></i>
+          <span>Masuk</span>
+        </a>
+      </div>
+    </header>
+
+    <!-- Header Content -->
+    <div class="legal-hero">
+      <div class="legal-tag">
+        <i class="fas fa-user-shield"></i>
+        <span>Kebijakan Perlindungan Data</span>
+      </div>
+      <h1 class="legal-title">Kebijakan Privasi</h1>
+      <p class="legal-subtitle">
+        Penjelasan transparan tentang bagaimana SkillSphere AI mengumpulkan, menggunakan, menyimpan, serta melindungi data pribadi Anda sesuai dengan Undang-Undang Perlindungan Data Pribadi (UU PDP No. 27 Tahun 2022) dan standar keamanan Google API Services.
+      </p>
+
+      <div class="legal-meta-bar">
+        <div class="legal-meta-item">
+          <i class="far fa-calendar-check"></i>
+          <span>Terakhir Diperbarui: <strong>28 September 2026</strong></span>
+        </div>
+        <div class="legal-meta-item">
+          <i class="fas fa-globe"></i>
+          <span>Domain Terdaftar: <strong>skillsphere.codingsolver.my.id</strong></span>
+        </div>
+        <div class="legal-meta-item">
+          <i class="fas fa-lock"></i>
+          <span>Kepatuhan: <strong>UU PDP & Google API Services</strong></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Grid: Sticky TOC + Document Body -->
+    <div class="legal-layout-grid">
+      
+      <!-- Sticky Table of Contents -->
+      <aside class="legal-sidebar" aria-label="Daftar Isi Kebijakan Privasi">
+        <div class="toc-title">
+          <span>Daftar Isi</span>
+          <i class="fas fa-list-ul"></i>
+        </div>
+
+        <div class="toc-search">
+          <i class="fas fa-search toc-search-icon"></i>
+          <input type="text" id="toc-filter-input" class="toc-search-input" placeholder="Cari topik privasi...">
+        </div>
+
+        <ul class="toc-list" id="toc-list">
+          <li><a href="#section-1" class="toc-link active">1. Dasar Hukum & Komitmen</a></li>
+          <li><a href="#section-2" class="toc-link">2. Data Pribadi yang Dikumpulkan</a></li>
+          <li><a href="#section-3" class="toc-link">3. Kepatuhan Google API & OAuth</a></li>
+          <li><a href="#section-4" class="toc-link">4. Tujuan Penggunaan Data</a></li>
+          <li><a href="#section-5" class="toc-link">5. Keamanan & Penyimpanan Data</a></li>
+          <li><a href="#section-6" class="toc-link">6. Pembagian Data ke Pihak Ketiga</a></li>
+          <li><a href="#section-7" class="toc-link">7. Hak Subjek Data (Pengguna)</a></li>
+          <li><a href="#section-8" class="toc-link">8. Cookies & Penyimpanan Lokal</a></li>
+          <li><a href="#section-9" class="toc-link">9. Penghapusan Akun & Retensi</a></li>
+          <li><a href="#section-10" class="toc-link">10. Privasi Anak</a></li>
+          <li><a href="#section-11" class="toc-link">11. Perubahan Kebijakan</a></li>
+          <li><a href="#section-12" class="toc-link">12. Kontak Perlindungan Data</a></li>
+        </ul>
+
+        <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border-subtle);">
+          <a href="/terms" class="btn-nav-outline" style="width: 100%; justify-content: center; box-sizing: border-box;">
+            <i class="fas fa-scale-balanced"></i>
+            <span>Buka Syarat & Ketentuan</span>
+          </a>
+        </div>
+      </aside>
+
+      <!-- Document Content -->
+      <main class="legal-content">
+        
+        <!-- Section 1 -->
+        <section id="section-1" class="legal-section">
+          <h2 class="legal-section-heading">
+            <span class="legal-section-number">1</span>
+            <span>Dasar Hukum dan Komitmen Privasi</span>
+          </h2>
+          <p>
+            SkillSphere AI ("Kami", "Platform") yang beroperasi di bawah domain <strong>https://skillsphere.codingsolver.my.id</strong> berkomitmen penuh untuk menghormati dan melindungi privasi setiap pengguna ("Anda").
+          </p>
+          <p>
+            Kebijakan Privasi ini disusun berlandaskan ketentuan hukum <strong>Undang-Undang Republik Indonesia No. 27 Tahun 2022 tentang Perlindungan Data Pribadi (UU PDP)</strong> serta prinsip internasional mengenai transparansi data digital. Dokumen ini menjelaskan tata cara pengumpulan, pemrosesan, pengarsipan, dan hak Anda atas data pribadi yang dikelola oleh platform kami.
+          </p>
+        </section>
+
+        <!-- Section 2 -->
+        <section id="section-2" class="legal-section">
+          <h2 class="legal-section-heading">
+            <span class="legal-section-number">2</span>
+            <span>Data Pribadi yang Kami Kumpulkan</span>
+          </h2>
+          <p>Kami mengumpulkan jenis data berikut demi kelancaran penyediaan layanan edukasi:</p>
+          
+          <table class="legal-table">
+            <thead>
+              <tr>
+                <th>Kategori Data</th>
+                <th>Jenis Informasi yang Diperoleh</th>
+                <th>Sumber Pengumpulan</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Identitas Akun</strong></td>
+                <td>Nama lengkap, alamat email, nomor telepon, peran akun (Siswa / Tutor).</td>
+                <td>Formulir pendaftaran mandiri atau otentikasi Google.</td>
+              </tr>
+              <tr>
+                <td><strong>Data Otentikasi Google</strong></td>
+                <td>Nama akun Google, alamat email terverifikasi, tautan foto profil publik, serta identitas unik Google ID.</td>
+                <td>Google OAuth 2.0 saat memilih login Google.</td>
+              </tr>
+              <tr>
+                <td><strong>Verifikasi Tutor</strong></td>
+                <td>Identitas legal, tautan portofolio, dokumen keahlian, nomor rekening bank / e-wallet untuk pencairan dana.</td>
+                <td>Diunggah langsung oleh Tutor pada portal verifikasi.</td>
+              </tr>
+              <tr>
+                <td><strong>Aktivitas Pembelajaran</strong></td>
+                <td>Progres modul, riwayat kuis, kursus yang diikuti, catatan hasil belajar berbasis rekomendasi AI.</td>
+                <td>Aktivitas internal selama menggunakan platform.</td>
+              </tr>
+              <tr>
+                <td><strong>Data Teknis</strong></td>
+                <td>Alamat IP perangkat, jenis peramban (browser), sistem operasi, waktu akses, dan cookies teknis.</td>
+                <td>Pencatatan log server otomatis untuk keamanan jaringan.</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <!-- Section 3 -->
+        <section id="section-3" class="legal-section">
+          <h2 class="legal-section-heading">
+            <span class="legal-section-number">3</span>
+            <span>Kepatuhan Khusus Terhadap Kebijakan Data Pengguna Google API</span>
+          </h2>
+          <div class="legal-box-compliance">
+            <p style="margin-bottom: 8px;"><strong><i class="fab fa-google" style="margin-right: 6px;"></i> Kepatuhan Kebijakan Penggunaan Terbatas Google (Limited Use Requirements)</strong></p>
+            <p style="margin-bottom: 0;">
+              Penggunaan dan pemindahan informasi yang diterima oleh SkillSphere dari Google API ke aplikasi lain akan mematuhi 
+              <strong>Kebijakan Data Pengguna Layanan Google API (Google API Services User Data Policy)</strong>, termasuk persyaratan Penggunaan Terbatas (Limited Use).
+            </p>
+          </div>
+          <p>
+            Secara rinci, perlindungan terhadap data Google Anda diatur sebagai berikut:
+          </p>
+          <ul>
+            <li><strong>Tujuan Terbatas:</strong> Kami hanya mengakses data profil dasar (email, nama, foto profil) yang Anda setujui untuk keperluan otentikasi akun dan komunikasi layanan terkait akun Anda.</li>
+            <li><strong>Tidak Ada Penjualan Data:</strong> Kami <strong>tidak pernah menjual</strong>, menyewakan, atau memperdagangkan data yang diperoleh melalui Google OAuth kepada pihak ketiga mana pun.</li>
+            <li><strong>Tidak Digunakan untuk Iklan:</strong> Data Google Anda tidak pernah digunakan untuk penargetan iklan pihak ketiga atau pembuatan profil pemasaran di luar platform SkillSphere.</li>
+            <li><strong>Tidak Dipakai Melatih Model AI Umum Tanpa Persetujuan:</strong> Data pribadi dari Google tidak digunakan untuk melatih model kecerdasan buatan umum tanpa izin eksplisit dari Anda.</li>
+          </ul>
+        </section>
+
+        <!-- Section 4 -->
+        <section id="section-4" class="legal-section">
+          <h2 class="legal-section-heading">
+            <span class="legal-section-number">4</span>
+            <span>Tujuan Penggunaan Data Pribadi</span>
+          </h2>
+          <p>Data pribadi yang dikumpulkan digunakan secara proporsional untuk:</p>
+          <ul>
+            <li>Membuat dan mengelola akun pengguna serta memvalidasi keaslian kepemilikan akun melalui sistem verifikasi OTP email atau Google OAuth.</li>
+            <li>Menyediakan kurikulum edukasi yang dipersonalisasi dan rekomendasi materi kursus yang relevan.</li>
+            <li>Memproses transaksi pembayaran kursus dan validasi pencairan dana bagi pengajar (Tutor).</li>
+            <li>Mengirimkan notifikasi penting mengenai pembaruan sistem, materi baru, konfirmasi transaksi, atau perubahan kebijakan keamanan.</li>
+            <li>Mencegah aktivitas mencurigakan, penipuan, pelanggaran hak cipta, atau serangan siber.</li>
+          </ul>
+        </section>
+
+        <!-- Section 5 -->
+        <section id="section-5" class="legal-section">
+          <h2 class="legal-section-heading">
+            <span class="legal-section-number">5</span>
+            <span>Keamanan dan Penyimpanan Data</span>
+          </h2>
+          <p>
+            Kami menerapkan standar pengamanan teknis dan organisasi yang ketat untuk menjaga integritas data Anda:
+          </p>
+          <ul>
+            <li><strong>Enkripsi Kata Sandi:</strong> Kata sandi pengguna tidak disimpan dalam bentuk teks biasa, melainkan dienkripsi menggunakan algoritma cryptographic hashing tingkat lanjut (bcrypt).</li>
+            <li><strong>Enkripsi Jalur Komunikasi (SSL/TLS):</strong> Seluruh pertukaran data antara perangkat Anda dan server dilindungi protokol HTTPS terenkripsi.</li>
+            <li><strong>Token Sesi Aman:</strong> Otentikasi sesi dikelola menggunakan JSON Web Token (JWT) yang disimpan dalam cookie HttpOnly yang aman dari eksploitasi Cross-Site Scripting (XSS).</li>
+            <li><strong>Akses Terbatas:</strong> Data sensitif verifikasi hanya dapat diakses oleh personil terotorisasi melalui otentikasi bertingkat.</li>
+          </ul>
+        </section>
+
+        <!-- Section 6 -->
+        <section id="section-6" class="legal-section">
+          <h2 class="legal-section-heading">
+            <span class="legal-section-number">6</span>
+            <span>Pembagian Data kepada Pihak Ketiga</span>
+          </h2>
+          <p>
+            SkillSphere tidak membagikan data pribadi Anda kecuali dalam kondisi operasional resmi berikut:
+          </p>
+          <ol>
+            <li><strong>Penyedia Gerbang Pembayaran:</strong> Informasi transaksi diteruskan ke payment gateway berizin untuk pemrosesan pembayaran kursus secara aman.</li>
+            <li><strong>Layanan Otentikasi & Email:</strong> Google LLC untuk proses OAuth 2.0 serta penyedia SMTP resmi untuk pengiriman kode verifikasi OTP.</li>
+            <li><strong>Kewajiban Hukum:</strong> Apabila diwajibkan oleh instruksi pengadilan atau penegak hukum yang sah di wilayah yurisdiksi Republik Indonesia sesuai peraturan perundang-undangan.</li>
+          </ol>
+        </section>
+
+        <!-- Section 7 -->
+        <section id="section-7" class="legal-section">
+          <h2 class="legal-section-heading">
+            <span class="legal-section-number">7</span>
+            <span>Hak Subjek Data (Hak Anda Berdasarkan UU PDP)</span>
+          </h2>
+          <p>Sesuai dengan Undang-Undang Perlindungan Data Pribadi No. 27/2022, Anda memiliki hak-hak fundamental berikut:</p>
+          <ul>
+            <li><strong>Hak atas Informasi & Akses:</strong> Berhak mengetahui rincian data pribadi Anda yang kami simpan dan meminta salinannya.</li>
+            <li><strong>Hak Pembaruan & Koreksi:</strong> Berhak memperbarui nama, nomor kontak, kata sandi, atau preferensi profil kapan saja melalui dasbor akun.</li>
+            <li><strong>Hak Penghapusan (Right to Erasure):</strong> Berhak meminta penghapusan permanen akun dan seluruh data pribadi terkait dari sistem kami.</li>
+            <li><strong>Hak Penarikan Persetujuan:</strong> Berhak mencabut persetujuan pemrosesan data, termasuk memutus integrasi Google OAuth dari akun Google Anda kapan saja.</li>
+          </ul>
+        </section>
+
+        <!-- Section 8 -->
+        <section id="section-8" class="legal-section">
+          <h2 class="legal-section-heading">
+            <span class="legal-section-number">8</span>
+            <span>Kebijakan Cookies dan Penyimpanan Lokal</span>
+          </h2>
+          <p>
+            Platform kami menggunakan cookies esensial dan Local Storage peramban semata-mata untuk:
+          </p>
+          <ul>
+            <li>Menyimpan preferensi tampilan pengguna (misalnya pengaturan Mode Gelap / Terang).</li>
+            <li>Mempertahankan sesi masuk yang aman sehingga Anda tidak perlu login berulang saat berpindah halaman kursus.</li>
+          </ul>
+          <p>
+            Kami tidak menggunakan cookies pihak ketiga yang bersifat melacak riwayat penjelajahan Anda di situs web lain (third-party tracking cookies).
+          </p>
+        </section>
+
+        <!-- Section 9 -->
+        <section id="section-9" class="legal-section">
+          <h2 class="legal-section-heading">
+            <span class="legal-section-number">9</span>
+            <span>Prosedur Penghapusan Akun dan Retensi Data</span>
+          </h2>
+          <p>
+            Kami menyimpan data pribadi Anda selama akun Anda berstatus aktif di SkillSphere. Jika Anda ingin menghapus akun dan data pribadi secara permanen:
+          </p>
+          <ol>
+            <li>Kunjungi menu Pengaturan Akun di Dasbor dan pilih opsi "Hapus Akun Saya", atau</li>
+            <li>Kirimkan permohonan tertulis melalui email resmi ke <strong>support@codingsolver.my.id</strong> dengan subjek "Permohonan Penghapusan Data Akun".</li>
+          </ol>
+          <p>
+            Setelah permohonan diverifikasi, data identitas Anda akan dihapus secara permanen dari basis data utama kami dalam kurun waktu maksimal 14 hari kerja, kecuali data riwayat transaksi keuangan tertentu yang wajib disimpan berdasarkan ketentuan peraturan perundang-undangan perpajakan.
+          </p>
+        </section>
+
+        <!-- Section 10 -->
+        <section id="section-10" class="legal-section">
+          <h2 class="legal-section-heading">
+            <span class="legal-section-number">10</span>
+            <span>Perlindungan Privasi Anak di Bawah Umur</span>
+          </h2>
+          <p>
+            Layanan SkillSphere ditujukan bagi pengguna yang telah berusia minimal 13 tahun atau memiliki izin serta pengawasan dari orang tua / wali yang sah. Kami tidak secara sengaja mengumpulkan data pribadi dari anak di bawah batas usia yang ditentukan tanpa persetujuan wali.
+          </p>
+        </section>
+
+        <!-- Section 11 -->
+        <section id="section-11" class="legal-section">
+          <h2 class="legal-section-heading">
+            <span class="legal-section-number">11</span>
+            <span>Pembaruan Kebijakan Privasi</span>
+          </h2>
+          <p>
+            Kami dapat memperbarui Kebijakan Privasi ini secara berkala guna menyesuaikan perkembangan regulasi atau fitur platform. Tanggal pembaruan terakhir akan selalu tertera pada bagian atas halaman ini. Perubahan signifikan akan kami beritahukan melalui banner notifikasi di platform atau pesan email.
+          </p>
+        </section>
+
+        <!-- Section 12 -->
+        <section id="section-12" class="legal-section">
+          <h2 class="legal-section-heading">
+            <span class="legal-section-number">12</span>
+            <span>Kontak Pejabat Perlindungan Data & Pengaduan</span>
+          </h2>
+          <p>
+            Apabila Anda memiliki pertanyaan, keberatan, atau ingin menggunakan hak-hak perlindungan data Anda, silakan hubungi tim pengelola data kami melalui saluran resmi berikut:
+          </p>
+          <div class="legal-box-highlight">
+            <p style="margin-bottom: 6px;"><strong>SkillSphere Data Privacy Officer</strong></p>
+            <p style="margin-bottom: 4px;"><i class="fas fa-envelope" style="margin-right: 8px;"></i> Email: support@codingsolver.my.id</p>
+            <p style="margin-bottom: 4px;"><i class="fas fa-globe" style="margin-right: 8px;"></i> Website: https://skillsphere.codingsolver.my.id</p>
+            <p style="margin-bottom: 0;"><i class="fas fa-location-dot" style="margin-right: 8px;"></i> Domisili: Jakarta, Indonesia</p>
+          </div>
+        </section>
+
+      </main>
+
+    </div>
+
+    <!-- Footer -->
+    <footer class="legal-footer">
+      <p>© 2026 SkillSphere AI. Seluruh hak cipta dilindungi undang-undang.</p>
+      <div class="legal-footer-links">
+        <a href="/privacy">Kebijakan Privasi</a>
+        <a href="/terms">Syarat & Ketentuan</a>
+        <a href="/login">Halaman Masuk</a>
+        <a href="/register">Pendaftaran Akun</a>
+      </div>
+    </footer>
+
+  </div>
+
+  <script>
+    // Theme Toggle Logic
+    const themeBtn = document.getElementById('theme-toggle-btn');
+    const themeIconSun = document.getElementById('theme-icon-sun');
+    const themeIconMoon = document.getElementById('theme-icon-moon');
+    const themeText = document.getElementById('theme-text');
+
+    function updateThemeUI(theme) {
+      if (theme === 'dark') {
+        themeIconSun.style.display = 'inline-block';
+        themeIconMoon.style.display = 'none';
+        themeText.textContent = 'Mode Terang';
+      } else {
+        themeIconSun.style.display = 'none';
+        themeIconMoon.style.display = 'inline-block';
+        themeText.textContent = 'Mode Gelap';
+      }
+    }
+
+    const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+    updateThemeUI(currentTheme);
+
+    themeBtn.addEventListener('click', () => {
+      const active = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', active);
+      localStorage.setItem('skillsphere_theme', active);
+      updateThemeUI(active);
+    });
+
+    // TOC Active State on Scroll & Filter
+    const sections = document.querySelectorAll('.legal-section');
+    const tocLinks = document.querySelectorAll('.toc-link');
+
+    window.addEventListener('scroll', () => {
+      let currentSectionId = '';
+      sections.forEach(section => {
+        const sectionTop = section.offsetTop - 80;
+        if (window.pageYOffset >= sectionTop) {
+          currentSectionId = section.getAttribute('id');
+        }
+      });
+
+      tocLinks.forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('href') === '#' + currentSectionId) {
+          link.classList.add('active');
+        }
+      });
+    });
+
+    // TOC Search Filter
+    const filterInput = document.getElementById('toc-filter-input');
+    filterInput.addEventListener('input', function(e) {
+      const query = e.target.value.toLowerCase().trim();
+      tocLinks.forEach(link => {
+        const text = link.textContent.toLowerCase();
+        const parentLi = link.parentElement;
+        if (text.includes(query)) {
+          parentLi.style.display = 'block';
+        } else {
+          parentLi.style.display = 'none';
+        }
+      });
+    });
+  </script>
+
+</body>
+</html>

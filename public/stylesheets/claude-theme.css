@@ -679,8 +679,30 @@ body {
   }
 
   .login-header {
-    padding: 6px 0 16px;
-    margin-bottom: 6px;
+    padding: 8px 0 14px;
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+  }
+
+  .brand-logo {
+    font-size: 18px;
+    gap: 8px;
+  }
+
+  .brand-icon {
+    width: 24px;
+    height: 24px;
+  }
+
+  .theme-toggle-btn #theme-text {
+    display: none;
+  }
+
+  .theme-toggle-btn {
+    padding: 7px 10px;
   }
 
   .login-main {

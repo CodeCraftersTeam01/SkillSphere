@@ -258,6 +258,99 @@
       font-weight: 600;
     }
 
+    .header-right-side {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .theme-toggle-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 14px;
+      border-radius: var(--radius-full);
+      background: var(--bg-surface-subtle);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: var(--font-sans);
+    }
+
+    .theme-toggle-btn:hover {
+      background: var(--bg-surface);
+      border-color: var(--border-strong);
+    }
+
+    .user-profile-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 5px 14px 5px 6px;
+      border-radius: var(--radius-full);
+      background: var(--bg-surface-subtle);
+      border: 1px solid var(--border-subtle);
+      font-family: var(--font-sans);
+    }
+
+    .user-avatar-sm {
+      width: 28px;
+      height: 28px;
+      border-radius: var(--radius-full);
+      background: var(--accent-primary);
+      color: var(--accent-text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11.5px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .user-name-label {
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--text-primary);
+      white-space: nowrap;
+    }
+
+    .user-role-tag {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: 2px 7px;
+      border-radius: var(--radius-full);
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      letter-spacing: 0.04em;
+    }
+
+    .logout-btn {
+      background: transparent;
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      padding: 7px 14px;
+      border-radius: var(--radius-full);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+      font-family: var(--font-sans);
+    }
+
+    .logout-btn:hover {
+      background: var(--color-danger-bg);
+      border-color: var(--color-danger);
+      color: var(--color-danger);
+    }
+
     .admin-content-body {
       padding: 36px 32px 80px;
       flex: 1;
@@ -619,7 +712,7 @@
       }
 
       .admin-content-body {
-        padding: 24px 16px 60px;
+        padding: 20px 14px 60px;
       }
 
       .sidebar-backdrop {
@@ -632,6 +725,97 @@
 
       .sidebar-backdrop.active {
         display: block;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .admin-header {
+        padding: 10px 14px;
+        gap: 8px;
+      }
+
+      .header-right-side {
+        gap: 8px;
+      }
+
+      .header-breadcrumb span:nth-child(2),
+      .header-breadcrumb span:nth-child(3),
+      .header-breadcrumb span:nth-child(4) {
+        display: none;
+      }
+
+      .theme-toggle-btn #theme-text {
+        display: none;
+      }
+
+      .theme-toggle-btn {
+        padding: 6px 10px;
+      }
+
+      .user-profile-badge {
+        padding: 3px 8px 3px 3px;
+        gap: 6px;
+      }
+
+      .user-profile-badge .user-name-label {
+        max-width: 75px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-size: 12px;
+      }
+
+      .logout-btn span {
+        display: none;
+      }
+
+      .logout-btn {
+        padding: 6px 10px;
+      }
+
+      .metrics-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+      }
+
+      .section-card {
+        padding: 18px 14px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .header-breadcrumb {
+        font-size: 12px;
+      }
+
+      .user-profile-badge .user-name-label {
+        display: none;
+      }
+
+      .metrics-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+
+      .welcome-hero {
+        padding: 16px 14px;
+      }
+
+      .welcome-title {
+        font-size: 20px;
+      }
+
+      .welcome-desc {
+        font-size: 12.5px;
+      }
+
+      .filter-bar {
+        gap: 4px;
+      }
+
+      .filter-btn {
+        font-size: 11px;
+        padding: 5px 10px;
       }
     }
   </style>
@@ -717,7 +901,7 @@
           </button>
           
           <div class="header-breadcrumb">
-            <a href="/dashboard" style="color:var(--text-secondary); text-decoration:none;"><i class="fas fa-house" style="font-size:12px;"></i></a>
+            <a href="/admin/dashboard" style="color:var(--text-secondary); text-decoration:none;"><i class="fas fa-shield-halved" style="font-size:12px;"></i></a>
             <span>/</span>
             <span>Admin Panel</span>
             <span>/</span>
@@ -733,11 +917,18 @@
             <span id="theme-text">Mode Gelap</span>
           </button>
 
-          <!-- Back to Dashboard Link -->
-          <a href="/dashboard" class="logout-btn">
-            <i class="fas fa-layer-group"></i>
-            <span>Dashboard</span>
-          </a>
+          <!-- User Profile Pill -->
+          <div class="user-profile-badge">
+            <div class="user-avatar-sm" id="header-avatar">AS</div>
+            <span class="user-name-label" id="header-user-name">Admin SkillSphere</span>
+            <span class="user-role-tag" id="header-user-role">ADMIN</span>
+          </div>
+
+          <!-- Logout Button -->
+          <button class="logout-btn" id="header-logout-btn" type="button" title="Keluar dari Admin">
+            <i class="fas fa-arrow-right-from-bracket"></i>
+            <span>Keluar</span>
+          </button>
         </div>
       </header>
 
@@ -944,11 +1135,11 @@
           <div class="welcome-hero" style="margin-bottom:20px;">
             <h2 class="welcome-title" style="font-size:26px;">Model Finansial & Revenue Sharing 20% / 80%</h2>
             <p class="welcome-desc">
-              Sistem revenue sharing SkillSphere AI membagi 20% biaya platform (infrastruktur server, AI Gemini API, operasional) dan 80% pendapatan bersih diberikan kepada Tutor dengan batas minimum penarikan Rp 100.000 dan masa holding 7 hari.
+              Sistem revenue sharing SkillSphere membagi 20% biaya platform (infrastruktur server, AI Gemini API, operasional) dan 80% pendapatan bersih diberikan kepada Tutor dengan batas minimum penarikan Rp 100.000 dan masa holding 7 hari.
             </p>
           </div>
 
-          <div class="metrics-grid">
+          <div class="metrics-grid" style="margin-bottom: 24px;">
             <div class="stat-card">
               <div class="stat-label">
                 <span>Fee Platform</span>
@@ -985,8 +1176,68 @@
               <div class="stat-meta">Pencairan ke Rekening Bank / E-Wallet</div>
             </div>
           </div>
-        </section>
 
+          <!-- Tutor Virtual Wallets Table -->
+          <div class="table-container" style="margin-bottom: 24px;">
+            <div class="table-header-box">
+              <div>
+                <h3 style="font-size:16px; font-weight:700; color:var(--text-primary);">Daftar Saldo Dompet Virtual Tutor (80% Bagi Hasil)</h3>
+                <p style="font-size:13px; color:var(--text-secondary); margin-top:2px;">Saldo bersih yang dihasilkan dari pendaftaran kursus berbayar.</p>
+              </div>
+            </div>
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Nama Tutor</th>
+                    <th>Email</th>
+                    <th>Saldo Tersedia</th>
+                    <th>Saldo Tertunda (Holding)</th>
+                    <th>Total Dicairkan</th>
+                    <th>Status Dompet</th>
+                  </tr>
+                </thead>
+                <tbody id="wallets-table-body">
+                  <tr>
+                    <td colspan="6" style="text-align:center; padding:32px; color:var(--text-secondary);">
+                      <i class="fas fa-spinner fa-spin" style="margin-right:8px;"></i> Memuat data dompet tutor...
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Withdrawal Requests Table -->
+          <div class="table-container">
+            <div class="table-header-box">
+              <div>
+                <h3 style="font-size:16px; font-weight:700; color:var(--text-primary);">Riwayat Permintaan Penarikan Dana (Withdrawal)</h3>
+                <p style="font-size:13px; color:var(--text-secondary); margin-top:2px;">Pengajuan pencairan dana ke rekening bank / e-wallet tutor.</p>
+              </div>
+            </div>
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Tutor</th>
+                    <th>Jumlah Penarikan</th>
+                    <th>Metode / Bank</th>
+                    <th>No. Rekening / Akun</th>
+                    <th>Tanggal Pengajuan</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="withdrawals-table-body">
+                  <tr>
+                    <td colspan="6" style="text-align:center; padding:32px; color:var(--text-secondary);">
+                      <i class="fas fa-spinner fa-spin" style="margin-right:8px;"></i> Memuat data penarikan...
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
         </section>
 
       </main>
@@ -1140,6 +1391,7 @@
       fetchApplications();
       fetchCertifications();
       fetchPlatformCourses();
+      fetchFinancialData();
       setupLogout();
     });
 
@@ -1163,6 +1415,10 @@
         financial: 'Bagi Hasil & Finansial',
       };
       document.getElementById('current-view-breadcrumb').textContent = breadcrumbMap[viewName] || 'Admin Panel';
+
+      if (viewName === 'financial') {
+        fetchFinancialData();
+      }
     }
 
     // Fetch Admin Profile
@@ -1179,8 +1435,20 @@
             window.location.href = '/dashboard';
             return;
           }
-          document.getElementById('sidebar-user-name').textContent = user.name || user.email;
-          document.getElementById('sidebar-avatar').textContent = (user.name || 'A')[0].toUpperCase();
+          const name = user.name || 'Admin SkillSphere';
+          const initials = name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() || 'AS';
+          
+          const headerUserName = document.getElementById('header-user-name');
+          if (headerUserName) headerUserName.textContent = name;
+          
+          const headerAvatar = document.getElementById('header-avatar');
+          if (headerAvatar) headerAvatar.textContent = initials;
+
+          const sidebarName = document.getElementById('sidebar-user-name');
+          if (sidebarName) sidebarName.textContent = name;
+
+          const sidebarAvatar = document.getElementById('sidebar-avatar');
+          if (sidebarAvatar) sidebarAvatar.textContent = initials;
         }
       } catch (e) {
         console.error('Error fetching admin profile:', e);
@@ -1188,19 +1456,26 @@
     }
 
     function setupLogout() {
-      const btn = document.getElementById('sidebar-logout-btn');
-      if (btn) {
-        btn.addEventListener('click', async () => {
-          try {
-            await fetch('/api/auth/logout', {
-              method: 'POST',
-              headers: { 'Authorization': 'Bearer ' + token }
-            });
-          } catch (_) {}
-          localStorage.removeItem('skillsphere_access_token');
-          localStorage.removeItem('skillsphere_refresh_token');
-          window.location.href = '/login';
-        });
+      const performLogout = async () => {
+        try {
+          await fetch('/api/auth/logout', {
+            method: 'POST',
+            headers: { 'Authorization': 'Bearer ' + token }
+          });
+        } catch (_) {}
+        localStorage.removeItem('skillsphere_access_token');
+        localStorage.removeItem('skillsphere_refresh_token');
+        window.location.href = '/login';
+      };
+
+      const sidebarBtn = document.getElementById('sidebar-logout-btn');
+      if (sidebarBtn) {
+        sidebarBtn.addEventListener('click', performLogout);
+      }
+
+      const headerBtn = document.getElementById('header-logout-btn');
+      if (headerBtn) {
+        headerBtn.addEventListener('click', performLogout);
       }
     }
 
@@ -1219,12 +1494,23 @@
           const totalStudents = stats.system ? stats.system.totalStudents : 0;
           const totalCourses = stats.system ? stats.system.totalCourses : 0;
 
-          document.getElementById('badge-pending-tutors').textContent = pendingApps;
-          document.getElementById('badge-pending-certs').textContent = pendingCerts;
-          document.getElementById('stat-pending-total').textContent = pendingApps + pendingCerts;
-          document.getElementById('stat-total-tutors').textContent = totalTutors;
-          document.getElementById('stat-total-students').textContent = totalStudents;
-          document.getElementById('stat-total-courses').textContent = totalCourses;
+          const badgeTutors = document.getElementById('badge-pending-tutors');
+          if (badgeTutors) badgeTutors.textContent = pendingApps;
+
+          const badgeCerts = document.getElementById('badge-pending-certs');
+          if (badgeCerts) badgeCerts.textContent = pendingCerts;
+
+          const statPendingTotal = document.getElementById('stat-pending-total');
+          if (statPendingTotal) statPendingTotal.textContent = pendingApps + pendingCerts;
+
+          const statTotalTutors = document.getElementById('stat-total-tutors');
+          if (statTotalTutors) statTotalTutors.textContent = totalTutors;
+
+          const statTotalStudents = document.getElementById('stat-total-students');
+          if (statTotalStudents) statTotalStudents.textContent = totalStudents;
+
+          const statTotalCourses = document.getElementById('stat-total-courses');
+          if (statTotalCourses) statTotalCourses.textContent = totalCourses;
         }
       } catch (e) {
         console.error('Error fetching stats:', e);
@@ -1238,8 +1524,15 @@
           headers: { 'Authorization': 'Bearer ' + token }
         });
         const json = await res.json();
-        if (json.success) {
-          allApplications = json.data || [];
+        if (json.success && json.data) {
+          // API returns { total, applications } or an array
+          if (Array.isArray(json.data)) {
+            allApplications = json.data;
+          } else if (Array.isArray(json.data.applications)) {
+            allApplications = json.data.applications;
+          } else {
+            allApplications = [];
+          }
           renderApplicationsTable();
         }
       } catch (e) {
@@ -1256,6 +1549,8 @@
 
     function renderApplicationsTable() {
       const tbody = document.getElementById('applications-table-body');
+      if (!tbody) return;
+
       let filtered = allApplications;
       if (currentAppFilter !== 'all') {
         filtered = allApplications.filter(a => a.status === currentAppFilter);
@@ -1264,7 +1559,7 @@
       if (!filtered.length) {
         tbody.innerHTML = `
           <tr>
-            <td colspan="7" style="text-align:center; padding:32px; color:var(--text-tertiary);">
+            <td colspan="7" style="text-align:center; padding:32px; color:var(--text-secondary);">
               Tidak ada data pendaftaran pengajar dengan filter ini.
             </td>
           </tr>
@@ -1273,13 +1568,15 @@
       }
 
       tbody.innerHTML = filtered.map(app => {
-        let statusBadge = '<span class="status-pill status-pending"><i class="fas fa-clock"></i> Pending</span>';
+        let statusBadge = '<span class="status-pill status-pending"><i class="fas fa-clock"></i> Menunggu</span>';
         if (app.status === 'approved') statusBadge = '<span class="status-pill status-active"><i class="fas fa-check"></i> Disetujui</span>';
         if (app.status === 'rejected') statusBadge = '<span class="status-pill status-rejected"><i class="fas fa-xmark"></i> Ditolak</span>';
 
         const applicantName = app.applicant ? app.applicant.name : 'Pelamar';
         const applicantEmail = app.applicant ? app.applicant.email : '-';
-        const dateStr = new Date(app.createdAt || Date.now()).toLocaleDateString('id-ID', { year: 'numeric', month: 'short', day: 'numeric' });
+        const expertise = app.institution_name || app.expertise_field || 'Pengajar';
+        const expYears = app.experience_years !== undefined ? app.experience_years : (app.years_of_experience || 0);
+        const dateStr = new Date(app.created_at || app.createdAt || Date.now()).toLocaleDateString('id-ID', { year: 'numeric', month: 'short', day: 'numeric' });
 
         return `
           <tr>
@@ -1287,11 +1584,12 @@
               <div style="font-weight:600; color:var(--text-primary);">${escapeHtml(applicantName)}</div>
               <div style="font-size:12px; color:var(--text-secondary);">${escapeHtml(applicantEmail)}</div>
             </td>
-            <td><strong>${escapeHtml(app.expertise_field || '-')}</strong></td>
-            <td>${app.years_of_experience || 0} Tahun</td>
+            <td><strong>${escapeHtml(expertise)}</strong></td>
+            <td>${expYears} Tahun</td>
             <td>
               ${app.portfolio_url ? `<a href="${app.portfolio_url}" target="_blank" class="link" style="font-size:12px; font-weight:600; margin-right:8px;"><i class="fas fa-link"></i> Portofolio</a>` : ''}
               ${app.cv_url ? `<a href="${app.cv_url}" target="_blank" class="link" style="font-size:12px; font-weight:600;"><i class="fas fa-file-pdf"></i> CV</a>` : ''}
+              ${(!app.portfolio_url && !app.cv_url) ? '<span style="font-size:12px; color:var(--text-secondary);">-</span>' : ''}
             </td>
             <td>${dateStr}</td>
             <td>${statusBadge}</td>
@@ -1321,17 +1619,20 @@
       if (!app) return;
 
       const applicantName = app.applicant ? app.applicant.name : 'Pelamar';
+      const expertise = app.institution_name || app.expertise_field || 'Pengajar';
+      const expYears = app.experience_years !== undefined ? app.experience_years : (app.years_of_experience || 0);
+
       document.getElementById('modal-app-title').textContent = `Review Pendaftaran: ${applicantName}`;
 
       document.getElementById('modal-app-content').innerHTML = `
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:18px;">
           <div style="background:var(--bg-surface-subtle); padding:14px; border-radius:var(--radius-md); border:1px solid var(--border-subtle);">
-            <div style="font-size:11px; font-weight:700; color:var(--text-secondary); text-transform:uppercase;">Bidang Keahlian</div>
-            <div style="font-size:14px; font-weight:600; color:var(--text-primary); margin-top:4px;">${escapeHtml(app.expertise_field || '-')}</div>
+            <div style="font-size:11px; font-weight:700; color:var(--text-secondary); text-transform:uppercase;">Institusi / Bidang Keahlian</div>
+            <div style="font-size:14px; font-weight:600; color:var(--text-primary); margin-top:4px;">${escapeHtml(expertise)}</div>
           </div>
           <div style="background:var(--bg-surface-subtle); padding:14px; border-radius:var(--radius-md); border:1px solid var(--border-subtle);">
             <div style="font-size:11px; font-weight:700; color:var(--text-secondary); text-transform:uppercase;">Pengalaman Mengajar</div>
-            <div style="font-size:14px; font-weight:600; color:var(--text-primary); margin-top:4px;">${app.years_of_experience || 0} Tahun</div>
+            <div style="font-size:14px; font-weight:600; color:var(--text-primary); margin-top:4px;">${expYears} Tahun</div>
           </div>
         </div>
 
@@ -1366,7 +1667,7 @@
 
     // Approve Application
     async function approveApplication(id, name) {
-      if (!confirm(`Setujui pendaftaran "${name}"? Peran akun akan di-upgrade menjadi Tutor dan Dompet Virtual diaktifkan.`)) return;
+      if (!confirm(`Setujui pendaftaran "${name}"? Peran akun akan diubah menjadi Tutor dan Dompet Virtual diaktifkan.`)) return;
 
       try {
         const res = await fetch(`/api/admin/tutor-applications/${id}/approve`, {
@@ -1411,7 +1712,7 @@
             'Authorization': 'Bearer ' + token,
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ rejection_reason: reason }),
+          body: JSON.stringify({ reason: reason, rejection_reason: reason }),
         });
         const json = await res.json();
         if (res.ok && json.success) {
@@ -1434,8 +1735,15 @@
           headers: { 'Authorization': 'Bearer ' + token }
         });
         const json = await res.json();
-        if (json.success) {
-          allCertifications = json.data || [];
+        if (json.success && json.data) {
+          // API returns { total, certifications } or an array
+          if (Array.isArray(json.data)) {
+            allCertifications = json.data;
+          } else if (Array.isArray(json.data.certifications)) {
+            allCertifications = json.data.certifications;
+          } else {
+            allCertifications = [];
+          }
           renderCertificationsTable();
         }
       } catch (e) {
@@ -1452,6 +1760,8 @@
 
     function renderCertificationsTable() {
       const tbody = document.getElementById('certifications-table-body');
+      if (!tbody) return;
+
       let filtered = allCertifications;
       if (currentCertFilter === 'verified') filtered = allCertifications.filter(c => c.is_verified);
       if (currentCertFilter === 'pending') filtered = allCertifications.filter(c => !c.is_verified);
@@ -1459,7 +1769,7 @@
       if (!filtered.length) {
         tbody.innerHTML = `
           <tr>
-            <td colspan="7" style="text-align:center; padding:32px; color:var(--text-tertiary);">
+            <td colspan="7" style="text-align:center; padding:32px; color:var(--text-secondary);">
               Tidak ada data sertifikasi pengajar dengan filter ini.
             </td>
           </tr>
@@ -1469,23 +1779,26 @@
 
       tbody.innerHTML = filtered.map(cert => {
         const tutorName = cert.tutor ? cert.tutor.name : 'Tutor';
-        const isVerified = cert.is_verified;
+        const certName = cert.certificate_name || cert.title || 'Sertifikat';
+        const issuer = cert.issuer || cert.issuer_organization || '-';
+        const fileUrl = cert.certificate_file_url || cert.file_url || '';
+        const isVerified = Boolean(cert.is_verified);
         const statusBadge = isVerified 
-          ? '<span class="status-pill status-active"><i class="fas fa-circle-check"></i> Terverifikasi Resmi</span>'
+          ? '<span class="status-pill status-active"><i class="fas fa-circle-check"></i> Terverifikasi</span>'
           : '<span class="status-pill status-pending"><i class="fas fa-clock"></i> Belum Divalidasi</span>';
 
         return `
           <tr>
             <td><strong>${escapeHtml(tutorName)}</strong></td>
-            <td>${escapeHtml(cert.title)}</td>
-            <td><span class="user-role-tag">${escapeHtml(cert.issuer_organization || '-')}</span></td>
+            <td>${escapeHtml(certName)}</td>
+            <td><span class="user-role-tag">${escapeHtml(issuer)}</span></td>
             <td><code>${escapeHtml(cert.credential_id || '-')}</code></td>
             <td>
-              ${cert.certificate_file_url ? `
-                <button class="btn btn-outline" style="padding:4px 10px; font-size:12px;" onclick="previewCertificateImage('${cert.certificate_file_url}', '${escapeHtml(cert.title)}')">
+              ${fileUrl ? `
+                <button class="btn btn-outline" style="padding:4px 10px; font-size:12px;" onclick="previewCertificateImage('${fileUrl}', '${escapeHtml(certName)}')">
                   <i class="fas fa-image"></i> Lihat Berkas
                 </button>
-              ` : '<span style="color:var(--text-tertiary); font-size:12px;">Tidak ada berkas</span>'}
+              ` : '<span style="color:var(--text-secondary); font-size:12px;">Tidak ada berkas</span>'}
             </td>
             <td>${statusBadge}</td>
             <td>
@@ -1521,7 +1834,7 @@
 
     async function verifyCertificate(id, shouldVerify) {
       const action = shouldVerify ? 'verify' : 'unverify';
-      const promptText = shouldVerify ? 'Verifikasi dan tandai sertifikat ini sebagai Resmi?' : 'Batalkan status verifikasi resmi sertifikat ini?';
+      const promptText = shouldVerify ? 'Verifikasi dan tandai sertifikat ini sebagai Resmi?' : 'Batalkan status verifikasi sertifikat ini?';
       if (!confirm(promptText)) return;
 
       try {
@@ -1551,10 +1864,12 @@
         const res = await fetch('/api/courses?limit=20');
         const json = await res.json();
         const tbody = document.getElementById('admin-courses-table-body');
+        if (!tbody) return;
+
         const courses = (json.data && json.data.courses) ? json.data.courses : [];
 
         if (!courses.length) {
-          tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:32px; color:var(--text-tertiary);">Belum ada kursus yang terdaftar di platform.</td></tr>`;
+          tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:32px; color:var(--text-secondary);">Belum ada kursus yang terdaftar di platform.</td></tr>`;
           return;
         }
 
@@ -1570,6 +1885,80 @@
         `).join('');
       } catch (e) {
         console.error('Error fetching courses overview:', e);
+      }
+    }
+
+    // Fetch Financial & Revenue Data
+    async function fetchFinancialData() {
+      try {
+        const res = await fetch('/api/admin/financial', {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        const json = await res.json();
+        if (json.success && json.data) {
+          renderFinancialTables(json.data);
+        }
+      } catch (e) {
+        console.error('Error fetching financial data:', e);
+      }
+    }
+
+    function renderFinancialTables(data) {
+      const walletsTbody = document.getElementById('wallets-table-body');
+      const withdrawalsTbody = document.getElementById('withdrawals-table-body');
+
+      // Wallets
+      if (walletsTbody) {
+        const wallets = data.wallets || [];
+        if (!wallets.length) {
+          walletsTbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:32px; color:var(--text-secondary);">Belum ada dompet virtual tutor aktif.</td></tr>`;
+        } else {
+          walletsTbody.innerHTML = wallets.map(w => {
+            const tutorName = w.tutor ? w.tutor.name : 'Tutor';
+            const tutorEmail = w.tutor ? w.tutor.email : '-';
+            return `
+              <tr>
+                <td><strong>${escapeHtml(tutorName)}</strong></td>
+                <td><span style="font-size:12px; color:var(--text-secondary);">${escapeHtml(tutorEmail)}</span></td>
+                <td><strong style="color:var(--color-success);">Rp ${Number(w.balance || 0).toLocaleString('id-ID')}</strong></td>
+                <td>Rp ${Number(w.pending_balance || 0).toLocaleString('id-ID')}</td>
+                <td>Rp ${Number(w.total_withdrawn || 0).toLocaleString('id-ID')}</td>
+                <td>
+                  ${w.is_active 
+                    ? '<span class="status-pill status-active"><i class="fas fa-check"></i> Aktif</span>' 
+                    : '<span class="status-pill status-rejected">Nonaktif</span>'}
+                </td>
+              </tr>
+            `;
+          }).join('');
+        }
+      }
+
+      // Withdrawals
+      if (withdrawalsTbody) {
+        const withdrawals = data.withdrawals || [];
+        if (!withdrawals.length) {
+          withdrawalsTbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:32px; color:var(--text-secondary);">Belum ada riwayat permintaan penarikan dana.</td></tr>`;
+        } else {
+          withdrawalsTbody.innerHTML = withdrawals.map(wd => {
+            const tutorName = wd.tutor ? wd.tutor.name : 'Tutor';
+            const dateStr = new Date(wd.created_at || wd.createdAt || Date.now()).toLocaleDateString('id-ID', { year: 'numeric', month: 'short', day: 'numeric' });
+            let statusPill = '<span class="status-pill status-pending"><i class="fas fa-clock"></i> Diproses</span>';
+            if (wd.status === 'completed') statusPill = '<span class="status-pill status-active"><i class="fas fa-check"></i> Selesai</span>';
+            if (wd.status === 'rejected') statusPill = '<span class="status-pill status-rejected"><i class="fas fa-xmark"></i> Ditolak</span>';
+
+            return `
+              <tr>
+                <td><strong>${escapeHtml(tutorName)}</strong></td>
+                <td><strong style="color:var(--text-primary);">Rp ${Number(wd.amount || 0).toLocaleString('id-ID')}</strong></td>
+                <td><span class="user-role-tag">${escapeHtml(wd.bank_name || '-')}</span></td>
+                <td><code>${escapeHtml(wd.account_number || '-')}</code> (${escapeHtml(wd.account_holder_name || '-')})</td>
+                <td>${dateStr}</td>
+                <td>${statusPill}</td>
+              </tr>
+            `;
+          }).join('');
+        }
       }
     }
 

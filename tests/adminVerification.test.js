@@ -257,7 +257,9 @@ async function runAdminVerificationTests() {
 }
 
 if (require.main === module) {
-  runAdminVerificationTests();
+  runAdminVerificationTests()
+    .then(() => process.exit(0))
+    .catch(() => process.exit(1));
 }
 
 module.exports = runAdminVerificationTests;

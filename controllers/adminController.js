@@ -4,6 +4,9 @@ const {
   TutorApplication,
   TutorCertification,
   TutorWallet,
+  WithdrawalRequest,
+  Transaction,
+  WalletTransaction,
   Course,
   Enrollment,
 } = require('../models');
@@ -411,6 +414,68 @@ exports.unverifyTutorCertification = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: 'Gagal membatalkan verifikasi sertifikat.',
+      error: err.message,
+    });
+  }
+};
+
+/**
+ * Get Financial & Revenue Sharing Overview
+ */
+exports.getFinancialData = async (req, res) => {
+  try {
+    const wallets = await TutorWallet.findAll({
+      include: [
+        {
+          model: User,
+          as: 'tutor',
+          attributes: ['id', 'name', 'email'],
+        },
+      ],
+      order: [['balance', 'DESC']],
+    });
+
+    const withdrawals = await WithdrawalRequest.findAll({
+      include: [
+        {
+          model: User,
+          as: 'tutor',
+          attributes: ['id', 'name', 'email'],
+        },
+      ],
+      order: [['created_at', 'DESC']],
+      limit: 50,
+    });
+
+    const transactions = await Transaction.findAll({
+      order: [['created_at', 'DESC']],
+      limit: 50,
+    });
+
+    const totalPlatformRevenue = transactions.reduce((sum, t) => sum + Number(t.platform_fee || 0), 0);
+    const totalTutorEarnings = transactions.reduce((sum, t) => sum + Number(t.tutor_earning || 0), 0);
+    const totalVolume = transactions.reduce((sum, t) => sum + Number(t.amount || 0), 0);
+
+    return res.status(200).json({
+      success: true,
+      message: 'Data finansial admin berhasil dimuat.',
+      data: {
+        summary: {
+          totalVolume,
+          totalPlatformRevenue,
+          totalTutorEarnings,
+          totalWallets: wallets.length,
+          pendingWithdrawals: withdrawals.filter(w => w.status === 'pending').length,
+        },
+        wallets,
+        withdrawals,
+      },
+    });
+  } catch (err) {
+    console.error('Error in getFinancialData:', err);
+    return res.status(500).json({
+      success: false,
+      message: 'Gagal memuat data finansial.',
       error: err.message,
     });
   }

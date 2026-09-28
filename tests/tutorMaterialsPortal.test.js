@@ -269,7 +269,9 @@ async function runTutorMaterialsPortalTests() {
 }
 
 if (require.main === module) {
-  runTutorMaterialsPortalTests();
+  runTutorMaterialsPortalTests()
+    .then(() => process.exit(0))
+    .catch(() => process.exit(1));
 }
 
 module.exports = runTutorMaterialsPortalTests;
