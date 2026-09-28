@@ -3,15 +3,20 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Portal Manajemen & Upload Materi | Tutor SkillSphere AI</title>
-  <meta name="description" content="Portal upload materi multi-format, struktur kurikulum, dan streaming konten untuk Pengajar SkillSphere.">
+  <title>Portal Manajemen Materi Kursus | SkillSphere AI</title>
+  <meta name="description" content="Portal upload materi multi-format, struktur kurikulum, dan streaming konten pembelajaran untuk Tutor SkillSphere AI.">
   
   <!-- PWA Manifest & App Icons -->
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#1F1E1B">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="SkillSphere">
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="shortcut icon" href="/favicon.svg">
   
-  <!-- Google Fonts -->
+  <!-- Google Fonts: Newsreader (Editorial Serif) & Plus Jakarta Sans (Modern Sans) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
@@ -23,7 +28,7 @@
   <link rel="stylesheet" href="/stylesheets/claude-theme.css">
 
   <style>
-    .tutor-layout {
+    .dashboard-layout {
       min-height: 100vh;
       display: flex;
       flex-direction: column;
@@ -33,7 +38,7 @@
     .navbar {
       background: var(--bg-surface);
       border-bottom: 1px solid var(--border-subtle);
-      padding: 14px 32px;
+      padding: 16px 32px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -42,33 +47,193 @@
       z-index: 100;
     }
 
-    .tutor-tag {
-      background: var(--accent-primary);
-      color: var(--accent-text);
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-      padding: 3px 8px;
-      border-radius: var(--radius-sm);
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
     }
 
-    .main-container {
+    .user-profile-badge {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 14px 6px 8px;
+      border-radius: var(--radius-full);
+      background: var(--bg-surface-subtle);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .user-avatar-sm {
+      width: 28px;
+      height: 28px;
+      border-radius: var(--radius-full);
+      background: var(--accent-primary);
+      color: var(--accent-text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .user-name-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .user-role-tag {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      padding: 2px 6px;
+      border-radius: var(--radius-full);
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+    }
+
+    .logout-btn {
+      background: transparent;
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      padding: 8px 14px;
+      border-radius: var(--radius-full);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+
+    .logout-btn:hover {
+      background: var(--color-danger-bg);
+      border-color: var(--color-danger);
+      color: var(--color-danger);
+    }
+
+    .dashboard-content {
       max-width: 1140px;
       width: 100%;
       margin: 0 auto;
-      padding: 32px 24px 60px;
+      padding: 40px 24px 80px;
       flex: 1;
     }
 
-    /* Course Banner & Info Card */
-    .course-banner-card {
+    .welcome-hero {
+      margin-bottom: 28px;
+    }
+
+    .welcome-title {
+      font-family: var(--font-serif);
+      font-size: 32px;
+      font-weight: 500;
+      color: var(--text-primary);
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+    }
+
+    .welcome-desc {
+      font-size: 15px;
+      color: var(--text-secondary);
+      max-width: 720px;
+      line-height: 1.5;
+    }
+
+    .sprint-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--accent-primary-light);
+      color: var(--text-primary);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-full);
+      padding: 6px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+
+    .stat-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.2s ease;
+    }
+
+    .stat-card:hover {
+      box-shadow: var(--shadow-md);
+      border-color: var(--border-strong);
+      transform: translateY(-2px);
+    }
+
+    .stat-label {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-secondary);
+      font-weight: 600;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .stat-value {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--text-primary);
+      font-feature-settings: "tnum";
+    }
+
+    .stat-meta {
+      font-size: 12px;
+      color: var(--text-tertiary);
+      margin-top: 6px;
+    }
+
+    .section-card {
       background: var(--bg-surface);
       border: 1px solid var(--border-subtle);
       border-radius: var(--radius-xl);
-      padding: 24px;
+      padding: 28px;
       box-shadow: var(--shadow-sm);
       margin-bottom: 28px;
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      border-bottom: 1px solid var(--border-subtle);
+      padding-bottom: 14px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .section-title {
+      font-family: var(--font-serif);
+      font-size: 22px;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    /* Course Banner Card */
+    .course-overview-grid {
       display: flex;
       gap: 24px;
       align-items: flex-start;
@@ -95,7 +260,8 @@
     .thumb-edit-overlay {
       position: absolute;
       inset: 0;
-      background: rgba(0, 0, 0, 0.55);
+      background: rgba(15, 14, 13, 0.65);
+      backdrop-filter: blur(2px);
       color: #ffffff;
       display: flex;
       flex-direction: column;
@@ -118,40 +284,16 @@
       min-width: 280px;
     }
 
-    .course-meta-tags {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin-bottom: 10px;
-    }
-
     .course-title-display {
       font-family: var(--font-serif);
-      font-size: 26px;
-      font-weight: 600;
+      font-size: 24px;
+      font-weight: 500;
       color: var(--text-primary);
-      line-height: 1.25;
+      line-height: 1.3;
       margin-bottom: 8px;
     }
 
-    .course-stats-row {
-      display: flex;
-      gap: 20px;
-      flex-wrap: wrap;
-      font-size: 13px;
-      color: var(--text-secondary);
-      margin-top: 14px;
-      padding-top: 12px;
-      border-top: 1px solid var(--border-subtle);
-    }
-
-    .stat-pill-item {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    /* Section Card & Material Items */
+    /* Curriculum Section Containers */
     .sections-container {
       display: flex;
       flex-direction: column;
@@ -185,11 +327,11 @@
     .section-title-text {
       font-family: var(--font-serif);
       font-size: 18px;
-      font-weight: 600;
+      font-weight: 500;
       color: var(--text-primary);
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
     }
 
     .material-list {
@@ -200,9 +342,9 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 12px 14px;
-      border-radius: var(--radius-md);
-      margin: 4px 0;
+      padding: 14px 16px;
+      border-radius: var(--radius-lg);
+      margin: 6px 0;
       border: 1px solid transparent;
       background: var(--bg-surface);
       transition: all 0.15s ease;
@@ -215,21 +357,18 @@
     }
 
     .material-icon-box {
-      width: 36px;
-      height: 36px;
+      width: 40px;
+      height: 40px;
       border-radius: var(--radius-md);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 14px;
+      font-size: 15px;
       flex-shrink: 0;
+      background: var(--bg-surface-subtle);
+      color: var(--text-primary);
+      border: 1px solid var(--border-subtle);
     }
-
-    .type-video { background: #EEF2FF; color: #4F46E5; }
-    .type-ppt { background: #FFF7ED; color: #EA580C; }
-    .type-pdf { background: #FEF2F2; color: #DC2626; }
-    .type-doc { background: #EFF6FF; color: #2563EB; }
-    .type-book { background: #ECFDF5; color: #059669; }
 
     .material-info {
       flex: 1;
@@ -240,46 +379,50 @@
       font-weight: 600;
       font-size: 14px;
       color: var(--text-primary);
-      margin-bottom: 3px;
+      margin-bottom: 4px;
     }
 
     .material-meta-row {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
       font-size: 12px;
       color: var(--text-secondary);
+      flex-wrap: wrap;
     }
 
-    .badge-preview {
-      background: #D1FAE5;
-      color: #065F46;
-      padding: 2px 7px;
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 8px;
       border-radius: var(--radius-full);
-      font-size: 10px;
-      font-weight: 700;
-      text-transform: uppercase;
-    }
-
-    .badge-locked {
-      background: #F3F4F6;
-      color: #4B5563;
-      padding: 2px 7px;
-      border-radius: var(--radius-full);
-      font-size: 10px;
+      font-size: 11px;
       font-weight: 600;
+    }
+
+    .status-active {
+      background: var(--color-success-bg);
+      color: var(--color-success);
+      border: 1px solid var(--color-success);
+    }
+
+    .status-locked {
+      background: var(--bg-surface-subtle);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-subtle);
     }
 
     /* Multi-format Drag and Drop Zone */
     .drop-zone {
       border: 2px dashed var(--border-strong);
       border-radius: var(--radius-lg);
-      padding: 28px 20px;
+      padding: 32px 20px;
       text-align: center;
       background: var(--bg-surface-subtle);
       cursor: pointer;
       transition: all 0.2s ease;
-      margin-bottom: 18px;
+      margin-bottom: 20px;
     }
 
     .drop-zone.dragover {
@@ -299,13 +442,13 @@
       background: var(--border-subtle);
       border-radius: 99px;
       overflow: hidden;
-      margin-top: 12px;
+      margin-top: 14px;
       display: none;
     }
 
     .progress-bar-fill {
       height: 100%;
-      background: #10B981;
+      background: var(--accent-primary);
       width: 0%;
       transition: width 0.2s ease;
     }
@@ -347,6 +490,37 @@
       position: relative;
     }
 
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .modal-title {
+      font-family: var(--font-serif);
+      font-size: 20px;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .modal-close-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      font-size: 16px;
+      cursor: pointer;
+      padding: 6px;
+      border-radius: var(--radius-sm);
+      transition: color 0.15s ease;
+    }
+
+    .modal-close-btn:hover {
+      color: var(--text-primary);
+    }
+
     .media-player-container {
       width: 100%;
       border-radius: var(--radius-lg);
@@ -364,16 +538,16 @@
 
     .format-selector-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(95px, 1fr));
       gap: 8px;
-      margin-bottom: 18px;
+      margin-bottom: 20px;
     }
 
     .format-card-btn {
       border: 1px solid var(--border-subtle);
       background: var(--bg-surface);
       border-radius: var(--radius-md);
-      padding: 10px 6px;
+      padding: 12px 6px;
       text-align: center;
       cursor: pointer;
       transition: all 0.15s ease;
@@ -383,16 +557,26 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 4px;
+      gap: 6px;
     }
 
     .format-card-btn i {
       font-size: 18px;
+      color: var(--text-secondary);
+    }
+
+    .format-card-btn:hover {
+      border-color: var(--border-strong);
+      background: var(--bg-surface-subtle);
     }
 
     .format-card-btn.active {
       border-color: var(--accent-primary);
       background: var(--accent-primary-light);
+      color: var(--text-primary);
+    }
+
+    .format-card-btn.active i {
       color: var(--text-primary);
     }
 
@@ -425,6 +609,7 @@
   </style>
 
   <script>
+    // Initial Theme Script to prevent flash
     (function() {
       const savedTheme = localStorage.getItem('skillsphere_theme') || 
         (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
@@ -434,80 +619,142 @@
 </head>
 <body>
 
-  <div class="tutor-layout">
+  <div class="dashboard-layout">
     <!-- Navbar -->
     <header class="navbar">
-      <div style="display: flex; align-items: center; gap: 12px;">
+      <div style="display: flex; align-items: center; gap: 14px;">
         <a href="/dashboard" class="brand-logo" style="text-decoration:none;">
           <div class="brand-icon">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
               <path d="M12 0L13.8 8.2L22 10L13.8 11.8L12 20L10.2 11.8L2 10L10.2 8.2L12 0Z" />
             </svg>
           </div>
-          <span style="font-weight:700; color:var(--text-primary); font-size:16px;">SkillSphere</span>
+          <span>SkillSphere AI</span>
         </a>
-        <span class="tutor-tag"><i class="fas fa-chalkboard-user"></i> Portal Tutor</span>
+        <span class="user-role-tag" style="background:var(--accent-primary); color:var(--accent-text); border:none; padding:4px 8px; font-weight:700;">
+          <i class="fas fa-chalkboard-user"></i> Portal Tutor
+        </span>
       </div>
 
       <div class="nav-actions">
-        <a href="/dashboard" class="btn btn-outline" style="padding: 6px 14px; font-size: 13px; text-decoration:none;">
-          <i class="fas fa-arrow-left"></i> Dashboard
+        <!-- Back to Dashboard -->
+        <a href="/dashboard" class="logout-btn">
+          <i class="fas fa-arrow-left"></i>
+          <span>Dashboard</span>
         </a>
-        <button class="theme-toggle-btn" id="theme-toggle-btn" type="button">
+
+        <!-- Theme Toggle -->
+        <button class="theme-toggle-btn" id="theme-toggle-btn" type="button" aria-label="Toggle dark/light mode">
           <i class="fas fa-sun" id="theme-icon-sun" style="display:none;"></i>
           <i class="fas fa-moon" id="theme-icon-moon"></i>
+          <span id="theme-text">Mode Gelap</span>
+        </button>
+
+        <!-- User Profile Pill -->
+        <div class="user-profile-badge">
+          <div class="user-avatar-sm" id="nav-avatar">T</div>
+          <span class="user-name-label" id="nav-user-name">Memuat...</span>
+          <span class="user-role-tag" id="nav-user-role">Tutor</span>
+        </div>
+
+        <!-- Logout Button -->
+        <button class="logout-btn" id="logout-btn" type="button">
+          <i class="fas fa-arrow-right-from-bracket"></i>
+          <span>Keluar</span>
         </button>
       </div>
     </header>
 
-    <!-- Main Container -->
-    <main class="main-container">
-      <!-- Course Selector Bar -->
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
-        <div style="display:flex; align-items:center; gap:12px;">
-          <label style="font-size:13px; font-weight:600; color:var(--text-secondary);">Pilih Kursus:</label>
-          <select id="course-selector" class="input-field" style="max-width:320px; padding:6px 14px; font-size:13px;" onchange="changeActiveCourse(this.value)">
-            <option value="">Memuat kursus...</option>
-          </select>
-        </div>
+    <!-- Main Content -->
+    <main class="dashboard-content">
+      <!-- Welcome Hero -->
+      <section class="welcome-hero">
+        <h1 class="welcome-title">Studio Manajemen & Upload Materi</h1>
+        <p class="welcome-desc">
+          Kelola kurikulum kursus, unggah materi pembelajaran multi-format (Video, PPT, PDF, DOC, dan Digital Book), serta optimasi gambar sampul WebP.
+        </p>
+      </section>
 
-        <div style="display:flex; gap:10px;">
-          <button class="btn btn-outline" style="padding:8px 16px; font-size:13px;" onclick="openModal('new-section-modal')">
-            <i class="fas fa-folder-plus"></i> Tambah Bab Baru
-          </button>
-          <button class="btn btn-primary" style="padding:8px 18px; font-size:13px;" onclick="openUploadModal()">
-            <i class="fas fa-cloud-arrow-up"></i> Upload Materi Multi-Format
-          </button>
-        </div>
-      </div>
-
-      <!-- Active Course Banner Card -->
-      <div class="course-banner-card" id="course-banner-card">
-        <div class="course-thumb-container">
-          <img src="/icons/icon-512.png" id="course-thumb-preview" class="course-thumb-img" alt="Thumbnail Kursus">
-          <label for="thumb-file-input" class="thumb-edit-overlay">
-            <i class="fas fa-camera" style="font-size: 18px;"></i>
-            <span>Ubah Sampul (WebP)</span>
-          </label>
-          <input type="file" id="thumb-file-input" accept="image/*" style="display:none;" onchange="handleThumbnailUpload(this)">
-        </div>
-
-        <div class="course-meta-details">
-          <div class="course-meta-tags">
-            <span class="status-pill status-active" id="course-status-badge">Published</span>
-            <span class="tab-badge" id="course-category-badge">Web Development</span>
-            <span class="tab-badge" id="course-level-badge">Intermediate</span>
+      <!-- Active Course Card & Controls -->
+      <section class="section-card">
+        <div class="section-header">
+          <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+            <label style="font-size:13px; font-weight:600; color:var(--text-secondary);">Pilih Kursus Aktif:</label>
+            <select id="course-selector" class="input-field" style="max-width:340px; padding:8px 14px; font-size:13px;" onchange="changeActiveCourse(this.value)">
+              <option value="">Memuat daftar kursus...</option>
+            </select>
           </div>
 
-          <h1 class="course-title-display" id="course-title-display">Memuat Detail Kursus...</h1>
-          <p style="font-size:13px; color:var(--text-secondary); line-height:1.5;" id="course-desc-display">-</p>
-
-          <div class="course-stats-row">
-            <div class="stat-pill-item"><i class="fas fa-layer-group"></i> <strong id="stat-sections-count">0</strong> Bab</div>
-            <div class="stat-pill-item"><i class="fas fa-file-video"></i> <strong id="stat-materials-count">0</strong> Materi</div>
-            <div class="stat-pill-item"><i class="fas fa-clock"></i> <strong id="stat-duration-count">0</strong> Menit Belajar</div>
-            <div class="stat-pill-item"><i class="fas fa-tag"></i> <strong id="stat-price-display">Rp 0</strong></div>
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <button class="btn btn-outline" onclick="openModal('new-section-modal')">
+              <i class="fas fa-folder-plus"></i> Tambah Bab Baru
+            </button>
+            <button class="btn btn-primary" onclick="openUploadModal()">
+              <i class="fas fa-cloud-arrow-up"></i> Upload Materi Multi-Format
+            </button>
           </div>
+        </div>
+
+        <!-- Course Overview Banner -->
+        <div class="course-overview-grid" id="course-banner-card">
+          <div class="course-thumb-container">
+            <img src="/icons/icon-512.png" id="course-thumb-preview" class="course-thumb-img" alt="Thumbnail Kursus">
+            <label for="thumb-file-input" class="thumb-edit-overlay">
+              <i class="fas fa-camera" style="font-size: 18px;"></i>
+              <span>Ubah Sampul (WebP)</span>
+            </label>
+            <input type="file" id="thumb-file-input" accept="image/*" style="display:none;" onchange="handleThumbnailUpload(this)">
+          </div>
+
+          <div class="course-meta-details">
+            <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px;">
+              <span class="status-pill status-active" id="course-status-badge">Published</span>
+              <span class="status-pill status-locked" id="course-category-badge">Kategori</span>
+              <span class="status-pill status-locked" id="course-level-badge">Level</span>
+            </div>
+
+            <h2 class="course-title-display" id="course-title-display">Memuat Detail Kursus...</h2>
+            <p style="font-size:14px; color:var(--text-secondary); line-height:1.5; margin-bottom:16px;" id="course-desc-display">Memuat deskripsi kursus...</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Live Course Metrics Grid -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-label">
+            <span>Total Bab</span>
+            <i class="fas fa-layer-group" style="color: var(--text-secondary);"></i>
+          </div>
+          <div class="stat-value" id="stat-sections-count">0</div>
+          <div class="stat-meta">Modul / Bab Terstruktur</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-label">
+            <span>Total Materi</span>
+            <i class="fas fa-file-video" style="color: var(--text-secondary);"></i>
+          </div>
+          <div class="stat-value" id="stat-materials-count">0</div>
+          <div class="stat-meta">Unit Video, Slide & Dokumen</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-label">
+            <span>Durasi Belajar</span>
+            <i class="fas fa-clock" style="color: var(--text-secondary);"></i>
+          </div>
+          <div class="stat-value" id="stat-duration-count">0 Menit</div>
+          <div class="stat-meta">Estimasi Waktu Penyelesaian</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-label">
+            <span>Harga Kursus</span>
+            <i class="fas fa-tag" style="color: var(--text-secondary);"></i>
+          </div>
+          <div class="stat-value" id="stat-price-display">Rp 0</div>
+          <div class="stat-meta">Bagi Hasil 80% Tutor</div>
         </div>
       </div>
 
@@ -535,24 +782,24 @@
         <label style="display:block; font-size:12px; font-weight:600; color:var(--text-primary); margin-bottom:6px;">Tipe Konten Pembelajaran *</label>
         <div class="format-selector-grid">
           <div class="format-card-btn active" data-type="video" onclick="selectFormatType('video')">
-            <i class="fas fa-file-video" style="color:#4F46E5;"></i>
+            <i class="fas fa-file-video"></i>
             <span>Video MP4</span>
           </div>
           <div class="format-card-btn" data-type="ppt" onclick="selectFormatType('ppt')">
-            <i class="fas fa-file-powerpoint" style="color:#EA580C;"></i>
+            <i class="fas fa-file-powerpoint"></i>
             <span>Slide PPT</span>
           </div>
           <div class="format-card-btn" data-type="pdf" onclick="selectFormatType('pdf')">
-            <i class="fas fa-file-pdf" style="color:#DC2626;"></i>
+            <i class="fas fa-file-pdf"></i>
             <span>Dokumen PDF</span>
           </div>
           <div class="format-card-btn" data-type="doc" onclick="selectFormatType('doc')">
-            <i class="fas fa-file-word" style="color:#2563EB;"></i>
+            <i class="fas fa-file-word"></i>
             <span>Word DOC</span>
           </div>
           <div class="format-card-btn" data-type="book" onclick="selectFormatType('book')">
-            <i class="fas fa-book-open" style="color:#059669;"></i>
-            <span>E-Book Digital</span>
+            <i class="fas fa-book-open"></i>
+            <span>Buku Digital</span>
           </div>
         </div>
 
@@ -580,7 +827,7 @@
         </div>
 
         <!-- Preview Toggle -->
-        <div style="display:flex; align-items:center; gap:10px; margin-bottom:24px; padding:12px; background:var(--bg-surface-subtle); border-radius:var(--radius-md);">
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:24px; padding:12px; background:var(--bg-surface-subtle); border-radius:var(--radius-md); border:1px solid var(--border-subtle);">
           <input type="checkbox" id="material-is-preview" style="width:16px; height:16px; accent-color:var(--accent-primary);">
           <div>
             <label for="material-is-preview" style="font-size:13px; font-weight:600; color:var(--text-primary); cursor:pointer;">Gratis untuk Preview Siswa</label>
@@ -589,8 +836,8 @@
         </div>
 
         <div style="display:flex; justify-content:flex-end; gap:10px;">
-          <button class="btn btn-outline" style="padding:8px 16px; font-size:13px;" onclick="closeModal('upload-material-modal')">Batal</button>
-          <button class="btn btn-primary" id="btn-submit-upload" style="padding:8px 20px; font-size:13px;" onclick="submitMaterialUpload()">
+          <button class="btn btn-outline" onclick="closeModal('upload-material-modal')">Batal</button>
+          <button class="btn btn-primary" id="btn-submit-upload" onclick="submitMaterialUpload()">
             <i class="fas fa-upload"></i> Unggah Materi
           </button>
         </div>
@@ -599,7 +846,7 @@
 
     <!-- Create Section Modal -->
     <div class="modal-overlay" id="new-section-modal">
-      <div class="modal-card" style="max-width: 440px;">
+      <div class="modal-card" style="max-width: 460px;">
         <div class="modal-header">
           <h3 class="modal-title">Tambah Bab / Modul Baru</h3>
           <button class="modal-close-btn" onclick="closeModal('new-section-modal')"><i class="fas fa-xmark"></i></button>
@@ -609,8 +856,8 @@
           <input type="text" id="new-section-title" class="input-field" placeholder="Contoh: Bab 2: Manajemen Basis Data Relasional">
         </div>
         <div style="display:flex; justify-content:flex-end; gap:10px;">
-          <button class="btn btn-outline" style="padding:8px 16px; font-size:13px;" onclick="closeModal('new-section-modal')">Batal</button>
-          <button class="btn btn-primary" style="padding:8px 18px; font-size:13px;" onclick="submitCreateSection()">
+          <button class="btn btn-outline" onclick="closeModal('new-section-modal')">Batal</button>
+          <button class="btn btn-primary" onclick="submitCreateSection()">
             <i class="fas fa-plus"></i> Buat Bab
           </button>
         </div>
@@ -619,7 +866,7 @@
 
     <!-- Live Media Previewer Modal -->
     <div class="modal-overlay" id="media-preview-modal">
-      <div class="modal-card" style="max-width: 720px;">
+      <div class="modal-card" style="max-width: 760px;">
         <div class="modal-header">
           <h3 class="modal-title" id="preview-modal-title">Pemutar Materi Pembelajaran</h3>
           <button class="modal-close-btn" onclick="closePreviewModal()"><i class="fas fa-xmark"></i></button>
@@ -629,9 +876,9 @@
           <!-- Populated dynamically: Video / PDF / Doc -->
         </div>
 
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:16px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:16px; flex-wrap:wrap; gap:10px;">
           <div style="font-size:12px; color:var(--text-secondary);" id="preview-file-info">-</div>
-          <button class="btn btn-outline" style="padding:6px 14px; font-size:12px;" onclick="closePreviewModal()">Tutup</button>
+          <button class="btn btn-outline" onclick="closePreviewModal()">Tutup</button>
         </div>
       </div>
     </div>
@@ -645,14 +892,17 @@
     const themeBtn = document.getElementById('theme-toggle-btn');
     const themeIconSun = document.getElementById('theme-icon-sun');
     const themeIconMoon = document.getElementById('theme-icon-moon');
+    const themeText = document.getElementById('theme-text');
 
     function updateThemeUI(theme) {
       if (theme === 'dark') {
         themeIconSun.style.display = 'inline-block';
         themeIconMoon.style.display = 'none';
+        if (themeText) themeText.textContent = 'Mode Terang';
       } else {
         themeIconSun.style.display = 'none';
         themeIconMoon.style.display = 'inline-block';
+        if (themeText) themeText.textContent = 'Mode Gelap';
       }
     }
     updateThemeUI(document.documentElement.getAttribute('data-theme') || 'light');
@@ -670,9 +920,9 @@
       const toast = document.createElement('div');
       toast.className = 'toast';
       
-      let icon = '<i class="fas fa-circle-check" style="color: #10B981; font-size: 16px;"></i>';
-      if (type === 'error') icon = '<i class="fas fa-circle-exclamation" style="color: #EF4444; font-size: 16px;"></i>';
-      if (type === 'info') icon = '<i class="fas fa-circle-info" style="color: #3B82F6; font-size: 16px;"></i>';
+      let icon = '<i class="fas fa-circle-check" style="color: var(--color-success); font-size: 16px;"></i>';
+      if (type === 'error') icon = '<i class="fas fa-circle-exclamation" style="color: var(--color-danger); font-size: 16px;"></i>';
+      if (type === 'info') icon = '<i class="fas fa-circle-info" style="color: var(--text-primary); font-size: 16px;"></i>';
 
       toast.innerHTML = `${icon}<span>${message}</span>`;
       container.appendChild(toast);
@@ -700,10 +950,46 @@
       window.location.href = '/login';
     }
 
+    // Initialize User Session & Data
     document.addEventListener('DOMContentLoaded', () => {
+      fetchUserProfile();
       loadTutorCourses();
       setupDragAndDrop();
+      setupLogout();
     });
+
+    async function fetchUserProfile() {
+      try {
+        const res = await fetch('/api/auth/me', {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        const json = await res.json();
+        if (json.success && json.data) {
+          const user = json.data;
+          document.getElementById('nav-user-name').textContent = user.name || user.email;
+          document.getElementById('nav-avatar').textContent = (user.name || 'T')[0].toUpperCase();
+          document.getElementById('nav-user-role').textContent = user.role.toUpperCase();
+        }
+      } catch (err) {
+        console.error('Failed to fetch user profile:', err);
+      }
+    }
+
+    function setupLogout() {
+      const logoutBtn = document.getElementById('logout-btn');
+      if (!logoutBtn) return;
+      logoutBtn.addEventListener('click', async () => {
+        try {
+          await fetch('/api/auth/logout', {
+            method: 'POST',
+            headers: { 'Authorization': 'Bearer ' + token }
+          });
+        } catch (_) {}
+        localStorage.removeItem('skillsphere_access_token');
+        localStorage.removeItem('skillsphere_refresh_token');
+        window.location.href = '/login';
+      });
+    }
 
     // Load Tutor's Courses
     async function loadTutorCourses() {
@@ -724,6 +1010,7 @@
         if (!currentCourses.length) {
           select.innerHTML = `<option value="">Belum ada kelas yang diajar</option>`;
           document.getElementById('course-title-display').textContent = 'Anda belum memiliki kursus.';
+          document.getElementById('course-desc-display').textContent = 'Silakan buat kursus terlebih dahulu.';
           return;
         }
 
@@ -731,7 +1018,6 @@
           <option value="${c.id}">${c.title}</option>
         `).join('');
 
-        // Select first course by default or from query param
         const urlParams = new URLSearchParams(window.location.search);
         const courseIdParam = urlParams.get('courseId');
         const defaultId = courseIdParam ? parseInt(courseIdParam, 10) : currentCourses[0].id;
@@ -763,7 +1049,7 @@
 
     function renderActiveCourse(course) {
       document.getElementById('course-title-display').textContent = course.title;
-      document.getElementById('course-desc-display').textContent = course.description || 'Tidak ada deskripsi.';
+      document.getElementById('course-desc-display').textContent = course.description || 'Tidak ada deskripsi kursus.';
       document.getElementById('course-status-badge').textContent = (course.status || 'draft').toUpperCase();
       document.getElementById('course-category-badge').textContent = course.category ? course.category.name : 'Umum';
       document.getElementById('course-level-badge').textContent = (course.level || 'beginner').toUpperCase();
@@ -786,7 +1072,7 @@
 
       document.getElementById('stat-sections-count').textContent = sections.length;
       document.getElementById('stat-materials-count').textContent = totalMaterials;
-      document.getElementById('stat-duration-count').textContent = totalDuration;
+      document.getElementById('stat-duration-count').textContent = `${totalDuration} Menit`;
       document.getElementById('stat-price-display').textContent = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(course.price || 0);
 
       // Render Section Selector in Upload Modal
@@ -799,10 +1085,12 @@
       const container = document.getElementById('sections-container');
       if (!sections.length) {
         container.innerHTML = `
-          <div style="background:var(--bg-surface); border:1px solid var(--border-subtle); border-radius:var(--radius-xl); padding:40px; text-align:center; color:var(--text-secondary);">
-            <i class="fas fa-folder-open" style="font-size:32px; margin-bottom:12px; display:block;"></i>
-            <h3 style="font-family:var(--font-serif); font-size:20px; color:var(--text-primary); margin-bottom:6px;">Belum Ada Bab Materi</h3>
-            <p style="font-size:13px; margin-bottom:16px;">Buat bab pertama Anda untuk mulai mengunggah materi multi-format.</p>
+          <div class="section-card" style="text-align:center; padding:48px 24px;">
+            <i class="fas fa-folder-open" style="font-size:36px; color:var(--text-tertiary); margin-bottom:14px; display:block;"></i>
+            <h3 style="font-family:var(--font-serif); font-size:20px; color:var(--text-primary); margin-bottom:8px;">Belum Ada Bab Materi</h3>
+            <p style="font-size:14px; color:var(--text-secondary); margin-bottom:20px; max-width:440px; margin-left:auto; margin-right:auto;">
+              Buat bab pertama Anda untuk mulai mengunggah materi multi-format.
+            </p>
             <button class="btn btn-primary" onclick="openModal('new-section-modal')"><i class="fas fa-plus"></i> Buat Bab Pertama</button>
           </div>
         `;
@@ -820,10 +1108,10 @@
                 <span style="font-family:var(--font-sans); font-size:12px; color:var(--text-secondary); font-weight:500;">(${materials.length} Materi)</span>
               </div>
               <div style="display:flex; align-items:center; gap:8px;">
-                <button class="btn btn-outline" style="padding:4px 10px; font-size:12px;" onclick="openUploadModalForSection(${sec.id})">
+                <button class="btn btn-outline" style="padding:6px 12px; font-size:12px;" onclick="openUploadModalForSection(${sec.id})">
                   <i class="fas fa-plus"></i> Tambah Materi
                 </button>
-                <button class="btn btn-outline" style="padding:4px 8px; font-size:12px; color:#EF4444;" onclick="deleteSection(${sec.id}, '${sec.title}')" title="Hapus Bab">
+                <button class="logout-btn" style="padding:6px 10px; font-size:12px;" onclick="deleteSection(${sec.id}, '${sec.title}')" title="Hapus Bab">
                   <i class="fas fa-trash-can"></i>
                 </button>
               </div>
@@ -831,49 +1119,48 @@
 
             <div class="material-list">
               ${!materials.length ? `
-                <div style="padding:20px; text-align:center; font-size:13px; color:var(--text-tertiary);">
+                <div style="padding:24px; text-align:center; font-size:13px; color:var(--text-tertiary);">
                   Belum ada materi di bab ini. Klik "Tambah Materi" untuk mengunggah.
                 </div>
               ` : materials.map((mat, index) => {
-                let typeIcon = '<i class="fas fa-file-video"></i>';
-                let typeClass = 'type-video';
-                if (mat.content_type === 'ppt') { typeIcon = '<i class="fas fa-file-powerpoint"></i>'; typeClass = 'type-ppt'; }
-                if (mat.content_type === 'pdf') { typeIcon = '<i class="fas fa-file-pdf"></i>'; typeClass = 'type-pdf'; }
-                if (mat.content_type === 'doc') { typeIcon = '<i class="fas fa-file-word"></i>'; typeClass = 'type-doc'; }
-                if (mat.content_type === 'book') { typeIcon = '<i class="fas fa-book-open"></i>'; typeClass = 'type-book'; }
+                let typeIcon = 'fa-video';
+                if (mat.content_type === 'ppt') typeIcon = 'fa-file-powerpoint';
+                if (mat.content_type === 'pdf') typeIcon = 'fa-file-pdf';
+                if (mat.content_type === 'doc') typeIcon = 'fa-file-lines';
+                if (mat.content_type === 'book') typeIcon = 'fa-book-open';
 
                 return `
                   <div class="material-item-row" id="material-row-${mat.id}">
-                    <div style="display:flex; align-items:center; gap:12px; flex:1;">
-                      <div class="material-icon-box ${typeClass}">
-                        ${typeIcon}
+                    <div style="display:flex; align-items:center; gap:14px; flex:1;">
+                      <div class="material-icon-box">
+                        <i class="fas ${typeIcon}"></i>
                       </div>
                       <div class="material-info">
                         <div class="material-title-text">${mat.title}</div>
                         <div class="material-meta-row">
-                          <span><i class="fas fa-clock" style="font-size:10px;"></i> ${mat.duration_minutes || 0} Menit</span>
+                          <span><i class="fas fa-clock" style="font-size:11px;"></i> ${mat.duration_minutes || 0} Menit</span>
                           <span>•</span>
                           <span>Tipe: ${mat.content_type.toUpperCase()}</span>
                           <span>•</span>
-                          ${mat.is_preview ? '<span class="badge-preview"><i class="fas fa-unlock"></i> Gratis Preview</span>' : '<span class="badge-locked"><i class="fas fa-lock"></i> Terkunci</span>'}
+                          ${mat.is_preview ? '<span class="status-pill status-active"><i class="fas fa-unlock"></i> Gratis Preview</span>' : '<span class="status-pill status-locked"><i class="fas fa-lock"></i> Terkunci</span>'}
                         </div>
                       </div>
                     </div>
 
-                    <div style="display:flex; align-items:center; gap:6px;">
-                      <button class="btn btn-outline" style="padding:5px 10px; font-size:12px;" onclick="previewMaterial(${mat.id})">
+                    <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+                      <button class="btn btn-outline" style="padding:6px 12px; font-size:12px;" onclick="previewMaterial(${mat.id})">
                         <i class="fas fa-play"></i> Putar / Lihat
                       </button>
                       
                       <!-- Reorder Buttons -->
-                      <button class="btn btn-outline" style="padding:5px 8px; font-size:11px;" onclick="moveMaterialOrder(${sec.id}, ${mat.id}, 'up')" title="Pindah ke Atas" ${index === 0 ? 'disabled style="opacity:0.4;"' : ''}>
+                      <button class="btn btn-outline" style="padding:6px 10px; font-size:11px;" onclick="moveMaterialOrder(${sec.id}, ${mat.id}, 'up')" title="Pindah ke Atas" ${index === 0 ? 'disabled style="opacity:0.35;"' : ''}>
                         <i class="fas fa-arrow-up"></i>
                       </button>
-                      <button class="btn btn-outline" style="padding:5px 8px; font-size:11px;" onclick="moveMaterialOrder(${sec.id}, ${mat.id}, 'down')" title="Pindah ke Bawah" ${index === materials.length - 1 ? 'disabled style="opacity:0.4;"' : ''}>
+                      <button class="btn btn-outline" style="padding:6px 10px; font-size:11px;" onclick="moveMaterialOrder(${sec.id}, ${mat.id}, 'down')" title="Pindah ke Bawah" ${index === materials.length - 1 ? 'disabled style="opacity:0.35;"' : ''}>
                         <i class="fas fa-arrow-down"></i>
                       </button>
 
-                      <button class="btn btn-outline" style="padding:5px 8px; font-size:12px; color:#EF4444;" onclick="deleteMaterial(${mat.id}, '${mat.title}')" title="Hapus Materi">
+                      <button class="logout-btn" style="padding:6px 10px; font-size:12px;" onclick="deleteMaterial(${mat.id}, '${mat.title}')" title="Hapus Materi">
                         <i class="fas fa-trash-can"></i>
                       </button>
                     </div>
@@ -897,6 +1184,7 @@
     // Drag and Drop Handling
     function setupDragAndDrop() {
       const dropZone = document.getElementById('material-drop-zone');
+      if (!dropZone) return;
       ['dragenter', 'dragover'].forEach(name => {
         dropZone.addEventListener(name, (e) => {
           e.preventDefault();
@@ -927,9 +1215,8 @@
       document.getElementById('drop-zone-text').textContent = file.name;
       document.getElementById('drop-zone-sub').textContent = `Ukuran: ${(file.size / (1024 * 1024)).toFixed(2)} MB`;
       document.getElementById('drop-icon').className = 'fas fa-file-circle-check drop-zone-icon';
-      document.getElementById('drop-icon').style.color = '#10B981';
+      document.getElementById('drop-icon').style.color = 'var(--color-success)';
 
-      // Auto-detect title and format
       const nameWithoutExt = file.name.replace(/\.[^/.]+$/, "");
       if (!document.getElementById('material-title-input').value) {
         document.getElementById('material-title-input').value = nameWithoutExt;
@@ -1088,12 +1375,10 @@
       const targetIdx = direction === 'up' ? idx - 1 : idx + 1;
       if (targetIdx < 0 || targetIdx >= materials.length) return;
 
-      // Swap elements
       const temp = materials[idx];
       materials[idx] = materials[targetIdx];
       materials[targetIdx] = temp;
 
-      // Prepare items for API
       const items = materials.map((m, i) => ({ id: m.id, order_index: i + 1 }));
 
       try {
@@ -1220,7 +1505,6 @@
         if (uploadRes.ok && uploadJson.success) {
           const webpUrl = uploadJson.data.relativeUrl;
 
-          // Update course thumbnail
           await fetch(`/api/courses/${activeCourse.id}`, {
             method: 'PUT',
             headers: {

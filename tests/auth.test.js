@@ -46,15 +46,12 @@ async function runAuthTests() {
   console.log('🧪 Starting Auth, OTP Verification & Security API Test Suite...\n');
 
   try {
-    const dialect = sequelize.getDialect();
-    if (dialect === 'mysql') {
-      await sequelize.query('SET FOREIGN_KEY_CHECKS = 0;');
-      await sequelize.sync({ force: true });
-      await sequelize.query('SET FOREIGN_KEY_CHECKS = 1;');
-    } else {
-      await sequelize.sync();
-      await User.destroy({ where: {}, cascade: true });
-    }
+    // 1. Safe non-destructive sync
+    await sequelize.sync();
+
+    // 2. Clean up only test fixture emails (preserve all seeded data)
+    const testEmails = ['rian@student.com', 'arjuna@tutor.com'];
+    await User.destroy({ where: { email: testEmails } }).catch(() => {});
 
     server = app.listen(0);
     port = server.address().port;
@@ -292,6 +289,9 @@ async function runAuthTests() {
     console.log('\n======================================================');
     console.log('🎉 ALL AUTH & OTP EMAIL TESTS PASSED SUCCESSFULLY!');
     console.log('======================================================\n');
+
+    // Clean up test fixture users
+    await User.destroy({ where: { email: ['rian@student.com', 'arjuna@tutor.com'] } }).catch(() => {});
 
     server.close();
     process.exit(0);

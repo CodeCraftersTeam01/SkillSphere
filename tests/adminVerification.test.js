@@ -154,6 +154,10 @@ async function runAdminVerificationTests() {
         status: 'pending',
       },
     });
+    testApp.status = 'pending';
+    await testApp.save();
+    applicantUser.role = 'student';
+    await applicantUser.save();
 
     // 5. Test GET /api/admin/tutor-applications
     const listAppsRes = await makeRequest('GET', '/api/admin/tutor-applications?status=all', adminAuth);
@@ -202,6 +206,9 @@ async function runAdminVerificationTests() {
         status: 'pending',
       },
     });
+    rejectApp.status = 'pending';
+    rejectApp.rejection_reason = null;
+    await rejectApp.save();
 
     const rejectRes = await makeRequest(
       'PUT',
@@ -213,6 +220,7 @@ async function runAdminVerificationTests() {
     assert.strictEqual(rejectRes.body.data.status, 'rejected');
     assert.strictEqual(rejectRes.body.data.rejection_reason, 'Dokumen kualifikasi tidak mencukupi standar minimum.');
     console.log('  ✔ PUT /api/admin/tutor-applications/:id/reject recorded rejection reason successfully.');
+
 
     // 9. Test Tutor Certification verification
     const [testCert] = await TutorCertification.findOrCreate({

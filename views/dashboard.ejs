@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard | SkillSphere AI</title>
-  <meta name="description" content="Dashboard platform pembelajaran online SkillSphere AI.">
+  <title>Dashboard Belajar | SkillSphere AI</title>
+  <meta name="description" content="Dashboard belajar personal peserta dan portal studio pengajar SkillSphere AI.">
   
   <!-- PWA Manifest & App Icons -->
   <link rel="manifest" href="/manifest.json">
@@ -27,7 +27,6 @@
   <!-- Claude Design System Stylesheet -->
   <link rel="stylesheet" href="/stylesheets/claude-theme.css">
 
-  
   <style>
     .dashboard-layout {
       min-height: 100vh;
@@ -36,10 +35,11 @@
       background-color: var(--bg-app);
     }
 
+    /* Top Main Navigation Bar */
     .navbar {
       background: var(--bg-surface);
       border-bottom: 1px solid var(--border-subtle);
-      padding: 16px 32px;
+      padding: 12px 32px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -48,17 +48,70 @@
       z-index: 100;
     }
 
+    .nav-brand-group {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+    }
+
+    .nav-links-menu {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .nav-link-item {
+      padding: 8px 14px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      text-decoration: none;
+      border-radius: var(--radius-md);
+      transition: all 0.15s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .nav-link-item:hover {
+      color: var(--text-primary);
+      background: var(--bg-surface-subtle);
+    }
+
+    .nav-link-item.active {
+      color: var(--text-primary);
+      font-weight: 600;
+      background: var(--bg-surface-subtle);
+      border-bottom: 2px solid var(--accent-primary);
+    }
+
     .nav-actions {
       display: flex;
       align-items: center;
-      gap: 16px;
+      gap: 12px;
+    }
+
+    .streak-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: var(--radius-full);
+      background: var(--bg-surface-subtle);
+      border: 1px solid var(--border-subtle);
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-primary);
     }
 
     .user-profile-badge {
       display: flex;
       align-items: center;
       gap: 10px;
-      padding: 6px 14px 6px 8px;
+      padding: 5px 12px 5px 6px;
       border-radius: var(--radius-full);
       background: var(--bg-surface-subtle);
       border: 1px solid var(--border-subtle);
@@ -85,7 +138,7 @@
 
     .user-role-tag {
       font-size: 10px;
-      font-weight: 600;
+      font-weight: 700;
       text-transform: uppercase;
       padding: 2px 6px;
       border-radius: var(--radius-full);
@@ -98,14 +151,14 @@
       background: transparent;
       border: 1px solid var(--border-subtle);
       color: var(--text-secondary);
-      padding: 8px 14px;
+      padding: 7px 12px;
       border-radius: var(--radius-full);
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 500;
       cursor: pointer;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       transition: all 0.2s ease;
     }
 
@@ -115,161 +168,399 @@
       color: var(--color-danger);
     }
 
-    .dashboard-content {
-      max-width: 1060px;
+    /* Main Container (2-Column Grid like Dicoding) */
+    .dashboard-container {
+      max-width: 1240px;
       width: 100%;
       margin: 0 auto;
-      padding: 40px 24px;
+      padding: 32px 24px 80px;
       flex: 1;
     }
 
-    .welcome-hero {
-      margin-bottom: 32px;
-    }
-
-    .welcome-title {
-      font-family: var(--font-serif);
-      font-size: 34px;
-      font-weight: 500;
-      color: var(--text-primary);
-      letter-spacing: -0.02em;
-      margin-bottom: 8px;
-    }
-
-    .welcome-desc {
-      font-size: 15px;
-      color: var(--text-secondary);
-      max-width: 680px;
-    }
-
-    .stats-grid {
+    .dashboard-grid-layout {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 18px;
-      margin-bottom: 32px;
+      grid-template-columns: 340px 1fr;
+      gap: 24px;
+      align-items: start;
     }
 
-    .stat-card {
+    @media (max-width: 960px) {
+      .dashboard-grid-layout {
+        grid-template-columns: 1fr;
+      }
+      .nav-links-menu {
+        display: none;
+      }
+    }
+
+    /* Left Sidebar Widget Cards */
+    .sidebar-widgets-column {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .widget-card {
       background: var(--bg-surface);
       border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-lg);
-      padding: 22px;
+      border-radius: var(--radius-xl);
+      padding: 24px;
       box-shadow: var(--shadow-sm);
-      transition: all 0.2s ease;
+      position: relative;
     }
 
-    .stat-card:hover {
-      box-shadow: var(--shadow-md);
-      border-color: var(--border-strong);
-      transform: translateY(-2px);
-    }
-
-    .stat-label {
-      font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: var(--text-secondary);
-      font-weight: 600;
-      margin-bottom: 10px;
+    .profile-hero-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-xl);
+      padding: 24px;
+      box-shadow: var(--shadow-sm);
       display: flex;
-      justify-content: space-between;
-      align-items: center;
+      flex-direction: column;
+      gap: 16px;
     }
 
-    .stat-value {
-      font-size: 26px;
+    .circular-progress-box {
+      width: 64px;
+      height: 64px;
+      border-radius: var(--radius-full);
+      border: 4px solid var(--accent-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
       font-weight: 700;
       color: var(--text-primary);
-      font-feature-settings: "tnum";
+      background: var(--bg-surface-subtle);
+      margin-bottom: 6px;
     }
 
-    .stat-meta {
-      font-size: 12px;
+    .profile-card-title {
+      font-family: var(--font-serif);
+      font-size: 20px;
+      font-weight: 500;
+      color: var(--text-primary);
+      line-height: 1.3;
+      margin: 0;
+    }
+
+    .profile-card-desc {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+      margin: 0;
+    }
+
+    .profile-card-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+      text-decoration: none;
+      margin-top: 4px;
+      transition: gap 0.2s ease;
+    }
+
+    .profile-card-cta:hover {
+      gap: 10px;
+    }
+
+    /* Streak Widget */
+    .streak-day-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 6px;
+      margin: 16px 0;
+    }
+
+    .streak-day-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
       color: var(--text-tertiary);
-      margin-top: 6px;
+      font-weight: 600;
+    }
+
+    .streak-circle {
+      width: 34px;
+      height: 34px;
+      border-radius: var(--radius-full);
+      background: var(--bg-surface-subtle);
+      border: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .streak-circle.active {
+      background: var(--accent-primary);
+      color: var(--accent-text);
+      border-color: var(--accent-primary);
+    }
+
+    /* Right Main Content Area */
+    .main-activities-column {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
     }
 
     .section-card {
       background: var(--bg-surface);
       border: 1px solid var(--border-subtle);
       border-radius: var(--radius-xl);
-      padding: 28px;
+      padding: 26px;
       box-shadow: var(--shadow-sm);
-      margin-bottom: 28px;
     }
 
-    .section-header {
+    .section-header-row {
       display: flex;
-      justify-content: space-between;
       align-items: center;
+      justify-content: space-between;
       margin-bottom: 20px;
+      padding-bottom: 12px;
       border-bottom: 1px solid var(--border-subtle);
-      padding-bottom: 14px;
     }
 
     .section-title {
       font-family: var(--font-serif);
-      font-size: 22px;
+      font-size: 20px;
       font-weight: 500;
       color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 0;
     }
 
-    .sprint-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: var(--accent-primary-light);
-      color: var(--text-primary);
+    /* Learning Activity Rows */
+    .activity-course-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .activity-course-item {
+      background: var(--bg-surface);
       border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-full);
-      padding: 6px 14px;
-      font-size: 12px;
-      font-weight: 600;
-    }
-
-    .table-responsive {
-      overflow-x: auto;
-    }
-
-    .styled-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 13px;
-      text-align: left;
-    }
-
-    .styled-table th {
-      background: var(--bg-surface-subtle);
-      color: var(--text-secondary);
-      font-weight: 600;
-      padding: 12px 16px;
-      border-bottom: 1px solid var(--border-subtle);
-    }
-
-    .styled-table td {
-      padding: 14px 16px;
-      border-bottom: 1px solid var(--border-subtle);
-      color: var(--text-primary);
-    }
-
-    .styled-table tr:hover td {
-      background: var(--bg-surface-subtle);
-    }
-
-    .status-pill {
-      display: inline-flex;
+      border-radius: var(--radius-lg);
+      padding: 16px 20px;
+      display: flex;
       align-items: center;
-      gap: 5px;
-      padding: 3px 8px;
-      border-radius: var(--radius-full);
+      justify-content: space-between;
+      gap: 16px;
+      transition: all 0.2s ease;
+    }
+
+    .activity-course-item:hover {
+      border-color: var(--border-strong);
+      background: var(--bg-surface-subtle);
+      transform: translateY(-1px);
+    }
+
+    .activity-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .activity-badge-text {
       font-size: 11px;
       font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 4px;
     }
 
-    .status-active {
-      background: var(--color-success-bg);
-      color: var(--color-success);
-      border: 1px solid var(--color-success);
+    .activity-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 6px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .activity-progress-bar {
+      width: 100%;
+      height: 5px;
+      background: var(--border-subtle);
+      border-radius: 99px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+
+    .activity-progress-fill {
+      height: 100%;
+      background: var(--accent-primary);
+      border-radius: 99px;
+    }
+
+    .btn-continue-learning {
+      background: var(--accent-primary);
+      color: var(--accent-text);
+      border: none;
+      padding: 8px 16px;
+      border-radius: var(--radius-md);
+      font-size: 13px;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+      transition: opacity 0.15s ease;
+    }
+
+    .btn-continue-learning:hover {
+      opacity: 0.88;
+    }
+
+    /* Sub Activities Grid */
+    .sub-activities-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    @media (max-width: 600px) {
+      .sub-activities-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .sub-activity-card {
+      background: var(--bg-surface-subtle);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      text-decoration: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+
+    .sub-activity-card:hover {
+      border-color: var(--border-strong);
+      background: var(--bg-surface);
+      transform: translateY(-2px);
+    }
+
+    .sub-activity-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .sub-activity-desc {
+      font-size: 12px;
+      color: var(--text-secondary);
+      line-height: 1.4;
+    }
+
+    /* Course Catalog Grid */
+    .courses-catalog-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 16px;
+      margin-top: 14px;
+    }
+
+    .course-card-mini {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: all 0.2s ease;
+    }
+
+    .course-card-mini:hover {
+      border-color: var(--border-strong);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .course-mini-thumb {
+      width: 100%;
+      height: 120px;
+      background: var(--bg-surface-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-tertiary);
+      font-size: 24px;
+      object-fit: cover;
+    }
+
+    .course-mini-body {
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      justify-content: space-between;
+    }
+
+    .course-mini-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+      line-height: 1.35;
+      margin-bottom: 6px;
+    }
+
+    .course-mini-tutor {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-bottom: 10px;
+    }
+
+    .course-mini-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid var(--border-subtle);
+      padding-top: 8px;
+      margin-top: auto;
+    }
+
+    .course-mini-price {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    /* Tutor Mode Specific Banner */
+    .tutor-studio-banner {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-xl);
+      padding: 24px;
+      margin-bottom: 24px;
+      display: none;
+    }
+
+    /* Admin Redirection Banner */
+    .admin-redirect-banner {
+      background: var(--bg-surface-subtle);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-xl);
+      padding: 20px 24px;
+      margin-bottom: 24px;
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
     }
   </style>
 
@@ -287,16 +578,32 @@
   <div class="dashboard-layout">
     <!-- Navbar -->
     <header class="navbar">
-      <a href="/dashboard" class="brand-logo">
-        <div class="brand-icon">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 0L13.8 8.2L22 10L13.8 11.8L12 20L10.2 11.8L2 10L10.2 8.2L12 0Z" />
-          </svg>
-        </div>
-        <span>SkillSphere AI</span>
-      </a>
+      <div class="nav-brand-group">
+        <a href="/dashboard" class="brand-logo" style="text-decoration:none;">
+          <div class="brand-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 0L13.8 8.2L22 10L13.8 11.8L12 20L10.2 11.8L2 10L10.2 8.2L12 0Z" />
+            </svg>
+          </div>
+          <span>SkillSphere AI</span>
+        </a>
+
+        <!-- Main Navigation Links -->
+        <ul class="nav-links-menu">
+          <li><a href="/dashboard" class="nav-link-item active">Beranda</a></li>
+          <li><a href="#courses-catalog-section" class="nav-link-item">Katalog Kursus</a></li>
+          <li><a href="/dashboard/onboarding" class="nav-link-item">Jalur Belajar AI</a></li>
+          <li><a href="#activities-section" class="nav-link-item">Tantangan</a></li>
+        </ul>
+      </div>
 
       <div class="nav-actions">
+        <!-- Streak Indicator -->
+        <div class="streak-badge" title="Runtutan Belajar Aktif">
+          <i class="fas fa-bolt" style="color:var(--text-primary); font-size:13px;"></i>
+          <span id="nav-streak-count">1</span>
+        </div>
+
         <!-- Theme Toggle -->
         <button class="theme-toggle-btn" id="theme-toggle-btn" type="button" aria-label="Toggle dark/light mode">
           <i class="fas fa-sun" id="theme-icon-sun" style="display:none;"></i>
@@ -308,177 +615,235 @@
         <div class="user-profile-badge">
           <div class="user-avatar-sm" id="nav-avatar">U</div>
           <span class="user-name-label" id="nav-user-name">Memuat...</span>
-          <span class="user-role-tag" id="nav-user-role">...</span>
+          <span class="user-role-tag" id="nav-user-role">Siswa</span>
         </div>
 
         <!-- Logout Button -->
-        <button class="logout-btn" id="logout-btn" type="button">
+        <button class="logout-btn" id="logout-btn" type="button" title="Keluar">
           <i class="fas fa-arrow-right-from-bracket"></i>
           <span>Keluar</span>
         </button>
       </div>
     </header>
 
-    <!-- Main Dashboard Content -->
-    <main class="dashboard-content">
-      <!-- Welcome Hero -->
-      <section class="welcome-hero">
-        <div class="sprint-badge">
-          <i class="fas fa-rocket"></i>
-          <span>Sprint 1: Foundation, MySQL 19 Tables & JWT Security</span>
-        </div>
-        <h1 class="welcome-title" id="welcome-heading">Selamat Datang di SkillSphere</h1>
-        <p class="welcome-desc" id="welcome-subheading">
-          Ekosistem pendidikan cerdas yang menghubungkan tutor ahli dengan peserta didik melalui personalisasi kecerdasan buatan.
-        </p>
-      </section>
+    <!-- Main Dashboard Container -->
+    <main class="dashboard-container">
 
-      <!-- Dynamic Role Stats Grid -->
-      <div class="stats-grid" id="stats-container">
-        <div class="stat-card">
-          <div class="stat-label">
-            <span>Status Akun</span>
-            <span class="status-pill status-active"><i class="fas fa-circle-check" style="font-size: 10px;"></i> Aktif</span>
-          </div>
-          <div class="stat-value" id="stat-role">-</div>
-          <div class="stat-meta" id="stat-email">-</div>
-        </div>
-
-        <div class="stat-card">
-          <div class="stat-label">
-            <span>Arsitektur DB</span>
-            <i class="fas fa-database" style="color: var(--text-secondary);"></i>
-          </div>
-          <div class="stat-value">19 Tabel</div>
-          <div class="stat-meta">MySQL Relasional (100% Synced)</div>
-        </div>
-
-        <div class="stat-card">
-          <div class="stat-label">
-            <span>Revenue Model</span>
-            <span style="color:var(--accent-amber); font-weight:700;">20% / 80%</span>
-          </div>
-          <div class="stat-value" id="stat-wallet">Rp 0</div>
-          <div class="stat-meta" id="stat-wallet-meta">Saldo Tutor Siap Tarik</div>
-        </div>
-
-        <div class="stat-card">
-          <div class="stat-label">
-            <span>Keamanan API</span>
-            <i class="fas fa-shield-halved" style="color: var(--text-secondary);"></i>
-          </div>
-          <div class="stat-value">JWT + RBAC</div>
-          <div class="stat-meta">Access & Refresh Token Active</div>
-        </div>
-      </div>
-
-      <!-- Portal Quick Navigation Grid (Sprint 1 & Sprint 2) -->
-      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:16px; margin-bottom:28px;" id="portal-quick-nav">
-        <a href="/admin/verification" class="stat-card" style="text-decoration:none; display:flex; flex-direction:column; justify-content:space-between; border-left:4px solid var(--accent-primary);">
+      <!-- Admin Quick Navigation Banner (If role === 'admin') -->
+      <div class="admin-redirect-banner" id="admin-banner">
+        <div style="display:flex; align-items:center; gap:12px;">
+          <div style="font-size:20px;"><i class="fas fa-shield-halved"></i></div>
           <div>
-            <div class="stat-label">
-              <span>Admin Portal (Sprint 1)</span>
-              <span class="status-pill status-active"><i class="fas fa-shield-halved"></i> FE: Satrio</span>
-            </div>
-            <div style="font-family:var(--font-serif); font-size:18px; font-weight:600; color:var(--text-primary); margin-bottom:4px;">
-              Verifikasi Pengajar & Dokumen
-            </div>
-            <p style="font-size:12px; color:var(--text-secondary); line-height:1.4;">
-              Validasi pendaftaran calon tutor, berkas CV, link portofolio, dan keaslian sertifikasi instansi resmi.
-            </p>
+            <strong style="font-size:14px; color:var(--text-primary); display:block;">Akses Administrator Terdeteksi</strong>
+            <span style="font-size:13px; color:var(--text-secondary);">Kelola verifikasi pengajar, validasi sertifikat, dan pengaturan platform di Admin Portal.</span>
           </div>
-          <div style="margin-top:14px; font-size:13px; font-weight:600; color:var(--text-primary); display:flex; align-items:center; gap:6px;">
-            Buka Panel Verifikasi <i class="fas fa-arrow-right" style="font-size:11px;"></i>
-          </div>
-        </a>
-
-        <a href="/tutor/materials" class="stat-card" style="text-decoration:none; display:flex; flex-direction:column; justify-content:space-between; border-left:4px solid #10B981;">
-          <div>
-            <div class="stat-label">
-              <span>Tutor Portal (Sprint 2)</span>
-              <span class="status-pill status-active" style="background:#D1FAE5; color:#065F46; border-color:#6EE7B7;"><i class="fas fa-cloud-arrow-up"></i> FE: Satrio</span>
-            </div>
-            <div style="font-family:var(--font-serif); font-size:18px; font-weight:600; color:var(--text-primary); margin-bottom:4px;">
-              Portal Manajemen & Upload Materi
-            </div>
-            <p style="font-size:12px; color:var(--text-secondary); line-height:1.4;">
-              Unggah materi multi-format (Video, PPT, PDF, DOC, Book), kompresi thumbnail WebP, dan atur struktur bab.
-            </p>
-          </div>
-          <div style="margin-top:14px; font-size:13px; font-weight:600; color:#10B981; display:flex; align-items:center; gap:6px;">
-            Buka Portal Upload <i class="fas fa-arrow-right" style="font-size:11px;"></i>
-          </div>
+        </div>
+        <a href="/admin" class="btn btn-primary" style="font-size:13px; padding:8px 16px;">
+          Buka Panel Admin <i class="fas fa-arrow-right" style="margin-left:6px;"></i>
         </a>
       </div>
 
-      <!-- Quick Action / Core Modules Card -->
-      <section class="section-card">
-        <div class="section-header">
-          <h2 class="section-title">Status Implementasi Sprint 1 & Sprint 2</h2>
-          <span style="font-size: 13px; color: var(--text-secondary);"><i class="fas fa-users" style="margin-right: 4px;"></i> Tim Pengembang CodeCrafters</span>
+      <!-- Tutor Studio Quick Banner (If role === 'tutor') -->
+      <div class="tutor-studio-banner" id="tutor-banner">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:12px;">
+          <div>
+            <h2 style="font-family:var(--font-serif); font-size:22px; color:var(--text-primary); margin:0 0 4px;">Studio Pengajar & Manajemen Materi</h2>
+            <p style="font-size:13px; color:var(--text-secondary); margin:0;">Kelola kurikulum, upload materi multi-format, dan pantau saldo virtual hasil penjualan kursus.</p>
+          </div>
+          <div style="display:flex; gap:10px;">
+            <a href="/tutor/materials" class="btn btn-primary" style="font-size:13px; padding:8px 16px;">
+              <i class="fas fa-cloud-arrow-up" style="margin-right:6px;"></i> Portal Upload Materi
+            </a>
+          </div>
         </div>
 
-        <div class="table-responsive">
-          <table class="styled-table">
-            <thead>
-              <tr>
-                <th>Fitur / Modul</th>
-                <th>Fase / Sprint</th>
-                <th>Penanggung Jawab</th>
-                <th>Status</th>
-                <th>Aksi / Tautan</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><strong>Admin Verification UI</strong> (Validasi Tutor & Sertifikat)</td>
-                <td>Sprint 1</td>
-                <td><strong>Satrio</strong> (Tutor FE & QA)</td>
-                <td><span class="status-pill status-active"><i class="fas fa-check" style="font-size: 10px;"></i> Selesai & Verified</span></td>
-                <td><a href="/admin/verification" class="link" style="font-weight:600;"><i class="fas fa-arrow-up-right-from-square" style="font-size: 11px;"></i> Buka Portal</a></td>
-              </tr>
-              <tr>
-                <td><strong>Material Upload Portal</strong> (Multi-Format & WebP)</td>
-                <td>Sprint 2</td>
-                <td><strong>Satrio</strong> (Tutor FE & QA)</td>
-                <td><span class="status-pill status-active"><i class="fas fa-check" style="font-size: 10px;"></i> Selesai & Verified</span></td>
-                <td><a href="/tutor/materials" class="link" style="font-weight:600;"><i class="fas fa-arrow-up-right-from-square" style="font-size: 11px;"></i> Buka Portal</a></td>
-              </tr>
-              <tr>
-                <td><strong>Setup 19 Tabel Relasional & JWT Auth</strong></td>
-                <td>Sprint 1</td>
-                <td>Arjuna (PM & Lead BE)</td>
-                <td><span class="status-pill status-active"><i class="fas fa-check" style="font-size: 10px;"></i> 100% Synced</span></td>
-                <td><code style="font-family:var(--font-mono); font-size:12px;">MySQL 3306</code></td>
-              </tr>
-              <tr>
-                <td><strong>Media Storage Service & HTTP Streaming</strong></td>
-                <td>Sprint 2</td>
-                <td>Arjuna (PM & Lead BE)</td>
-                <td><span class="status-pill status-active"><i class="fas fa-check" style="font-size: 10px;"></i> Aktif</span></td>
-                <td><code style="font-family:var(--font-mono); font-size:12px;">/api/media</code></td>
-              </tr>
-              <tr>
-                <td><strong>Auth & Profile Pages Claude Theme</strong></td>
-                <td>Sprint 1</td>
-                <td>Fadiyah (Student FE)</td>
-                <td><span class="status-pill status-active"><i class="fas fa-check" style="font-size: 10px;"></i> Aktif</span></td>
-                <td><a href="/login" class="link" style="font-weight:600;"><i class="fas fa-arrow-up-right-from-square" style="font-size: 11px;"></i> Login Page</a></td>
-              </tr>
-            </tbody>
-          </table>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:14px;">
+          <div style="background:var(--bg-surface-subtle); border:1px solid var(--border-subtle); border-radius:var(--radius-md); padding:14px;">
+            <div style="font-size:11px; color:var(--text-secondary); text-transform:uppercase; font-weight:600; margin-bottom:4px;">Saldo Dompet Virtual</div>
+            <div style="font-size:20px; font-weight:700; color:var(--text-primary);" id="tutor-wallet-balance">Rp 0</div>
+            <div style="font-size:11px; color:var(--text-tertiary); margin-top:2px;">Bagi Hasil 80% Tutor</div>
+          </div>
+          <div style="background:var(--bg-surface-subtle); border:1px solid var(--border-subtle); border-radius:var(--radius-md); padding:14px;">
+            <div style="font-size:11px; color:var(--text-secondary); text-transform:uppercase; font-weight:600; margin-bottom:4px;">Holding Period</div>
+            <div style="font-size:20px; font-weight:700; color:var(--text-primary);">7 Hari</div>
+            <div style="font-size:11px; color:var(--text-tertiary); margin-top:2px;">Mitigasi Refund / Dispute</div>
+          </div>
+          <div style="background:var(--bg-surface-subtle); border:1px solid var(--border-subtle); border-radius:var(--radius-md); padding:14px;">
+            <div style="font-size:11px; color:var(--text-secondary); text-transform:uppercase; font-weight:600; margin-bottom:4px;">Min. Penarikan Dana</div>
+            <div style="font-size:20px; font-weight:700; color:var(--text-primary);">Rp 100.000</div>
+            <div style="font-size:11px; color:var(--text-tertiary); margin-top:2px;">Transfer Rekening Bank</div>
+          </div>
         </div>
-      </section>
+      </div>
+
+      <!-- 2-Column Student Dashboard Layout -->
+      <div class="dashboard-grid-layout">
+        
+        <!-- Left Sidebar Column: Profil, Streak, Referral -->
+        <aside class="sidebar-widgets-column">
+          
+          <!-- Kelengkapan Profil Card -->
+          <div class="profile-hero-card">
+            <div class="circular-progress-box" id="profile-percent-badge">
+              80%
+            </div>
+            <div>
+              <h3 class="profile-card-title">Kelengkapan Profil Anda</h3>
+              <p class="profile-card-desc">
+                Dengan melengkapi preferensi belajar, Anda dapat menikmati rekomendasi kurikulum adaptif AI secara maksimal.
+              </p>
+            </div>
+            <a href="/dashboard/onboarding" class="profile-card-cta">
+              Lengkapi / Ubah Preferensi <i class="fas fa-arrow-right" style="font-size:11px;"></i>
+            </a>
+          </div>
+
+          <!-- Runtutan Belajar (Streak) Widget -->
+          <div class="widget-card">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+              <span style="font-size:14px; font-weight:600; color:var(--text-primary); display:flex; align-items:center; gap:8px;">
+                <i class="fas fa-calendar-check" style="color:var(--text-secondary);"></i> Runtutan Belajar
+              </span>
+              <span style="font-size:12px; color:var(--text-secondary);">Streak Terlama: <strong>1</strong></span>
+            </div>
+            <p style="font-size:12px; color:var(--text-secondary); line-height:1.4; margin:0;">
+              Bukan cuma angka, streak bantu Anda membangun kebiasaan belajar yang solid dan berkelanjutan.
+            </p>
+
+            <div class="streak-day-row">
+              <div class="streak-day-item">
+                <div class="streak-circle active"><i class="fas fa-bolt"></i></div>
+                <span>Sen</span>
+              </div>
+              <div class="streak-day-item">
+                <div class="streak-circle"><i class="fas fa-bolt"></i></div>
+                <span>Sel</span>
+              </div>
+              <div class="streak-day-item">
+                <div class="streak-circle"><i class="fas fa-bolt"></i></div>
+                <span>Rab</span>
+              </div>
+              <div class="streak-day-item">
+                <div class="streak-circle"><i class="fas fa-bolt"></i></div>
+                <span>Kam</span>
+              </div>
+              <div class="streak-day-item">
+                <div class="streak-circle"><i class="fas fa-bolt"></i></div>
+                <span>Jum</span>
+              </div>
+              <div class="streak-day-item">
+                <div class="streak-circle"><i class="fas fa-bolt"></i></div>
+                <span>Sab</span>
+              </div>
+              <div class="streak-day-item">
+                <div class="streak-circle"><i class="fas fa-bolt"></i></div>
+                <span>Min</span>
+              </div>
+            </div>
+
+            <div style="border-top:1px solid var(--border-subtle); padding-top:14px; margin-top:12px;">
+              <div style="font-size:13px; font-weight:600; color:var(--text-primary); margin-bottom:4px;">Daily Check-in</div>
+              <p style="font-size:12px; color:var(--text-secondary); line-height:1.4; margin-bottom:10px;">
+                Check-in rutin menciptakan ritme belajar yang teratur sehingga membuat Anda lebih konsisten dan terarah.
+              </p>
+              <button class="btn btn-outline" style="width:100%; font-size:12px; padding:7px 12px;" onclick="handleDailyCheckin(this)">
+                <i class="fas fa-check" style="margin-right:6px;"></i> Mulai isi check-in
+              </button>
+            </div>
+          </div>
+
+          <!-- Subscription Referral Widget -->
+          <div class="widget-card">
+            <div style="font-size:14px; font-weight:600; color:var(--text-primary); margin-bottom:6px; display:flex; align-items:center; gap:8px;">
+              <i class="fas fa-gift" style="color:var(--text-secondary);"></i> Program Referral Belajar
+            </div>
+            <p style="font-size:12px; color:var(--text-secondary); line-height:1.4; margin-bottom:14px;">
+              Yuk, ajak rekan belajar Anda ke SkillSphere AI dan dapatkan voucher potongan langganan sebesar 20%!
+            </p>
+            <button class="btn btn-outline" style="width:100%; font-size:12px; padding:7px 12px;" onclick="copyReferralCode(this)">
+              <i class="fas fa-copy" style="margin-right:6px;"></i> Salin Kode Referral
+            </button>
+          </div>
+
+        </aside>
+
+        <!-- Right Main Column: Aktivitas Belajar & Rekomendasi Kursus -->
+        <section class="main-activities-column">
+          
+          <!-- Aktivitas Belajar (Sedang Dipelajari) -->
+          <div class="section-card" id="activities-section">
+            <div class="section-header-row">
+              <h2 class="section-title">
+                <i class="fas fa-book-open"></i> Aktivitas Belajar
+              </h2>
+              <span style="font-size:12px; color:var(--text-secondary);" id="active-courses-count-label">Memuat aktivitas...</span>
+            </div>
+
+            <div class="activity-course-list" id="activities-container">
+              <div style="text-align: center; padding: 24px; color: var(--text-secondary); font-size: 13px;">
+                <i class="fas fa-spinner fa-spin" style="margin-right: 8px;"></i> Memuat daftar kursus yang sedang Anda pelajari...
+              </div>
+            </div>
+          </div>
+
+          <!-- Aktivitas Lain & Eksplorasi -->
+          <div class="section-card">
+            <div class="section-header-row">
+              <h2 class="section-title">
+                <i class="fas fa-compass"></i> Aktivitas Lain & Eksplorasi
+              </h2>
+            </div>
+
+            <div class="sub-activities-grid">
+              <a href="#events" class="sub-activity-card">
+                <div style="font-size:18px; color:var(--text-primary);"><i class="fas fa-calendar-days"></i></div>
+                <div class="sub-activity-title">Telusuri event dari SkillSphere</div>
+                <div class="sub-activity-desc">Ikuti webinar teknologi terkini dan sesi bedah kode bersama instruktur ahli.</div>
+              </a>
+
+              <a href="#challenges" class="sub-activity-card">
+                <div style="font-size:18px; color:var(--text-primary);"><i class="fas fa-rocket"></i></div>
+                <div class="sub-activity-title">Telusuri tantangan & kuis AI</div>
+                <div class="sub-activity-desc">Uji pemahaman algoritma dan arsitektur sistem Anda dengan soal berbasis industri.</div>
+              </a>
+            </div>
+          </div>
+
+          <!-- Katalog Rekomendasi Kursus Terkini -->
+          <div class="section-card" id="courses-catalog-section">
+            <div class="section-header-row">
+              <h2 class="section-title">
+                <i class="fas fa-graduation-cap"></i> Rekomendasi Kursus Pilihan
+              </h2>
+              <a href="/courses" style="font-size:13px; font-weight:600; color:var(--text-primary); text-decoration:none;">
+                Lihat Semua <i class="fas fa-arrow-right" style="font-size:10px;"></i>
+              </a>
+            </div>
+
+            <div class="courses-catalog-grid" id="courses-container">
+              <!-- Dynamically populated from /api/courses -->
+              <div style="grid-column: 1 / -1; text-align: center; padding: 24px; color: var(--text-secondary); font-size: 13px;">
+                <i class="fas fa-spinner fa-spin" style="margin-right: 8px;"></i> Memuat rekomendasi kursus...
+              </div>
+            </div>
+          </div>
+
+        </section>
+
+      </div>
     </main>
 
     <!-- Footer -->
-    <footer class="login-footer" style="padding-bottom: 24px;">
-      <p>© 2026 SkillSphere AI — Dikembangkan oleh Tim CodeCrafters (Sprint 1 & Sprint 2: Satrio, Arjuna, Tegar, Fadiyah)</p>
+    <footer class="login-footer" style="padding-bottom: 24px; border-top:1px solid var(--border-subtle); padding-top:24px;">
+      <p>© 2026 SkillSphere AI — Platform Pembelajaran Cerdas & Kurikulum Adaptif.</p>
     </footer>
   </div>
 
+  <!-- Global Toast Notification -->
+  <div id="toast-container" style="position:fixed; bottom:24px; right:24px; z-index:9999; display:flex; flex-direction:column; gap:8px;"></div>
+
   <script>
-    // Theme Switcher Logic
+    // 1. Theme Switcher Logic
     const themeBtn = document.getElementById('theme-toggle-btn');
     const themeIconSun = document.getElementById('theme-icon-sun');
     const themeIconMoon = document.getElementById('theme-icon-moon');
@@ -506,12 +871,21 @@
       updateThemeUI(active);
     });
 
-    // Check Authentication & Load Profile
+    // 2. Check Authentication & Load Data
     const token = localStorage.getItem('skillsphere_access_token');
+    let currentUser = null;
+
     if (!token) {
       window.location.href = '/login';
     } else {
-      loadUserProfile(token);
+      initStudentDashboard(token);
+    }
+
+    async function initStudentDashboard(accessToken) {
+      await loadUserProfile(accessToken);
+      await loadStudentActivities(accessToken);
+      await loadCoursesCatalog();
+      initStreakAndCheckin();
     }
 
     async function loadUserProfile(accessToken) {
@@ -530,6 +904,7 @@
 
         const json = await res.json();
         const user = json.data;
+        currentUser = user;
 
         // Enforce completed onboarding for new students, allow tutors & admin directly
         const hasCompletedOnboarding = user.role === 'admin' || user.role === 'tutor' || 
@@ -543,22 +918,37 @@
         const initials = user.name ? user.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() : 'U';
         document.getElementById('nav-avatar').textContent = initials;
         document.getElementById('nav-user-name').textContent = user.name;
-        document.getElementById('nav-user-role').textContent = user.role;
+        
+        let roleDisplay = 'Siswa';
+        if (user.role === 'tutor') roleDisplay = 'Tutor';
+        if (user.role === 'admin') roleDisplay = 'Admin';
+        document.getElementById('nav-user-role').textContent = roleDisplay;
 
-        document.getElementById('welcome-heading').textContent = `Selamat datang kembali, ${user.name}`;
-        document.getElementById('stat-role').textContent = user.role.toUpperCase();
-        document.getElementById('stat-email').textContent = user.email;
+        // Dynamic Profile Completeness calculation
+        let percent = 30; // base account
+        if (user.profile) {
+          if (user.profile.bio) percent += 20;
+          if (user.profile.phone_number) percent += 15;
+          if (user.profile.career_goal) percent += 20;
+          if (user.profile.study_preferences) percent += 15;
+        }
+        percent = Math.min(percent, 100);
+        const percentBadge = document.getElementById('profile-percent-badge');
+        if (percentBadge) percentBadge.textContent = percent + '%';
 
-        if (user.role === 'tutor' && user.wallet) {
-          const formatted = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(user.wallet.balance);
-          document.getElementById('stat-wallet').textContent = formatted;
-          document.getElementById('stat-wallet-meta').textContent = `Holding: Rp ${Number(user.wallet.pending_balance).toLocaleString('id-ID')}`;
-        } else if (user.role === 'admin') {
-          document.getElementById('stat-wallet').textContent = '20% Platform';
-          document.getElementById('stat-wallet-meta').textContent = 'Hak Akses Penuh Sistem';
-        } else {
-          document.getElementById('stat-wallet').textContent = 'Siswa';
-          document.getElementById('stat-wallet-meta').textContent = 'Akses Materi & AI Assistant';
+        // Role-based banners
+        if (user.role === 'admin') {
+          const adminBanner = document.getElementById('admin-banner');
+          if (adminBanner) adminBanner.style.display = 'flex';
+        } else if (user.role === 'tutor') {
+          const tutorBanner = document.getElementById('tutor-banner');
+          if (tutorBanner) {
+            tutorBanner.style.display = 'block';
+            if (user.wallet) {
+              const formatted = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(user.wallet.balance);
+              document.getElementById('tutor-wallet-balance').textContent = formatted;
+            }
+          }
         }
 
       } catch (err) {
@@ -566,7 +956,238 @@
       }
     }
 
-    // Logout Logic
+    // 3. Load Dynamic Student Learning Activities
+    async function loadStudentActivities(accessToken) {
+      const container = document.getElementById('activities-container');
+      const countLabel = document.getElementById('active-courses-count-label');
+      try {
+        const res = await fetch('/api/courses/student/my-learning', {
+          headers: {
+            'Authorization': 'Bearer ' + accessToken,
+          },
+        });
+        const json = await res.json();
+        const enrollments = (json.success && Array.isArray(json.data)) ? json.data : [];
+
+        if (countLabel) {
+          countLabel.textContent = `${enrollments.length} Kursus Aktif`;
+        }
+
+        if (!enrollments.length) {
+          container.innerHTML = `
+            <div style="text-align:center; padding:32px 16px; background:var(--bg-surface-subtle); border-radius:var(--radius-md); border:1px dashed var(--border-subtle);">
+              <div style="font-size:32px; color:var(--text-secondary); margin-bottom:12px;">
+                <i class="fas fa-book-open-reader"></i>
+              </div>
+              <div style="font-size:15px; font-weight:600; color:var(--text-primary); margin-bottom:6px;">
+                Belum Ada Kursus yang Diikuti
+              </div>
+              <p style="font-size:13px; color:var(--text-secondary); max-width:440px; margin:0 auto 16px; line-height:1.5;">
+                Pilih kursus unggulan dari instruktur ahli di katalog rekomendasi bawah untuk memulai pembelajaran adaptif Anda.
+              </p>
+              <a href="#courses-catalog-section" class="btn btn-primary" style="font-size:12px; padding:8px 18px; text-decoration:none; display:inline-flex; align-items:center; gap:8px;">
+                <i class="fas fa-compass"></i> Telusuri Katalog Kursus
+              </a>
+            </div>
+          `;
+          return;
+        }
+
+        container.innerHTML = enrollments.map(en => {
+          const course = en.course || {};
+          const categoryName = course.category ? course.category.name : 'Umum';
+          const progress = Math.round(en.progress_percentage || 0);
+
+          let totalMaterials = 0;
+          if (course.sections) {
+            course.sections.forEach(s => {
+              if (s.materials) totalMaterials += s.materials.length;
+            });
+          }
+          const subtitle = totalMaterials > 0 ? `${totalMaterials} modul materi terstruktur` : (en.status === 'completed' ? 'Selesai 100%' : 'Sedang dipelajari');
+
+          return `
+            <div class="activity-course-item">
+              <div class="activity-info">
+                <div class="activity-badge-text">Sedang dipelajari • ${escapeHtml(categoryName)}</div>
+                <div class="activity-title">${escapeHtml(course.title || 'Kursus')}</div>
+                <div style="font-size:12px; color:var(--text-secondary); display:flex; justify-content:space-between; margin-bottom:6px;">
+                  <span>${subtitle}</span>
+                  <span style="font-weight:600;">${progress}%</span>
+                </div>
+                <div class="activity-progress-bar">
+                  <div class="activity-progress-fill" style="width:${progress}%;"></div>
+                </div>
+              </div>
+              <a href="/tutor/materials" class="btn-continue-learning">
+                Lanjutkan <i class="fas fa-arrow-right"></i>
+              </a>
+            </div>
+          `;
+        }).join('');
+
+      } catch (e) {
+        console.error('Failed to load student learning activities:', e);
+        container.innerHTML = `
+          <div style="text-align:center; padding:24px; color:var(--text-tertiary); font-size:13px;">
+            Gagal memuat aktivitas belajar. Silakan refresh halaman.
+          </div>
+        `;
+      }
+    }
+
+    // 4. Load Courses Catalog with Instant Enrollment
+    async function loadCoursesCatalog() {
+      const container = document.getElementById('courses-container');
+      try {
+        const res = await fetch('/api/courses?limit=6');
+        const json = await res.json();
+        const courses = (json.data && json.data.courses) ? json.data.courses : (Array.isArray(json.data) ? json.data : []);
+
+        if (!courses.length) {
+          container.innerHTML = `
+            <div style="grid-column: 1 / -1; text-align: center; padding: 24px; color: var(--text-tertiary); font-size: 13px;">
+              Belum ada kursus publik yang tersedia saat ini.
+            </div>
+          `;
+          return;
+        }
+
+        container.innerHTML = courses.map(c => `
+          <div class="course-card-mini">
+            <div class="course-mini-thumb">
+              <i class="fas fa-graduation-cap"></i>
+            </div>
+            <div class="course-mini-body">
+              <span class="user-role-tag" style="align-self:flex-start; margin-bottom:6px; font-size:9px;">
+                ${c.category ? escapeHtml(c.category.name) : 'Teknologi'}
+              </span>
+              <div class="course-mini-title">${escapeHtml(c.title)}</div>
+              <div class="course-mini-tutor"><i class="fas fa-chalkboard-user" style="font-size:11px; margin-right:4px;"></i> ${c.tutor ? escapeHtml(c.tutor.name) : 'Instruktur'}</div>
+              <div class="course-mini-footer" style="margin-top:10px;">
+                <span class="course-mini-price">Rp ${(c.price || 0).toLocaleString('id-ID')}</span>
+                <div style="display:flex; gap:6px;">
+                  <button class="btn btn-outline" style="font-size:11px; padding:4px 8px;" onclick="enrollInCourse(${c.id}, '${escapeHtml(c.title)}')">
+                    <i class="fas fa-plus"></i> Ikuti
+                  </button>
+                  <a href="/tutor/materials" style="font-size:11px; font-weight:600; color:var(--text-primary); text-decoration:none; display:flex; align-items:center; gap:4px;">
+                    Materi <i class="fas fa-arrow-right" style="font-size:9px;"></i>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        `).join('');
+      } catch (e) {
+        console.error('Failed to load courses catalog:', e);
+      }
+    }
+
+    // 5. Enroll in Course Action
+    async function enrollInCourse(courseId, courseTitle) {
+      if (!token) {
+        window.location.href = '/login';
+        return;
+      }
+      try {
+        const res = await fetch(`/api/courses/${courseId}/enroll`, {
+          method: 'POST',
+          headers: {
+            'Authorization': 'Bearer ' + token,
+            'Content-Type': 'application/json',
+          },
+        });
+        const json = await res.json();
+        if (res.ok && json.success) {
+          showToast(json.message || `Berhasil mendaftar kursus "${courseTitle}"!`, 'success');
+          loadStudentActivities(token);
+        } else {
+          showToast(json.message || 'Gagal mendaftar kursus.', 'error');
+        }
+      } catch (e) {
+        showToast('Kesalahan jaringan saat mendaftar.', 'error');
+      }
+    }
+
+    // 6. Dynamic Daily Streak & Check-in
+    function initStreakAndCheckin() {
+      const today = new Date();
+      const dayIndex = (today.getDay() + 6) % 7; // Mon=0, Sun=6
+      const streakCircles = document.querySelectorAll('.streak-day-row .streak-day-item .streak-circle');
+      
+      streakCircles.forEach((circle, idx) => {
+        if (idx <= dayIndex) {
+          circle.classList.add('active');
+        } else {
+          circle.classList.remove('active');
+        }
+      });
+
+      const todayKey = 'skillsphere_checkin_' + (today.toISOString().split('T')[0]);
+      const hasCheckedIn = localStorage.getItem(todayKey);
+      const checkinBtn = document.querySelector('button[onclick*="handleDailyCheckin"]');
+      if (hasCheckedIn && checkinBtn) {
+        checkinBtn.innerHTML = '<i class="fas fa-circle-check" style="margin-right:6px; color:var(--color-success);"></i> Sudah Check-in Hari Ini';
+        checkinBtn.disabled = true;
+      }
+    }
+
+    function handleDailyCheckin(btn) {
+      const today = new Date();
+      const todayKey = 'skillsphere_checkin_' + (today.toISOString().split('T')[0]);
+      localStorage.setItem(todayKey, 'true');
+      btn.innerHTML = '<i class="fas fa-circle-check" style="margin-right:6px; color:var(--color-success);"></i> Berhasil Check-in!';
+      btn.disabled = true;
+      showToast('Check-in harian berhasil! Streak belajar Anda bertambah +1.', 'success');
+    }
+
+    function copyReferralCode(btn) {
+      navigator.clipboard.writeText('SKILLSPHERE-BELAJAR-2026');
+      btn.innerHTML = '<i class="fas fa-check" style="margin-right:6px; color:var(--color-success);"></i> Kode Tersalin!';
+      showToast('Kode referral berhasil disalin ke papan klip!', 'success');
+      setTimeout(() => {
+        btn.innerHTML = '<i class="fas fa-copy" style="margin-right:6px;"></i> Salin Kode Referral';
+      }, 2000);
+    }
+
+    function showToast(message, type = 'success') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.style.cssText = `
+        background: var(--bg-surface);
+        color: var(--text-primary);
+        padding: 12px 18px;
+        border-radius: var(--radius-md);
+        border: 1px solid ${type === 'error' ? 'var(--color-danger, #ef4444)' : 'var(--border-subtle)'};
+        box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        font-size: 13px;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        animation: slideIn 0.2s ease-out;
+      `;
+      const icon = type === 'error' ? '<i class="fas fa-circle-exclamation" style="color:var(--color-danger,#ef4444);"></i>' : '<i class="fas fa-circle-check" style="color:var(--color-success,#10b981);"></i>';
+      toast.innerHTML = `${icon} <span>${escapeHtml(message)}</span>`;
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transition = 'opacity 0.3s ease';
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    // 7. Logout Logic
     document.getElementById('logout-btn').addEventListener('click', async () => {
       const accessToken = localStorage.getItem('skillsphere_access_token');
       try {
@@ -585,6 +1206,7 @@
       localStorage.removeItem('skillsphere_user');
       window.location.href = '/login';
     });
+
   </script>
   <!-- PWA Service Worker & Install Prompt Banner -->
   <script src="/javascripts/pwa-installer.js"></script>

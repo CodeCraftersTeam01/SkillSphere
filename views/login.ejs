@@ -884,10 +884,19 @@
             saveAccountLocally(result.data.user, password);
           }
 
-          const hasCompletedOnboarding = result.data.user.role === 'admin' || 
+          const userRole = result.data.user ? result.data.user.role : 'student';
+          const hasCompletedOnboarding = userRole === 'admin' || userRole === 'tutor' || 
             (result.data.user && result.data.user.profile && result.data.user.profile.study_preferences && result.data.user.profile.study_preferences.onboarding_completed);
 
-          if (!hasCompletedOnboarding || result.data.requires_onboarding) {
+          let targetUrl = '/dashboard';
+          if (userRole === 'admin') {
+            targetUrl = '/admin';
+            showAlert('success', 'Login berhasil! Mengalihkan ke Admin Portal...');
+          } else if (userRole === 'tutor') {
+            targetUrl = '/dashboard';
+            showAlert('success', 'Login berhasil! Menyiapkan Studio Tutor...');
+          } else if (!hasCompletedOnboarding || result.data.requires_onboarding) {
+            targetUrl = '/dashboard/onboarding';
             showAlert('success', 'Login berhasil! Mengalihkan ke formulir personalisasi...');
           } else {
             showAlert('success', 'Login berhasil! Menyiapkan ruang belajar...');
@@ -903,11 +912,7 @@
           }
 
           setTimeout(() => {
-            if (!hasCompletedOnboarding || result.data.requires_onboarding) {
-              window.location.href = '/dashboard/onboarding';
-            } else {
-              window.location.href = '/dashboard';
-            }
+            window.location.href = targetUrl;
           }, 350);
         } else {
           showAlert('danger', result.message || 'Login gagal. Periksa kembali email dan password Anda.');
@@ -1090,15 +1095,21 @@
 
             saveAccountLocally(result.data.user, activeLoginPassword);
 
-            const hasCompletedOnboarding = result.data.user.role === 'admin' || 
+            const userRole = result.data.user ? result.data.user.role : 'student';
+            const hasCompletedOnboarding = userRole === 'admin' || userRole === 'tutor' || 
               (result.data.user && result.data.user.profile && result.data.user.profile.study_preferences && result.data.user.profile.study_preferences.onboarding_completed);
 
+            let targetUrl = '/dashboard';
+            if (userRole === 'admin') {
+              targetUrl = '/admin';
+            } else if (userRole === 'tutor') {
+              targetUrl = '/dashboard';
+            } else if (!hasCompletedOnboarding || result.data.requires_onboarding) {
+              targetUrl = '/dashboard/onboarding';
+            }
+
             setTimeout(() => {
-              if (!hasCompletedOnboarding) {
-                window.location.href = '/dashboard/onboarding';
-              } else {
-                window.location.href = '/dashboard';
-              }
+              window.location.href = targetUrl;
             }, 900);
           }, 350);
         } else {
