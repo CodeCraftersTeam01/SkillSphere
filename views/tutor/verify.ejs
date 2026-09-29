@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title || 'Verifikasi Pengajar | SkillSphere AI' %></title>
+  <meta name="description" content="Formulir pengajuan verifikasi instruktur dan pengajar resmi SkillSphere AI.">
+  
+  <!-- PWA Manifest & App Icons -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#1F1E1B">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  
+  <!-- Google Fonts: Newsreader (Editorial Serif) & Plus Jakarta Sans (Modern Sans) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome 6 Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Claude Design System Stylesheet -->
+  <link rel="stylesheet" href="/stylesheets/claude-theme.css?v=2.0">
+
+  <style>
+    .verify-page-layout {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background-color: var(--bg-app);
+    }
+
+    .verify-navbar {
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 14px 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .gform-container {
+      max-width: 700px;
+      width: 100%;
+      margin: 28px auto 60px;
+      padding: 0 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* Google Forms Header Section Card */
+    .gform-header-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      position: relative;
+    }
+
+    .gform-header-accent-bar {
+      height: 10px;
+      background: var(--accent-primary);
+      width: 100%;
+    }
+
+    .gform-header-body {
+      padding: 26px 28px 22px;
+    }
+
+    .gform-title {
+      font-family: var(--font-serif);
+      font-size: 28px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin: 0 0 10px;
+      line-height: 1.25;
+    }
+
+    .gform-description {
+      font-size: 13.5px;
+      color: var(--text-secondary);
+      line-height: 1.55;
+      margin: 0 0 14px;
+    }
+
+    .gform-required-note {
+      font-size: 12.5px;
+      color: var(--color-danger, #ef4444);
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      border-top: 1px solid var(--border-subtle);
+      padding-top: 14px;
+      margin-top: 10px;
+    }
+
+    /* Status Banner Block */
+    .status-notice-box {
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 14px 18px;
+      margin-bottom: 16px;
+      display: none;
+      align-items: flex-start;
+      gap: 12px;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .status-notice-box.status-pending {
+      background: rgba(245, 158, 11, 0.08);
+      border-color: rgba(245, 158, 11, 0.25);
+      color: var(--text-primary);
+    }
+
+    .status-notice-box.status-rejected {
+      background: rgba(239, 68, 68, 0.08);
+      border-color: rgba(239, 68, 68, 0.25);
+      color: var(--text-primary);
+    }
+
+    .status-notice-box.status-approved {
+      background: rgba(16, 185, 129, 0.08);
+      border-color: rgba(16, 185, 129, 0.25);
+      color: var(--text-primary);
+    }
+
+    /* Google Forms Section Card */
+    .gform-section-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-xl);
+      padding: 24px 28px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .gform-section-card:focus-within {
+      border-color: var(--accent-primary);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+    }
+
+    .gform-section-header {
+      border-bottom: 1px solid var(--border-subtle);
+      padding-bottom: 12px;
+      margin-bottom: 4px;
+    }
+
+    .gform-section-title {
+      font-family: var(--font-serif);
+      font-size: 19px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin: 0 0 4px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .gform-section-desc {
+      font-size: 12.5px;
+      color: var(--text-secondary);
+      margin: 0;
+    }
+
+    /* Question Item inside Section */
+    .gform-question-item {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .gform-question-label {
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--text-primary);
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
+    }
+
+    .gform-question-label .req-star {
+      color: var(--color-danger, #ef4444);
+      font-size: 14px;
+    }
+
+    .gform-question-hint {
+      font-size: 12px;
+      color: var(--text-tertiary);
+      margin-top: -4px;
+    }
+
+    .gform-input {
+      background: var(--bg-surface-subtle);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 11px 14px;
+      font-size: 13.5px;
+      color: var(--text-primary);
+      font-family: inherit;
+      outline: none;
+      transition: all 0.15s ease;
+    }
+
+    .gform-input:focus {
+      border-color: var(--accent-primary);
+      background: var(--bg-surface);
+      box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05);
+    }
+
+    [data-theme="dark"] .gform-input:focus {
+      box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.06);
+    }
+
+    .gform-grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    /* Footer Action Bar */
+    .gform-footer-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 12px 4px 24px;
+      flex-wrap: wrap;
+    }
+
+    .gform-brand-note {
+      text-align: center;
+      font-size: 12px;
+      color: var(--text-tertiary);
+      margin-top: 10px;
+    }
+
+    @media (max-width: 640px) {
+      .gform-header-body {
+        padding: 20px;
+      }
+      .gform-section-card {
+        padding: 20px;
+      }
+      .gform-grid-2 {
+        grid-template-columns: 1fr;
+      }
+      .gform-footer-bar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .gform-footer-bar .btn {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  </style>
+
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('skillsphere_theme') || 
+        (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    })();
+  </script>
+</head>
+<body>
+
+  <div class="verify-page-layout">
+    <!-- Clean Minimalist Header -->
+    <header class="verify-navbar">
+      <div style="display:flex; align-items:center; gap:14px;">
+        <a href="/dashboard" class="brand-logo" style="text-decoration:none;">
+          <div class="brand-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+              <path opacity="0.38" d="M12 7.6L17.3 4.7L14.4 10L17.3 15.3L12 12.4L6.7 15.3L9.6 10L6.7 4.7Z" />
+              <path d="M12 0L13.8 8.2L22 10L13.8 11.8L12 20L10.2 11.8L2 10L10.2 8.2L12 0Z" />
+            </svg>
+          </div>
+          <span>SkillSphere AI</span>
+        </a>
+      </div>
+
+      <div style="display:flex; align-items:center; gap:12px;">
+        <!-- Back Button -->
+        <a href="/dashboard" class="btn btn-outline btn-sm" style="font-size:12.5px; padding:6px 14px; text-decoration:none;">
+          <i class="fas fa-arrow-left" style="margin-right:6px;"></i> Kembali ke Dashboard
+        </a>
+
+        <!-- Theme Toggle -->
+        <button class="theme-toggle-btn" id="theme-toggle-btn" type="button" aria-label="Toggle theme">
+          <i class="fas fa-sun" id="theme-icon-sun" style="display:none;"></i>
+          <i class="fas fa-moon" id="theme-icon-moon"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- Google Forms Style Multi-Section Container -->
+    <main class="gform-container">
+      
+      <!-- 0. Form Header Card -->
+      <div class="gform-header-card">
+        <div class="gform-header-accent-bar"></div>
+        <div class="gform-header-body">
+          <h1 class="gform-title">Formulir Verifikasi Pengajar</h1>
+          <p class="gform-description">
+            Lengkapi data kualifikasi dan portofolio resmi Anda. Tim Administrator SkillSphere AI akan meninjau berkas Anda sebelum memberikan akses penuh ke Studio Pengajar & Portal Kurikulum.
+          </p>
+
+          <!-- Live Status Notice Box -->
+          <div class="status-notice-box" id="status-notice-box">
+            <div id="status-notice-icon" style="font-size:16px; margin-top:2px;"></div>
+            <div>
+              <div id="status-notice-title" style="font-weight:600; margin-bottom:2px;"></div>
+              <div id="status-notice-desc" style="color:var(--text-secondary); font-size:12.5px;"></div>
+            </div>
+          </div>
+
+          <div class="gform-required-note">
+            <span>* Menunjukkan pertanyaan yang wajib diisi</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Verification Form Form Element (Sections inside) -->
+      <form id="tutor-verification-form" style="display:flex; flex-direction:column; gap:16px;">
+        
+        <!-- Section 1: Profil Akademik & Pengalaman -->
+        <div class="gform-section-card">
+          <div class="gform-section-header">
+            <h2 class="gform-section-title">
+              <i class="fas fa-user-graduate" style="font-size:17px; color:var(--text-secondary);"></i>
+              <span>1. Profil Akademik & Pengalaman</span>
+            </h2>
+            <p class="gform-section-desc">Informasi institusi atau perusahaan tempat Anda beraktivitas dan durasi pengalaman mengajar/industri.</p>
+          </div>
+
+          <div class="gform-question-item">
+            <label class="gform-question-label" for="institution_name">
+              Institusi / Universitas / Lembaga <span class="req-star">*</span>
+            </label>
+            <span class="gform-question-hint">Nama universitas, politeknik, perusahaan, atau instansi Anda saat ini.</span>
+            <input type="text" id="institution_name" name="institution_name" class="gform-input" placeholder="Contoh: Institut Teknologi Bandung / Tech Lead di PT Teknologi" required />
+          </div>
+
+          <div class="gform-question-item">
+            <label class="gform-question-label" for="experience_years">
+              Pengalaman Mengajar / Industri (Tahun) <span class="req-star">*</span>
+            </label>
+            <span class="gform-question-hint">Jumlah tahun pengalaman profesional di bidang yang relevan.</span>
+            <input type="number" id="experience_years" name="experience_years" class="gform-input" min="0" max="50" placeholder="Contoh: 3" required />
+          </div>
+        </div>
+
+        <!-- Section 2: Berkas & Portofolio Resmi -->
+        <div class="gform-section-card">
+          <div class="gform-section-header">
+            <h2 class="gform-section-title">
+              <i class="fas fa-file-contract" style="font-size:17px; color:var(--text-secondary);"></i>
+              <span>2. Berkas & Portofolio Resmi</span>
+            </h2>
+            <p class="gform-section-desc">Cantumkan tautan penyimpanan cloud (Google Drive, Dropbox) atau link publik yang dapat diakses tim kurator.</p>
+          </div>
+
+          <div class="gform-question-item">
+            <label class="gform-question-label" for="cv_url">
+              Tautan Berkas CV / Resume <span class="req-star">*</span>
+            </label>
+            <span class="gform-question-hint">Pastikan izin akses Google Drive diatur ke "Siapa saja yang memiliki tautan".</span>
+            <input type="url" id="cv_url" name="cv_url" class="gform-input" placeholder="https://drive.google.com/... atau tautan berkas PDF" required />
+          </div>
+
+          <div class="gform-grid-2">
+            <div class="gform-question-item">
+              <label class="gform-question-label" for="portfolio_url">
+                Tautan Portofolio / Repositori Proyek
+              </label>
+              <input type="url" id="portfolio_url" name="portfolio_url" class="gform-input" placeholder="https://github.com/... atau tautan situs" />
+            </div>
+
+            <div class="gform-question-item">
+              <label class="gform-question-label" for="certificate_document_url">
+                Tautan Sertifikasi Keahlian
+              </label>
+              <input type="url" id="certificate_document_url" name="certificate_document_url" class="gform-input" placeholder="https://..." />
+            </div>
+          </div>
+
+          <div class="gform-question-item">
+            <label class="gform-question-label" for="linkedin_url">
+              Tautan Profil LinkedIn
+            </label>
+            <input type="url" id="linkedin_url" name="linkedin_url" class="gform-input" placeholder="https://linkedin.com/in/..." />
+          </div>
+        </div>
+
+        <!-- Section 3: Motivasi & Spesialisasi Kurikulum -->
+        <div class="gform-section-card">
+          <div class="gform-section-header">
+            <h2 class="gform-section-title">
+              <i class="fas fa-chalkboard" style="font-size:17px; color:var(--text-secondary);"></i>
+              <span>3. Motivasi & Spesialisasi Kurikulum</span>
+            </h2>
+            <p class="gform-section-desc">Jelaskan rencana materi, metodologi pengajaran, dan target capaian kurikulum yang ingin Anda bangun.</p>
+          </div>
+
+          <div class="gform-question-item">
+            <label class="gform-question-label" for="motivation_letter">
+              Deskripsi Keahlian & Materi yang Ingin Diajarkan
+            </label>
+            <span class="gform-question-hint">Tuliskan spesialisasi teknologi dan kurikulum yang ingin Anda kembangkan di platform SkillSphere AI.</span>
+            <textarea id="motivation_letter" name="motivation_letter" class="gform-input" rows="4" placeholder="Tuliskan spesialisasi keahlian Anda, misalnya: Machine Learning Dasar, Fullstack Javascript, Cloud Kubernetes..."></textarea>
+          </div>
+        </div>
+
+        <!-- Footer Actions Bar -->
+        <div class="gform-footer-bar">
+          <button type="submit" class="btn btn-primary" id="submit-verify-btn" style="padding:10px 24px; font-size:13.5px;">
+            <i class="fas fa-paper-plane" style="margin-right:8px;"></i>
+            <span id="submit-btn-label">Kirim Pengajuan Verifikasi</span>
+          </button>
+
+          <div style="display:flex; align-items:center; gap:12px;">
+            <button type="button" class="btn btn-outline" onclick="document.getElementById('tutor-verification-form').reset()" style="font-size:13px; padding:9px 16px;">
+              Kosongkan Formulir
+            </button>
+            <a href="/dashboard" class="btn btn-outline" style="text-decoration:none; font-size:13px; padding:9px 16px;">
+              Kembali
+            </a>
+          </div>
+        </div>
+
+      </form>
+
+      <div class="gform-brand-note">
+        Formulir verifikasi resmi pengajar • SkillSphere AI
+      </div>
+
+    </main>
+  </div>
+
+  <div id="toast-container" style="position:fixed; bottom:24px; right:24px; z-index:9999;"></div>
+
+  <script>
+    // Theme Management
+    const themeBtn = document.getElementById('theme-toggle-btn');
+    const themeIconSun = document.getElementById('theme-icon-sun');
+    const themeIconMoon = document.getElementById('theme-icon-moon');
+
+    function updateThemeUI(theme) {
+      if (theme === 'dark') {
+        themeIconSun.style.display = 'inline-block';
+        themeIconMoon.style.display = 'none';
+      } else {
+        themeIconSun.style.display = 'none';
+        themeIconMoon.style.display = 'inline-block';
+      }
+    }
+
+    const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+    updateThemeUI(currentTheme);
+
+    themeBtn.addEventListener('click', () => {
+      const active = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', active);
+      localStorage.setItem('skillsphere_theme', active);
+      updateThemeUI(active);
+    });
+
+    // Auth & Form Logic
+    const token = localStorage.getItem('skillsphere_access_token');
+    if (!token) {
+      window.location.href = '/login';
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadCurrentApplication();
+    });
+
+    async function loadCurrentApplication() {
+      try {
+        const res = await fetch('/api/auth/me', {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        const json = await res.json();
+        if (json.success && json.data) {
+          const user = json.data;
+          const apps = Array.isArray(user.tutor_applications) ? user.tutor_applications : [];
+          const latestApp = apps.length > 0 ? apps[apps.length - 1] : null;
+
+          const noticeBox = document.getElementById('status-notice-box');
+          const noticeIcon = document.getElementById('status-notice-icon');
+          const noticeTitle = document.getElementById('status-notice-title');
+          const noticeDesc = document.getElementById('status-notice-desc');
+          const submitBtnLabel = document.getElementById('submit-btn-label');
+
+          if (latestApp) {
+            // Pre-fill form fields
+            document.getElementById('institution_name').value = latestApp.institution_name || '';
+            document.getElementById('experience_years').value = latestApp.experience_years || 0;
+            document.getElementById('cv_url').value = latestApp.cv_url || '';
+            document.getElementById('portfolio_url').value = latestApp.portfolio_url || '';
+            document.getElementById('certificate_document_url').value = latestApp.certificate_document_url || '';
+            document.getElementById('linkedin_url').value = latestApp.linkedin_url || '';
+            if (user.profile && user.profile.bio) {
+              document.getElementById('motivation_letter').value = user.profile.bio;
+            }
+
+            if (latestApp.status === 'approved' && user.role === 'tutor') {
+              noticeBox.className = 'status-notice-box status-approved';
+              noticeBox.style.display = 'flex';
+              noticeIcon.innerHTML = '<i class="fas fa-circle-check" style="color:var(--color-success,#10b981);"></i>';
+              noticeTitle.textContent = 'Akun Pengajar Anda Telah Terverifikasi';
+              noticeDesc.textContent = 'Berkas Anda telah disetujui resmi oleh Administrator. Anda memiliki akses penuh ke Studio Pengajar & Portal Materi.';
+              submitBtnLabel.textContent = 'Perbarui Data Profil';
+            } else if (latestApp.status === 'pending') {
+              noticeBox.className = 'status-notice-box status-pending';
+              noticeBox.style.display = 'flex';
+              noticeIcon.innerHTML = '<i class="fas fa-hourglass-half" style="color:#D97706;"></i>';
+              noticeTitle.textContent = 'Pendaftaran Sedang Ditinjau Administrator';
+              const appDate = latestApp.createdAt ? new Date(latestApp.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : 'Baru saja';
+              noticeDesc.textContent = `Pengajuan diajukan pada ${appDate}. Anda tetap dapat memperbarui tautan berkas di bawah ini jika terdapat perubahan.`;
+              submitBtnLabel.textContent = 'Simpan & Perbarui Pengajuan';
+            } else if (latestApp.status === 'rejected') {
+              noticeBox.className = 'status-notice-box status-rejected';
+              noticeBox.style.display = 'flex';
+              noticeIcon.innerHTML = '<i class="fas fa-circle-exclamation" style="color:#DC2626;"></i>';
+              noticeTitle.textContent = 'Pendaftaran Memerlukan Revisi';
+              noticeDesc.textContent = `Catatan Administrator: ${escapeHtml(latestApp.rejection_reason || 'Berkas belum memenuhi standar kurikulum.')}`;
+              submitBtnLabel.textContent = 'Kirim Ulang Verifikasi';
+            }
+          }
+        }
+      } catch (err) {
+        console.error('Error loading current tutor application:', err);
+      }
+    }
+
+    // Submit Handler
+    document.getElementById('tutor-verification-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const submitBtn = document.getElementById('submit-verify-btn');
+      const originalHtml = submitBtn.innerHTML;
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-right:6px;"></i> Menyimpan...';
+
+      const payload = {
+        institution_name: document.getElementById('institution_name').value.trim(),
+        experience_years: parseInt(document.getElementById('experience_years').value) || 0,
+        cv_url: document.getElementById('cv_url').value.trim(),
+        portfolio_url: document.getElementById('portfolio_url').value.trim(),
+        certificate_document_url: document.getElementById('certificate_document_url').value.trim(),
+        linkedin_url: document.getElementById('linkedin_url').value.trim(),
+        motivation_letter: document.getElementById('motivation_letter').value.trim(),
+      };
+
+      try {
+        const res = await fetch('/api/auth/apply-tutor', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token,
+          },
+          body: JSON.stringify(payload),
+        });
+
+        const json = await res.json();
+        if (json.success) {
+          showToast('Pengajuan verifikasi berhasil dikirim! Tim Admin akan segera meninjau berkas Anda.', 'success');
+          setTimeout(() => {
+            window.location.href = '/dashboard';
+          }, 1200);
+        } else {
+          showToast(json.message || 'Gagal mengirim formulir verifikasi.', 'error');
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = originalHtml;
+        }
+      } catch (err) {
+        console.error('Error submitting form:', err);
+        showToast('Kesalahan koneksi saat mengirim formulir.', 'error');
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalHtml;
+      }
+    });
+
+    function showToast(message, type = 'success') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.style.cssText = `
+        background: var(--bg-surface);
+        color: var(--text-primary);
+        padding: 12px 18px;
+        border-radius: var(--radius-md);
+        border: 1px solid ${type === 'error' ? '#EF4444' : 'var(--border-subtle)'};
+        box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        font-size: 13px;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        animation: slideIn 0.2s ease-out;
+      `;
+      const icon = type === 'error' ? '<i class="fas fa-circle-exclamation" style="color:#EF4444;"></i>' : '<i class="fas fa-circle-check" style="color:#10B981;"></i>';
+      toast.innerHTML = `${icon} <span>${escapeHtml(message)}</span>`;
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transition = 'opacity 0.3s ease';
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+  </script>
+</body>
+</html>

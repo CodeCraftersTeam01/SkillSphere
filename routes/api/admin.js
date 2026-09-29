@@ -15,6 +15,7 @@ router.get('/tutor-applications', adminController.getTutorApplications);
 router.get('/tutor-applications/:id', adminController.getTutorApplicationById);
 router.put('/tutor-applications/:id/approve', invalidateCacheMiddleware(['cache:/api/admin*', 'cache:/api/courses*']), adminController.approveTutorApplication);
 router.put('/tutor-applications/:id/reject', invalidateCacheMiddleware(['cache:/api/admin*']), adminController.rejectTutorApplication);
+router.put('/tutor-applications/:id/reset', invalidateCacheMiddleware(['cache:/api/admin*']), adminController.resetTutorApplication);
 
 // Tutor Certifications Validation
 router.get('/tutor-certifications', adminController.getTutorCertifications);
@@ -23,5 +24,10 @@ router.put('/tutor-certifications/:id/unverify', invalidateCacheMiddleware(['cac
 
 // Financial & Revenue Sharing Overview
 router.get('/financial', adminController.getFinancialData);
+
+// Courses Management & Approval / Suspension (Sprint 1/2 Admin)
+router.get('/courses', adminController.getAllCourses);
+router.put('/courses/:id/approve', invalidateCacheMiddleware(['cache:/api/admin*', 'cache:/api/courses*']), adminController.approveCourse);
+router.put('/courses/:id/suspend', invalidateCacheMiddleware(['cache:/api/admin*', 'cache:/api/courses*']), adminController.suspendCourse);
 
 module.exports = router;

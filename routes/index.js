@@ -31,6 +31,11 @@ router.get('/dashboard', function(req, res, next) {
   res.render('dashboard', { title: 'Dashboard | SkillSphere AI' });
 });
 
+/* GET cinematic warp transition page */
+router.get('/warp', function(req, res, next) {
+  res.render('warp', { title: 'Memasuki Ruang Belajar | SkillSphere AI' });
+});
+
 /* GET Admin Dashboard & Verification UI (Sprint 1 - Satrio) */
 router.get(['/admin', '/admin/dashboard', '/admin/verification'], function(req, res, next) {
   res.render('admin/verification', { title: 'Dashboard Admin & Verifikasi Pengajar | SkillSphere AI' });
@@ -39,6 +44,11 @@ router.get(['/admin', '/admin/dashboard', '/admin/verification'], function(req, 
 /* GET Tutor Material Upload & Management Portal (Sprint 2 - Satrio) */
 router.get('/tutor/materials', function(req, res, next) {
   res.render('tutor/materials', { title: 'Portal Manajemen & Upload Materi | Tutor SkillSphere' });
+});
+
+/* GET Standalone Tutor Verification Form Page */
+router.get(['/tutor/verify', '/tutor/verification', '/dashboard/tutor-verify'], function(req, res, next) {
+  res.render('tutor/verify', { title: 'Verifikasi Akun Pengajar | SkillSphere AI' });
 });
 
 /* GET Terms of Service page */
