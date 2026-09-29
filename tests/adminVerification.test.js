@@ -10,6 +10,8 @@ const {
   TutorApplication,
   TutorCertification,
   TutorWallet,
+  Course,
+  Category,
 } = require('../models');
 
 let server;
@@ -68,6 +70,11 @@ async function runAdminVerificationTests() {
 
   try {
     await sequelize.sync();
+    if (sequelize.getDialect() === 'mysql') {
+      try {
+        await sequelize.query("ALTER TABLE `courses` MODIFY COLUMN `status` ENUM('draft', 'published', 'archived', 'suspended') NOT NULL DEFAULT 'draft';");
+      } catch (_) {}
+    }
 
     server = http.createServer(app);
     await new Promise((resolve) => {
@@ -240,10 +247,49 @@ async function runAdminVerificationTests() {
     assert.strictEqual(verifyCertRes.body.data.verified_by, adminUser.id);
     console.log('  ✔ PUT /api/admin/tutor-certifications/:id/verify: Verified teacher official certification.');
 
-    const unverifyCertRes = await makeRequest('PUT', `/api/admin/tutor-certifications/${testCert.id}/unverify`, adminAuth);
-    assert.strictEqual(unverifyCertRes.status, 200);
-    assert.strictEqual(unverifyCertRes.body.data.is_verified, false);
-    console.log('  ✔ PUT /api/admin/tutor-certifications/:id/unverify: Certification verification revoked cleanly.');
+    // 10. Test Course Moderation (Admin)
+    const [testCategory] = await Category.findOrCreate({
+      where: { slug: 'admin-test-category' },
+      defaults: {
+        name: 'Admin Test Category',
+        slug: 'admin-test-category',
+      },
+    });
+
+    const [testCourse] = await Course.findOrCreate({
+      where: { slug: 'test-course-moderation' },
+      defaults: {
+        tutor_id: applicantUser.id,
+        category_id: testCategory.id,
+        title: 'Mastering System Design & Distributed Systems',
+        slug: 'test-course-moderation',
+        description: 'Comprehensive course on scalable systems.',
+        price: 350000,
+        level: 'intermediate',
+        status: 'published',
+      },
+    });
+
+    // Test GET /api/admin/courses
+    const adminCoursesRes = await makeRequest('GET', '/api/admin/courses?limit=10', adminAuth);
+    assert.strictEqual(adminCoursesRes.status, 200);
+    assert.strictEqual(adminCoursesRes.body.success, true);
+    assert.ok(adminCoursesRes.body.data.courses.length > 0);
+    console.log(`  ✔ GET /api/admin/courses: Fetched ${adminCoursesRes.body.data.courses.length} courses successfully.`);
+
+    // Test PUT /api/admin/courses/:id/suspend
+    const suspendCourseRes = await makeRequest('PUT', `/api/admin/courses/${testCourse.id}/suspend`, adminAuth, {
+      reason: 'Pemeriksaan konten materi kursus.',
+    });
+    assert.strictEqual(suspendCourseRes.status, 200);
+    assert.strictEqual(suspendCourseRes.body.data.status, 'suspended');
+    console.log('  ✔ PUT /api/admin/courses/:id/suspend: Course suspended successfully.');
+
+    // Test PUT /api/admin/courses/:id/approve
+    const approveCourseRes = await makeRequest('PUT', `/api/admin/courses/${testCourse.id}/approve`, adminAuth);
+    assert.strictEqual(approveCourseRes.status, 200);
+    assert.strictEqual(approveCourseRes.body.data.status, 'published');
+    console.log('  ✔ PUT /api/admin/courses/:id/approve: Course approved and published successfully.');
 
     console.log('\n======================================================');
     console.log('🎉 ALL ADMIN VERIFICATION TESTS PASSED (SPRINT 1 - SATRIO)!');

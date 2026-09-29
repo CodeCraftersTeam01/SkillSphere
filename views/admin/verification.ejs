@@ -1378,13 +1378,42 @@
         <!-- VIEW 4: COURSES MANAGEMENT OVERVIEW -->
         <section class="dashboard-view-section" id="view-courses">
           <div class="section-card">
-            <div class="section-header">
-              <h2 class="section-title">
-                <i class="fas fa-graduation-cap"></i> Manajemen Kursus & Materi Pembelajaran
-              </h2>
-              <a href="/tutor/materials" class="btn btn-outline" style="font-size:12px; padding:6px 14px;">
-                <i class="fas fa-arrow-up-right-from-square"></i> Portal Upload Materi
-              </a>
+            <div class="section-header" style="flex-wrap:wrap; gap:12px;">
+              <div>
+                <h2 class="section-title">
+                  <i class="fas fa-graduation-cap"></i> Manajemen Kursus & Materi Pembelajaran
+                </h2>
+                <p style="font-size:12.5px; color:var(--text-secondary); margin-top:4px;">
+                  Moderasi, setujui (approve), atau bekukan (suspend) kursus instruktur platform.
+                </p>
+              </div>
+              <div style="display:flex; gap:8px;">
+                <a href="/tutor/materials" class="btn btn-outline" style="font-size:12px; padding:6px 14px;">
+                  <i class="fas fa-arrow-up-right-from-square"></i> Portal Upload Materi
+                </a>
+              </div>
+            </div>
+
+            <!-- Course Moderation Filter Bar -->
+            <div class="filter-bar" style="margin-top: 14px;">
+              <div class="filter-btn-group" id="course-status-filter-group">
+                <button class="filter-btn active" data-status="all" onclick="filterAdminCourses('all', this)">Semua</button>
+                <button class="filter-btn" data-status="published" onclick="filterAdminCourses('published', this)">Published</button>
+                <button class="filter-btn" data-status="suspended" onclick="filterAdminCourses('suspended', this)">Suspended</button>
+                <button class="filter-btn" data-status="draft" onclick="filterAdminCourses('draft', this)">Draft</button>
+              </div>
+
+              <div class="search-box" style="position:relative; min-width:240px;">
+                <input 
+                  type="text" 
+                  id="admin-course-search-input" 
+                  class="input-field" 
+                  placeholder="Cari judul kursus..." 
+                  style="padding-left:34px; height:36px; font-size:12.5px;"
+                  oninput="debounceAdminCourseSearch(this.value)"
+                >
+                <i class="fas fa-magnifying-glass" style="position:absolute; left:12px; top:11px; color:var(--text-secondary); font-size:12px;"></i>
+              </div>
             </div>
 
             <div class="table-responsive">
@@ -1397,11 +1426,12 @@
                     <th>Harga</th>
                     <th>Level</th>
                     <th>Status</th>
+                    <th style="text-align:right;">Aksi Moderasi</th>
                   </tr>
                 </thead>
                 <tbody id="admin-courses-table-body">
                   <tr>
-                    <td colspan="6" style="text-align:center; padding:32px; color:var(--text-secondary);">
+                    <td colspan="7" style="text-align:center; padding:32px; color:var(--text-secondary);">
                       <i class="fas fa-spinner fa-spin" style="margin-right:8px;"></i> Memuat data kursus platform...
                     </td>
                   </tr>
@@ -1834,6 +1864,10 @@
 
       if (viewName === 'financial') {
         fetchFinancialData();
+      }
+
+      if (viewName === 'courses') {
+        fetchPlatformCourses();
       }
     }
 
@@ -2331,33 +2365,236 @@
       }
     }
 
-    // Fetch Platform Courses for Overview
-    async function fetchPlatformCourses() {
-      try {
-        const res = await fetch('/api/courses?limit=20');
-        const json = await res.json();
-        const tbody = document.getElementById('admin-courses-table-body');
-        if (!tbody) return;
+    // =========================================================
+    // --- Course Management & Moderation Logic (Approve & Suspend) ---
+    // =========================================================
+    let currentAdminCourseStatus = 'all';
+    let adminCourseSearchQuery = '';
+    let adminCourseSearchTimeout = null;
+    let currentCoursesMap = {};
+    window.showConfirmDialog = showCustomConfirm;
 
-        const courses = (json.data && json.data.courses) ? json.data.courses : [];
+    function filterAdminCourses(status, btnElement) {
+      currentAdminCourseStatus = status;
+      const group = document.getElementById('course-status-filter-group');
+      if (group) {
+        group.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      }
+      if (btnElement) btnElement.classList.add('active');
+      fetchPlatformCourses();
+    }
+
+    function debounceAdminCourseSearch(val) {
+      clearTimeout(adminCourseSearchTimeout);
+      adminCourseSearchTimeout = setTimeout(() => {
+        adminCourseSearchQuery = (val || '').trim();
+        fetchPlatformCourses();
+      }, 300);
+    }
+
+    // Fetch Platform Courses for Admin Management
+    async function fetchPlatformCourses() {
+      const tbody = document.getElementById('admin-courses-table-body');
+      if (!tbody) return;
+
+      tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:28px; color:var(--text-secondary);"><i class="fas fa-spinner fa-spin" style="margin-right:8px;"></i> Memperbarui data kursus...</td></tr>`;
+
+      try {
+        let url = `/api/admin/courses?limit=100`;
+        if (currentAdminCourseStatus !== 'all') {
+          url += `&status=${encodeURIComponent(currentAdminCourseStatus)}`;
+        }
+        if (adminCourseSearchQuery) {
+          url += `&search=${encodeURIComponent(adminCourseSearchQuery)}`;
+        }
+
+        let res = await fetch(url, {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+
+        if (!res.ok) {
+          // Fallback to general courses endpoint if admin auth check fails
+          res = await fetch('/api/courses?limit=100' + (currentAdminCourseStatus !== 'all' ? `&status=${encodeURIComponent(currentAdminCourseStatus)}` : ''));
+        }
+
+        const json = await res.json();
+        const courses = (json.data && Array.isArray(json.data.courses))
+          ? json.data.courses
+          : (Array.isArray(json.data) ? json.data : ((json.data && Array.isArray(json.data.items)) ? json.data.items : []));
+
+        currentCoursesMap = {};
+        courses.forEach(c => {
+          currentCoursesMap[c.id] = c;
+        });
 
         if (!courses.length) {
-          tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:32px; color:var(--text-secondary);">Belum ada kursus yang terdaftar di platform.</td></tr>`;
+          tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:32px; color:var(--text-secondary);">Tidak ada kursus yang sesuai filter (${escapeHtml(currentAdminCourseStatus)}).</td></tr>`;
           return;
         }
 
-        tbody.innerHTML = courses.map(c => `
-          <tr>
-            <td><strong>${escapeHtml(c.title)}</strong></td>
-            <td>${c.tutor ? escapeHtml(c.tutor.name) : '-'}</td>
-            <td><span class="user-role-tag">${c.category ? escapeHtml(c.category.name) : 'Umum'}</span></td>
-            <td>Rp ${(c.price || 0).toLocaleString('id-ID')}</td>
-            <td><span class="status-pill status-locked">${(c.level || 'beginner').toUpperCase()}</span></td>
-            <td><span class="status-pill status-active">${(c.status || 'published').toUpperCase()}</span></td>
-          </tr>
-        `).join('');
+        tbody.innerHTML = courses.map(c => {
+          const status = (c.status || 'draft').toLowerCase();
+          let statusBadge = '';
+          let actionButtons = '';
+
+          if (status === 'published') {
+            statusBadge = `<span class="status-pill status-active"><i class="fas fa-circle-check"></i> PUBLISHED</span>`;
+            actionButtons = `
+              <button class="btn btn-danger btn-sm" onclick="suspendCoursePrompt(${c.id})" style="font-size:11.5px; padding:4px 10px;">
+                <i class="fas fa-ban"></i> Suspend
+              </button>
+            `;
+          } else if (status === 'suspended') {
+            statusBadge = `<span class="status-pill status-rejected"><i class="fas fa-ban"></i> SUSPENDED</span>`;
+            actionButtons = `
+              <button class="btn btn-success btn-sm" onclick="approveCoursePrompt(${c.id})" style="font-size:11.5px; padding:4px 10px;">
+                <i class="fas fa-check"></i> Approve & Publish
+              </button>
+            `;
+          } else if (status === 'draft') {
+            statusBadge = `<span class="status-pill status-pending"><i class="fas fa-file-lines"></i> DRAFT</span>`;
+            actionButtons = `
+              <button class="btn btn-success btn-sm" onclick="approveCoursePrompt(${c.id})" style="font-size:11.5px; padding:4px 10px;">
+                <i class="fas fa-check"></i> Approve & Publish
+              </button>
+            `;
+          } else {
+            statusBadge = `<span class="status-pill status-locked">${escapeHtml(status.toUpperCase())}</span>`;
+            actionButtons = `
+              <button class="btn btn-success btn-sm" onclick="approveCoursePrompt(${c.id})" style="font-size:11.5px; padding:4px 10px;">
+                <i class="fas fa-check"></i> Publish
+              </button>
+            `;
+          }
+
+          return `
+            <tr id="course-row-${c.id}">
+              <td>
+                <div style="font-weight:600; color:var(--text-primary);">${escapeHtml(c.title || 'Tanpa Judul')}</div>
+                <div style="font-size:11.5px; color:var(--text-secondary); margin-top:2px;">ID: #${escapeHtml(String(c.id || ''))}</div>
+              </td>
+              <td>${c.tutor ? escapeHtml(c.tutor.name || '') : '<span style="color:var(--text-secondary);">-</span>'}</td>
+              <td><span class="user-role-tag">${c.category ? escapeHtml(c.category.name || '') : 'Umum'}</span></td>
+              <td><strong style="color:var(--text-primary);">Rp ${(Number(c.price) || 0).toLocaleString('id-ID')}</strong></td>
+              <td><span class="status-pill status-locked">${escapeHtml((c.level || 'beginner').toUpperCase())}</span></td>
+              <td id="course-status-cell-${c.id}">${statusBadge}</td>
+              <td style="text-align:right;">
+                <div style="display:inline-flex; gap:6px; justify-content:flex-end; align-items:center;">
+                  <span id="course-action-cell-${c.id}">${actionButtons}</span>
+                  <a href="/tutor/materials?courseId=${c.id}" target="_blank" class="btn btn-outline btn-sm" style="font-size:11.5px; padding:4px 8px;" title="Lihat Materi Kursus">
+                    <i class="fas fa-folder-open"></i>
+                  </a>
+                </div>
+              </td>
+            </tr>
+          `;
+        }).join('');
       } catch (e) {
         console.error('Error fetching courses overview:', e);
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:32px; color:var(--color-danger);">Gagal memuat kursus platform: ${escapeHtml(e.message || 'Kesalahan data.')}</td></tr>`;
+      }
+    }
+
+    // Approve / Publish Action
+    async function approveCoursePrompt(courseId) {
+      const course = currentCoursesMap[courseId] || {};
+      const courseTitle = course.title || `Kursus #${courseId}`;
+
+      const confirmed = await showCustomConfirm({
+        title: 'Setujui & Publikasikan Kursus?',
+        message: `Apakah Anda yakin ingin menyetujui dan mempublikasikan kursus "${courseTitle}"? Kursus ini akan langsung dapat diakses dan dibeli oleh seluruh siswa di platform.`,
+        type: 'success',
+        confirmText: 'Approve & Publish',
+        cancelText: 'Batal',
+        icon: 'fa-circle-check'
+      });
+
+      if (!confirmed) return;
+
+      try {
+        let res = await fetch(`/api/admin/courses/${courseId}/approve`, {
+          method: 'PUT',
+          headers: {
+            'Authorization': 'Bearer ' + token,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (!res.ok) {
+          // Fallback directly to general course update endpoint
+          res = await fetch(`/api/courses/${courseId}`, {
+            method: 'PUT',
+            headers: {
+              'Authorization': 'Bearer ' + token,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ status: 'published' })
+          });
+        }
+
+        const json = await res.json();
+        if (res.ok && json.success) {
+          showToast(json.message || 'Kursus berhasil dipublikasikan!', 'success');
+          fetchPlatformCourses();
+          fetchAdminStats();
+        } else {
+          showToast(json.message || 'Gagal menyetujui kursus.', 'error');
+        }
+      } catch (err) {
+        console.error('Error approving course:', err);
+        showToast('Kesalahan jaringan saat memproses persetujuan kursus.', 'error');
+      }
+    }
+
+    // Suspend / Freeze Action
+    async function suspendCoursePrompt(courseId) {
+      const course = currentCoursesMap[courseId] || {};
+      const courseTitle = course.title || `Kursus #${courseId}`;
+
+      const confirmed = await showCustomConfirm({
+        title: 'Bekukan (Suspend) Kursus?',
+        message: `Apakah Anda yakin ingin membekukan / suspend kursus "${courseTitle}"? Kursus ini akan dinonaktifkan dari katalog publik siswa hingga disetujui kembali.`,
+        type: 'danger',
+        confirmText: 'Suspend Kursus',
+        cancelText: 'Batal',
+        icon: 'fa-ban'
+      });
+
+      if (!confirmed) return;
+
+      try {
+        let res = await fetch(`/api/admin/courses/${courseId}/suspend`, {
+          method: 'PUT',
+          headers: {
+            'Authorization': 'Bearer ' + token,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ reason: 'Peninjauan kepatuhan materi oleh Administrator.' })
+        });
+
+        if (!res.ok) {
+          // Fallback directly to general course update endpoint
+          res = await fetch(`/api/courses/${courseId}`, {
+            method: 'PUT',
+            headers: {
+              'Authorization': 'Bearer ' + token,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ status: 'suspended' })
+          });
+        }
+
+        const json = await res.json();
+        if (res.ok && json.success) {
+          showToast(json.message || 'Kursus berhasil disuspend!', 'warning');
+          fetchPlatformCourses();
+          fetchAdminStats();
+        } else {
+          showToast(json.message || 'Gagal membekukan kursus.', 'error');
+        }
+      } catch (err) {
+        console.error('Error suspending course:', err);
+        showToast('Kesalahan jaringan saat memproses suspend kursus.', 'error');
       }
     }
 

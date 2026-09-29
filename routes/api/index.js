@@ -33,7 +33,7 @@ router.get('/health', (req, res) => {
 router.use('/auth', authRoutes);
 router.use('/media', mediaRoutes);
 router.use('/materials', materialRoutes);
-router.use('/admin', adminRoutes);
 router.use('/courses', courseRoutes);
+router.use('/admin', adminRoutes);
 
 module.exports = router;

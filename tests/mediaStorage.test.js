@@ -505,7 +505,9 @@ async function runMediaStorageTests() {
 }
 
 if (require.main === module) {
-  runMediaStorageTests();
+  runMediaStorageTests()
+    .then(() => process.exit(0))
+    .catch(() => process.exit(1));
 }
 
 module.exports = runMediaStorageTests;

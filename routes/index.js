@@ -31,6 +31,11 @@ router.get('/dashboard', function(req, res, next) {
   res.render('dashboard', { title: 'Dashboard | SkillSphere AI' });
 });
 
+/* GET cinematic warp transition page */
+router.get('/warp', function(req, res, next) {
+  res.render('warp', { title: 'Memasuki Ruang Belajar | SkillSphere AI' });
+});
+
 /* GET Admin Dashboard & Verification UI (Sprint 1 - Satrio) */
 router.get(['/admin', '/admin/dashboard', '/admin/verification'], function(req, res, next) {
   res.render('admin/verification', { title: 'Dashboard Admin & Verifikasi Pengajar | SkillSphere AI' });

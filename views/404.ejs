@@ -50,6 +50,7 @@
     body, html {
       width: 100%;
       height: 100%;
+      height: 100dvh;
       overflow: hidden;
       background-color: var(--bg);
       color: var(--text);
@@ -74,11 +75,14 @@
       z-index: 10;
       width: 100vw;
       height: 100vh;
+      height: 100dvh;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
       align-items: flex-start;
       padding: 24px 32px;
+      /* safe area for notched phones */
+      padding-bottom: max(24px, env(safe-area-inset-bottom, 24px));
       pointer-events: none;
     }
 
@@ -124,7 +128,16 @@
       text-align: left;
       pointer-events: none;
       transform-origin: top left;
-      transition: transform 0.05s ease;
+      transition:
+        transform 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+        filter 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+        opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .headline-wrap.playing {
+      transform: scale(0.52) translateY(-8px);
+      filter: blur(2px);
+      opacity: 0.45;
     }
 
     @keyframes buro-quake {
@@ -137,7 +150,8 @@
       100% { transform: translate(0, 0) rotate(0deg); }
     }
 
-    .headline-wrap.quake {
+    /* Quake applied to inner h1, not headline-wrap — preserves scale(0.52) playing state */
+    .buro-headline.quake {
       animation: buro-quake 0.24s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
     }
 
@@ -155,6 +169,113 @@
       font-weight: 400;
     }
 
+    /* ============ BOSS SYSTEM ============ */
+    @keyframes boss-pulse-ring {
+      0%   { transform: scale(1);   opacity: 0.85; }
+      50%  { transform: scale(1.12); opacity: 0.4; }
+      100% { transform: scale(1);   opacity: 0.85; }
+    }
+
+    @keyframes boss-alert-in {
+      0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.7); filter: blur(8px); }
+      55%  { opacity: 1; transform: translate(-50%, -50%) scale(1.04); filter: blur(0px); }
+      80%  { transform: translate(-50%, -50%) scale(0.98); }
+      100% { opacity: 1; transform: translate(-50%, -50%) scale(1); filter: blur(0px); }
+    }
+    @keyframes boss-alert-out {
+      0%   { opacity: 1; transform: translate(-50%, -50%) scale(1); filter: blur(0px); }
+      100% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); filter: blur(6px); }
+    }
+
+    #boss-alert {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 50;
+      pointer-events: none;
+      text-align: center;
+      display: none;
+    }
+    #boss-alert.visible {
+      display: block;
+      animation: boss-alert-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+    #boss-alert.hiding {
+      display: block;
+      animation: boss-alert-out 0.4s ease forwards;
+    }
+    #boss-alert-title {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: clamp(1.6rem, 5vw, 3.2rem);
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      color: #EF4444;
+      text-shadow: 0 0 32px rgba(239,68,68,0.7), 0 0 8px rgba(239,68,68,0.9);
+      text-transform: uppercase;
+    }
+    #boss-alert-sub {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: clamp(0.75rem, 2vw, 1rem);
+      letter-spacing: 0.12em;
+      color: rgba(255,255,255,0.7);
+      margin-top: 8px;
+      text-transform: uppercase;
+    }
+
+    #boss-hpbar-wrap {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: min(480px, 92vw);
+      padding: 12px 18px 14px;
+      background: rgba(10, 8, 8, 0.78);
+      border: 1px solid rgba(239,68,68,0.4);
+      border-bottom: none;
+      border-radius: 14px 14px 0 0;
+      backdrop-filter: blur(14px);
+      z-index: 40;
+      pointer-events: none;
+      display: none;
+      transition: opacity 0.4s ease;
+    }
+    #boss-hpbar-wrap.visible { display: block; }
+
+    #boss-bar-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 7px;
+    }
+    #boss-bar-name {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #EF4444;
+    }
+    #boss-bar-hp-text {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: rgba(255,255,255,0.55);
+    }
+    #boss-hpbar-track {
+      width: 100%;
+      height: 8px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 9999px;
+      overflow: hidden;
+    }
+    #boss-hpbar-fill {
+      height: 100%;
+      width: 100%;
+      border-radius: 9999px;
+      background: linear-gradient(90deg, #EF4444, #F59E0B);
+      transition: width 0.12s ease-out;
+    }
+
     /* Target Hit Indicator Overlay */
     .game-hint {
       display: inline-flex;
@@ -168,7 +289,7 @@
       letter-spacing: 0.05em;
     }
 
-    /* Bottom Centered Pill Dock */
+    /* Bottom Pill Dock */
     .bottom-dock-wrap {
       display: flex;
       justify-content: space-between;
@@ -259,22 +380,21 @@
 
     @media (max-width: 768px) {
       .viewport-overlay {
-        padding: 18px 20px;
+        padding: 16px 18px;
+        padding-bottom: max(16px, env(safe-area-inset-bottom, 16px));
       }
       .buro-headline {
         font-size: 2rem;
         line-height: 1.18;
       }
       .bottom-dock-wrap {
-        flex-direction: column-reverse;
-        align-items: stretch;
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-end;
       }
       .buro-dock {
-        width: 100%;
+        width: auto;
         justify-content: space-between;
-      }
-      .score-badge {
-        width: fit-content;
       }
     }
   </style>
@@ -306,7 +426,7 @@
         <button class="nav-btn" id="theme-btn" type="button" aria-label="Toggle Theme">
           <span id="theme-label">Dark</span>
         </button>
-        <button class="nav-btn" onclick="if(window.history.length > 1) window.history.back(); else window.location.href='/';">
+        <button class="nav-btn" onclick="if(window.history.length > 1) window.history.back(); else window.location.href='/'">
           <span>Close</span>
         </button>
       </div>
@@ -323,7 +443,24 @@
       </div>
     </main>
 
-    <!-- Bottom Action Dock & Live Score -->
+    <!-- Boss: Warning Alert Overlay -->
+    <div id="boss-alert" aria-live="assertive">
+      <div id="boss-alert-title">&#9888; BOSS MUNCUL!</div>
+      <div id="boss-alert-sub">ERROR 404 TITAN &mdash; HP: 5000</div>
+    </div>
+
+    <!-- Boss: Health Bar (bottom center) -->
+    <div id="boss-hpbar-wrap">
+      <div id="boss-bar-label">
+        <span id="boss-bar-name">&#9888; ERROR 404 TITAN</span>
+        <span id="boss-bar-hp-text">5000 / 5000</span>
+      </div>
+      <div id="boss-hpbar-track">
+        <div id="boss-hpbar-fill"></div>
+      </div>
+    </div>
+
+    <!-- Bottom Action Dock & Score -->
     <footer class="bottom-dock-wrap">
       <div class="score-badge">
         <i class="fas fa-crosshairs"></i>
@@ -541,6 +678,8 @@
         this.reset(initial);
       }
       reset(initial = false) {
+        // Smaller on mobile so they don't fill the screen
+        const sizeMult = width < 600 ? 0.78 : 1.0;
         this.x = (Math.random() - 0.5) * width * 1.6;
         this.y = (Math.random() - 0.5) * height * 1.6;
         this.z = initial ? Math.random() * MAX_DEPTH : MAX_DEPTH;
@@ -550,11 +689,11 @@
         this.rotSpeedX = (Math.random() - 0.5) * 0.04;
         this.rotSpeedY = (Math.random() - 0.5) * 0.04;
         this.rotSpeedZ = (Math.random() - 0.5) * 0.03;
-        this.baseSize = Math.random() * 18 + 24;
+        this.baseSize = (Math.random() * 18 + 24) * sizeMult;
         this.points = 25;
         this.screenX = 0;
         this.screenY = 0;
-        this.radius = 24;
+        this.radius = 24 * sizeMult;
       }
       update(speed) {
         this.z -= speed * 0.95;
@@ -814,6 +953,251 @@
     const stars = Array.from({ length: STAR_COUNT }, () => new Star());
     const debrisList = Array.from({ length: 14 }, () => new SkillSphereStar3D(true));
 
+    // ============================================================
+    // BOSS SYSTEM
+    // ============================================================
+    const BOSS_MAX_HP   = 5000;
+    const BOSS_DAMAGE   = 25;    // HP lost per laser hit
+    const BOSS_INTERVAL = 1000;  // spawn every N score points
+    let boss            = null;
+    let nextBossAt      = BOSS_INTERVAL;
+    let bossAlertTimer  = null;
+
+    const bossAlertEl  = document.getElementById('boss-alert');
+    const bossHPWrap   = document.getElementById('boss-hpbar-wrap');
+    const bossHPFill   = document.getElementById('boss-hpbar-fill');
+    const bossHPText   = document.getElementById('boss-bar-hp-text');
+
+    function showBossAlert(onDone) {
+      if (!bossAlertEl) return;
+      bossAlertEl.classList.remove('hiding');
+      bossAlertEl.classList.add('visible');
+      if (bossAlertTimer) clearTimeout(bossAlertTimer);
+      bossAlertTimer = setTimeout(() => {
+        bossAlertEl.classList.remove('visible');
+        bossAlertEl.classList.add('hiding');
+        setTimeout(() => {
+          bossAlertEl.classList.remove('hiding');
+          if (onDone) onDone();
+        }, 420);
+      }, 2200);
+    }
+
+    function updateBossHPBar() {
+      if (!boss) return;
+      const pct = Math.max(boss.hp / BOSS_MAX_HP, 0) * 100;
+      if (bossHPFill) bossHPFill.style.width = pct + '%';
+      if (bossHPText) bossHPText.textContent = `${Math.max(boss.hp, 0).toLocaleString()} / ${BOSS_MAX_HP.toLocaleString()}`;
+    }
+
+    function spawnBoss() {
+      if (boss) return; // already alive
+      boss = new BossSkillSphereStar3D();
+      if (bossHPWrap) bossHPWrap.classList.add('visible');
+      updateBossHPBar();
+      showBossAlert();
+    }
+
+    function despawnBoss() {
+      boss = null;
+      if (bossHPWrap) bossHPWrap.classList.remove('visible');
+    }
+
+    // Boss: giant faceted star with pulsing red aura
+    class BossSkillSphereStar3D {
+      constructor() {
+        // Smaller on mobile so it stays challenging, not trivially easy
+        const sizeMult = width < 600 ? 0.78 : 1.0;
+        this.x = (Math.random() - 0.5) * width * 0.15;
+        this.y = (Math.random() - 0.5) * height * 0.15;
+        this.z = MAX_DEPTH * 0.9;
+        this.rx = Math.random() * Math.PI * 2;
+        this.ry = Math.random() * Math.PI * 2;
+        this.rz = Math.random() * Math.PI * 2;
+        this.rotSpeedX = 0.018;
+        this.rotSpeedY = 0.022;
+        this.rotSpeedZ = 0.014;
+        this.baseSize = 88 * sizeMult;
+        this.points   = BOSS_MAX_HP;
+        this.hp       = BOSS_MAX_HP;
+        this.screenX  = cx;
+        this.screenY  = cy;
+        this.radius   = 90 * sizeMult;
+        this.pulse    = 0;
+        this.phase    = Math.random() * Math.PI * 2;
+        this.orbitR   = Math.min(width, height) * 0.28;
+        this.chaseX   = 0;
+        this.chaseY   = 0;
+        this.driftVX  = (Math.random() - 0.5) * 4;
+        this.driftVY  = (Math.random() - 0.5) * 4;
+      }
+
+      update(speed) {
+        // Mobile moves at 50% speed — easier to track on small screen
+        const mobileMult = width < 600 ? 0.25 : 1.0;
+
+        // Phase 1: fly in from deep space to combat depth
+        if (this.z > 220) {
+          this.z -= speed * 1.8 * mobileMult;
+        } else {
+          // Phase 2: hover at combat depth with active lateral movement
+          this.z += (220 - this.z) * 0.02;
+
+          const hpPct = Math.max(this.hp / BOSS_MAX_HP, 0);
+          const aggressionMult = 1 + (1 - hpPct) * 2.2;
+
+          // Slower phase advance on mobile
+          this.phase += 0.012 * aggressionMult * mobileMult;
+
+          // Sinusoidal drift pattern (figure-8 style Lissajous)
+          const targetX = Math.sin(this.phase) * this.orbitR * 0.9;
+          const targetY = Math.sin(this.phase * 0.63) * this.orbitR * 0.55;
+
+          // Smooth chase toward aim when aggression is high
+          const aimWorldX = (aimX - cx) * (this.z / 340) * 0.35 * (1 - hpPct);
+          const aimWorldY = (aimY - cy) * (this.z / 340) * 0.35 * (1 - hpPct);
+
+          // Slower lateral movement on mobile
+          this.x += (targetX + aimWorldX - this.x) * 0.025 * aggressionMult * mobileMult;
+          this.y += (targetY + aimWorldY - this.y) * 0.025 * aggressionMult * mobileMult;
+        }
+
+        this.rx += this.rotSpeedX * mobileMult;
+        this.ry += this.rotSpeedY * mobileMult;
+        this.rz += this.rotSpeedZ * mobileMult;
+        this.pulse += 0.055;
+      }
+
+      hit() {
+        this.hp -= BOSS_DAMAGE;
+        updateBossHPBar();
+        return this.hp <= 0;
+      }
+
+      draw(isDark) {
+        const k = 340 / this.z;
+        this.screenX = this.x * k + cx + currentAngleX * (1 - this.z / MAX_DEPTH);
+        this.screenY = this.y * k + cy + currentAngleY * (1 - this.z / MAX_DEPTH);
+        if (this.screenX < -200 || this.screenX > width + 200 ||
+            this.screenY < -200 || this.screenY > height + 200) return;
+
+        const depth = 1 - this.z / MAX_DEPTH;
+        const alpha = Math.min(Math.max(depth * 1.6, 0), 1);
+        const R = Math.max(this.baseSize * k, 14);
+        this.radius = R * 1.2;
+
+        // Pulsing red danger ring (no Gaussian blur — raster ring is fast)
+        const ringScale = 1 + Math.sin(this.pulse) * 0.1;
+        ctx.save();
+        ctx.globalAlpha = alpha * (0.35 + Math.sin(this.pulse) * 0.15);
+        ctx.beginPath();
+        ctx.arc(this.screenX, this.screenY, R * 1.55 * ringScale, 0, Math.PI * 2);
+        ctx.strokeStyle = '#EF4444';
+        ctx.lineWidth = R * 0.14;
+        ctx.stroke();
+        ctx.restore();
+
+        // Outer glow ring (thin)
+        ctx.save();
+        ctx.globalAlpha = alpha * 0.2;
+        ctx.beginPath();
+        ctx.arc(this.screenX, this.screenY, R * 2.1 * ringScale, 0, Math.PI * 2);
+        ctx.strokeStyle = '#F59E0B';
+        ctx.lineWidth = 3;
+        ctx.stroke();
+        ctx.restore();
+
+        // Core 3D faceted star (same geometry as SkillSphereStar3D but bigger + red-tinted)
+        ctx.save();
+        ctx.translate(this.screenX, this.screenY);
+        ctx.globalAlpha = alpha;
+
+        const cosY = Math.cos(this.ry), sinY = Math.sin(this.ry);
+        const cosX = Math.cos(this.rx), sinX = Math.sin(this.rx);
+        const cosZ = Math.cos(this.rz), sinZ = Math.sin(this.rz);
+
+        function proj(px, py, pz) {
+          let x1 = px*cosY + pz*sinY, y1 = py, z1 = -px*sinY + pz*cosY;
+          let x2 = x1, y2 = y1*cosX - z1*sinX, z2 = y1*sinX + z1*cosX;
+          return { x: x2*cosZ - y2*sinZ, y: x2*sinZ + y2*cosZ, z: z2 };
+        }
+
+        // HP-based red tint (more red as hp drops)
+        const hpPct = Math.max(this.hp / BOSS_MAX_HP, 0);
+        const redG  = Math.floor(hpPct * 40);
+        const redB  = Math.floor(hpPct * 40);
+
+        const diagR = R * 0.64, diagI = R * 0.12;
+        const corners = [
+          proj(diagR*.707, -diagR*.707, 0), proj(diagR*.707, diagR*.707, 0),
+          proj(-diagR*.707, diagR*.707, 0), proj(-diagR*.707, -diagR*.707, 0)
+        ];
+        const inners = [
+          proj(0,-diagI,0), proj(diagI,0,0), proj(0,diagI,0), proj(-diagI,0,0)
+        ];
+        ctx.beginPath();
+        ctx.moveTo(corners[0].x,corners[0].y);
+        ctx.lineTo(inners[1].x,inners[1].y); ctx.lineTo(corners[1].x,corners[1].y);
+        ctx.lineTo(inners[2].x,inners[2].y); ctx.lineTo(corners[2].x,corners[2].y);
+        ctx.lineTo(inners[3].x,inners[3].y); ctx.lineTo(corners[3].x,corners[3].y);
+        ctx.lineTo(inners[0].x,inners[0].y);
+        ctx.closePath();
+        ctx.fillStyle = `rgba(255, ${redG}, ${redB}, 0.45)`;
+        ctx.fill();
+
+        const waist = R * 0.16;
+        const topTip = proj(0,-R,0), botTip = proj(0,R,0);
+        const rTip = proj(R,0,0),    lTip = proj(-R,0,0);
+        const iTR = proj(waist,-waist,0), iBR = proj(waist,waist,0);
+        const iBL = proj(-waist,waist,0), iTL = proj(-waist,-waist,0);
+        const fApex = proj(0,0,R*0.28), bApex = proj(0,0,-R*0.28);
+
+        function facet(p1, p2, p3) {
+          const nx = (p2.y-p1.y)*(p3.z-p1.z) - (p2.z-p1.z)*(p3.y-p1.y);
+          const ny = (p2.z-p1.z)*(p3.x-p1.x) - (p2.x-p1.x)*(p3.z-p1.z);
+          const nz = (p2.x-p1.x)*(p3.y-p1.y) - (p2.y-p1.y)*(p3.x-p1.x);
+          const len = Math.hypot(nx,ny,nz) || 1;
+          const light = Math.max((nz/len)*0.45 + 0.55, 0.25);
+          ctx.beginPath();
+          ctx.moveTo(p1.x,p1.y); ctx.lineTo(p2.x,p2.y); ctx.lineTo(p3.x,p3.y);
+          ctx.closePath();
+          const v = Math.floor(255 * light);
+          const g = Math.floor(redG * light), b = Math.floor(redB * light);
+          ctx.fillStyle = `rgb(${v}, ${g}, ${b})`;
+          ctx.strokeStyle = 'rgba(239,68,68,0.35)';
+          ctx.lineWidth = 0.8;
+          ctx.fill(); ctx.stroke();
+        }
+
+        // Draw all 16 facets explicitly — forEach on multiline array literals is ambiguous
+        const facets = [
+          [fApex,topTip,iTR],[fApex,iTL,topTip],[fApex,rTip,iBR],[fApex,iTR,rTip],
+          [fApex,botTip,iBL],[fApex,iBR,botTip],[fApex,lTip,iTL],[fApex,iBL,lTip],
+          [bApex,iTR,topTip],[bApex,topTip,iTL],[bApex,iBR,rTip],[bApex,rTip,iTR],
+          [bApex,iBL,botTip],[bApex,botTip,iBR],[bApex,iTL,lTip],[bApex,lTip,iBL]
+        ];
+        for (let fi = 0; fi < facets.length; fi++) {
+          facet(facets[fi][0], facets[fi][1], facets[fi][2]);
+        }
+
+        // Core glowing eye
+        ctx.beginPath();
+        ctx.arc(fApex.x, fApex.y, Math.max(R * 0.1, 2), 0, Math.PI * 2);
+        ctx.fillStyle = '#EF4444';
+        ctx.fill();
+
+        // HP label above boss on canvas
+        if (this.hp > 0) {
+          ctx.font = `bold ${Math.max(R * 0.28, 11)}px 'JetBrains Mono', monospace`;
+          ctx.fillStyle = '#EF4444';
+          ctx.textAlign = 'center';
+          ctx.fillText(`HP ${Math.max(this.hp, 0).toLocaleString()}`, 0, -R * 1.8);
+        }
+
+        ctx.restore();
+      }
+    }
+
     // Mouse Tracking & Aim Coordinates
     let aimX = cx;
     let aimY = cy;
@@ -862,11 +1246,35 @@
       // Spawn 3D perspective laser bolt converging directly to cursor crosshair
       lasers.push(new PerspectiveLaser(startX, startY, aimX, aimY));
 
-      // Direct raycast hit check on 3D SkillSphere Star objects at aim location
+      // Boss hit check (priority over regular targets)
+      if (boss) {
+        const bDist = Math.hypot(aimX - boss.screenX, aimY - boss.screenY);
+        // No generous padding on mobile — must aim accurately
+        const bPad = width < 600 ? 0 : 40;
+        if (bDist < boss.radius + bPad) {
+          const killed = boss.hit();
+          if (killed) {
+            triggerBossExplosion();
+          } else {
+            // Hit flash — big screen shake
+            screenShake = 14;
+            if (particles.length < 60) {
+              for (let p = 0; p < 6; p++) {
+                particles.push(new Particle(boss.screenX, boss.screenY));
+              }
+            }
+          }
+          return;
+        }
+      }
+
+      // Direct raycast hit check on regular 3D SkillSphere Star objects
       for (let i = 0; i < debrisList.length; i++) {
         const obj = debrisList[i];
         const dist = Math.hypot(aimX - obj.screenX, aimY - obj.screenY);
-        if (dist < obj.radius + 30) {
+        // Tighter hit box on mobile — no generous padding
+        const pad = width < 600 ? 0 : 30;
+        if (dist < obj.radius + pad) {
           triggerExplosion(obj);
           break;
         }
@@ -876,22 +1284,28 @@
     function triggerExplosion(obj) {
       playExplosionSound();
       score += obj.points;
-      if (scoreValElem) scoreValElem.textContent = score;
+      if (scoreValElem) scoreValElem.textContent = score.toLocaleString();
+
+      // Check if boss should spawn (every BOSS_INTERVAL score)
+      if (!boss && score >= nextBossAt) {
+        nextBossAt += BOSS_INTERVAL;
+        setTimeout(spawnBoss, 600);
+      }
 
       // Haptic Feedback on explosion
       if (typeof navigator !== 'undefined' && navigator.vibrate) {
         try { navigator.vibrate([35, 18, 50]); } catch(e) {}
       }
 
-      // Non-blocking asynchronous text quake (avoids synchronous layout thrashing)
+      // Non-blocking asynchronous text quake on h1 (keeps headline-wrap scale intact)
       const now = performance.now();
       if (now - lastQuakeTime > 180) {
         lastQuakeTime = now;
-        const headlineElem = document.getElementById('headline-wrap');
-        if (headlineElem) {
-          headlineElem.classList.remove('quake');
+        const headlineH1 = document.querySelector('.buro-headline');
+        if (headlineH1) {
+          headlineH1.classList.remove('quake');
           requestAnimationFrame(() => {
-            headlineElem.classList.add('quake');
+            headlineH1.classList.add('quake');
           });
         }
       }
@@ -904,7 +1318,7 @@
         particles.splice(0, particles.length - 36);
       }
 
-      // Spawn diamond crystal shards (12 particles is plenty and ultra lightweight)
+      // Spawn diamond crystal shards
       for (let p = 0; p < 12; p++) {
         particles.push(new Particle(obj.screenX, obj.screenY));
       }
@@ -915,6 +1329,51 @@
 
       // Reset hit 3D object to far depth
       obj.reset();
+    }
+
+    function triggerBossExplosion() {
+      playExplosionSound();
+      const bossX = boss.screenX;
+      const bossY = boss.screenY;
+
+      // Massive score reward
+      score += BOSS_MAX_HP;
+      if (scoreValElem) scoreValElem.textContent = score.toLocaleString();
+
+      // Schedule next boss
+      nextBossAt = score + BOSS_INTERVAL;
+
+      // Epic screen shake
+      screenShake = 28;
+
+      // Massive particle burst
+      for (let p = 0; p < 48; p++) {
+        particles.push(new Particle(bossX, bossY));
+      }
+
+      // Big score popup
+      if (popups.length > 8) popups.shift();
+      popups.push(new ScorePopup(bossX, bossY, `+${BOSS_MAX_HP} BOSS!`));
+
+      // Haptic big rumble
+      if (typeof navigator !== 'undefined' && navigator.vibrate) {
+        try { navigator.vibrate([80, 30, 80, 30, 120]); } catch(e) {}
+      }
+
+      despawnBoss();
+
+      // Show death alert briefly
+      if (bossAlertEl) {
+        const subEl = document.getElementById('boss-alert-sub');
+        const titleEl = document.getElementById('boss-alert-title');
+        if (titleEl) titleEl.textContent = 'BOSS DIKALAHKAN!';
+        if (subEl) subEl.textContent = `+${BOSS_MAX_HP.toLocaleString()} POIN BONUS`;
+        showBossAlert(() => {
+          // Reset text for next boss
+          if (titleEl) titleEl.textContent = '\u26A0 BOSS MUNCUL!';
+          if (subEl) subEl.textContent = `ERROR 404 TITAN \u2014 HP: ${BOSS_MAX_HP.toLocaleString()}`;
+        });
+      }
     }
 
     // Start / Stop Rapid Fire on Hold
@@ -930,6 +1389,10 @@
 
       isShooting = true;
       targetSpeed = 26; // Accelerate warp speed while shooting!
+
+      const headlineEl = document.getElementById('headline-wrap');
+      if (headlineEl) headlineEl.classList.add('playing');
+
       fireLaser();
 
       if (fireInterval) clearInterval(fireInterval);
@@ -947,6 +1410,8 @@
         clearInterval(fireInterval);
         fireInterval = null;
       }
+      const headlineEl = document.getElementById('headline-wrap');
+      if (headlineEl) headlineEl.classList.remove('playing');
     }
 
     window.addEventListener('mousedown', startShooting);
@@ -1005,6 +1470,17 @@
       for (let i = 0; i < debrisList.length; i++) {
         debrisList[i].update(currentSpeed);
         debrisList[i].draw(isDark);
+      }
+
+      // Render Boss — wrapped in try-catch so any draw error never kills the RAF loop
+      if (boss) {
+        try {
+          boss.update(currentSpeed);
+          boss.draw(isDark);
+        } catch(bossErr) {
+          console.warn('Boss draw error:', bossErr);
+          despawnBoss();
+        }
       }
 
       // Update & Render 3D Perspective Lasers
