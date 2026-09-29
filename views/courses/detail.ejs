@@ -1,0 +1,1058 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Detail Kursus & Kurikulum | SkillSphere AI</title>
+  <meta name="description" content="Pelajari kurikulum lengkap, silabus materi, profil instruktur terverifikasi, dan daftar ke kelas impian Anda di SkillSphere AI.">
+  
+  <!-- PWA Manifest & App Icons -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#1F1E1B">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="SkillSphere">
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="shortcut icon" href="/favicon.svg">
+  
+  <!-- Google Fonts: Newsreader & Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome 6 Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Claude Design System Stylesheet -->
+  <link rel="stylesheet" href="/stylesheets/claude-theme.css?v=2.0">
+
+  <style>
+    .course-detail-layout {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background-color: var(--bg-app);
+    }
+
+    /* Navbar styling */
+    .navbar {
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 12px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .nav-main-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      gap: 20px;
+    }
+
+    .desktop-only {
+      display: flex;
+    }
+
+    .mobile-only {
+      display: none;
+    }
+
+    /* Course Detail Hero */
+    .detail-hero-section {
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 36px 24px;
+    }
+
+    .detail-hero-container {
+      max-width: 1240px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 36px;
+      align-items: start;
+    }
+
+    .breadcrumb-nav {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+
+    .breadcrumb-nav a {
+      color: var(--text-secondary);
+      text-decoration: none;
+    }
+
+    .breadcrumb-nav a:hover {
+      color: var(--text-primary);
+    }
+
+    .course-badges-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+
+    .badge-pill {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: var(--radius-full);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .badge-pill.category {
+      background: var(--accent-primary);
+      color: var(--accent-text);
+    }
+
+    .badge-pill.level {
+      background: var(--bg-surface-subtle);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+    }
+
+    .detail-course-title {
+      font-family: var(--font-serif);
+      font-size: 34px;
+      font-weight: 500;
+      color: var(--text-primary);
+      line-height: 1.25;
+      margin-bottom: 14px;
+    }
+
+    .detail-course-summary {
+      font-size: 15px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+
+    .instructor-hero-card {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .instructor-avatar-md {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-full);
+      background: var(--accent-primary);
+      color: var(--accent-text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .instructor-hero-meta h4 {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin: 0 0 2px;
+    }
+
+    .instructor-hero-meta p {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin: 0;
+    }
+
+    /* Sticky Sidebar Purchase Box */
+    .sidebar-enroll-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-xl);
+      padding: 24px;
+      box-shadow: var(--shadow-floating);
+      position: sticky;
+      top: 90px;
+    }
+
+    .enroll-video-preview {
+      width: 100%;
+      height: 200px;
+      border-radius: var(--radius-lg);
+      background: linear-gradient(135deg, #2D2B28 0%, #1A1918 100%);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+      cursor: pointer;
+    }
+
+    .enroll-video-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .preview-play-btn {
+      position: absolute;
+      width: 52px;
+      height: 52px;
+      border-radius: var(--radius-full);
+      background: rgba(255, 255, 255, 0.9);
+      color: #000000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+      transition: transform 0.2s ease;
+    }
+
+    .preview-play-btn:hover {
+      transform: scale(1.1);
+    }
+
+    .enroll-price-display {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 16px;
+    }
+
+    .btn-enroll-action {
+      width: 100%;
+      padding: 14px;
+      font-size: 15px;
+      font-weight: 600;
+      border-radius: var(--radius-md);
+      background: var(--accent-primary);
+      color: var(--accent-text);
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: opacity 0.15s ease;
+      margin-bottom: 16px;
+    }
+
+    .btn-enroll-action:hover {
+      opacity: 0.88;
+    }
+
+    .enroll-benefits-list {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .enroll-benefit-item {
+      font-size: 13px;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .enroll-benefit-item i {
+      color: var(--color-success);
+      font-size: 14px;
+    }
+
+    /* Main Tabs and Content */
+    .detail-body-container {
+      max-width: 1240px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 32px 24px 80px;
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 36px;
+    }
+
+    .detail-tabs-bar {
+      display: flex;
+      gap: 8px;
+      border-bottom: 1px solid var(--border-subtle);
+      margin-bottom: 28px;
+    }
+
+    .detail-tab-btn {
+      padding: 12px 18px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+
+    .detail-tab-btn:hover {
+      color: var(--text-primary);
+    }
+
+    .detail-tab-btn.active {
+      color: var(--text-primary);
+      font-weight: 600;
+      border-bottom-color: var(--accent-primary);
+    }
+
+    .detail-tab-pane {
+      display: none;
+    }
+
+    .detail-tab-pane.active {
+      display: block;
+      animation: framerFadeIn 0.25s ease-out;
+    }
+
+    @keyframes framerFadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .content-card-section {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-xl);
+      padding: 28px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .section-title-sm {
+      font-family: var(--font-serif);
+      font-size: 20px;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* Curriculum Accordion */
+    .curriculum-accordion {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .section-accordion-item {
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      background: var(--bg-surface);
+      overflow: hidden;
+    }
+
+    .section-accordion-header {
+      padding: 16px 20px;
+      background: var(--bg-surface-subtle);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
+      font-weight: 600;
+      font-size: 14px;
+      color: var(--text-primary);
+    }
+
+    .section-accordion-body {
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .material-unit-row {
+      padding: 12px 20px;
+      border-top: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 13px;
+      transition: background-color 0.15s ease;
+    }
+
+    .material-unit-row:hover {
+      background: var(--bg-surface-subtle);
+    }
+
+    .material-meta-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--text-primary);
+      flex: 1;
+    }
+
+    .material-type-icon {
+      color: var(--text-secondary);
+      font-size: 14px;
+      width: 18px;
+      text-align: center;
+    }
+
+    .material-badge-preview {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: var(--radius-full);
+      background: var(--color-success-bg);
+      border: 1px solid var(--color-success);
+      color: var(--color-success);
+      cursor: pointer;
+    }
+
+    .material-badge-locked {
+      font-size: 11px;
+      color: var(--text-tertiary);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* Modal Player */
+    .preview-modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(8px);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .preview-modal-box {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-xl);
+      max-width: 800px;
+      width: 100%;
+      overflow: hidden;
+      box-shadow: var(--shadow-floating);
+      animation: framerFadeIn 0.2s ease-out;
+    }
+
+    .preview-modal-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .preview-modal-body {
+      padding: 20px;
+      background: #000000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 380px;
+    }
+
+    @media (max-width: 960px) {
+      .detail-hero-container,
+      .detail-body-container {
+        grid-template-columns: 1fr;
+      }
+      .sidebar-enroll-card {
+        position: static;
+        order: -1;
+      }
+      .navbar {
+        padding: 10px 16px 8px;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+      }
+      .desktop-only {
+        display: none !important;
+      }
+      .mobile-only {
+        display: block !important;
+        width: 100%;
+      }
+      .nav-mobile-row {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+      }
+      .nav-mobile-row::-webkit-scrollbar {
+        display: none;
+      }
+      .nav-links-menu.mobile-scroll {
+        display: flex;
+        gap: 6px;
+        list-style: none;
+        margin: 0;
+        padding: 2px 0;
+        width: max-content;
+      }
+      .nav-links-menu.mobile-scroll .nav-link-item {
+        font-size: 12px;
+        padding: 6px 12px;
+        white-space: nowrap;
+        background: var(--bg-surface-subtle);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-full);
+      }
+      .nav-links-menu.mobile-scroll .nav-link-item.active {
+        background: var(--accent-primary);
+        color: var(--accent-text);
+        border-color: var(--accent-primary);
+      }
+      .detail-course-title {
+        font-size: 26px;
+      }
+    }
+  </style>
+
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('skillsphere_theme') || 
+        (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    })();
+  </script>
+</head>
+<body>
+
+  <div class="course-detail-layout">
+    <!-- Navbar -->
+    <header class="navbar">
+      <div class="nav-main-row">
+        <a href="/dashboard" class="brand-logo" style="text-decoration:none;">
+          <div class="brand-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 0L13.8 8.2L22 10L13.8 11.8L12 20L10.2 11.8L2 10L10.2 8.2L12 0Z" />
+            </svg>
+          </div>
+          <span>SkillSphere AI</span>
+        </a>
+
+        <!-- Desktop Navigation -->
+        <ul class="nav-links-menu desktop-only">
+          <li><a href="/dashboard" class="nav-link-item">Beranda</a></li>
+          <li><a href="/courses" class="nav-link-item active">Katalog Kursus</a></li>
+          <li><a href="/dashboard/onboarding" class="nav-link-item">Jalur Belajar AI</a></li>
+          <li><a href="/profile" class="nav-link-item">Profil Saya</a></li>
+        </ul>
+
+        <div class="nav-actions">
+          <button class="theme-toggle-btn" id="theme-toggle-btn" type="button" aria-label="Toggle dark/light mode">
+            <i class="fas fa-sun" id="theme-icon-sun" style="display:none;"></i>
+            <i class="fas fa-moon" id="theme-icon-moon"></i>
+            <span id="theme-text">Mode Gelap</span>
+          </button>
+
+          <a href="/login" class="btn btn-outline" id="nav-auth-btn" style="font-size:12px; padding:6px 14px;">
+            Masuk
+          </a>
+        </div>
+      </div>
+
+      <!-- Mobile Scrollable Nav -->
+      <div class="nav-mobile-row mobile-only">
+        <ul class="nav-links-menu mobile-scroll">
+          <li><a href="/dashboard" class="nav-link-item">Beranda</a></li>
+          <li><a href="/courses" class="nav-link-item active">Katalog Kursus</a></li>
+          <li><a href="/dashboard/onboarding" class="nav-link-item">Jalur Belajar AI</a></li>
+          <li><a href="/profile" class="nav-link-item">Profil Saya</a></li>
+        </ul>
+      </div>
+    </header>
+
+    <!-- Detail Hero Section -->
+    <section class="detail-hero-section">
+      <div class="detail-hero-container">
+        
+        <!-- Left Hero Details -->
+        <div>
+          <nav class="breadcrumb-nav">
+            <a href="/dashboard"><i class="fas fa-home"></i></a>
+            <span>/</span>
+            <a href="/courses">Katalog Kursus</a>
+            <span>/</span>
+            <span id="breadcrumb-category">Memuat Kategori...</span>
+          </nav>
+
+          <div class="course-badges-row">
+            <span class="badge-pill category" id="badge-category">Kategori</span>
+            <span class="badge-pill level" id="badge-level">Tingkat</span>
+          </div>
+
+          <h1 class="detail-course-title" id="course-title">Memuat Informasi Kursus...</h1>
+          <p class="detail-course-summary" id="course-description">
+            Deskripsi lengkap materi dan kurikulum adaptif sedang dimuat.
+          </p>
+
+          <div class="instructor-hero-card">
+            <div class="instructor-avatar-md" id="tutor-avatar">T</div>
+            <div class="instructor-hero-meta">
+              <h4 id="tutor-name">Instruktur Pengajar <i class="fas fa-circle-check" style="color:#3B82F6;" title="Terverifikasi"></i></h4>
+              <p id="tutor-role-title">Pengajar Ahli Terverifikasi SkillSphere AI</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sticky Sidebar Card Desktop -->
+        <aside class="sidebar-enroll-card">
+          <div class="enroll-video-preview" id="preview-box" onclick="handleOpenPreviewModal()">
+            <img id="course-cover-img" src="" alt="Thumbnail Kursus" style="display:none;">
+            <div class="preview-play-btn">
+              <i class="fas fa-play" style="margin-left:3px;"></i>
+            </div>
+          </div>
+
+          <div style="font-size:12px; color:var(--text-secondary); text-transform:uppercase; font-weight:600; margin-bottom:2px;">Biaya Pendaftaran</div>
+          <div class="enroll-price-display" id="course-price-tag">Rp 0</div>
+
+          <button class="btn-enroll-action" id="btn-enroll-main" onclick="handleEnrollCourse()">
+            <i class="fas fa-graduation-cap"></i> Daftar & Masuk Kelas
+          </button>
+
+          <ul class="enroll-benefits-list">
+            <li class="enroll-benefit-item"><i class="fas fa-circle-check"></i> Akses materi penuh seumur hidup</li>
+            <li class="enroll-benefit-item"><i class="fas fa-circle-check"></i> Sertifikat kompetensi digital resmi</li>
+            <li class="enroll-benefit-item"><i class="fas fa-circle-check"></i> Tanya jawab asisten belajar Gemini AI</li>
+            <li class="enroll-benefit-item"><i class="fas fa-circle-check"></i> Garansi 7 hari kepuasan materi</li>
+          </ul>
+
+          <button class="btn btn-outline" style="width:100%; font-size:12px; padding:8px 12px;" onclick="copyCourseShareLink()">
+            <i class="fas fa-share-nodes" style="margin-right:6px;"></i> Bagikan Tautan Kelas
+          </button>
+        </aside>
+
+      </div>
+    </section>
+
+    <!-- Main Content Tabs -->
+    <main class="detail-body-container">
+      <div>
+        
+        <!-- Tabs Header -->
+        <div class="detail-tabs-bar">
+          <button class="detail-tab-btn active" data-tab="tab-overview">
+            <i class="fas fa-circle-info"></i> Tentang Kursus
+          </button>
+          <button class="detail-tab-btn" data-tab="tab-curriculum">
+            <i class="fas fa-layer-group"></i> Silabus & Kurikulum
+          </button>
+          <button class="detail-tab-btn" data-tab="tab-instructor">
+            <i class="fas fa-chalkboard-user"></i> Instruktur
+          </button>
+        </div>
+
+        <!-- TAB 1: TENTANG KURSUS -->
+        <section id="tab-overview" class="detail-tab-pane active">
+          <div class="content-card-section">
+            <h2 class="section-title-sm"><i class="fas fa-list-check"></i> Apa yang Akan Anda Pelajari</h2>
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:12px; margin-bottom:20px;">
+              <div style="display:flex; align-items:start; gap:10px; font-size:13px; color:var(--text-secondary);">
+                <i class="fas fa-check" style="color:var(--color-success); margin-top:3px;"></i>
+                <span>Pemahaman fundamental hingga implementasi arsitektur nyata.</span>
+              </div>
+              <div style="display:flex; align-items:start; gap:10px; font-size:13px; color:var(--text-secondary);">
+                <i class="fas fa-check" style="color:var(--color-success); margin-top:3px;"></i>
+                <span>Studi kasus relevan dengan kebutuhan industri teknologi saat ini.</span>
+              </div>
+              <div style="display:flex; align-items:start; gap:10px; font-size:13px; color:var(--text-secondary);">
+                <i class="fas fa-check" style="color:var(--color-success); margin-top:3px;"></i>
+                <span>Pemanfaatan AI untuk mempercepat alur belajar & pemecahan error.</span>
+              </div>
+              <div style="display:flex; align-items:start; gap:10px; font-size:13px; color:var(--text-secondary);">
+                <i class="fas fa-check" style="color:var(--color-success); margin-top:3px;"></i>
+                <span>Kesiapan menghadapi uji kompetensi dan sertifikasi resmi.</span>
+              </div>
+            </div>
+
+            <h2 class="section-title-sm" style="margin-top:28px;"><i class="fas fa-book-bookmark"></i> Prasyarat Belajar</h2>
+            <p style="font-size:13px; color:var(--text-secondary); line-height:1.6; margin:0;">
+              Memiliki komputer/laptop dengan koneksi internet stabil serta kemauan untuk berlatih secara konsisten setiap hari. Tidak ada batasan usia atau latar belakang khusus untuk memulai.
+            </p>
+          </div>
+        </section>
+
+        <!-- TAB 2: KURIKULUM & SILABUS -->
+        <section id="tab-curriculum" class="detail-tab-pane">
+          <div class="content-card-section">
+            <h2 class="section-title-sm"><i class="fas fa-list-ol"></i> Struktur Bab & Unit Materi</h2>
+            <p style="font-size:13px; color:var(--text-secondary); margin-bottom:20px;">
+              Kurikulum disusun bertahap untuk memastikan pemahaman teori dan praktek berjalan selaras.
+            </p>
+
+            <div class="curriculum-accordion" id="curriculum-container">
+              <div style="text-align: center; padding: 24px; color: var(--text-secondary); font-size: 13px;">
+                <i class="fas fa-spinner fa-spin" style="margin-right: 8px;"></i> Memuat kurikulum...
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- TAB 3: PROFIL INSTRUKTUR -->
+        <section id="tab-instructor" class="detail-tab-pane">
+          <div class="content-card-section">
+            <div style="display:flex; align-items:center; gap:16px; margin-bottom:16px;">
+              <div class="instructor-avatar-md" id="tab-tutor-avatar" style="width:54px; height:54px; font-size:20px;">T</div>
+              <div>
+                <h3 style="font-family:var(--font-serif); font-size:20px; color:var(--text-primary); margin:0 0 4px;" id="tab-tutor-name">Nama Instruktur</h3>
+                <p style="font-size:13px; color:var(--text-secondary); margin:0;">Tutor Terverifikasi SkillSphere AI</p>
+              </div>
+            </div>
+            <p style="font-size:13px; color:var(--text-secondary); line-height:1.6;">
+              Instruktur berpengalaman di bidangnya dan telah lulus proses verifikasi portofolio sertifikasi oleh Administrator SkillSphere.
+            </p>
+          </div>
+        </section>
+
+      </div>
+    </main>
+
+    <!-- Preview Modal -->
+    <div class="preview-modal-overlay" id="preview-modal" onclick="handleClosePreviewModal(event)">
+      <div class="preview-modal-box" onclick="event.stopPropagation()">
+        <div class="preview-modal-header">
+          <h3 style="font-family:var(--font-serif); font-size:18px; color:var(--text-primary); margin:0;" id="modal-preview-title">Preview Materi Kelas</h3>
+          <button class="btn btn-outline" style="padding:4px 8px; border-radius:var(--radius-full);" onclick="closePreviewModalDirect()">
+            <i class="fas fa-xmark"></i>
+          </button>
+        </div>
+        <div class="preview-modal-body" id="modal-preview-content">
+          <!-- Video or material preview dynamic frame -->
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    function escapeHtml(str) {
+      if (str === null || str === undefined) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function formatRupiah(amount) {
+      const num = parseFloat(amount);
+      if (isNaN(num) || num === 0) return 'Gratis';
+      return new Intl.NumberFormat('id-ID', {
+        style: 'currency',
+        currency: 'IDR',
+        maximumFractionDigits: 0
+      }).format(num);
+    }
+
+    // Get Course ID from URL
+    const pathSegments = window.location.pathname.split('/').filter(Boolean);
+    const courseId = pathSegments[pathSegments.length - 1];
+
+    let currentCourse = null;
+    let firstPreviewUrl = '';
+
+    // Check Auth Token
+    const token = localStorage.getItem('access_token');
+    const authBtn = document.getElementById('nav-auth-btn');
+    if (token) {
+      authBtn.textContent = 'Dashboard';
+      authBtn.href = '/dashboard';
+    }
+
+    // Tab Navigation Logic
+    const tabButtons = document.querySelectorAll('.detail-tab-btn');
+    const tabPanels = document.querySelectorAll('.detail-tab-pane');
+
+    tabButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const target = btn.getAttribute('data-tab');
+        tabButtons.forEach(b => b.classList.remove('active'));
+        tabPanels.forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        const activePane = document.getElementById(target);
+        if (activePane) activePane.classList.add('active');
+      });
+    });
+
+    // Theme Toggle Handler
+    const themeBtn = document.getElementById('theme-toggle-btn');
+    const sunIcon = document.getElementById('theme-icon-sun');
+    const moonIcon = document.getElementById('theme-icon-moon');
+    const themeText = document.getElementById('theme-text');
+
+    function updateThemeUI(theme) {
+      if (theme === 'dark') {
+        sunIcon.style.display = 'inline-block';
+        moonIcon.style.display = 'none';
+        themeText.textContent = 'Mode Terang';
+      } else {
+        sunIcon.style.display = 'none';
+        moonIcon.style.display = 'inline-block';
+        themeText.textContent = 'Mode Gelap';
+      }
+    }
+
+    const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+    updateThemeUI(currentTheme);
+
+    themeBtn.addEventListener('click', () => {
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      const nextTheme = isDark ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', nextTheme);
+      localStorage.setItem('skillsphere_theme', nextTheme);
+      updateThemeUI(nextTheme);
+    });
+
+    // Fetch Course Detail
+    async function loadCourseDetail() {
+      if (!courseId) {
+        window.location.href = '/courses';
+        return;
+      }
+
+      try {
+        const res = await fetch(`/api/courses/${courseId}`);
+        const json = await res.json();
+
+        if (!json.success || !json.data) {
+          alert('Kursus tidak ditemukan.');
+          window.location.href = '/courses';
+          return;
+        }
+
+        const course = json.data;
+        currentCourse = course;
+
+        const catName = course.category ? course.category.name : 'Teknologi';
+        const tutorName = course.tutor ? course.tutor.name : 'Instruktur SkillSphere';
+        const priceFormatted = formatRupiah(course.price);
+        const levelFormatted = course.level === 'advanced' ? 'Mahir' : (course.level === 'intermediate' ? 'Menengah' : 'Pemula');
+
+        // Populate Hero
+        document.getElementById('breadcrumb-category').textContent = catName;
+        document.getElementById('badge-category').textContent = catName;
+        document.getElementById('badge-level').textContent = levelFormatted;
+        document.getElementById('course-title').textContent = course.title;
+        document.getElementById('course-description').textContent = course.description || 'Pelajari materi terstruktur dan kuasai keahlian baru.';
+        
+        document.getElementById('tutor-name').innerHTML = `${escapeHtml(tutorName)} <i class="fas fa-circle-check" style="color:#3B82F6;" title="Terverifikasi"></i>`;
+        document.getElementById('tutor-avatar').textContent = tutorName.charAt(0).toUpperCase();
+
+        document.getElementById('tab-tutor-name').textContent = tutorName;
+        document.getElementById('tab-tutor-avatar').textContent = tutorName.charAt(0).toUpperCase();
+
+        document.getElementById('course-price-tag').textContent = priceFormatted;
+
+        if (course.thumbnail_url) {
+          const img = document.getElementById('course-cover-img');
+          img.src = course.thumbnail_url;
+          img.style.display = 'block';
+        }
+
+        // Render Curriculum Sections & Materials
+        renderCurriculum(course.sections || []);
+
+      } catch (err) {
+        console.error('Error loading course:', err);
+      }
+    }
+
+    function renderCurriculum(sections) {
+      const container = document.getElementById('curriculum-container');
+      if (sections.length === 0) {
+        container.innerHTML = `<div style="text-align:center; padding:20px; color:var(--text-secondary);">Silabus materi sedang dipersiapkan oleh pengajar.</div>`;
+        return;
+      }
+
+      container.innerHTML = sections.map((sec, index) => {
+        const materials = sec.materials || [];
+        return `
+          <div class="section-accordion-item">
+            <div class="section-accordion-header" onclick="toggleSectionAccordion(this)">
+              <span>Bab ${index + 1}: ${escapeHtml(sec.title)}</span>
+              <span style="font-size:12px; color:var(--text-secondary); font-weight:500;">
+                ${materials.length} Unit Materi <i class="fas fa-chevron-down" style="margin-left:6px;"></i>
+              </span>
+            </div>
+            <div class="section-accordion-body">
+              ${materials.length === 0 ? `<div style="padding:12px 20px; font-size:12px; color:var(--text-secondary);">Materi bab ini akan segera hadir.</div>` : materials.map(mat => {
+                let iconClass = 'fa-file-lines';
+                if (mat.content_type === 'video') iconClass = 'fa-circle-play';
+                if (mat.content_type === 'presentation') iconClass = 'fa-file-powerpoint';
+                if (mat.content_type === 'book') iconClass = 'fa-book-open';
+
+                const isPreview = mat.is_preview;
+                if (isPreview && !firstPreviewUrl && mat.file_url) {
+                  firstPreviewUrl = mat.file_url;
+                }
+
+                return `
+                  <div class="material-unit-row">
+                    <div class="material-meta-left">
+                      <i class="fas ${iconClass} material-type-icon"></i>
+                      <span>${escapeHtml(mat.title)}</span>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:10px;">
+                      <span style="font-size:12px; color:var(--text-secondary);">${mat.duration_minutes || 5} mnt</span>
+                      ${isPreview ? `
+                        <button class="material-badge-preview" onclick="openMaterialPreview('${escapeHtml(mat.title)}', '${escapeHtml(mat.file_url || '')}', '${mat.content_type}')">
+                          <i class="fas fa-play" style="font-size:9px;"></i> Preview Gratis
+                        </button>
+                      ` : `
+                        <span class="material-badge-locked"><i class="fas fa-lock"></i> Terkunci</span>
+                      `}
+                    </div>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function toggleSectionAccordion(headerEl) {
+      const body = headerEl.nextElementSibling;
+      const icon = headerEl.querySelector('.fa-chevron-down, .fa-chevron-up');
+      if (body.style.display === 'none') {
+        body.style.display = 'flex';
+        if (icon) { icon.classList.remove('fa-chevron-down'); icon.classList.add('fa-chevron-up'); }
+      } else {
+        body.style.display = 'none';
+        if (icon) { icon.classList.remove('fa-chevron-up'); icon.classList.add('fa-chevron-down'); }
+      }
+    }
+
+    // Modal Preview Controls
+    function handleOpenPreviewModal() {
+      if (firstPreviewUrl) {
+        openMaterialPreview('Preview Pelajaran', firstPreviewUrl, 'video');
+      } else {
+        openMaterialPreview('Trailer Kursus', '', 'video');
+      }
+    }
+
+    function openMaterialPreview(title, fileUrl, type) {
+      const modal = document.getElementById('preview-modal');
+      const titleEl = document.getElementById('modal-preview-title');
+      const bodyEl = document.getElementById('modal-preview-content');
+
+      titleEl.textContent = title;
+      if (fileUrl && type === 'video') {
+        bodyEl.innerHTML = `
+          <video controls autoplay style="width:100%; max-height:420px; border-radius:var(--radius-md);">
+            <source src="${escapeHtml(fileUrl)}" type="video/mp4">
+            Browser Anda tidak mendukung pemutar video.
+          </video>
+        `;
+      } else {
+        bodyEl.innerHTML = `
+          <div style="text-align:center; padding:40px; color:#FFFFFF;">
+            <i class="fas fa-circle-play" style="font-size:48px; margin-bottom:14px; opacity:0.8;"></i>
+            <h4 style="font-family:var(--font-serif); font-size:18px; margin-bottom:6px;">Preview Pelajaran Terpilih</h4>
+            <p style="font-size:13px; color:#A8A29A;">Daftarkan diri Anda ke kelas ini untuk mengakses kurikulum lengkap dan interaksi asisten AI.</p>
+          </div>
+        `;
+      }
+      modal.style.display = 'flex';
+    }
+
+    function handleClosePreviewModal(e) {
+      if (e.target.id === 'preview-modal') {
+        closePreviewModalDirect();
+      }
+    }
+
+    function closePreviewModalDirect() {
+      const modal = document.getElementById('preview-modal');
+      const bodyEl = document.getElementById('modal-preview-content');
+      bodyEl.innerHTML = '';
+      modal.style.display = 'none';
+    }
+
+    // Enroll Action
+    async function handleEnrollCourse() {
+      const token = localStorage.getItem('access_token');
+      if (!token) {
+        alert('Silakan masuk (login) terlebih dahulu untuk mendaftar kelas ini.');
+        window.location.href = `/login?redirect=${encodeURIComponent(window.location.pathname)}`;
+        return;
+      }
+
+      const btn = document.getElementById('btn-enroll-main');
+      const originalText = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses Pendaftaran...';
+
+      try {
+        const res = await fetch(`/api/courses/${courseId}/enroll`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        const json = await res.json();
+        if (json.success) {
+          alert(json.message || 'Pendaftaran kelas berhasil! Anda akan diarahkan ke ruang belajar.');
+          window.location.href = '/dashboard';
+        } else {
+          alert(json.message || 'Pendaftaran tidak dapat diproses.');
+        }
+      } catch (err) {
+        alert('Terjadi kesalahan jaringan saat mendaftar kelas.');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+      }
+    }
+
+    function copyCourseShareLink() {
+      navigator.clipboard.writeText(window.location.href);
+      alert('Tautan kursus berhasil disalin ke clipboard!');
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadCourseDetail();
+    });
+  </script>
+</body>
+</html>

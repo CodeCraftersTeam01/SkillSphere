@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pengaturan Profil & Preferensi Belajar | SkillSphere AI</title>
+  <meta name="description" content="Kelola data profil, preferensi karir adaptif AI, keamanan akun, dan pantau sertifikat keahlian Anda di SkillSphere AI.">
+  
+  <!-- PWA Manifest & App Icons -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#1F1E1B">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="SkillSphere">
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="shortcut icon" href="/favicon.svg">
+  
+  <!-- Google Fonts: Newsreader & Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome 6 Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Claude Design System Stylesheet -->
+  <link rel="stylesheet" href="/stylesheets/claude-theme.css?v=2.0">
+
+  <style>
+    .profile-layout {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background-color: var(--bg-app);
+    }
+
+    /* Navbar styling */
+    .navbar {
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 12px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .nav-main-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      gap: 20px;
+    }
+
+    .desktop-only {
+      display: flex;
+    }
+
+    .mobile-only {
+      display: none;
+    }
+
+    .profile-container {
+      max-width: 1100px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 32px 24px 80px;
+      flex: 1;
+    }
+
+    /* Profile Header Card */
+    .profile-header-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-xl);
+      padding: 32px;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+
+    .profile-user-group {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .profile-avatar-large {
+      width: 76px;
+      height: 76px;
+      border-radius: var(--radius-full);
+      background: var(--accent-primary);
+      color: var(--accent-text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      font-weight: 700;
+      flex-shrink: 0;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .profile-info-details h1 {
+      font-family: var(--font-serif);
+      font-size: 26px;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin-bottom: 6px;
+      line-height: 1.2;
+    }
+
+    .profile-meta-pills {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .meta-pill {
+      font-size: 12px;
+      padding: 4px 10px;
+      border-radius: var(--radius-full);
+      background: var(--bg-surface-subtle);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .meta-pill.role-badge {
+      background: var(--accent-primary);
+      color: var(--accent-text);
+      border-color: var(--accent-primary);
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 11px;
+    }
+
+    /* Tab Navigation */
+    .profile-tabs-nav {
+      display: flex;
+      gap: 8px;
+      border-bottom: 1px solid var(--border-subtle);
+      margin-bottom: 24px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+
+    .profile-tabs-nav::-webkit-scrollbar {
+      display: none;
+    }
+
+    .profile-tab-btn {
+      padding: 12px 18px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+      transition: all 0.2s ease;
+    }
+
+    .profile-tab-btn:hover {
+      color: var(--text-primary);
+    }
+
+    .profile-tab-btn.active {
+      color: var(--text-primary);
+      font-weight: 600;
+      border-bottom-color: var(--accent-primary);
+    }
+
+    /* Tab Panels */
+    .tab-panel {
+      display: none;
+    }
+
+    .tab-panel.active {
+      display: block;
+      animation: framerFadeIn 0.25s ease-out;
+    }
+
+    @keyframes framerFadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .card-panel {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-xl);
+      padding: 28px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .panel-heading-row {
+      margin-bottom: 24px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .panel-title {
+      font-family: var(--font-serif);
+      font-size: 20px;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+
+    .panel-subtitle {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    /* Form Grid */
+    .form-grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+
+    .form-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .form-input, .form-select, .form-textarea {
+      width: 100%;
+      padding: 10px 14px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-surface-subtle);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      font-size: 14px;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .form-input:focus, .form-select:focus, .form-textarea:focus {
+      outline: none;
+      border-color: var(--accent-primary);
+      box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.06);
+    }
+
+    [data-theme="dark"] .form-input:focus,
+    [data-theme="dark"] .form-select:focus,
+    [data-theme="dark"] .form-textarea:focus {
+      box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+    }
+
+    .form-input:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      background: var(--border-subtle);
+    }
+
+    .form-helper {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .form-actions-row {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      margin-top: 24px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    /* Alert Toast Box */
+    .alert-banner {
+      padding: 12px 16px;
+      border-radius: var(--radius-md);
+      font-size: 13px;
+      margin-bottom: 20px;
+      display: none;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .alert-banner.success {
+      background: var(--color-success-bg);
+      border: 1px solid var(--color-success);
+      color: var(--color-success);
+      display: flex;
+    }
+
+    .alert-banner.error {
+      background: var(--color-danger-bg);
+      border: 1px solid var(--color-danger);
+      color: var(--color-danger);
+      display: flex;
+    }
+
+    /* Certificate & Courses Grid */
+    .my-items-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+    }
+
+    .my-item-card {
+      background: var(--bg-surface-subtle);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      transition: all 0.2s ease;
+    }
+
+    .my-item-card:hover {
+      border-color: var(--border-strong);
+      transform: translateY(-2px);
+    }
+
+    @media (max-width: 860px) {
+      .navbar {
+        padding: 10px 16px 8px;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+      }
+      .desktop-only {
+        display: none !important;
+      }
+      .mobile-only {
+        display: block !important;
+        width: 100%;
+      }
+      .nav-mobile-row {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+      }
+      .nav-mobile-row::-webkit-scrollbar {
+        display: none;
+      }
+      .nav-links-menu.mobile-scroll {
+        display: flex;
+        gap: 6px;
+        list-style: none;
+        margin: 0;
+        padding: 2px 0;
+        width: max-content;
+      }
+      .nav-links-menu.mobile-scroll .nav-link-item {
+        font-size: 12px;
+        padding: 6px 12px;
+        white-space: nowrap;
+        background: var(--bg-surface-subtle);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-full);
+      }
+      .nav-links-menu.mobile-scroll .nav-link-item.active {
+        background: var(--accent-primary);
+        color: var(--accent-text);
+        border-color: var(--accent-primary);
+      }
+      .form-grid-2 {
+        grid-template-columns: 1fr;
+      }
+      .profile-header-card {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .profile-container {
+        padding: 20px 16px 60px;
+      }
+    }
+  </style>
+
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('skillsphere_theme') || 
+        (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    })();
+  </script>
+</head>
+<body>
+
+  <div class="profile-layout">
+    <!-- Navbar Header -->
+    <header class="navbar">
+      <div class="nav-main-row">
+        <a href="/dashboard" class="brand-logo" style="text-decoration:none;">
+          <div class="brand-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 0L13.8 8.2L22 10L13.8 11.8L12 20L10.2 11.8L2 10L10.2 8.2L12 0Z" />
+            </svg>
+          </div>
+          <span>SkillSphere AI</span>
+        </a>
+
+        <!-- Desktop Navigation -->
+        <ul class="nav-links-menu desktop-only">
+          <li><a href="/dashboard" class="nav-link-item">Beranda</a></li>
+          <li><a href="/courses" class="nav-link-item">Katalog Kursus</a></li>
+          <li><a href="/dashboard/onboarding" class="nav-link-item">Jalur Belajar AI</a></li>
+          <li><a href="/profile" class="nav-link-item active">Profil Saya</a></li>
+        </ul>
+
+        <div class="nav-actions">
+          <button class="theme-toggle-btn" id="theme-toggle-btn" type="button" aria-label="Toggle dark/light mode">
+            <i class="fas fa-sun" id="theme-icon-sun" style="display:none;"></i>
+            <i class="fas fa-moon" id="theme-icon-moon"></i>
+            <span id="theme-text">Mode Gelap</span>
+          </button>
+
+          <button class="logout-btn" id="logout-btn" type="button" title="Keluar">
+            <i class="fas fa-arrow-right-from-bracket"></i>
+            <span>Keluar</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Mobile Scrollable Nav -->
+      <div class="nav-mobile-row mobile-only">
+        <ul class="nav-links-menu mobile-scroll">
+          <li><a href="/dashboard" class="nav-link-item">Beranda</a></li>
+          <li><a href="/courses" class="nav-link-item">Katalog Kursus</a></li>
+          <li><a href="/dashboard/onboarding" class="nav-link-item">Jalur Belajar AI</a></li>
+          <li><a href="/profile" class="nav-link-item active">Profil Saya</a></li>
+        </ul>
+      </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="profile-container">
+      
+      <!-- Top Alert Notification -->
+      <div id="global-alert" class="alert-banner">
+        <i id="alert-icon" class="fas fa-circle-check"></i>
+        <span id="alert-message">Pesan notifikasi</span>
+      </div>
+
+      <!-- Profile Header Card -->
+      <section class="profile-header-card">
+        <div class="profile-user-group">
+          <div class="profile-avatar-large" id="profile-avatar">U</div>
+          <div class="profile-info-details">
+            <h1 id="header-user-name">Memuat Profil...</h1>
+            <div class="profile-meta-pills">
+              <span class="meta-pill role-badge" id="header-user-role">Siswa</span>
+              <span class="meta-pill" id="header-user-email"><i class="fas fa-envelope"></i> email@domain.com</span>
+              <span class="meta-pill" id="header-user-joined"><i class="fas fa-calendar"></i> Bergabung 2026</span>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <a href="/dashboard/onboarding" class="btn btn-outline" style="font-size:13px; padding:8px 16px;">
+            <i class="fas fa-wand-magic-sparkles" style="margin-right:6px;"></i> Ubah Personalisasi AI
+          </a>
+        </div>
+      </section>
+
+      <!-- Tab Navigation -->
+      <div class="profile-tabs-nav">
+        <button class="profile-tab-btn active" data-tab="tab-bio">
+          <i class="fas fa-user-circle"></i> Informasi Biodata
+        </button>
+        <button class="profile-tab-btn" data-tab="tab-preferences">
+          <i class="fas fa-compass"></i> Preferensi Belajar & Karir
+        </button>
+        <button class="profile-tab-btn" data-tab="tab-security">
+          <i class="fas fa-shield-halved"></i> Keamanan & Kata Sandi
+        </button>
+        <button class="profile-tab-btn" data-tab="tab-activities">
+          <i class="fas fa-award"></i> Kelas & Sertifikat Saya
+        </button>
+      </div>
+
+      <!-- TAB 1: INFORMASI BIODATA -->
+      <section id="tab-bio" class="tab-panel active">
+        <div class="card-panel">
+          <div class="panel-heading-row">
+            <h2 class="panel-title">Informasi Pribadi</h2>
+            <p class="panel-subtitle">Perbarui data kontak dan identitas akun pembelajar Anda.</p>
+          </div>
+
+          <form id="form-bio" onsubmit="handleUpdateBio(event)">
+            <div class="form-grid-2">
+              <div class="form-group">
+                <label class="form-label" for="bio-name">Nama Lengkap</label>
+                <input type="text" id="bio-name" class="form-input" required placeholder="Masukkan nama lengkap">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="bio-email">Alamat Email</label>
+                <input type="email" id="bio-email" class="form-input" disabled title="Email terverifikasi tidak dapat diubah sembarangan.">
+                <span class="form-helper">Email akun telah terverifikasi via OTP.</span>
+              </div>
+            </div>
+
+            <div class="form-grid-2">
+              <div class="form-group">
+                <label class="form-label" for="bio-phone">Nomor Telepon / WhatsApp</label>
+                <input type="tel" id="bio-phone" class="form-input" placeholder="Contoh: 081234567890">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="bio-location">Domisili / Kota</label>
+                <input type="text" id="bio-location" class="form-input" placeholder="Contoh: Surabaya, Jawa Timur">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="bio-about">Tentang Saya / Bio Singkat</label>
+              <textarea id="bio-about" class="form-textarea" rows="4" placeholder="Ceritakan latar belakang pendidikan atau ketertarikan teknologi Anda..."></textarea>
+            </div>
+
+            <div class="form-actions-row">
+              <button type="submit" class="btn btn-primary" id="btn-save-bio">
+                <i class="fas fa-floppy-disk" style="margin-right:6px;"></i> Simpan Perubahan Biodata
+              </button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <!-- TAB 2: PREFERENSI BELAJAR & KARIR -->
+      <section id="tab-preferences" class="tab-panel">
+        <div class="card-panel">
+          <div class="panel-heading-row">
+            <h2 class="panel-title">Preferensi Karir & Kurikulum AI</h2>
+            <p class="panel-subtitle">Konfigurasi target karir Anda untuk mendapatkan rekomendasi materi cerdas dari Gemini AI.</p>
+          </div>
+
+          <form id="form-pref" onsubmit="handleUpdatePreferences(event)">
+            <div class="form-grid-2">
+              <div class="form-group">
+                <label class="form-label" for="pref-career">Target Rumpun Karir Masa Depan</label>
+                <select id="pref-career" class="form-select">
+                  <option value="Fullstack Web Developer">Fullstack Web Developer (Node.js & Modern Frontend)</option>
+                  <option value="AI & Machine Learning Engineer">AI & Machine Learning Engineer (Python & Deep Learning)</option>
+                  <option value="Cloud & DevOps Specialist">Cloud & DevOps Specialist (Docker, Kubernetes, AWS)</option>
+                  <option value="Mobile App Developer">Mobile App Developer (Flutter & Kotlin/Swift)</option>
+                  <option value="Cybersecurity Analyst">Cybersecurity Analyst & Penetration Tester</option>
+                  <option value="Data Scientist / Analyst">Data Scientist & Business Intelligence</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="pref-skill-level">Tingkat Kemampuan Saat Ini</label>
+                <select id="pref-skill-level" class="form-select">
+                  <option value="beginner">Pemula (Baru memulai langkah belajar)</option>
+                  <option value="intermediate">Menengah (Paham sintaks & fondasi dasar)</option>
+                  <option value="advanced">Mahir (Siap implementasi skala produksi industri)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-grid-2">
+              <div class="form-group">
+                <label class="form-label" for="pref-time-commit">Komitmen Waktu Belajar</label>
+                <select id="pref-time-commit" class="form-select">
+                  <option value="30">30 Menit / Hari (Konsisten santai)</option>
+                  <option value="60">1 Jam / Hari (Direkomendasikan)</option>
+                  <option value="120">2 Jam / Hari (Akselerasi karir)</option>
+                  <option value="240">4+ Jam / Hari (Intensif Bootcamp)</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="pref-tools">Teknologi / Bahasa Pemrograman Utama</label>
+                <input type="text" id="pref-tools" class="form-input" placeholder="Contoh: JavaScript, Python, Docker, React">
+              </div>
+            </div>
+
+            <div class="form-actions-row">
+              <button type="submit" class="btn btn-primary" id="btn-save-pref">
+                <i class="fas fa-wand-magic-sparkles" style="margin-right:6px;"></i> Simpan Preferensi Belajar
+              </button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <!-- TAB 3: KEAMANAN & KATA SANDI -->
+      <section id="tab-security" class="tab-panel">
+        <div class="card-panel">
+          <div class="panel-heading-row">
+            <h2 class="panel-title">Keamanan & Perubahan Kata Sandi</h2>
+            <p class="panel-subtitle">Pastikan akun Anda tetap aman dengan menggunakan kata sandi yang kuat dan unik.</p>
+          </div>
+
+          <form id="form-security" onsubmit="handleChangePassword(event)">
+            <div class="form-group">
+              <label class="form-label" for="sec-curr-pass">Kata Sandi Saat Ini</label>
+              <input type="password" id="sec-curr-pass" class="form-input" required placeholder="Masukkan kata sandi lama">
+            </div>
+
+            <div class="form-grid-2">
+              <div class="form-group">
+                <label class="form-label" for="sec-new-pass">Kata Sandi Baru</label>
+                <input type="password" id="sec-new-pass" class="form-input" required minlength="6" placeholder="Minimal 6 karakter">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="sec-conf-pass">Konfirmasi Kata Sandi Baru</label>
+                <input type="password" id="sec-conf-pass" class="form-input" required minlength="6" placeholder="Ulangi kata sandi baru">
+              </div>
+            </div>
+
+            <div class="form-actions-row">
+              <button type="submit" class="btn btn-primary" id="btn-save-sec">
+                <i class="fas fa-key" style="margin-right:6px;"></i> Perbarui Kata Sandi
+              </button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <!-- TAB 4: KELAS & SERTIFIKAT SAYA -->
+      <section id="tab-activities" class="tab-panel">
+        <div class="card-panel">
+          <div class="panel-heading-row">
+            <h2 class="panel-title">Riwayat Kelas & Sertifikat Kelulusan</h2>
+            <p class="panel-subtitle">Daftar kursus terdaftar dan sertifikasi kompetensi digital yang telah Anda selesaikan.</p>
+          </div>
+
+          <div id="my-enrollments-container" class="my-items-grid">
+            <div style="grid-column: 1 / -1; text-align: center; padding: 32px; color: var(--text-secondary); font-size: 13px;">
+              <i class="fas fa-spinner fa-spin" style="margin-right: 8px;"></i> Memuat data kelas Anda...
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <script>
+    // Escape HTML helper
+    function escapeHtml(str) {
+      if (str === null || str === undefined) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function showAlert(message, type = 'success') {
+      const banner = document.getElementById('global-alert');
+      const msg = document.getElementById('alert-message');
+      const icon = document.getElementById('alert-icon');
+      
+      banner.className = `alert-banner ${type}`;
+      msg.textContent = message;
+      icon.className = type === 'success' ? 'fas fa-circle-check' : 'fas fa-circle-exclamation';
+      
+      banner.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      setTimeout(() => {
+        banner.style.display = 'none';
+      }, 5000);
+    }
+
+    // Tab Navigation Logic
+    const tabButtons = document.querySelectorAll('.profile-tab-btn');
+    const tabPanels = document.querySelectorAll('.tab-panel');
+
+    tabButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const targetTab = btn.getAttribute('data-tab');
+        
+        tabButtons.forEach(b => b.classList.remove('active'));
+        tabPanels.forEach(p => p.classList.remove('active'));
+
+        btn.classList.add('active');
+        const activePanel = document.getElementById(targetTab);
+        if (activePanel) activePanel.classList.add('active');
+      });
+    });
+
+    // Theme Toggle Handler
+    const themeBtn = document.getElementById('theme-toggle-btn');
+    const sunIcon = document.getElementById('theme-icon-sun');
+    const moonIcon = document.getElementById('theme-icon-moon');
+    const themeText = document.getElementById('theme-text');
+
+    function updateThemeUI(theme) {
+      if (theme === 'dark') {
+        sunIcon.style.display = 'inline-block';
+        moonIcon.style.display = 'none';
+        themeText.textContent = 'Mode Terang';
+      } else {
+        sunIcon.style.display = 'none';
+        moonIcon.style.display = 'inline-block';
+        themeText.textContent = 'Mode Gelap';
+      }
+    }
+
+    const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+    updateThemeUI(currentTheme);
+
+    themeBtn.addEventListener('click', () => {
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      const nextTheme = isDark ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', nextTheme);
+      localStorage.setItem('skillsphere_theme', nextTheme);
+      updateThemeUI(nextTheme);
+    });
+
+    // Logout Handler
+    document.getElementById('logout-btn').addEventListener('click', async () => {
+      const token = localStorage.getItem('access_token');
+      if (token) {
+        try {
+          await fetch('/api/auth/logout', {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+        } catch (e) {}
+      }
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('refresh_token');
+      localStorage.removeItem('user');
+      window.location.href = '/login';
+    });
+
+    // Fetch User Profile
+    async function loadUserProfile() {
+      const token = localStorage.getItem('access_token');
+      if (!token) {
+        window.location.href = '/login';
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/auth/me', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (res.status === 401) {
+          window.location.href = '/login';
+          return;
+        }
+
+        const json = await res.json();
+        if (json.success && json.user) {
+          const user = json.user;
+          const profile = user.profile || {};
+
+          // Populate Header
+          document.getElementById('header-user-name').textContent = user.name || 'Pengguna SkillSphere';
+          document.getElementById('profile-avatar').textContent = (user.name || 'U').charAt(0).toUpperCase();
+          document.getElementById('header-user-role').textContent = user.role === 'tutor' ? 'Pengajar / Tutor' : (user.role === 'admin' ? 'Administrator' : 'Siswa');
+          document.getElementById('header-user-email').innerHTML = `<i class="fas fa-envelope"></i> ${escapeHtml(user.email)}`;
+          
+          if (user.created_at) {
+            const year = new Date(user.created_at).getFullYear();
+            document.getElementById('header-user-joined').innerHTML = `<i class="fas fa-calendar"></i> Bergabung ${year}`;
+          }
+
+          // Populate Bio Form
+          document.getElementById('bio-name').value = user.name || '';
+          document.getElementById('bio-email').value = user.email || '';
+          document.getElementById('bio-phone').value = profile.phone_number || '';
+          document.getElementById('bio-about').value = profile.bio || '';
+          document.getElementById('bio-location').value = profile.institution || '';
+
+          // Populate Preferences Form
+          if (profile.target_career) {
+            document.getElementById('pref-career').value = profile.target_career;
+          }
+          if (profile.skill_level) {
+            document.getElementById('pref-skill-level').value = profile.skill_level;
+          }
+          if (profile.preferred_study_time) {
+            document.getElementById('pref-time-commit').value = String(profile.preferred_study_time);
+          }
+        }
+      } catch (err) {
+        console.error('Gagal memuat profil:', err);
+      }
+    }
+
+    // Save Bio Form Handler
+    async function handleUpdateBio(e) {
+      e.preventDefault();
+      const token = localStorage.getItem('access_token');
+      const btn = document.getElementById('btn-save-bio');
+      const originalText = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
+
+      try {
+        const bodyData = {
+          name: document.getElementById('bio-name').value.trim(),
+          phone_number: document.getElementById('bio-phone').value.trim(),
+          bio: document.getElementById('bio-about').value.trim(),
+          institution: document.getElementById('bio-location').value.trim(),
+        };
+
+        const res = await fetch('/api/auth/profile', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(bodyData)
+        });
+
+        const json = await res.json();
+        if (json.success) {
+          showAlert(json.message || 'Biodata profil berhasil diperbarui!', 'success');
+          loadUserProfile();
+        } else {
+          showAlert(json.message || 'Gagal memperbarui profil.', 'error');
+        }
+      } catch (err) {
+        showAlert('Terjadi kesalahan jaringan saat menyimpan profil.', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+      }
+    }
+
+    // Save Preferences Form Handler
+    async function handleUpdatePreferences(e) {
+      e.preventDefault();
+      const token = localStorage.getItem('access_token');
+      const btn = document.getElementById('btn-save-pref');
+      const originalText = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
+
+      try {
+        const bodyData = {
+          target_career: document.getElementById('pref-career').value,
+          skill_level: document.getElementById('pref-skill-level').value,
+          preferred_study_time: parseInt(document.getElementById('pref-time-commit').value, 10),
+        };
+
+        const res = await fetch('/api/auth/profile', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(bodyData)
+        });
+
+        const json = await res.json();
+        if (json.success) {
+          showAlert(json.message || 'Preferensi belajar berhasil diperbarui!', 'success');
+        } else {
+          showAlert(json.message || 'Gagal menyimpan preferensi.', 'error');
+        }
+      } catch (err) {
+        showAlert('Terjadi kesalahan jaringan saat menyimpan preferensi.', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+      }
+    }
+
+    // Change Password Handler
+    async function handleChangePassword(e) {
+      e.preventDefault();
+      const token = localStorage.getItem('access_token');
+      const oldPassword = document.getElementById('sec-curr-pass').value;
+      const newPassword = document.getElementById('sec-new-pass').value;
+      const confirmPassword = document.getElementById('sec-conf-pass').value;
+
+      if (newPassword !== confirmPassword) {
+        showAlert('Konfirmasi kata sandi baru tidak sesuai.', 'error');
+        return;
+      }
+
+      const btn = document.getElementById('btn-save-sec');
+      const originalText = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
+
+      try {
+        const res = await fetch('/api/auth/change-password', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            old_password: oldPassword,
+            new_password: newPassword,
+            confirm_password: confirmPassword
+          })
+        });
+
+        const json = await res.json();
+        if (json.success) {
+          showAlert(json.message || 'Kata sandi berhasil diubah.', 'success');
+          document.getElementById('form-security').reset();
+        } else {
+          showAlert(json.message || 'Gagal mengubah kata sandi.', 'error');
+        }
+      } catch (err) {
+        showAlert('Terjadi kesalahan jaringan saat mengubah kata sandi.', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+      }
+    }
+
+    // Load Student Enrollments & Activities
+    async function loadStudentEnrollments() {
+      const container = document.getElementById('my-enrollments-container');
+      const token = localStorage.getItem('access_token');
+      if (!token) return;
+
+      try {
+        const res = await fetch('/api/courses/student/my-learning', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        const json = await res.json();
+        const enrollments = (json.success && Array.isArray(json.data)) ? json.data : [];
+
+        if (enrollments.length === 0) {
+          container.innerHTML = `
+            <div style="grid-column: 1 / -1; text-align: center; padding: 40px; background: var(--bg-surface); border: 1px dashed var(--border-subtle); border-radius: var(--radius-lg);">
+              <i class="fas fa-book-open-reader" style="font-size: 32px; color: var(--text-tertiary); margin-bottom: 12px;"></i>
+              <h3 style="font-family: var(--font-serif); font-size: 18px; color: var(--text-primary); margin-bottom: 6px;">Belum Ada Kursus Terdaftar</h3>
+              <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 16px;">Jelajahi berbagai materi pilihan dan mulai bangun keahlian impian Anda sekarang.</p>
+              <a href="/courses" class="btn btn-primary" style="font-size: 13px; padding: 8px 18px;">
+                <i class="fas fa-compass" style="margin-right: 6px;"></i> Jelajah Katalog Kursus
+              </a>
+            </div>
+          `;
+          return;
+        }
+
+        container.innerHTML = enrollments.map(item => {
+          const course = item.course || {};
+          const progress = item.progress_percentage || 0;
+          return `
+            <div class="my-item-card">
+              <div style="font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">
+                ${escapeHtml(course.category ? course.category.name : 'Teknologi')}
+              </div>
+              <h3 style="font-size: 15px; font-weight: 600; color: var(--text-primary); margin: 0; line-height: 1.35;">
+                ${escapeHtml(course.title || 'Kursus')}
+              </h3>
+              <div style="margin-top: auto; padding-top: 8px;">
+                <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--text-secondary); margin-bottom: 4px;">
+                  <span>Progres Belajar</span>
+                  <strong style="color: var(--text-primary);">${progress}%</strong>
+                </div>
+                <div style="width: 100%; height: 6px; background: var(--border-subtle); border-radius: 99px; overflow: hidden; margin-bottom: 12px;">
+                  <div style="width: ${progress}%; height: 100%; background: var(--accent-primary); border-radius: 99px;"></div>
+                </div>
+                <a href="/courses/${course.id || ''}" class="btn btn-outline" style="width: 100%; font-size: 12px; padding: 6px 12px; text-align: center; text-decoration: none; display: block;">
+                  Lanjutkan Belajar <i class="fas fa-arrow-right" style="font-size: 10px; margin-left: 4px;"></i>
+                </a>
+              </div>
+            </div>
+          `;
+        }).join('');
+      } catch (err) {
+        container.innerHTML = `<div style="grid-column: 1 / -1; text-align: center; color: var(--color-danger); padding: 20px;">Gagal memuat daftar kursus Anda.</div>`;
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadUserProfile();
+      loadStudentEnrollments();
+    });
+  </script>
+</body>
+</html>

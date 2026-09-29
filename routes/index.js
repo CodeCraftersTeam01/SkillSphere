@@ -31,6 +31,21 @@ router.get('/dashboard', function(req, res, next) {
   res.render('dashboard', { title: 'Dashboard | SkillSphere AI' });
 });
 
+/* GET Student Profile & Settings Page (Sprint 1 - Fadiyah) */
+router.get(['/profile', '/dashboard/profile'], function(req, res, next) {
+  res.render('profile', { title: 'Profil & Pengaturan Akun | SkillSphere AI' });
+});
+
+/* GET Course Catalog Page (Sprint 2 - Fadiyah) */
+router.get(['/courses', '/catalog', '/katalog'], function(req, res, next) {
+  res.render('courses/index', { title: 'Katalog Kursus & Kurikulum | SkillSphere AI' });
+});
+
+/* GET Course Detail & Syllabus Page (Sprint 2 - Fadiyah) */
+router.get('/courses/:id', function(req, res, next) {
+  res.render('courses/detail', { title: 'Detail Kursus | SkillSphere AI', courseId: req.params.id });
+});
+
 /* GET Admin Dashboard & Verification UI (Sprint 1 - Satrio) */
 router.get(['/admin', '/admin/dashboard', '/admin/verification'], function(req, res, next) {
   res.render('admin/verification', { title: 'Dashboard Admin & Verifikasi Pengajar | SkillSphere AI' });
@@ -52,3 +67,4 @@ router.get(['/privacy', '/privacy-policy', '/kebijakan-privasi'], function(req, 
 });
 
 module.exports = router;
+
