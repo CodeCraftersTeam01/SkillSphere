@@ -23,9 +23,15 @@ router.post('/:id/enroll', authenticateJWT, invalidateCacheMiddleware(['cache:/a
 // Course details (Cache for 5 minutes)
 router.get('/:id', cacheMiddleware(300), courseController.getCourseById);
 
+const adminController = require('../../controllers/adminController');
+
 // Course creation & modification (Tutor & Admin) -> Invalidate courses cache
 router.post('/', authenticateJWT, authorizeRoles('tutor', 'admin'), invalidateCacheMiddleware(['cache:/api/courses*', 'cache:/api/admin*']), courseController.createCourse);
 router.put('/:id', authenticateJWT, authorizeRoles('tutor', 'admin'), invalidateCacheMiddleware(['cache:/api/courses*', 'cache:/api/admin*']), courseController.updateCourse);
+
+// Direct Moderation Endpoints (/api/courses/:id/approve & /api/courses/:id/suspend)
+router.put('/:id/approve', authenticateJWT, authorizeRoles('admin'), invalidateCacheMiddleware(['cache:/api/courses*', 'cache:/api/admin*']), adminController.approveCourse);
+router.put('/:id/suspend', authenticateJWT, authorizeRoles('admin'), invalidateCacheMiddleware(['cache:/api/courses*', 'cache:/api/admin*']), adminController.suspendCourse);
 
 // Course Sections Management
 router.post('/:courseId/sections', authenticateJWT, authorizeRoles('tutor', 'admin'), invalidateCacheMiddleware(['cache:/api/courses*']), courseController.createSection);

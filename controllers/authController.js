@@ -382,6 +382,8 @@ const getProfile = async (req, res) => {
     const user = await User.findByPk(req.user.id, {
       include: [
         { model: UserProfile, as: 'profile' },
+        { model: TutorApplication, as: 'tutor_applications' },
+        { model: TutorCertification, as: 'tutor_certifications' },
         ...(req.user.role === 'tutor' ? [{ model: TutorWallet, as: 'wallet' }] : []),
       ],
       attributes: { exclude: ['password', 'refresh_token', 'otp_code'] },
@@ -767,6 +769,78 @@ const personalize = async (req, res) => {
 };
 
 /**
+ * Apply or Re-apply for Tutor Verification
+ */
+const applyTutor = async (req, res) => {
+  const t = await sequelize.transaction();
+  try {
+    const userId = req.user.id;
+    const {
+      institution_name,
+      experience_years,
+      cv_url,
+      portfolio_url,
+      linkedin_url,
+      certificate_document_url,
+      motivation_letter,
+    } = req.body;
+
+    let application = await TutorApplication.findOne({
+      where: { user_id: userId },
+      transaction: t,
+    });
+
+    if (!application) {
+      application = await TutorApplication.create({
+        user_id: userId,
+        institution_name: institution_name || null,
+        experience_years: experience_years ? parseInt(experience_years) : 0,
+        cv_url: cv_url || null,
+        portfolio_url: portfolio_url || null,
+        linkedin_url: linkedin_url || null,
+        certificate_document_url: certificate_document_url || null,
+        status: 'pending',
+        rejection_reason: null,
+      }, { transaction: t });
+    } else {
+      await application.update({
+        institution_name: institution_name !== undefined ? institution_name : application.institution_name,
+        experience_years: experience_years !== undefined ? parseInt(experience_years) : application.experience_years,
+        cv_url: cv_url !== undefined ? cv_url : application.cv_url,
+        portfolio_url: portfolio_url !== undefined ? portfolio_url : application.portfolio_url,
+        linkedin_url: linkedin_url !== undefined ? linkedin_url : application.linkedin_url,
+        certificate_document_url: certificate_document_url !== undefined ? certificate_document_url : application.certificate_document_url,
+        status: 'pending',
+        rejection_reason: null,
+      }, { transaction: t });
+    }
+
+    if (motivation_letter) {
+      let profile = await UserProfile.findOne({ where: { user_id: userId }, transaction: t });
+      if (profile) {
+        await profile.update({ bio: motivation_letter }, { transaction: t });
+      }
+    }
+
+    await t.commit();
+
+    return res.status(200).json({
+      success: true,
+      message: 'Pengajuan verifikasi pengajar berhasil dikirim! Tim Admin akan segera meninjau berkas Anda.',
+      data: application,
+    });
+  } catch (error) {
+    await t.rollback();
+    console.error('Error applying for tutor:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Gagal mengajukan verifikasi pengajar.',
+      error: error.message,
+    });
+  }
+};
+
+/**
  * OAuth Provider Redirection & Informative Handler
  */
 const oauthRedirect = async (req, res) => {
@@ -834,4 +908,5 @@ module.exports = {
   refreshToken,
   logout,
   oauthRedirect,
+  applyTutor,
 };

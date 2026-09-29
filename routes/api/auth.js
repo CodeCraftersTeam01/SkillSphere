@@ -24,6 +24,7 @@ router.get('/me', authenticateJWT, authController.getProfile);
 router.put('/profile', authenticateJWT, validateProfileUpdate, authController.updateProfile);
 router.post('/upload-certificate', authenticateJWT, upload.single('certificate'), authController.uploadCertificate);
 router.post('/personalize', authenticateJWT, authController.personalize);
+router.post('/apply-tutor', authenticateJWT, authController.applyTutor);
 router.put('/change-password', authenticateJWT, validateChangePassword, authController.changePassword);
 router.post('/logout', authenticateJWT, authController.logout);
 

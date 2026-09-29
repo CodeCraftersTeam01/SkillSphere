@@ -540,6 +540,111 @@
       color: var(--text-primary);
     }
 
+    /* Top Full-Width Announcement Bar (Dicoding / Claude Warm Paper Aesthetic) */
+    .top-announcement-bar {
+      background: #1C1B18;
+      color: #FAF9F5;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      font-size: 13px;
+      font-weight: 500;
+      padding: 10px 24px;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      z-index: 105;
+      line-height: 1.4;
+      transition: background-color 0.2s ease;
+    }
+
+    [data-theme="dark"] .top-announcement-bar {
+      background: #141312;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .top-announcement-content {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      text-align: center;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .top-bar-badge {
+      font-size: 10.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      padding: 2px 7px;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.15);
+      color: #FFFFFF;
+      display: inline-block;
+    }
+
+    .top-bar-badge.status-pending {
+      background: rgba(245, 158, 11, 0.3);
+      color: #FDE68A;
+    }
+
+    .top-bar-badge.status-rejected {
+      background: rgba(239, 68, 68, 0.3);
+      color: #FECACA;
+    }
+
+    .top-bar-text {
+      color: rgba(255, 255, 255, 0.92);
+      font-size: 13px;
+    }
+
+    .top-bar-divider {
+      color: rgba(255, 255, 255, 0.35);
+      font-size: 13px;
+      user-select: none;
+    }
+
+    .top-bar-cta {
+      background: none;
+      border: none;
+      color: #FFFFFF;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 0;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      transition: opacity 0.15s ease;
+      font-family: inherit;
+    }
+
+    .top-bar-cta:hover {
+      opacity: 0.82;
+    }
+
+    @media (max-width: 768px) {
+      .top-announcement-bar {
+        padding: 8px 16px;
+        font-size: 12px;
+      }
+      .top-bar-text {
+        font-size: 12px;
+      }
+      .top-bar-cta {
+        font-size: 12px;
+      }
+      .top-announcement-content {
+        gap: 6px;
+      }
+      .top-bar-divider {
+        display: none;
+      }
+    }
     /* Tutor Mode Specific Banner */
     .tutor-studio-banner {
       background: var(--bg-surface);
@@ -550,17 +655,542 @@
       display: none;
     }
 
-    /* Admin Redirection Banner */
-    .admin-redirect-banner {
-      background: var(--bg-surface-subtle);
+    /* ========================================================= */
+    /* --- CREATE COURSE MODAL STYLES -------------------------- */
+    /* ========================================================= */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(4px);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.2s ease, visibility 0.2s ease;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal-card {
+      background: var(--bg-surface);
       border: 1px solid var(--border-subtle);
       border-radius: var(--radius-xl);
-      padding: 20px 24px;
-      margin-bottom: 24px;
-      display: none;
+      max-width: 540px;
+      width: 100%;
+      padding: 28px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+      transform: scale(0.96);
+      transition: transform 0.2s ease;
+    }
+
+    .modal-overlay.active .modal-card {
+      transform: scale(1);
+    }
+
+    .form-group-custom {
+      margin-bottom: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-label-custom {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .form-control-custom {
+      background: var(--bg-surface-subtle);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 9px 12px;
+      font-size: 13.5px;
+      color: var(--text-primary);
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.15s ease;
+    }
+
+    .form-control-custom:focus {
+      border-color: var(--accent-primary);
+      background: var(--bg-surface);
+    }
+
+    /* ========================================================= */
+    /* --- GOOGLE CLASSROOM FULL LAYOUT & DOCKED SIDEBAR ------- */
+    /* ========================================================= */
+    .classroom-sidebar-toggle-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-full);
+      border: none;
+      background: transparent;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 17px;
+      cursor: pointer;
+      transition: background 0.15s ease;
+      flex-shrink: 0;
+    }
+
+    .classroom-sidebar-toggle-btn:hover {
+      background: var(--bg-surface-subtle);
+    }
+
+    .classroom-app-container {
+      display: flex;
+      width: 100%;
+      min-height: calc(100vh - 60px);
+    }
+
+    /* Left Sidebar (Docked on Desktop, Drawer on Mobile) */
+    .classroom-left-sidebar {
+      width: 270px;
+      background: var(--bg-surface);
+      border-right: 1px solid var(--border-subtle);
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      height: calc(100vh - 60px);
+      position: sticky;
+      top: 60px;
+      transition: width 0.2s ease, transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      overflow-y: auto;
+      z-index: 90;
+    }
+
+    .classroom-left-sidebar.collapsed {
+      width: 0;
+      overflow: hidden;
+      border-right: none;
+    }
+
+    .sidebar-scroll-body {
+      padding: 12px 0 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .sidebar-nav-group {
+      display: flex;
+      flex-direction: column;
+      padding-right: 12px;
+    }
+
+    .sidebar-nav-pill {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 10px 24px;
+      font-size: 13.5px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      text-decoration: none;
+      border-radius: 0 24px 24px 0;
+      transition: all 0.15s ease;
+      cursor: pointer;
+    }
+
+    .sidebar-nav-pill:hover {
+      color: var(--text-primary);
+      background: var(--bg-surface-subtle);
+    }
+
+    .sidebar-nav-pill.active {
+      color: var(--text-primary);
+      font-weight: 600;
+      background: var(--bg-surface-subtle);
+    }
+
+    .sidebar-nav-icon {
+      font-size: 16px;
+      width: 22px;
+      text-align: center;
+      color: var(--text-secondary);
+      flex-shrink: 0;
+    }
+
+    .sidebar-nav-pill.active .sidebar-nav-icon {
+      color: var(--text-primary);
+    }
+
+    .sidebar-divider-line {
+      height: 1px;
+      background: var(--border-subtle);
+      margin: 8px 0;
+    }
+
+    .sidebar-section-header {
+      padding: 10px 24px 6px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+      display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 16px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .sidebar-section-header:hover {
+      color: var(--text-primary);
+    }
+
+    .sidebar-class-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 8px 24px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      text-decoration: none;
+      border-radius: 0 24px 24px 0;
+      transition: all 0.15s ease;
+      overflow: hidden;
+    }
+
+    .sidebar-class-row:hover {
+      color: var(--text-primary);
+      background: var(--bg-surface-subtle);
+    }
+
+    .sidebar-class-circle {
+      width: 30px;
+      height: 30px;
+      border-radius: var(--radius-full);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+      color: #FFFFFF;
+      flex-shrink: 0;
+    }
+
+    .sidebar-class-text {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      flex: 1;
+    }
+
+    .sidebar-class-title {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-size: 13px;
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+
+    .sidebar-class-subtitle {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-size: 11px;
+      color: var(--text-tertiary);
+    }
+
+    /* Right Main Classroom Pane */
+    .classroom-main-pane {
+      flex: 1;
+      min-width: 0;
+      padding: 24px 32px 64px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      max-width: 1320px;
+    }
+
+    .classroom-top-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 8px;
+    }
+
+    .classroom-title-text {
+      font-family: var(--font-serif);
+      font-size: 26px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin: 0;
+    }
+
+    .classroom-add-link {
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--text-primary);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 6px 12px;
+      border-radius: var(--radius-md);
+      transition: background 0.15s ease;
+    }
+
+    .classroom-add-link:hover {
+      background: var(--bg-surface-subtle);
+    }
+
+    /* Exact Google Classroom Card Grid */
+    .classroom-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+      gap: 20px;
+    }
+
+    .classroom-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      transition: box-shadow 0.2s ease, border-color 0.2s ease;
+    }
+
+    .classroom-card:hover {
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.09);
+      border-color: var(--border-strong);
+    }
+
+    /* Card Header Banner */
+    .classroom-card-header {
+      height: 136px;
+      padding: 16px 18px 12px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      color: #FFFFFF;
+      text-decoration: none;
+      border-radius: 8px 8px 0 0;
+      box-sizing: border-box;
+    }
+
+    /* SkillSphere Thematic Palettes */
+    .card-theme-0 { background: #1B384A; }
+    .card-theme-1 { background: #184E3F; }
+    .card-theme-2 { background: #124B5F; }
+    .card-theme-3 { background: #8E3C1B; }
+    .card-theme-4 { background: #2F335C; }
+    .card-theme-5 { background: #6E2346; }
+    .card-theme-6 { background: #5C3D1E; }
+
+    .classroom-card-menu-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius-full);
+      background: transparent;
+      border: none;
+      color: #FFFFFF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background 0.15s ease;
+      z-index: 6;
+      font-size: 15px;
+    }
+
+    .classroom-card-menu-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .classroom-card-titles {
+      padding-right: 36px;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .classroom-card-title {
+      font-size: 17px;
+      font-weight: 600;
+      color: #FFFFFF;
+      margin: 0;
+      line-height: 1.3;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      cursor: pointer;
+    }
+
+    .classroom-card-title:hover {
+      text-decoration: underline;
+    }
+
+    .classroom-card-subtitle {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.88);
+      margin: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .classroom-card-tutor {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.88);
+      margin: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Floating Circle Avatar */
+    .classroom-card-avatar {
+      position: absolute;
+      bottom: -30px;
+      right: 16px;
+      width: 60px;
+      height: 60px;
+      border-radius: var(--radius-full);
+      background: #ea580c;
+      color: #FFFFFF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      font-weight: 700;
+      border: 3px solid var(--bg-surface);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18);
+      z-index: 5;
+      text-transform: uppercase;
+      user-select: none;
+    }
+
+    /* Card Middle Body */
+    .classroom-card-body {
+      height: 116px;
+      padding: 34px 18px 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background: var(--bg-surface);
+      box-sizing: border-box;
+    }
+
+    .classroom-card-body-text {
+      font-size: 12.5px;
+      color: var(--text-secondary);
+      line-height: 1.45;
+      margin: 0;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .classroom-card-body-meta {
+      font-size: 11.5px;
+      color: var(--text-tertiary);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* Card Bottom Action Footer */
+    .classroom-card-footer {
+      height: 48px;
+      border-top: 1px solid var(--border-subtle);
+      padding: 0 12px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 4px;
+      background: var(--bg-surface);
+      border-radius: 0 0 8px 8px;
+    }
+
+    .classroom-card-footer-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-full);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-secondary);
+      background: transparent;
+      border: none;
+      text-decoration: none;
+      font-size: 15px;
+      transition: background 0.15s ease, color 0.15s ease;
+      cursor: pointer;
+    }
+
+    .classroom-card-footer-icon:hover {
+      background: var(--bg-surface-subtle);
+      color: var(--text-primary);
+    }
+
+    /* Backdrop for Mobile Overlay Sidebar */
+    .classroom-sidebar-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.45);
+      backdrop-filter: blur(2px);
+      z-index: 998;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.2s ease, visibility 0.2s ease;
+    }
+
+    .classroom-sidebar-backdrop.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    @media (max-width: 1024px) {
+      .classroom-left-sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        height: 100vh;
+        z-index: 999;
+        transform: translateX(-100%);
+        box-shadow: 4px 0 24px rgba(0, 0, 0, 0.18);
+      }
+
+      .classroom-left-sidebar.drawer-open {
+        transform: translateX(0);
+      }
+
+      .classroom-main-pane {
+        padding: 20px 16px 48px;
+      }
     }
 
     /* ========================================================= */
@@ -746,20 +1376,32 @@
 <body>
 
   <div class="dashboard-layout">
-    <!-- Navbar -->
+    <!-- Top Full-Width Verification Announcement Bar (Dicoding / Claude Warm Paper Style) -->
+    <!-- Google Classroom Drawer Sidebar Backdrop -->
+    <div class="classroom-sidebar-backdrop" id="classroom-sidebar-backdrop" onclick="toggleClassroomSidebar(false)"></div>
+
+    <!-- Top Navigation Bar -->
     <header class="navbar">
       <div class="nav-main-row">
-        <a href="/dashboard" class="brand-logo" style="text-decoration:none;">
-          <div class="brand-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 0L13.8 8.2L22 10L13.8 11.8L12 20L10.2 11.8L2 10L10.2 8.2L12 0Z" />
-            </svg>
-          </div>
-          <span>SkillSphere AI</span>
-        </a>
+        <div style="display:flex; align-items:center; gap:14px;">
+          <!-- Classroom Sidebar Hamburger Button (Visible for Tutor) -->
+          <button class="classroom-sidebar-toggle-btn" id="classroom-sidebar-toggle" style="display:none;" onclick="toggleClassroomSidebar()" title="Menu Utama" aria-label="Menu Utama">
+            <i class="fas fa-bars"></i>
+          </button>
 
-        <!-- Desktop Navigation Links -->
-        <ul class="nav-links-menu desktop-only">
+          <a href="/dashboard" class="brand-logo" style="text-decoration:none;">
+            <div class="brand-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path opacity="0.38" d="M12 7.6L17.3 4.7L14.4 10L17.3 15.3L12 12.4L6.7 15.3L9.6 10L6.7 4.7Z" />
+                <path d="M12 0L13.8 8.2L22 10L13.8 11.8L12 20L10.2 11.8L2 10L10.2 8.2L12 0Z" />
+              </svg>
+            </div>
+            <span>SkillSphere AI</span>
+          </a>
+        </div>
+
+        <!-- Desktop Navigation Links (Student Only) -->
+        <ul class="nav-links-menu desktop-only" id="desktop-nav-menu">
           <li><a href="/dashboard" class="nav-link-item active">Beranda</a></li>
           <li><a href="#courses-catalog-section" class="nav-link-item">Katalog Kursus</a></li>
           <li><a href="/dashboard/onboarding" class="nav-link-item">Jalur Belajar AI</a></li>
@@ -795,9 +1437,9 @@
         </div>
       </div>
 
-      <!-- Mobile Scrollable Subnav Menu -->
-      <div class="nav-mobile-row mobile-only">
-        <ul class="nav-links-menu mobile-scroll">
+      <!-- Mobile Scrollable Subnav Menu (Student Only) -->
+      <div class="nav-mobile-row mobile-only" id="mobile-nav-row">
+        <ul class="nav-links-menu mobile-scroll" id="mobile-nav-menu">
           <li><a href="/dashboard" class="nav-link-item active">Beranda</a></li>
           <li><a href="#courses-catalog-section" class="nav-link-item">Katalog Kursus</a></li>
           <li><a href="/dashboard/onboarding" class="nav-link-item">Jalur Belajar AI</a></li>
@@ -806,44 +1448,98 @@
       </div>
     </header>
 
-    <!-- Main Dashboard Container -->
-    <main class="dashboard-container">
+    <!-- Top Full-Width Verification Announcement Bar (Dicoding / Claude Warm Paper Style) -->
+    <div class="top-announcement-bar" id="tutor-verification-bar" style="display:none;">
+      <div class="top-announcement-content">
+        <span class="top-bar-badge" id="top-bar-badge">Verifikasi Pengajar</span>
+        <span class="top-bar-text" id="top-bar-text">Mohon lengkapi verifikasi berkas dan portofolio Anda terlebih dahulu sebelum melanjutkan ke Studio Pengajar.</span>
+        <span class="top-bar-divider">|</span>
+        <a href="/tutor/verify" class="top-bar-cta" id="top-bar-cta-btn">
+          <span id="top-bar-cta-label">Lengkapi Sekarang</span> <i class="fas fa-arrow-right" style="font-size:10px;"></i>
+        </a>
+      </div>
+    </div>
 
-      <!-- Tutor Studio Quick Banner (If role === 'tutor') -->
-      <div class="tutor-studio-banner" id="tutor-banner">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:12px;">
-          <div>
-            <h2 style="font-family:var(--font-serif); font-size:22px; color:var(--text-primary); margin:0 0 4px;">Studio Pengajar & Manajemen Materi</h2>
-            <p style="font-size:13px; color:var(--text-secondary); margin:0;">Kelola kurikulum, upload materi multi-format, dan pantau saldo virtual hasil penjualan kursus.</p>
+    <!-- Tutor Google Classroom Full Layout View (Role === 'tutor') -->
+    <div id="tutor-classroom-section" class="classroom-app-container" style="display:none;">
+      <!-- Docked Left Sidebar on Desktop & Slide-out Drawer on Mobile -->
+      <aside class="classroom-left-sidebar" id="classroom-left-sidebar">
+        <div class="sidebar-scroll-body">
+          <!-- Main Menu Group -->
+          <div class="sidebar-nav-group">
+            <a href="/dashboard" class="sidebar-nav-pill active">
+              <i class="fas fa-house sidebar-nav-icon"></i>
+              <span>Beranda</span>
+            </a>
+            <a href="#kalender" class="sidebar-nav-pill" onclick="showToast('Fitur Kalender adaptif segera hadir pada pembaruan mendatang!', 'success'); return false;">
+              <i class="fas fa-calendar-days sidebar-nav-icon"></i>
+              <span>Kalender</span>
+            </a>
           </div>
-          <div style="display:flex; gap:10px;">
-            <a href="/tutor/materials" class="btn btn-primary" style="font-size:13px; padding:8px 16px;">
-              <i class="fas fa-cloud-arrow-up" style="margin-right:6px;"></i> Portal Upload Materi
+
+          <div class="sidebar-divider-line"></div>
+
+          <!-- Mengajar (Teaching Section) -->
+          <div class="sidebar-section-header" onclick="toggleSidebarSection('teaching')">
+            <span>Mengajar</span>
+            <i class="fas fa-chevron-down" id="chevron-teaching" style="font-size:10px; color:var(--text-tertiary); transition:transform 0.2s;"></i>
+          </div>
+
+          <div class="sidebar-nav-group" id="sidebar-teaching-group">
+            <a href="#tasks" class="sidebar-nav-pill" onclick="showToast('Semua tugas kurikulum saat ini telah diperiksa.', 'success'); return false;">
+              <i class="fas fa-list-check sidebar-nav-icon"></i>
+              <span>Untuk diperiksa</span>
+            </a>
+            <div id="sidebar-teaching-classes"></div>
+          </div>
+
+          <div class="sidebar-divider-line"></div>
+
+          <!-- Terdaftar & Pintasan Section -->
+          <div class="sidebar-section-header" onclick="toggleSidebarSection('registered')">
+            <span>Terdaftar & Lainnya</span>
+            <i class="fas fa-chevron-down" id="chevron-registered" style="font-size:10px; color:var(--text-tertiary); transition:transform 0.2s;"></i>
+          </div>
+
+          <div class="sidebar-nav-group" id="sidebar-registered-group">
+            <a href="/tutor/materials" class="sidebar-nav-pill">
+              <i class="fas fa-folder-open sidebar-nav-icon"></i>
+              <span>Portal Upload Materi</span>
+            </a>
+            <a href="/tutor/verify" class="sidebar-nav-pill">
+              <i class="fas fa-id-card-clip sidebar-nav-icon"></i>
+              <span>Verifikasi Pengajar</span>
+            </a>
+            <a href="/courses" class="sidebar-nav-pill">
+              <i class="fas fa-compass sidebar-nav-icon"></i>
+              <span>Katalog Kursus Publik</span>
             </a>
           </div>
         </div>
+      </aside>
 
-        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:14px;">
-          <div style="background:var(--bg-surface-subtle); border:1px solid var(--border-subtle); border-radius:var(--radius-md); padding:14px;">
-            <div style="font-size:11px; color:var(--text-secondary); text-transform:uppercase; font-weight:600; margin-bottom:4px;">Saldo Dompet Virtual</div>
-            <div style="font-size:20px; font-weight:700; color:var(--text-primary);" id="tutor-wallet-balance">Rp 0</div>
-            <div style="font-size:11px; color:var(--text-tertiary); margin-top:2px;">Bagi Hasil 80% Tutor</div>
-          </div>
-          <div style="background:var(--bg-surface-subtle); border:1px solid var(--border-subtle); border-radius:var(--radius-md); padding:14px;">
-            <div style="font-size:11px; color:var(--text-secondary); text-transform:uppercase; font-weight:600; margin-bottom:4px;">Holding Period</div>
-            <div style="font-size:20px; font-weight:700; color:var(--text-primary);">7 Hari</div>
-            <div style="font-size:11px; color:var(--text-tertiary); margin-top:2px;">Mitigasi Refund / Dispute</div>
-          </div>
-          <div style="background:var(--bg-surface-subtle); border:1px solid var(--border-subtle); border-radius:var(--radius-md); padding:14px;">
-            <div style="font-size:11px; color:var(--text-secondary); text-transform:uppercase; font-weight:600; margin-bottom:4px;">Min. Penarikan Dana</div>
-            <div style="font-size:20px; font-weight:700; color:var(--text-primary);">Rp 100.000</div>
-            <div style="font-size:11px; color:var(--text-tertiary); margin-top:2px;">Transfer Rekening Bank</div>
+      <!-- Main Classroom Content Pane -->
+      <main class="classroom-main-pane">
+        <!-- Classroom Top Header: "Kelas" on left, "+ Tambahkan kelas" on right -->
+        <div class="classroom-top-header">
+          <h1 class="classroom-title-text">Kelas</h1>
+          <button class="classroom-add-link" onclick="openCreateCourseModal()">
+            <i class="fas fa-plus"></i> <span>Tambahkan kelas</span>
+          </button>
+        </div>
+
+        <!-- Google Classroom Cards Grid -->
+        <div class="classroom-grid" id="tutor-courses-grid">
+          <div style="grid-column: 1 / -1; text-align: center; padding: 40px 20px; color: var(--text-secondary); font-size: 13.5px;">
+            <i class="fas fa-spinner fa-spin" style="margin-right: 8px;"></i> Memuat daftar kelas dan kursus Anda...
           </div>
         </div>
-      </div>
+      </main>
+    </div>
 
-      <!-- 2-Column Student Dashboard Layout -->
-      <div class="dashboard-grid-layout">
+    <!-- Student Dashboard View Container (Role === 'student') -->
+    <main class="dashboard-container" id="student-dashboard-container">
+      <div id="student-dashboard-section" class="dashboard-grid-layout">
         
         <!-- Left Sidebar Column: Profil, Streak, Referral -->
         <aside class="sidebar-widgets-column">
@@ -999,6 +1695,63 @@
       </div>
     </main>
 
+    <!-- Modal: Buat Kursus Baru (Google Classroom Style Simple Modal) -->
+    <div class="modal-overlay" id="create-course-modal" onclick="if(event.target === this) closeCreateCourseModal()">
+      <div class="modal-card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+          <h3 style="font-family:var(--font-serif); font-size:20px; font-weight:500; color:var(--text-primary); margin:0;">
+            <i class="fas fa-folder-plus" style="margin-right:8px; color:var(--accent-primary);"></i> Buat Kelas / Kursus Baru
+          </h3>
+          <button type="button" onclick="closeCreateCourseModal()" style="background:none; border:none; color:var(--text-tertiary); font-size:18px; cursor:pointer;">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+
+        <form id="create-course-form" onsubmit="handleCreateCourseSubmit(event)">
+          <div class="form-group-custom">
+            <label class="form-label-custom" for="modal-course-title">Judul Kursus / Nama Kelas *</label>
+            <input type="text" id="modal-course-title" class="form-control-custom" placeholder="Contoh: Pemrograman Python Modern & Analisis Data" required>
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+            <div class="form-group-custom">
+              <label class="form-label-custom" for="modal-course-category">Kategori Kursus *</label>
+              <select id="modal-course-category" class="form-control-custom" required>
+                <option value="">Pilih Kategori...</option>
+              </select>
+            </div>
+            <div class="form-group-custom">
+              <label class="form-label-custom" for="modal-course-level">Tingkat Kesulitan</label>
+              <select id="modal-course-level" class="form-control-custom">
+                <option value="beginner">Pemula (Beginner)</option>
+                <option value="intermediate">Menengah (Intermediate)</option>
+                <option value="advanced">Mahir (Advanced)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group-custom">
+            <label class="form-label-custom" for="modal-course-price">Harga Kursus (Rp) - Masukkan 0 untuk Gratis</label>
+            <input type="number" id="modal-course-price" class="form-control-custom" placeholder="0" min="0" step="1000" value="0">
+          </div>
+
+          <div class="form-group-custom">
+            <label class="form-label-custom" for="modal-course-desc">Deskripsi Singkat Kursus</label>
+            <textarea id="modal-course-desc" class="form-control-custom" rows="3" placeholder="Jelaskan ringkasan materi, target capaian siswa, dan prasyarat dasar..."></textarea>
+          </div>
+
+          <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:24px;">
+            <button type="button" class="btn btn-outline" onclick="closeCreateCourseModal()" style="font-size:13px; padding:8px 16px;">
+              Batal
+            </button>
+            <button type="submit" id="btn-submit-create-course" class="btn btn-primary" style="font-size:13px; padding:8px 20px;">
+              <i class="fas fa-check" style="margin-right:6px;"></i> Buat Kursus
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
     <!-- Footer -->
     <footer class="login-footer" style="padding-bottom: 24px; border-top:1px solid var(--border-subtle); padding-top:24px;">
       <p>© 2026 SkillSphere AI — Platform Pembelajaran Cerdas & Kurikulum Adaptif.</p>
@@ -1055,14 +1808,11 @@
         }
       } catch (e) {}
 
-      initStudentDashboard(token);
+      initAppDashboard(token);
     }
 
-    async function initStudentDashboard(accessToken) {
+    async function initAppDashboard(accessToken) {
       await loadUserProfile(accessToken);
-      await loadStudentActivities(accessToken);
-      await loadCoursesCatalog();
-      initStreakAndCheckin();
     }
 
     async function loadUserProfile(accessToken) {
@@ -1118,16 +1868,75 @@
         const percentBadge = document.getElementById('profile-percent-badge');
         if (percentBadge) percentBadge.textContent = percent + '%';
 
-        // Tutor studio banner
+        // Tutor verification bar logic
+        const verifBar = document.getElementById('tutor-verification-bar');
+        const topBadge = document.getElementById('top-bar-badge');
+        const topText = document.getElementById('top-bar-text');
+        const topCtaLabel = document.getElementById('top-bar-cta-label');
+        const topCtaBtn = document.getElementById('top-bar-cta-btn');
+
+        const apps = Array.isArray(user.tutor_applications) ? user.tutor_applications : [];
+        const latestApp = apps.length > 0 ? apps[apps.length - 1] : null;
+        const isVerifiedTutor = user.role === 'tutor' && latestApp && latestApp.status === 'approved';
+
         if (user.role === 'tutor') {
-          const tutorBanner = document.getElementById('tutor-banner');
-          if (tutorBanner) {
-            tutorBanner.style.display = 'block';
-            if (user.wallet) {
-              const formatted = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(user.wallet.balance);
-              document.getElementById('tutor-wallet-balance').textContent = formatted;
+          // TUTOR ROLE VIEW: Show Google Classroom Section & Hide Student Dashboard Container
+          document.getElementById('tutor-classroom-section').style.display = 'flex';
+          const studentContainer = document.getElementById('student-dashboard-container');
+          if (studentContainer) studentContainer.style.display = 'none';
+
+          // Hide streak badge for tutor
+          const streakBadge = document.querySelector('.streak-badge');
+          if (streakBadge) streakBadge.style.display = 'none';
+
+          // Update desktop & mobile navigation links for tutor
+          updateNavLinksForRole('tutor');
+
+          if (isVerifiedTutor) {
+            if (verifBar) verifBar.style.display = 'none';
+          } else {
+            if (verifBar) {
+              verifBar.style.display = 'flex';
+              if (latestApp && latestApp.status === 'pending') {
+                if (topBadge) { topBadge.className = 'top-bar-badge status-pending'; topBadge.textContent = 'Dalam Review'; }
+                if (topText) topText.textContent = 'Pendaftaran Pengajar Sedang Ditinjau Admin: Berkas CV dan portofolio Anda sedang dalam proses evaluasi.';
+                if (topCtaLabel) topCtaLabel.textContent = 'Lihat Status';
+              } else if (latestApp && latestApp.status === 'rejected') {
+                if (topBadge) { topBadge.className = 'top-bar-badge status-rejected'; topBadge.textContent = 'Perlu Revisi'; }
+                if (topText) topText.textContent = `Verifikasi Pengajar Perlu Revisi: ${latestApp.rejection_reason || 'Mohon lengkapi kualifikasi Anda.'}`;
+                if (topCtaLabel) topCtaLabel.textContent = 'Ajukan Ulang';
+              } else {
+                if (topBadge) { topBadge.className = 'top-bar-badge'; topBadge.textContent = 'Verifikasi Pengajar'; }
+                if (topText) topText.textContent = 'Mohon verifikasi data kualifikasi dan portofolio Anda terlebih dahulu sebelum mengelola kurikulum di Studio Pengajar.';
+                if (topCtaLabel) topCtaLabel.textContent = 'Lengkapi Sekarang';
+              }
             }
           }
+
+          // Update wallet display
+          if (user.wallet) {
+            const formatted = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(user.wallet.balance);
+            const wElem = document.getElementById('tutor-wallet-balance-val');
+            if (wElem) wElem.textContent = formatted;
+          }
+
+          // Load Google Classroom Tutor Courses & Categories
+          await loadTutorClassroomCourses(accessToken);
+          loadCategoriesForModal();
+
+        } else {
+          // STUDENT ROLE VIEW: Show Student Section & Hide Tutor Classroom Section
+          document.getElementById('tutor-classroom-section').style.display = 'none';
+          const studentContainer = document.getElementById('student-dashboard-container');
+          if (studentContainer) studentContainer.style.display = 'block';
+          const studentSection = document.getElementById('student-dashboard-section');
+          if (studentSection) studentSection.style.display = 'grid';
+          if (verifBar) verifBar.style.display = 'none';
+
+          updateNavLinksForRole('student');
+          await loadStudentActivities(accessToken);
+          await loadCoursesCatalog();
+          initStreakAndCheckin();
         }
 
       } catch (err) {
@@ -1135,7 +1944,298 @@
       }
     }
 
-    // 3. Load Dynamic Student Learning Activities
+    function updateNavLinksForRole(role) {
+      const desktopNav = document.getElementById('desktop-nav-menu');
+      const mobileNavRow = document.getElementById('mobile-nav-row');
+      const sidebarToggle = document.getElementById('classroom-sidebar-toggle');
+      
+      if (role === 'tutor') {
+        // Hide horizontal navbar text links for tutor (per Google Classroom design)
+        if (desktopNav) desktopNav.style.display = 'none';
+        if (mobileNavRow) mobileNavRow.style.display = 'none';
+        // Show Classroom Drawer Hamburger button
+        if (sidebarToggle) sidebarToggle.style.display = 'flex';
+      } else {
+        // Show standard navigation links for students
+        if (desktopNav) desktopNav.style.display = 'flex';
+        if (mobileNavRow) mobileNavRow.style.display = '';
+        // Hide Classroom Drawer Hamburger button for students
+        if (sidebarToggle) sidebarToggle.style.display = 'none';
+        toggleClassroomSidebar(false);
+      }
+    }
+
+    function toggleClassroomSidebar(open) {
+      const sidebar = document.getElementById('classroom-left-sidebar');
+      const backdrop = document.getElementById('classroom-sidebar-backdrop');
+      if (!sidebar) return;
+      const isMobile = window.innerWidth <= 1024;
+      if (isMobile) {
+        const shouldOpen = (open !== undefined) ? open : !sidebar.classList.contains('drawer-open');
+        if (shouldOpen) {
+          sidebar.classList.add('drawer-open');
+          if (backdrop) backdrop.classList.add('active');
+          document.body.style.overflow = 'hidden';
+        } else {
+          sidebar.classList.remove('drawer-open');
+          if (backdrop) backdrop.classList.remove('active');
+          document.body.style.overflow = '';
+        }
+      } else {
+        if (open === false) {
+          sidebar.classList.add('collapsed');
+        } else if (open === true) {
+          sidebar.classList.remove('collapsed');
+        } else {
+          sidebar.classList.toggle('collapsed');
+        }
+      }
+    }
+
+    function toggleSidebarSection(sectionName) {
+      const group = document.getElementById(`sidebar-${sectionName}-group`);
+      const chevron = document.getElementById(`chevron-${sectionName}`);
+      if (!group) return;
+      if (group.style.display === 'none') {
+        group.style.display = 'flex';
+        if (chevron) chevron.style.transform = 'rotate(0deg)';
+      } else {
+        group.style.display = 'none';
+        if (chevron) chevron.style.transform = 'rotate(-90deg)';
+      }
+    }
+
+    // =========================================================
+    // 3. GOOGLE CLASSROOM TUTOR COURSES RENDERER
+    // =========================================================
+    async function loadTutorClassroomCourses(accessToken) {
+      const grid = document.getElementById('tutor-courses-grid');
+      const sidebarClasses = document.getElementById('sidebar-teaching-classes');
+
+      try {
+        const res = await fetch('/api/courses/tutor/my-courses', {
+          headers: {
+            'Authorization': 'Bearer ' + accessToken,
+          },
+        });
+
+        const json = await res.json();
+        const courses = (json.success && Array.isArray(json.data)) ? json.data : [];
+
+        // Populate Left Docked Sidebar Teaching Classes List
+        if (sidebarClasses) {
+          if (!courses.length) {
+            sidebarClasses.innerHTML = `
+              <div style="padding:6px 24px; font-size:12px; color:var(--text-tertiary);">Belum ada kelas</div>
+            `;
+          } else {
+            sidebarClasses.innerHTML = courses.map((c, idx) => {
+              const themeClass = `card-theme-${idx % 7}`;
+              const initial = c.title ? c.title.trim().charAt(0).toUpperCase() : 'K';
+              const categoryName = c.category ? escapeHtml(c.category.name) : 'Kelas';
+              return `
+                <a href="#course-card-${c.id}" class="sidebar-class-row" onclick="if(window.innerWidth<=1024) toggleClassroomSidebar(false)">
+                  <div class="sidebar-class-circle ${themeClass}">${initial}</div>
+                  <div class="sidebar-class-text">
+                    <span class="sidebar-class-title">${escapeHtml(c.title)}</span>
+                    <span class="sidebar-class-subtitle">${categoryName}</span>
+                  </div>
+                </a>
+              `;
+            }).join('');
+          }
+        }
+
+        if (!courses.length) {
+          grid.innerHTML = `
+            <div style="grid-column:1 / -1; text-align:center; padding:48px 20px; background:var(--bg-surface); border:1px dashed var(--border-subtle); border-radius:8px;">
+              <div style="width:60px; height:60px; border-radius:var(--radius-full); background:var(--bg-surface-subtle); display:flex; align-items:center; justify-content:center; margin:0 auto 16px; font-size:24px; color:var(--text-secondary);">
+                <i class="fas fa-chalkboard"></i>
+              </div>
+              <h3 style="font-family:var(--font-serif); font-size:20px; color:var(--text-primary); margin:0 0 6px;">Belum Ada Kelas Mengajar</h3>
+              <p style="font-size:13.5px; color:var(--text-secondary); max-width:440px; margin:0 auto 20px; line-height:1.5;">
+                Mulai buat kelas kursus pertama Anda untuk mempublikasikan materi pembelajaran terstruktur kepada siswa.
+              </p>
+              <button class="btn btn-primary" onclick="openCreateCourseModal()" style="font-size:13px; padding:9px 20px;">
+                <i class="fas fa-plus" style="margin-right:6px;"></i> Buat Kelas Pertama
+              </button>
+            </div>
+          `;
+          return;
+        }
+
+        const themesCount = 7;
+        const tutorName = currentUser && currentUser.name ? escapeHtml(currentUser.name) : 'Instruktur';
+        const tutorInitial = currentUser && currentUser.name ? currentUser.name.trim().charAt(0).toUpperCase() : 'T';
+
+        grid.innerHTML = courses.map((c, idx) => {
+          const themeClass = `card-theme-${idx % themesCount}`;
+          const categoryName = c.category ? escapeHtml(c.category.name) : 'Teknologi';
+          
+          let sectionsCount = 0;
+          let materialsCount = 0;
+          if (c.sections && Array.isArray(c.sections)) {
+            sectionsCount = c.sections.length;
+            c.sections.forEach(s => {
+              if (s.materials && Array.isArray(s.materials)) {
+                materialsCount += s.materials.length;
+              }
+            });
+          }
+
+          const descText = c.description ? escapeHtml(c.description) : 'Belum ada tugas tenggat waktu.';
+          const levelMap = { 'beginner': 'Pemula', 'intermediate': 'Menengah', 'advanced': 'Mahir' };
+          const levelLabel = levelMap[c.level] || 'Semua Tingkat';
+          const priceFormatted = (c.price && c.price > 0) ? 'Rp ' + Number(c.price).toLocaleString('id-ID') : 'Gratis';
+
+          return `
+            <div class="classroom-card" id="course-card-${c.id}">
+              <!-- Header Banner -->
+              <div class="classroom-card-header ${themeClass}">
+                <button class="classroom-card-menu-btn" title="Opsi lainnya" onclick="openCourseMenu(${c.id}, event)">
+                  <i class="fas fa-ellipsis-vertical"></i>
+                </button>
+                <div class="classroom-card-titles">
+                  <a href="/tutor/materials" class="classroom-card-title" title="${escapeHtml(c.title)}">${escapeHtml(c.title)}</a>
+                  <div class="classroom-card-subtitle">${categoryName} • ${levelLabel}</div>
+                  <div class="classroom-card-tutor">${tutorName}</div>
+                </div>
+                <!-- Overlapping Avatar -->
+                <div class="classroom-card-avatar" title="${tutorName}">
+                  ${tutorInitial}
+                </div>
+              </div>
+
+              <!-- Middle Body -->
+              <div class="classroom-card-body">
+                <p class="classroom-card-body-text">${descText}</p>
+                <div class="classroom-card-body-meta">
+                  <span>${sectionsCount} Bab • ${materialsCount} Modul</span>
+                  <span style="font-weight:600; color:var(--text-primary);">${priceFormatted}</span>
+                </div>
+              </div>
+
+              <!-- Bottom Footer -->
+              <div class="classroom-card-footer">
+                <a href="/courses/${c.id}" class="classroom-card-footer-icon" title="Lihat Pratinjau Publik Kursus">
+                  <i class="fa-regular fa-address-card"></i>
+                </a>
+                <a href="/tutor/materials" class="classroom-card-footer-icon" title="Buka Folder Modul Materi">
+                  <i class="fa-regular fa-folder-open"></i>
+                </a>
+                <button class="classroom-card-footer-icon" title="Opsi lainnya" onclick="openCourseMenu(${c.id}, event)">
+                  <i class="fas fa-ellipsis-vertical"></i>
+                </button>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+      } catch (err) {
+        console.error('Failed to load tutor classroom courses:', err);
+        grid.innerHTML = `
+          <div style="grid-column: 1 / -1; text-align: center; padding: 32px; color: var(--color-danger); font-size: 13.5px;">
+            Gagal memuat daftar kelas mengajar. Silakan coba muat ulang halaman.
+          </div>
+        `;
+      }
+    }
+
+    function openCourseMenu(courseId, event) {
+      if (event) event.stopPropagation();
+      showToast('Pilih opsi: Buka folder materi kursus atau edit kurikulum.', 'info');
+      window.location.href = '/tutor/materials';
+    }
+
+    // =========================================================
+    // 4. CREATE COURSE MODAL LOGIC (TUTOR)
+    // =========================================================
+    function openCreateCourseModal() {
+      const modal = document.getElementById('create-course-modal');
+      if (modal) {
+        modal.classList.add('active');
+        document.getElementById('modal-course-title').focus();
+      }
+    }
+
+    function closeCreateCourseModal() {
+      const modal = document.getElementById('create-course-modal');
+      if (modal) {
+        modal.classList.remove('active');
+        document.getElementById('create-course-form').reset();
+      }
+    }
+
+    async function loadCategoriesForModal() {
+      const select = document.getElementById('modal-course-category');
+      if (!select) return;
+      try {
+        const res = await fetch('/api/courses/categories');
+        const json = await res.json();
+        const categories = (json.success && Array.isArray(json.data)) ? json.data : [];
+        
+        select.innerHTML = '<option value="">Pilih Kategori...</option>' + categories.map(cat => `
+          <option value="${cat.id}">${escapeHtml(cat.name)}</option>
+        `).join('');
+      } catch (e) {
+        console.error('Failed to load categories for modal:', e);
+      }
+    }
+
+    async function handleCreateCourseSubmit(event) {
+      event.preventDefault();
+      const submitBtn = document.getElementById('btn-submit-create-course');
+      const title = document.getElementById('modal-course-title').value.trim();
+      const categoryId = document.getElementById('modal-course-category').value;
+      const level = document.getElementById('modal-course-level').value;
+      const price = parseFloat(document.getElementById('modal-course-price').value) || 0;
+      const description = document.getElementById('modal-course-desc').value.trim();
+
+      if (!title || !categoryId) {
+        showToast('Judul kursus dan kategori wajib diisi.', 'error');
+        return;
+      }
+
+      const originalText = submitBtn.innerHTML;
+      submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
+      submitBtn.disabled = true;
+
+      try {
+        const res = await fetch('/api/courses', {
+          method: 'POST',
+          headers: {
+            'Authorization': 'Bearer ' + token,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            title,
+            category_id: parseInt(categoryId, 10),
+            level,
+            price,
+            description,
+            status: 'published',
+          }),
+        });
+
+        const json = await res.json();
+        if (res.ok && json.success) {
+          showToast('Kelas / Kursus baru berhasil dibuat!', 'success');
+          closeCreateCourseModal();
+          await loadTutorClassroomCourses(token);
+        } else {
+          showToast(json.message || 'Gagal membuat kursus baru.', 'error');
+        }
+      } catch (err) {
+        showToast('Kesalahan jaringan saat membuat kursus.', 'error');
+      } finally {
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+      }
+    }
+
+    // =========================================================
+    // 5. STUDENT ACTIVITIES & CATALOG LOADERS
+    // =========================================================
     async function loadStudentActivities(accessToken) {
       const container = document.getElementById('activities-container');
       const countLabel = document.getElementById('active-courses-count-label');
@@ -1215,7 +2315,6 @@
       }
     }
 
-    // 4. Load Courses Catalog with Instant Enrollment
     async function loadCoursesCatalog() {
       const container = document.getElementById('courses-container');
       try {
@@ -1262,7 +2361,6 @@
       }
     }
 
-    // 5. Enroll in Course Action
     async function enrollInCourse(courseId, courseTitle) {
       if (!token) {
         window.location.href = '/login';
@@ -1288,7 +2386,6 @@
       }
     }
 
-    // 6. Dynamic Daily Streak & Check-in
     function initStreakAndCheckin() {
       const today = new Date();
       const dayIndex = (today.getDay() + 6) % 7; // Mon=0, Sun=6
@@ -1366,7 +2463,7 @@
         .replace(/'/g, '&#039;');
     }
 
-    // 7. Logout Logic
+    // 6. Logout Logic
     document.getElementById('logout-btn').addEventListener('click', async () => {
       const accessToken = localStorage.getItem('skillsphere_access_token');
       try {
@@ -1387,6 +2484,7 @@
     });
 
   </script>
+
   <!-- PWA Service Worker & Install Prompt Banner -->
   <script src="/javascripts/pwa-installer.js"></script>
 </body>

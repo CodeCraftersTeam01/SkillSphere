@@ -418,6 +418,58 @@
       flex-shrink: 0 !important;
       vertical-align: middle !important;
     }
+
+    /* ========================================================= */
+    /* --- Space Travel Circle Portal Transition Styles --- */
+    /* ========================================================= */
+    #wormhole-portal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      width: 100vw;
+      width: 100%;
+      height: 100vh;
+      height: 100dvh;
+      z-index: 99999999;
+      background: transparent;
+      display: none;
+      overflow: hidden;
+      pointer-events: all;
+      touch-action: none;
+      -webkit-touch-callout: none;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    #wormhole-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    #wormhole-flash {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      width: 100%;
+      height: 100%;
+      background: #ffffff;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.28s ease;
+      z-index: 10;
+    }
+
+    #wormhole-flash.active {
+      opacity: 1;
+    }
   </style>
   
   <script>
@@ -436,8 +488,9 @@
     <header class="login-header">
       <a href="/" class="brand-logo" id="brand-home-link">
         <div class="brand-icon">
-          <!-- 8-pointed Claude signature star -->
+          <!-- 8-pointed Claude signature star with subtle diagonal glow -->
           <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+            <path opacity="0.38" d="M12 7.6L17.3 4.7L14.4 10L17.3 15.3L12 12.4L6.7 15.3L9.6 10L6.7 4.7Z" />
             <path d="M12 0L13.8 8.2L22 10L13.8 11.8L12 20L10.2 11.8L2 10L10.2 8.2L12 0Z" />
           </svg>
         </div>
@@ -994,9 +1047,8 @@
             loginCard.classList.add('framer-exit-up');
           }
 
-          setTimeout(() => {
-            window.location.href = targetUrl;
-          }, 350);
+          // Immediately launch Wormhole Portal Transition
+          triggerWormholeTransition(targetUrl);
         } else {
           showAlert('danger', result.message || 'Login gagal. Periksa kembali email dan password Anda.');
           submitBtn.disabled = false;
@@ -1192,8 +1244,8 @@
             }
 
             setTimeout(() => {
-              window.location.href = targetUrl;
-            }, 900);
+              triggerWormholeTransition(targetUrl);
+            }, 600);
           }, 350);
         } else {
           setTimeout(() => {
@@ -1329,6 +1381,204 @@
         }
       });
     }
+  </script>
+
+  <!-- ========================================================= -->
+  <!-- --- 8. Space Travel Circle Portal Transition DOM --- -->
+  <!-- ========================================================= -->
+  <div id="wormhole-portal-overlay" aria-hidden="true">
+    <canvas id="wormhole-canvas"></canvas>
+    <div id="wormhole-flash"></div>
+  </div>
+
+  <script>
+    // =========================================================
+    // --- 9. Space Travel Hyperspace Engine (Buttery Smooth Canvas Portal) ---
+    // =========================================================
+    function triggerWormholeTransition(targetUrl) {
+      const overlay = document.getElementById('wormhole-portal-overlay');
+      const canvas = document.getElementById('wormhole-canvas');
+      const flash = document.getElementById('wormhole-flash');
+
+      if (!overlay || !canvas) {
+        window.location.href = targetUrl;
+        return;
+      }
+
+      // 1. Immediately dismiss mobile virtual keyboard & isolate touch
+      if (document.activeElement && typeof document.activeElement.blur === 'function') {
+        document.activeElement.blur();
+      }
+      document.body.style.overflow = 'hidden';
+      document.documentElement.style.overflow = 'hidden';
+      window.scrollTo(0, 0);
+
+      overlay.style.display = 'block';
+
+      const ctx = canvas.getContext('2d', { alpha: true });
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+      let vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0, screen.width || 0);
+      let vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0, screen.height || 0);
+
+      canvas.width = Math.round(vw * dpr);
+      canvas.height = Math.round(vh * dpr);
+      canvas.style.width = vw + 'px';
+      canvas.style.height = vh + 'px';
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+      let cx = vw / 2;
+      let cy = vh / 2;
+
+      const handleResize = () => {
+        vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0, screen.width || 0);
+        vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0, screen.height || 0);
+        canvas.width = Math.round(vw * dpr);
+        canvas.height = Math.round(vh * dpr);
+        canvas.style.width = vw + 'px';
+        canvas.style.height = vh + 'px';
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        cx = vw / 2;
+        cy = vh / 2;
+      };
+      window.addEventListener('resize', handleResize, { passive: true });
+      window.addEventListener('orientationchange', handleResize, { passive: true });
+
+      const MAX_DEPTH = 1800;
+      const NUM_STARS = vw < 600 ? 320 : 480;
+
+      // Authentic 404 Star Streaks
+      class Star {
+        constructor() {
+          this.reset(true);
+        }
+        reset(initial = false) {
+          this.x = (Math.random() - 0.5) * vw * 2.8;
+          this.y = (Math.random() - 0.5) * vh * 2.8;
+          this.z = initial ? Math.random() * MAX_DEPTH : MAX_DEPTH;
+          this.pz = this.z;
+        }
+        update(speed) {
+          this.pz = this.z;
+          this.z -= speed;
+          if (this.z <= 10) {
+            this.reset();
+          }
+        }
+        draw(speed) {
+          const k = 320 / this.z;
+          const px = this.x * k + cx;
+          const py = this.y * k + cy;
+
+          // Stretch streaks nicely with speed
+          const prevK = 320 / Math.max(this.pz + speed * 0.9, 10);
+          const prevPx = this.x * prevK + cx;
+          const prevPy = this.y * prevK + cy;
+
+          if (px < 0 || px > vw || py < 0 || py > vh) return;
+
+          const depth = 1 - this.z / MAX_DEPTH;
+          const alpha = Math.min(Math.max(depth * 1.3, 0.15), 1);
+
+          ctx.beginPath();
+          ctx.moveTo(prevPx, prevPy);
+          ctx.lineTo(px, py);
+          ctx.strokeStyle = `rgba(255, 255, 255, ${alpha * 0.95})`;
+          ctx.lineWidth = Math.max(k * 1.25, 0.85);
+          ctx.lineCap = 'round';
+          ctx.stroke();
+        }
+      }
+
+      const stars = Array.from({ length: NUM_STARS }, () => new Star());
+
+      const startTime = performance.now();
+      const DURATION = 1750; // 1.75s snappy transition
+      const EXPAND_TIME = 750; // Circle expands over 750ms
+      let redirected = false;
+
+      // Quartic ease out for fluid, buttery-smooth circle aperture
+      function easeOutQuart(x) {
+        return 1 - Math.pow(1 - x, 4);
+      }
+
+      function render(now) {
+        if (redirected) return;
+        const nowTime = (typeof now === 'number' && now > 0) ? now : performance.now();
+        const elapsed = Math.max(nowTime - startTime, 0);
+        const progress = Math.min(elapsed / DURATION, 1.0);
+        const expandProgress = Math.min(elapsed / EXPAND_TIME, 1.0);
+
+        // Max radius to cover corners of screen
+        const maxR = Math.hypot(cx, cy) * 1.08;
+        const currentR = Math.max(easeOutQuart(expandProgress) * maxR, 0.1);
+
+        // Clear canvas so background outside circle is transparent
+        ctx.clearRect(0, 0, vw, vh);
+
+        // 1. Clip to the expanding smooth circle
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(cx, cy, currentR, 0, Math.PI * 2);
+        ctx.clip();
+
+        // 2. Fill solid obsidian background inside the portal
+        ctx.fillStyle = '#09090b';
+        ctx.fillRect(0, 0, vw, vh);
+
+        // Accelerated Speed curve: 14 -> 86 (Accelerated 404 Hyperspace)
+        const currentSpeed = 14 + Math.pow(progress, 2.2) * 72;
+
+        for (let i = 0; i < stars.length; i++) {
+          stars[i].update(currentSpeed);
+          stars[i].draw(currentSpeed);
+        }
+
+        ctx.restore();
+
+        // 3. Draw luminous anti-aliased white portal rim & bloom while expanding
+        if (expandProgress < 1.0) {
+          const rimAlpha = Math.max((1 - expandProgress) * 0.9, 0.15);
+          ctx.beginPath();
+          ctx.arc(cx, cy, currentR, 0, Math.PI * 2);
+          ctx.strokeStyle = `rgba(255, 255, 255, ${rimAlpha})`;
+          ctx.lineWidth = Math.max(2.8 * (1 - expandProgress), 1.2);
+          ctx.stroke();
+
+          // Outer glowing edge
+          ctx.beginPath();
+          ctx.arc(cx, cy, currentR + 2, 0, Math.PI * 2);
+          ctx.strokeStyle = `rgba(56, 189, 248, ${rimAlpha * 0.45})`;
+          ctx.lineWidth = 3.5;
+          ctx.stroke();
+        }
+
+        // 4. White flash near peak speed
+        if (progress >= 0.86 && !flash.classList.contains('active')) {
+          flash.classList.add('active');
+        }
+
+        // 5. Land on dashboard
+        if (progress >= 1.0 && !redirected) {
+          redirected = true;
+          window.location.replace(targetUrl);
+          return;
+        }
+
+        requestAnimationFrame(render);
+      }
+
+      requestAnimationFrame(render);
+
+      // Failsafe fallback
+      setTimeout(() => {
+        if (!redirected) {
+          redirected = true;
+          window.location.replace(targetUrl);
+        }
+      }, 2200);
+    }
+    window.triggerWormholeTransition = triggerWormholeTransition;
   </script>
   <!-- PWA Service Worker & Install Prompt Banner -->
   <script src="/javascripts/pwa-installer.js"></script>

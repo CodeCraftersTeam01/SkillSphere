@@ -55,6 +55,7 @@
         <div class="pwa-banner-left">
           <div class="pwa-banner-app-icon">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+              <path opacity="0.38" d="M12 7.6L17.3 4.7L14.4 10L17.3 15.3L12 12.4L6.7 15.3L9.6 10L6.7 4.7Z" />
               <path d="M12 0L13.8 8.2L22 10L13.8 11.8L12 20L10.2 11.8L2 10L10.2 8.2L12 0Z" />
             </svg>
           </div>
@@ -107,6 +108,7 @@
         <div>
           <div class="pwa-sheet-icon-wrapper">
             <svg viewBox="0 0 24 24" fill="currentColor">
+              <path opacity="0.38" d="M12 7.6L17.3 4.7L14.4 10L17.3 15.3L12 12.4L6.7 15.3L9.6 10L6.7 4.7Z" />
               <path d="M12 0L13.8 8.2L22 10L13.8 11.8L12 20L10.2 11.8L2 10L10.2 8.2L12 0Z" />
             </svg>
           </div>

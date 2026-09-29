@@ -606,6 +606,102 @@
       min-width: 280px;
       max-width: 420px;
     }
+
+    /* Top Full-Width Announcement Bar (Dicoding / Claude Warm Paper Style) */
+    .top-announcement-bar {
+      background: #1C1B18;
+      color: #FAF9F5;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      font-size: 13px;
+      font-weight: 500;
+      padding: 10px 24px;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      z-index: 105;
+      line-height: 1.4;
+      transition: background-color 0.2s ease;
+    }
+
+    [data-theme="dark"] .top-announcement-bar {
+      background: #141312;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .top-announcement-content {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      text-align: center;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .top-bar-badge {
+      font-size: 10.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      padding: 2px 7px;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.15);
+      color: #FFFFFF;
+      display: inline-block;
+    }
+
+    .top-bar-text {
+      color: rgba(255, 255, 255, 0.92);
+      font-size: 13px;
+    }
+
+    .top-bar-divider {
+      color: rgba(255, 255, 255, 0.35);
+      font-size: 13px;
+      user-select: none;
+    }
+
+    .top-bar-cta {
+      background: none;
+      border: none;
+      color: #FFFFFF;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 0;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      transition: opacity 0.15s ease;
+      font-family: inherit;
+    }
+
+    .top-bar-cta:hover {
+      opacity: 0.82;
+    }
+
+    @media (max-width: 768px) {
+      .top-announcement-bar {
+        padding: 8px 16px;
+        font-size: 12px;
+      }
+      .top-bar-text {
+        font-size: 12px;
+      }
+      .top-bar-cta {
+        font-size: 12px;
+      }
+      .top-announcement-content {
+        gap: 6px;
+      }
+      .top-bar-divider {
+        display: none;
+      }
+    }
   </style>
 
   <script>
@@ -620,12 +716,25 @@
 <body>
 
   <div class="dashboard-layout">
+    <!-- Top Full-Width Verification Announcement Bar -->
+    <div class="top-announcement-bar" id="materials-verification-bar">
+      <div class="top-announcement-content">
+        <span class="top-bar-badge">Verifikasi Pengajar</span>
+        <span class="top-bar-text">Akun Anda belum menyelesaikan verifikasi kualifikasi pengajar resmi SkillSphere AI.</span>
+        <span class="top-bar-divider">|</span>
+        <a href="/dashboard" class="top-bar-cta">
+          Ke Dashboard Verifikasi <i class="fas fa-arrow-right" style="font-size:10px;"></i>
+        </a>
+      </div>
+    </div>
+
     <!-- Navbar -->
     <header class="navbar">
       <div style="display: flex; align-items: center; gap: 14px;">
         <a href="/dashboard" class="brand-logo" style="text-decoration:none;">
           <div class="brand-icon">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+              <path opacity="0.38" d="M12 7.6L17.3 4.7L14.4 10L17.3 15.3L12 12.4L6.7 15.3L9.6 10L6.7 4.7Z" />
               <path d="M12 0L13.8 8.2L22 10L13.8 11.8L12 20L10.2 11.8L2 10L10.2 8.2L12 0Z" />
             </svg>
           </div>
@@ -667,6 +776,7 @@
 
     <!-- Main Content -->
     <main class="dashboard-content">
+
       <!-- Welcome Hero -->
       <section class="welcome-hero">
         <h1 class="welcome-title">Studio Manajemen & Upload Materi</h1>
@@ -969,6 +1079,15 @@
           document.getElementById('nav-user-name').textContent = user.name || user.email;
           document.getElementById('nav-avatar').textContent = (user.name || 'T')[0].toUpperCase();
           document.getElementById('nav-user-role').textContent = user.role.toUpperCase();
+
+          const apps = Array.isArray(user.tutor_applications) ? user.tutor_applications : [];
+          const latestApp = apps.length > 0 ? apps[apps.length - 1] : null;
+          const isVerifiedTutor = (user.role === 'tutor' && latestApp && latestApp.status === 'approved') || user.role === 'admin';
+
+          const verifBar = document.getElementById('materials-verification-bar');
+          if (verifBar) {
+            verifBar.style.display = isVerifiedTutor ? 'none' : 'flex';
+          }
         }
       } catch (err) {
         console.error('Failed to fetch user profile:', err);

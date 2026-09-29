@@ -1,0 +1,1554 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>I'm Lost Too (404) | SkillSphere AI</title>
+  <meta name="description" content="Halaman tidak ditemukan - 404 Space Arcade Game">
+  
+  <!-- PWA Manifest & App Icons -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#ffffff">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  
+  <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    :root {
+      --bg: #ffffff;
+      --text: #080808;
+      --dock-bg: #1c1c1e;
+      --dock-text: #ffffff;
+      --dock-border: rgba(255, 255, 255, 0.12);
+      --tag-bg: #ffffff;
+      --tag-text: #050505;
+      --crosshair: #10B981;
+    }
+
+    [data-theme="dark"] {
+      --bg: #09090b;
+      --text: #f4f4f5;
+      --dock-bg: #18181b;
+      --dock-text: #ffffff;
+      --dock-border: rgba(255, 255, 255, 0.15);
+      --tag-bg: #27272a;
+      --tag-text: #ffffff;
+      --crosshair: #34D399;
+    }
+
+    body, html {
+      width: 100%;
+      height: 100%;
+      height: 100dvh;
+      overflow: hidden;
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      user-select: none;
+      cursor: crosshair;
+      transition: background-color 0.25s ease, color 0.25s ease;
+    }
+
+    #hyperspace-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      display: block;
+    }
+
+    .viewport-overlay {
+      position: relative;
+      z-index: 10;
+      width: 100vw;
+      height: 100vh;
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding: 24px 32px;
+      /* safe area for notched phones */
+      padding-bottom: max(24px, env(safe-area-inset-bottom, 24px));
+      pointer-events: none;
+    }
+
+    /* Top Navigation Bar */
+    .top-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      font-size: 14.5px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      pointer-events: auto;
+      margin-bottom: 12px;
+    }
+
+    .nav-btn {
+      color: var(--text);
+      text-decoration: none;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: inherit;
+      font-weight: 600;
+      opacity: 0.85;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .nav-btn:hover {
+      opacity: 1;
+      transform: translateY(-1px);
+    }
+
+    /* Top Left Bold Headline (Büro Style) */
+    .headline-wrap {
+      width: 100%;
+      max-width: 860px;
+      margin: 0 0 auto 0;
+      text-align: left;
+      pointer-events: none;
+      transform-origin: top left;
+      transition:
+        transform 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+        filter 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+        opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .headline-wrap.playing {
+      transform: scale(0.52) translateY(-8px);
+      filter: blur(2px);
+      opacity: 0.45;
+    }
+
+    @keyframes buro-quake {
+      0% { transform: translate(0, 0) rotate(0deg); }
+      18% { transform: translate(-6px, 4px) rotate(-0.6deg); }
+      36% { transform: translate(6px, -4px) rotate(0.6deg); }
+      54% { transform: translate(-4px, -3px) rotate(-0.4deg); }
+      72% { transform: translate(4px, 3px) rotate(0.3deg); }
+      90% { transform: translate(-2px, 1px) rotate(-0.1deg); }
+      100% { transform: translate(0, 0) rotate(0deg); }
+    }
+
+    /* Quake applied to inner h1, not headline-wrap — preserves scale(0.52) playing state */
+    .buro-headline.quake {
+      animation: buro-quake 0.24s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+    }
+
+    .buro-headline {
+      font-size: clamp(2.3rem, 5.2vw, 4.3rem);
+      font-weight: 500;
+      line-height: 1.12;
+      letter-spacing: -0.035em;
+      color: var(--text);
+      word-break: break-word;
+      text-align: left;
+    }
+
+    .buro-headline .numeral {
+      font-weight: 400;
+    }
+
+    /* ============ BOSS SYSTEM ============ */
+    @keyframes boss-pulse-ring {
+      0%   { transform: scale(1);   opacity: 0.85; }
+      50%  { transform: scale(1.12); opacity: 0.4; }
+      100% { transform: scale(1);   opacity: 0.85; }
+    }
+
+    @keyframes boss-alert-in {
+      0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.7); filter: blur(8px); }
+      55%  { opacity: 1; transform: translate(-50%, -50%) scale(1.04); filter: blur(0px); }
+      80%  { transform: translate(-50%, -50%) scale(0.98); }
+      100% { opacity: 1; transform: translate(-50%, -50%) scale(1); filter: blur(0px); }
+    }
+    @keyframes boss-alert-out {
+      0%   { opacity: 1; transform: translate(-50%, -50%) scale(1); filter: blur(0px); }
+      100% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); filter: blur(6px); }
+    }
+
+    #boss-alert {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 50;
+      pointer-events: none;
+      text-align: center;
+      display: none;
+    }
+    #boss-alert.visible {
+      display: block;
+      animation: boss-alert-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+    #boss-alert.hiding {
+      display: block;
+      animation: boss-alert-out 0.4s ease forwards;
+    }
+    #boss-alert-title {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: clamp(1.6rem, 5vw, 3.2rem);
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      color: #EF4444;
+      text-shadow: 0 0 32px rgba(239,68,68,0.7), 0 0 8px rgba(239,68,68,0.9);
+      text-transform: uppercase;
+    }
+    #boss-alert-sub {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: clamp(0.75rem, 2vw, 1rem);
+      letter-spacing: 0.12em;
+      color: rgba(255,255,255,0.7);
+      margin-top: 8px;
+      text-transform: uppercase;
+    }
+
+    #boss-hpbar-wrap {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: min(480px, 92vw);
+      padding: 12px 18px 14px;
+      background: rgba(10, 8, 8, 0.78);
+      border: 1px solid rgba(239,68,68,0.4);
+      border-bottom: none;
+      border-radius: 14px 14px 0 0;
+      backdrop-filter: blur(14px);
+      z-index: 40;
+      pointer-events: none;
+      display: none;
+      transition: opacity 0.4s ease;
+    }
+    #boss-hpbar-wrap.visible { display: block; }
+
+    #boss-bar-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 7px;
+    }
+    #boss-bar-name {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #EF4444;
+    }
+    #boss-bar-hp-text {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: rgba(255,255,255,0.55);
+    }
+    #boss-hpbar-track {
+      width: 100%;
+      height: 8px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 9999px;
+      overflow: hidden;
+    }
+    #boss-hpbar-fill {
+      height: 100%;
+      width: 100%;
+      border-radius: 9999px;
+      background: linear-gradient(90deg, #EF4444, #F59E0B);
+      transition: width 0.12s ease-out;
+    }
+
+    /* Target Hit Indicator Overlay */
+    .game-hint {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 12px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11.5px;
+      opacity: 0.65;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* Bottom Pill Dock */
+    .bottom-dock-wrap {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      pointer-events: auto;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .score-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 16px;
+      border-radius: 9999px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      color: var(--text);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      font-weight: 700;
+      backdrop-filter: blur(8px);
+    }
+
+    [data-theme="light"] .score-badge {
+      background: rgba(0, 0, 0, 0.05);
+      border: 1px solid rgba(0, 0, 0, 0.12);
+      color: #111111;
+    }
+
+    .buro-dock {
+      display: inline-flex;
+      align-items: center;
+      background: var(--dock-bg);
+      color: var(--dock-text);
+      border: 1px solid var(--dock-border);
+      border-radius: 9999px;
+      padding: 6px 8px 6px 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.22);
+      gap: 14px;
+      font-size: 13.5px;
+      font-weight: 500;
+    }
+
+    .dock-link {
+      color: var(--dock-text);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: opacity 0.2s ease;
+      cursor: pointer;
+      font-weight: 500;
+    }
+
+    .dock-link:hover {
+      opacity: 0.75;
+    }
+
+    .dock-divider {
+      width: 1px;
+      height: 16px;
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .dock-counter {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 5px 12px;
+      border-radius: 9999px;
+      background: var(--tag-bg);
+      color: var(--tag-text);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.15s ease, opacity 0.15s ease;
+      border: none;
+    }
+
+    .dock-counter:hover {
+      transform: scale(1.05);
+      opacity: 0.9;
+    }
+
+    @media (max-width: 768px) {
+      .viewport-overlay {
+        padding: 16px 18px;
+        padding-bottom: max(16px, env(safe-area-inset-bottom, 16px));
+      }
+      .buro-headline {
+        font-size: 2rem;
+        line-height: 1.18;
+      }
+      .bottom-dock-wrap {
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-end;
+      }
+      .buro-dock {
+        width: auto;
+        justify-content: space-between;
+      }
+    }
+  </style>
+
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('skillsphere_theme') || 
+        (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    })();
+  </script>
+</head>
+<body>
+
+  <!-- Fullscreen Interactive Shooting Arcade Hyperspace Canvas -->
+  <canvas id="hyperspace-canvas"></canvas>
+
+  <div class="viewport-overlay">
+    <!-- Top Navigation Bar -->
+    <header class="top-nav">
+      <a href="/" class="nav-btn" id="nav-brand">
+        <span>SkillSphere</span>
+      </a>
+
+      <div style="display: flex; align-items: center; gap: 16px;">
+        <button class="nav-btn" id="audio-toggle-btn" type="button" title="Toggle Sound">
+          <i class="fas fa-volume-high" id="audio-icon"></i>
+        </button>
+        <button class="nav-btn" id="theme-btn" type="button" aria-label="Toggle Theme">
+          <span id="theme-label">Dark</span>
+        </button>
+        <button class="nav-btn" onclick="if(window.history.length > 1) window.history.back(); else window.location.href='/'">
+          <span>Close</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Top Bold Headline Exactly Like Screenshot -->
+    <main class="headline-wrap" id="headline-wrap">
+      <h1 class="buro-headline">
+        I'm Lost Too <span class="numeral">(404)</span>.Oh shoot... Something went screwy. Oosh, sucks. You get the idea.
+      </h1>
+      <div class="game-hint">
+        <i class="fas fa-crosshairs"></i>
+        <span>Tahan mouse / layar untuk menembak beruntun</span>
+      </div>
+    </main>
+
+    <!-- Boss: Warning Alert Overlay -->
+    <div id="boss-alert" aria-live="assertive">
+      <div id="boss-alert-title">&#9888; BOSS MUNCUL!</div>
+      <div id="boss-alert-sub">ERROR 404 TITAN &mdash; HP: 5000</div>
+    </div>
+
+    <!-- Boss: Health Bar (bottom center) -->
+    <div id="boss-hpbar-wrap">
+      <div id="boss-bar-label">
+        <span id="boss-bar-name">&#9888; ERROR 404 TITAN</span>
+        <span id="boss-bar-hp-text">5000 / 5000</span>
+      </div>
+      <div id="boss-hpbar-track">
+        <div id="boss-hpbar-fill"></div>
+      </div>
+    </div>
+
+    <!-- Bottom Action Dock & Score -->
+    <footer class="bottom-dock-wrap">
+      <div class="score-badge">
+        <i class="fas fa-crosshairs"></i>
+        <span>SKOR: <span id="score-val">0</span></span>
+      </div>
+
+      <div class="buro-dock">
+        <a href="/dashboard" class="dock-link">
+          <span>🤘 Dashboard</span>
+        </a>
+        <span class="dock-divider"></span>
+        <a href="/" class="dock-link">
+          <span>Beranda</span>
+        </a>
+        <button class="dock-counter" id="warp-boost-btn" title="Klik untuk akselerasi warp!">
+          <span>404 +</span>
+        </button>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    // Theme Switcher Logic
+    const themeBtn = document.getElementById('theme-btn');
+    const themeLabel = document.getElementById('theme-label');
+
+    function updateThemeUI(theme) {
+      if (theme === 'dark') {
+        if (themeLabel) themeLabel.textContent = 'Light';
+      } else {
+        if (themeLabel) themeLabel.textContent = 'Dark';
+      }
+    }
+    updateThemeUI(document.documentElement.getAttribute('data-theme') || 'light');
+
+    if (themeBtn) {
+      themeBtn.addEventListener('click', () => {
+        const active = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', active);
+        localStorage.setItem('skillsphere_theme', active);
+        updateThemeUI(active);
+      });
+    }
+
+    // ============================================================
+    // PROCEDURAL AUDIO SYNTHESIZER (Optimized Web Audio API)
+    // ============================================================
+    let audioCtx = null;
+    let soundEnabled = true;
+
+    function initAudio() {
+      if (!audioCtx) {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (AudioContext) {
+          audioCtx = new AudioContext();
+        }
+      }
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    let lastLaserAudioTime = 0;
+    function playLaserSound() {
+      if (!soundEnabled || !audioCtx) return;
+      const now = audioCtx.currentTime;
+      if (now - lastLaserAudioTime < 0.07) return; // Prevent audio congestion during rapid hold
+      lastLaserAudioTime = now;
+      try {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(860, now);
+        osc.frequency.exponentialRampToValueAtTime(120, now + 0.09);
+
+        gain.gain.setValueAtTime(0.12, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.09);
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        osc.start(now);
+        osc.stop(now + 0.09);
+      } catch(e) {}
+    }
+
+    let lastExplosionAudioTime = 0;
+    function playExplosionSound() {
+      if (!soundEnabled || !audioCtx) return;
+      const now = audioCtx.currentTime;
+      if (now - lastExplosionAudioTime < 0.08) return;
+      lastExplosionAudioTime = now;
+      try {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(160, now);
+        osc.frequency.exponentialRampToValueAtTime(30, now + 0.22);
+
+        gain.gain.setValueAtTime(0.25, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        osc.start(now);
+        osc.stop(now + 0.22);
+      } catch(e) {}
+    }
+
+    const audioToggleBtn = document.getElementById('audio-toggle-btn');
+    const audioIcon = document.getElementById('audio-icon');
+    if (audioToggleBtn) {
+      audioToggleBtn.addEventListener('click', () => {
+        soundEnabled = !soundEnabled;
+        if (audioIcon) {
+          audioIcon.className = soundEnabled ? 'fas fa-volume-high' : 'fas fa-volume-xmark';
+        }
+      });
+    }
+
+    // ============================================================
+    // BÜRO 3D HYPERSPACE CANVAS & HIGH-PERFORMANCE ARCADE ENGINE
+    // ============================================================
+    const canvas = document.getElementById('hyperspace-canvas');
+    const ctx = canvas.getContext('2d');
+
+    let width = 0;
+    let height = 0;
+    let cx = 0;
+    let cy = 0;
+
+    function resize() {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+      cx = width / 2;
+      cy = height / 2;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    const STAR_COUNT = 280;
+    const MAX_DEPTH = 1400;
+    let targetSpeed = 7.5;
+    let currentSpeed = 7.5;
+    let targetAngleX = 0;
+    let targetAngleY = 0;
+    let currentAngleX = 0;
+    let currentAngleY = 0;
+
+    let score = 0;
+    const scoreValElem = document.getElementById('score-val');
+
+    // Laser Projectiles
+    const lasers = [];
+    // Explosion Particles
+    const particles = [];
+    // Floating Text Hit Popups
+    const popups = [];
+
+    // Star Streaks
+    class Star {
+      constructor() {
+        this.reset(true);
+      }
+      reset(initial = false) {
+        this.x = (Math.random() - 0.5) * width * 2.4;
+        this.y = (Math.random() - 0.5) * height * 2.4;
+        this.z = initial ? Math.random() * MAX_DEPTH : MAX_DEPTH;
+        this.pz = this.z;
+        this.len = Math.random() * 0.8 + 0.6;
+      }
+      update(speed) {
+        this.pz = this.z;
+        this.z -= speed;
+        if (this.z <= 10) {
+          this.reset();
+        }
+      }
+      draw(isDark) {
+        const k = 320 / this.z;
+        const px = this.x * k + cx + currentAngleX * (1 - this.z / MAX_DEPTH);
+        const py = this.y * k + cy + currentAngleY * (1 - this.z / MAX_DEPTH);
+
+        const prevK = 320 / this.pz;
+        const prevPx = this.x * prevK + cx + currentAngleX * (1 - this.pz / MAX_DEPTH);
+        const prevPy = this.y * prevK + cy + currentAngleY * (1 - this.pz / MAX_DEPTH);
+
+        if (px < 0 || px > width || py < 0 || py > height) return;
+
+        const depth = 1 - this.z / MAX_DEPTH;
+        const alpha = Math.min(Math.max(depth * 1.15, 0), 1);
+
+        ctx.beginPath();
+        ctx.moveTo(prevPx, prevPy);
+        ctx.lineTo(px, py);
+
+        if (isDark) {
+          ctx.strokeStyle = `rgba(255, 255, 255, ${alpha * 0.75})`;
+        } else {
+          ctx.strokeStyle = `rgba(10, 10, 10, ${alpha * 0.7})`;
+        }
+
+        ctx.lineWidth = Math.max(k * 1.1, 0.75);
+        ctx.lineCap = 'round';
+        ctx.stroke();
+      }
+    }
+
+    // 3D SkillSphere Logo Crystal Object
+    class SkillSphereStar3D {
+      constructor(initial = false) {
+        this.reset(initial);
+      }
+      reset(initial = false) {
+        // Smaller on mobile so they don't fill the screen
+        const sizeMult = width < 600 ? 0.78 : 1.0;
+        this.x = (Math.random() - 0.5) * width * 1.6;
+        this.y = (Math.random() - 0.5) * height * 1.6;
+        this.z = initial ? Math.random() * MAX_DEPTH : MAX_DEPTH;
+        this.rx = Math.random() * Math.PI * 2;
+        this.ry = Math.random() * Math.PI * 2;
+        this.rz = Math.random() * Math.PI * 2;
+        this.rotSpeedX = (Math.random() - 0.5) * 0.04;
+        this.rotSpeedY = (Math.random() - 0.5) * 0.04;
+        this.rotSpeedZ = (Math.random() - 0.5) * 0.03;
+        this.baseSize = (Math.random() * 18 + 24) * sizeMult;
+        this.points = 25;
+        this.screenX = 0;
+        this.screenY = 0;
+        this.radius = 24 * sizeMult;
+      }
+      update(speed) {
+        this.z -= speed * 0.95;
+        this.rx += this.rotSpeedX;
+        this.ry += this.rotSpeedY;
+        this.rz += this.rotSpeedZ;
+        if (this.z <= 20) {
+          this.reset();
+        }
+      }
+      draw(isDark) {
+        const k = 340 / this.z;
+        this.screenX = this.x * k + cx + currentAngleX * (1 - this.z / MAX_DEPTH);
+        this.screenY = this.y * k + cy + currentAngleY * (1 - this.z / MAX_DEPTH);
+
+        if (this.screenX < -100 || this.screenX > width + 100 || this.screenY < -100 || this.screenY > height + 100) return;
+
+        const depth = 1 - this.z / MAX_DEPTH;
+        const alpha = Math.min(Math.max(depth * 1.4, 0), 1);
+        const R = Math.max(this.baseSize * k, 6);
+        this.radius = R * 1.1;
+
+        ctx.save();
+        ctx.translate(this.screenX, this.screenY);
+        ctx.globalAlpha = alpha;
+
+        // 3D Matrix Rotation calculations for 8-point faceted star
+        const cosY = Math.cos(this.ry);
+        const sinY = Math.sin(this.ry);
+        const cosX = Math.cos(this.rx);
+        const sinX = Math.sin(this.rx);
+        const cosZ = Math.cos(this.rz);
+        const sinZ = Math.sin(this.rz);
+
+        function project3D(px, py, pz) {
+          let x1 = px * cosY + pz * sinY;
+          let y1 = py;
+          let z1 = -px * sinY + pz * cosY;
+          let x2 = x1;
+          let y2 = y1 * cosX - z1 * sinX;
+          let z2 = y1 * sinX + z1 * cosX;
+          let x3 = x2 * cosZ - y2 * sinZ;
+          let y3 = x2 * sinZ + y2 * cosZ;
+          return { x: x3, y: y3, z: z2 };
+        }
+
+        // 1. Draw 45-degree diagonal secondary sparkle (translucent cross star)
+        const diagR = R * 0.64;
+        const diagInner = R * 0.12;
+        const dTR = project3D(diagR * 0.707, -diagR * 0.707, 0);
+        const dBR = project3D(diagR * 0.707, diagR * 0.707, 0);
+        const dBL = project3D(-diagR * 0.707, diagR * 0.707, 0);
+        const dTL = project3D(-diagR * 0.707, -diagR * 0.707, 0);
+        const dInnerT = project3D(0, -diagInner, 0);
+        const dInnerR = project3D(diagInner, 0, 0);
+        const dInnerB = project3D(0, diagInner, 0);
+        const dInnerL = project3D(-diagInner, 0, 0);
+
+        ctx.beginPath();
+        ctx.moveTo(dTR.x, dTR.y);
+        ctx.lineTo(dInnerR.x, dInnerR.y);
+        ctx.lineTo(dBR.x, dBR.y);
+        ctx.lineTo(dInnerB.x, dInnerB.y);
+        ctx.lineTo(dBL.x, dBL.y);
+        ctx.lineTo(dInnerL.x, dInnerL.y);
+        ctx.lineTo(dTL.x, dTL.y);
+        ctx.lineTo(dInnerT.x, dInnerT.y);
+        ctx.closePath();
+        ctx.fillStyle = isDark ? 'rgba(255, 255, 255, 0.38)' : 'rgba(0, 0, 0, 0.32)';
+        ctx.fill();
+
+        // 2. Draw 3D Faceted Primary 4-Point SkillSphere Star (Pinched Concave Flares)
+        const waist = R * 0.16;
+        const topTip = project3D(0, -R, 0);
+        const bottomTip = project3D(0, R, 0);
+        const rightTip = project3D(R, 0, 0);
+        const leftTip = project3D(-R, 0, 0);
+
+        const innerTR = project3D(waist, -waist, 0);
+        const innerBR = project3D(waist, waist, 0);
+        const innerBL = project3D(-waist, waist, 0);
+        const innerTL = project3D(-waist, -waist, 0);
+
+        const frontApex = project3D(0, 0, R * 0.28);
+        const backApex = project3D(0, 0, -R * 0.28);
+
+        function drawFacet(p1, p2, p3) {
+          const nx = (p2.y - p1.y) * (p3.z - p1.z) - (p2.z - p1.z) * (p3.y - p1.y);
+          const ny = (p2.z - p1.z) * (p3.x - p1.x) - (p2.x - p1.x) * (p3.z - p1.z);
+          const nz = (p2.x - p1.x) * (p3.y - p1.y) - (p2.y - p1.y) * (p3.x - p1.x);
+          const len = Math.hypot(nx, ny, nz) || 1;
+          const light = Math.max((nz / len) * 0.45 + 0.55, 0.25);
+
+          ctx.beginPath();
+          ctx.moveTo(p1.x, p1.y);
+          ctx.lineTo(p2.x, p2.y);
+          ctx.lineTo(p3.x, p3.y);
+          ctx.closePath();
+
+          if (isDark) {
+            const v = Math.floor(255 * light);
+            ctx.fillStyle = `rgb(${v}, ${v}, ${v})`;
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+          } else {
+            const v = Math.floor(40 * (1 - light));
+            ctx.fillStyle = `rgb(${v}, ${v}, ${v})`;
+            ctx.strokeStyle = 'rgba(0, 0, 0, 0.25)';
+          }
+          ctx.lineWidth = 0.6;
+          ctx.fill();
+          ctx.stroke();
+        }
+
+        // Front 8 Faceted Arm Triangles
+        drawFacet(frontApex, topTip, innerTR);
+        drawFacet(frontApex, innerTL, topTip);
+        drawFacet(frontApex, rightTip, innerBR);
+        drawFacet(frontApex, innerTR, rightTip);
+        drawFacet(frontApex, bottomTip, innerBL);
+        drawFacet(frontApex, innerBR, bottomTip);
+        drawFacet(frontApex, leftTip, innerTL);
+        drawFacet(frontApex, innerBL, leftTip);
+
+        // Back 8 Faceted Arm Triangles
+        drawFacet(backApex, innerTR, topTip);
+        drawFacet(backApex, topTip, innerTL);
+        drawFacet(backApex, innerBR, rightTip);
+        drawFacet(backApex, rightTip, innerTR);
+        drawFacet(backApex, innerBL, bottomTip);
+        drawFacet(backApex, bottomTip, innerBR);
+        drawFacet(backApex, innerTL, leftTip);
+        drawFacet(backApex, leftTip, innerBL);
+
+        // Center Core Highlight
+        ctx.beginPath();
+        ctx.arc(frontApex.x, frontApex.y, Math.max(R * 0.08, 1.2), 0, Math.PI * 2);
+        ctx.fillStyle = isDark ? '#ffffff' : '#000000';
+        ctx.fill();
+
+        ctx.restore();
+      }
+    }
+
+    // High-Performance 3D Space Perspective Laser (Zero shadowBlur for 60FPS)
+    class PerspectiveLaser {
+      constructor(startX, startY, targetX, targetY) {
+        this.startX = startX;
+        this.startY = startY;
+        this.targetX = targetX;
+        this.targetY = targetY;
+        this.progress = 0;
+        this.speed = 0.19; // Ultra responsive
+        this.tailLen = 0.32;
+        this.alive = true;
+      }
+      update() {
+        this.progress += this.speed;
+        if (this.progress >= 1.04) {
+          this.alive = false;
+        }
+      }
+      draw(isDark) {
+        const headProg = Math.min(this.progress, 1.0);
+        const tailProg = Math.max(0, this.progress - this.tailLen);
+
+        const hx = this.startX + (this.targetX - this.startX) * headProg;
+        const hy = this.startY + (this.targetY - this.startY) * headProg;
+        const tx = this.startX + (this.targetX - this.startX) * tailProg;
+        const ty = this.startY + (this.targetY - this.startY) * tailProg;
+
+        const depth = 1 - headProg;
+        const coreWidth = depth * 2.8 + 1.2;
+        const haloWidth = coreWidth * 2.4;
+
+        // Pass 1: Semi-transparent glow halo (Zero Gaussian blur overhead)
+        ctx.beginPath();
+        ctx.moveTo(tx, ty);
+        ctx.lineTo(hx, hy);
+        ctx.strokeStyle = isDark ? 'rgba(255, 255, 255, 0.28)' : 'rgba(10, 10, 10, 0.22)';
+        ctx.lineWidth = haloWidth;
+        ctx.lineCap = 'round';
+        ctx.stroke();
+
+        // Pass 2: High-contrast pure white core beam
+        ctx.beginPath();
+        ctx.moveTo(tx, ty);
+        ctx.lineTo(hx, hy);
+        ctx.strokeStyle = isDark ? '#ffffff' : '#000000';
+        ctx.lineWidth = coreWidth;
+        ctx.stroke();
+      }
+    }
+
+    // High-Performance Crystal Shards
+    class Particle {
+      constructor(x, y) {
+        this.x = x;
+        this.y = y;
+        const angle = Math.random() * Math.PI * 2;
+        const speed = Math.random() * 8 + 3;
+        this.vx = Math.cos(angle) * speed;
+        this.vy = Math.sin(angle) * speed;
+        this.alpha = 1;
+        this.decay = Math.random() * 0.045 + 0.035;
+        this.size = Math.random() * 2.8 + 1.2;
+        this.rot = Math.random() * Math.PI * 2;
+        this.rotSpeed = (Math.random() - 0.5) * 0.25;
+      }
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        this.vy += 0.14;
+        this.alpha -= this.decay;
+        this.rot += this.rotSpeed;
+      }
+      draw(isDark) {
+        ctx.save();
+        ctx.globalAlpha = Math.max(this.alpha, 0);
+        ctx.translate(this.x, this.y);
+        ctx.rotate(this.rot);
+
+        ctx.beginPath();
+        ctx.moveTo(0, -this.size * 1.5);
+        ctx.lineTo(this.size, 0);
+        ctx.lineTo(0, this.size * 1.5);
+        ctx.lineTo(-this.size, 0);
+        ctx.closePath();
+        ctx.fillStyle = isDark ? '#ffffff' : '#111111';
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    // Floating Score Popups
+    class ScorePopup {
+      constructor(x, y, text) {
+        this.x = x;
+        this.y = y;
+        this.text = text;
+        this.alpha = 1;
+      }
+      update() {
+        this.y -= 1.8;
+        this.alpha -= 0.035;
+      }
+      draw(isDark) {
+        ctx.save();
+        ctx.globalAlpha = Math.max(this.alpha, 0);
+        ctx.font = `bold 15px 'JetBrains Mono', monospace`;
+        ctx.fillStyle = isDark ? '#ffffff' : '#111111';
+        ctx.textAlign = 'center';
+        ctx.fillText(this.text, this.x, this.y);
+        ctx.restore();
+      }
+    }
+
+    const stars = Array.from({ length: STAR_COUNT }, () => new Star());
+    const debrisList = Array.from({ length: 14 }, () => new SkillSphereStar3D(true));
+
+    // ============================================================
+    // BOSS SYSTEM
+    // ============================================================
+    const BOSS_MAX_HP   = 5000;
+    const BOSS_DAMAGE   = 25;    // HP lost per laser hit
+    const BOSS_INTERVAL = 1000;  // spawn every N score points
+    let boss            = null;
+    let nextBossAt      = BOSS_INTERVAL;
+    let bossAlertTimer  = null;
+
+    const bossAlertEl  = document.getElementById('boss-alert');
+    const bossHPWrap   = document.getElementById('boss-hpbar-wrap');
+    const bossHPFill   = document.getElementById('boss-hpbar-fill');
+    const bossHPText   = document.getElementById('boss-bar-hp-text');
+
+    function showBossAlert(onDone) {
+      if (!bossAlertEl) return;
+      bossAlertEl.classList.remove('hiding');
+      bossAlertEl.classList.add('visible');
+      if (bossAlertTimer) clearTimeout(bossAlertTimer);
+      bossAlertTimer = setTimeout(() => {
+        bossAlertEl.classList.remove('visible');
+        bossAlertEl.classList.add('hiding');
+        setTimeout(() => {
+          bossAlertEl.classList.remove('hiding');
+          if (onDone) onDone();
+        }, 420);
+      }, 2200);
+    }
+
+    function updateBossHPBar() {
+      if (!boss) return;
+      const pct = Math.max(boss.hp / BOSS_MAX_HP, 0) * 100;
+      if (bossHPFill) bossHPFill.style.width = pct + '%';
+      if (bossHPText) bossHPText.textContent = `${Math.max(boss.hp, 0).toLocaleString()} / ${BOSS_MAX_HP.toLocaleString()}`;
+    }
+
+    function spawnBoss() {
+      if (boss) return; // already alive
+      boss = new BossSkillSphereStar3D();
+      if (bossHPWrap) bossHPWrap.classList.add('visible');
+      updateBossHPBar();
+      showBossAlert();
+    }
+
+    function despawnBoss() {
+      boss = null;
+      if (bossHPWrap) bossHPWrap.classList.remove('visible');
+    }
+
+    // Boss: giant faceted star with pulsing red aura
+    class BossSkillSphereStar3D {
+      constructor() {
+        // Smaller on mobile so it stays challenging, not trivially easy
+        const sizeMult = width < 600 ? 0.78 : 1.0;
+        this.x = (Math.random() - 0.5) * width * 0.15;
+        this.y = (Math.random() - 0.5) * height * 0.15;
+        this.z = MAX_DEPTH * 0.9;
+        this.rx = Math.random() * Math.PI * 2;
+        this.ry = Math.random() * Math.PI * 2;
+        this.rz = Math.random() * Math.PI * 2;
+        this.rotSpeedX = 0.018;
+        this.rotSpeedY = 0.022;
+        this.rotSpeedZ = 0.014;
+        this.baseSize = 88 * sizeMult;
+        this.points   = BOSS_MAX_HP;
+        this.hp       = BOSS_MAX_HP;
+        this.screenX  = cx;
+        this.screenY  = cy;
+        this.radius   = 90 * sizeMult;
+        this.pulse    = 0;
+        this.phase    = Math.random() * Math.PI * 2;
+        this.orbitR   = Math.min(width, height) * 0.28;
+        this.chaseX   = 0;
+        this.chaseY   = 0;
+        this.driftVX  = (Math.random() - 0.5) * 4;
+        this.driftVY  = (Math.random() - 0.5) * 4;
+      }
+
+      update(speed) {
+        // Mobile moves at 50% speed — easier to track on small screen
+        const mobileMult = width < 600 ? 0.25 : 1.0;
+
+        // Phase 1: fly in from deep space to combat depth
+        if (this.z > 220) {
+          this.z -= speed * 1.8 * mobileMult;
+        } else {
+          // Phase 2: hover at combat depth with active lateral movement
+          this.z += (220 - this.z) * 0.02;
+
+          const hpPct = Math.max(this.hp / BOSS_MAX_HP, 0);
+          const aggressionMult = 1 + (1 - hpPct) * 2.2;
+
+          // Slower phase advance on mobile
+          this.phase += 0.012 * aggressionMult * mobileMult;
+
+          // Sinusoidal drift pattern (figure-8 style Lissajous)
+          const targetX = Math.sin(this.phase) * this.orbitR * 0.9;
+          const targetY = Math.sin(this.phase * 0.63) * this.orbitR * 0.55;
+
+          // Smooth chase toward aim when aggression is high
+          const aimWorldX = (aimX - cx) * (this.z / 340) * 0.35 * (1 - hpPct);
+          const aimWorldY = (aimY - cy) * (this.z / 340) * 0.35 * (1 - hpPct);
+
+          // Slower lateral movement on mobile
+          this.x += (targetX + aimWorldX - this.x) * 0.025 * aggressionMult * mobileMult;
+          this.y += (targetY + aimWorldY - this.y) * 0.025 * aggressionMult * mobileMult;
+        }
+
+        this.rx += this.rotSpeedX * mobileMult;
+        this.ry += this.rotSpeedY * mobileMult;
+        this.rz += this.rotSpeedZ * mobileMult;
+        this.pulse += 0.055;
+      }
+
+      hit() {
+        this.hp -= BOSS_DAMAGE;
+        updateBossHPBar();
+        return this.hp <= 0;
+      }
+
+      draw(isDark) {
+        const k = 340 / this.z;
+        this.screenX = this.x * k + cx + currentAngleX * (1 - this.z / MAX_DEPTH);
+        this.screenY = this.y * k + cy + currentAngleY * (1 - this.z / MAX_DEPTH);
+        if (this.screenX < -200 || this.screenX > width + 200 ||
+            this.screenY < -200 || this.screenY > height + 200) return;
+
+        const depth = 1 - this.z / MAX_DEPTH;
+        const alpha = Math.min(Math.max(depth * 1.6, 0), 1);
+        const R = Math.max(this.baseSize * k, 14);
+        this.radius = R * 1.2;
+
+        // Pulsing red danger ring (no Gaussian blur — raster ring is fast)
+        const ringScale = 1 + Math.sin(this.pulse) * 0.1;
+        ctx.save();
+        ctx.globalAlpha = alpha * (0.35 + Math.sin(this.pulse) * 0.15);
+        ctx.beginPath();
+        ctx.arc(this.screenX, this.screenY, R * 1.55 * ringScale, 0, Math.PI * 2);
+        ctx.strokeStyle = '#EF4444';
+        ctx.lineWidth = R * 0.14;
+        ctx.stroke();
+        ctx.restore();
+
+        // Outer glow ring (thin)
+        ctx.save();
+        ctx.globalAlpha = alpha * 0.2;
+        ctx.beginPath();
+        ctx.arc(this.screenX, this.screenY, R * 2.1 * ringScale, 0, Math.PI * 2);
+        ctx.strokeStyle = '#F59E0B';
+        ctx.lineWidth = 3;
+        ctx.stroke();
+        ctx.restore();
+
+        // Core 3D faceted star (same geometry as SkillSphereStar3D but bigger + red-tinted)
+        ctx.save();
+        ctx.translate(this.screenX, this.screenY);
+        ctx.globalAlpha = alpha;
+
+        const cosY = Math.cos(this.ry), sinY = Math.sin(this.ry);
+        const cosX = Math.cos(this.rx), sinX = Math.sin(this.rx);
+        const cosZ = Math.cos(this.rz), sinZ = Math.sin(this.rz);
+
+        function proj(px, py, pz) {
+          let x1 = px*cosY + pz*sinY, y1 = py, z1 = -px*sinY + pz*cosY;
+          let x2 = x1, y2 = y1*cosX - z1*sinX, z2 = y1*sinX + z1*cosX;
+          return { x: x2*cosZ - y2*sinZ, y: x2*sinZ + y2*cosZ, z: z2 };
+        }
+
+        // HP-based red tint (more red as hp drops)
+        const hpPct = Math.max(this.hp / BOSS_MAX_HP, 0);
+        const redG  = Math.floor(hpPct * 40);
+        const redB  = Math.floor(hpPct * 40);
+
+        const diagR = R * 0.64, diagI = R * 0.12;
+        const corners = [
+          proj(diagR*.707, -diagR*.707, 0), proj(diagR*.707, diagR*.707, 0),
+          proj(-diagR*.707, diagR*.707, 0), proj(-diagR*.707, -diagR*.707, 0)
+        ];
+        const inners = [
+          proj(0,-diagI,0), proj(diagI,0,0), proj(0,diagI,0), proj(-diagI,0,0)
+        ];
+        ctx.beginPath();
+        ctx.moveTo(corners[0].x,corners[0].y);
+        ctx.lineTo(inners[1].x,inners[1].y); ctx.lineTo(corners[1].x,corners[1].y);
+        ctx.lineTo(inners[2].x,inners[2].y); ctx.lineTo(corners[2].x,corners[2].y);
+        ctx.lineTo(inners[3].x,inners[3].y); ctx.lineTo(corners[3].x,corners[3].y);
+        ctx.lineTo(inners[0].x,inners[0].y);
+        ctx.closePath();
+        ctx.fillStyle = `rgba(255, ${redG}, ${redB}, 0.45)`;
+        ctx.fill();
+
+        const waist = R * 0.16;
+        const topTip = proj(0,-R,0), botTip = proj(0,R,0);
+        const rTip = proj(R,0,0),    lTip = proj(-R,0,0);
+        const iTR = proj(waist,-waist,0), iBR = proj(waist,waist,0);
+        const iBL = proj(-waist,waist,0), iTL = proj(-waist,-waist,0);
+        const fApex = proj(0,0,R*0.28), bApex = proj(0,0,-R*0.28);
+
+        function facet(p1, p2, p3) {
+          const nx = (p2.y-p1.y)*(p3.z-p1.z) - (p2.z-p1.z)*(p3.y-p1.y);
+          const ny = (p2.z-p1.z)*(p3.x-p1.x) - (p2.x-p1.x)*(p3.z-p1.z);
+          const nz = (p2.x-p1.x)*(p3.y-p1.y) - (p2.y-p1.y)*(p3.x-p1.x);
+          const len = Math.hypot(nx,ny,nz) || 1;
+          const light = Math.max((nz/len)*0.45 + 0.55, 0.25);
+          ctx.beginPath();
+          ctx.moveTo(p1.x,p1.y); ctx.lineTo(p2.x,p2.y); ctx.lineTo(p3.x,p3.y);
+          ctx.closePath();
+          const v = Math.floor(255 * light);
+          const g = Math.floor(redG * light), b = Math.floor(redB * light);
+          ctx.fillStyle = `rgb(${v}, ${g}, ${b})`;
+          ctx.strokeStyle = 'rgba(239,68,68,0.35)';
+          ctx.lineWidth = 0.8;
+          ctx.fill(); ctx.stroke();
+        }
+
+        // Draw all 16 facets explicitly — forEach on multiline array literals is ambiguous
+        const facets = [
+          [fApex,topTip,iTR],[fApex,iTL,topTip],[fApex,rTip,iBR],[fApex,iTR,rTip],
+          [fApex,botTip,iBL],[fApex,iBR,botTip],[fApex,lTip,iTL],[fApex,iBL,lTip],
+          [bApex,iTR,topTip],[bApex,topTip,iTL],[bApex,iBR,rTip],[bApex,rTip,iTR],
+          [bApex,iBL,botTip],[bApex,botTip,iBR],[bApex,iTL,lTip],[bApex,lTip,iBL]
+        ];
+        for (let fi = 0; fi < facets.length; fi++) {
+          facet(facets[fi][0], facets[fi][1], facets[fi][2]);
+        }
+
+        // Core glowing eye
+        ctx.beginPath();
+        ctx.arc(fApex.x, fApex.y, Math.max(R * 0.1, 2), 0, Math.PI * 2);
+        ctx.fillStyle = '#EF4444';
+        ctx.fill();
+
+        // HP label above boss on canvas
+        if (this.hp > 0) {
+          ctx.font = `bold ${Math.max(R * 0.28, 11)}px 'JetBrains Mono', monospace`;
+          ctx.fillStyle = '#EF4444';
+          ctx.textAlign = 'center';
+          ctx.fillText(`HP ${Math.max(this.hp, 0).toLocaleString()}`, 0, -R * 1.8);
+        }
+
+        ctx.restore();
+      }
+    }
+
+    // Mouse Tracking & Aim Coordinates
+    let aimX = cx;
+    let aimY = cy;
+    let isShooting = false;
+    let fireInterval = null;
+    let cannonSide = 0;
+    let screenShake = 0;
+    let lastQuakeTime = 0;
+
+    window.addEventListener('mousemove', (e) => {
+      aimX = e.clientX;
+      aimY = e.clientY;
+      const mx = (aimX - cx) / cx;
+      const my = (aimY - cy) / cy;
+      targetAngleX = -mx * 140;
+      targetAngleY = -my * 100;
+    });
+
+    window.addEventListener('touchmove', (e) => {
+      if (e.touches && e.touches[0]) {
+        aimX = e.touches[0].clientX;
+        aimY = e.touches[0].clientY;
+        const mx = (aimX - cx) / cx;
+        const my = (aimY - cy) / cy;
+        targetAngleX = -mx * 140;
+        targetAngleY = -my * 100;
+      }
+    }, { passive: true });
+
+    // 3D Perspective Laser Action from Cockpit Cannons
+    function fireLaser() {
+      initAudio();
+      playLaserSound();
+
+      // Haptic feedback on shoot
+      if (typeof navigator !== 'undefined' && navigator.vibrate) {
+        try { navigator.vibrate(10); } catch(e) {}
+      }
+
+      // Alternating bottom cockpit cannons
+      cannonSide = (cannonSide + 1) % 2;
+      const cannonOffset = Math.min(width * 0.36, 360);
+      const startX = cannonSide === 0 ? (cx - cannonOffset) : (cx + cannonOffset);
+      const startY = height + 16;
+
+      // Spawn 3D perspective laser bolt converging directly to cursor crosshair
+      lasers.push(new PerspectiveLaser(startX, startY, aimX, aimY));
+
+      // Boss hit check (priority over regular targets)
+      if (boss) {
+        const bDist = Math.hypot(aimX - boss.screenX, aimY - boss.screenY);
+        // No generous padding on mobile — must aim accurately
+        const bPad = width < 600 ? 0 : 40;
+        if (bDist < boss.radius + bPad) {
+          const killed = boss.hit();
+          if (killed) {
+            triggerBossExplosion();
+          } else {
+            // Hit flash — big screen shake
+            screenShake = 14;
+            if (particles.length < 60) {
+              for (let p = 0; p < 6; p++) {
+                particles.push(new Particle(boss.screenX, boss.screenY));
+              }
+            }
+          }
+          return;
+        }
+      }
+
+      // Direct raycast hit check on regular 3D SkillSphere Star objects
+      for (let i = 0; i < debrisList.length; i++) {
+        const obj = debrisList[i];
+        const dist = Math.hypot(aimX - obj.screenX, aimY - obj.screenY);
+        // Tighter hit box on mobile — no generous padding
+        const pad = width < 600 ? 0 : 30;
+        if (dist < obj.radius + pad) {
+          triggerExplosion(obj);
+          break;
+        }
+      }
+    }
+
+    function triggerExplosion(obj) {
+      playExplosionSound();
+      score += obj.points;
+      if (scoreValElem) scoreValElem.textContent = score.toLocaleString();
+
+      // Check if boss should spawn (every BOSS_INTERVAL score)
+      if (!boss && score >= nextBossAt) {
+        nextBossAt += BOSS_INTERVAL;
+        setTimeout(spawnBoss, 600);
+      }
+
+      // Haptic Feedback on explosion
+      if (typeof navigator !== 'undefined' && navigator.vibrate) {
+        try { navigator.vibrate([35, 18, 50]); } catch(e) {}
+      }
+
+      // Non-blocking asynchronous text quake on h1 (keeps headline-wrap scale intact)
+      const now = performance.now();
+      if (now - lastQuakeTime > 180) {
+        lastQuakeTime = now;
+        const headlineH1 = document.querySelector('.buro-headline');
+        if (headlineH1) {
+          headlineH1.classList.remove('quake');
+          requestAnimationFrame(() => {
+            headlineH1.classList.add('quake');
+          });
+        }
+      }
+
+      // Camera screen shake
+      screenShake = 9;
+
+      // Cap active particle count to prevent memory pressure
+      if (particles.length > 36) {
+        particles.splice(0, particles.length - 36);
+      }
+
+      // Spawn diamond crystal shards
+      for (let p = 0; p < 12; p++) {
+        particles.push(new Particle(obj.screenX, obj.screenY));
+      }
+
+      // Spawn floating score popup
+      if (popups.length > 8) popups.shift();
+      popups.push(new ScorePopup(obj.screenX, obj.screenY, `+${obj.points}`));
+
+      // Reset hit 3D object to far depth
+      obj.reset();
+    }
+
+    function triggerBossExplosion() {
+      playExplosionSound();
+      const bossX = boss.screenX;
+      const bossY = boss.screenY;
+
+      // Massive score reward
+      score += BOSS_MAX_HP;
+      if (scoreValElem) scoreValElem.textContent = score.toLocaleString();
+
+      // Schedule next boss
+      nextBossAt = score + BOSS_INTERVAL;
+
+      // Epic screen shake
+      screenShake = 28;
+
+      // Massive particle burst
+      for (let p = 0; p < 48; p++) {
+        particles.push(new Particle(bossX, bossY));
+      }
+
+      // Big score popup
+      if (popups.length > 8) popups.shift();
+      popups.push(new ScorePopup(bossX, bossY, `+${BOSS_MAX_HP} BOSS!`));
+
+      // Haptic big rumble
+      if (typeof navigator !== 'undefined' && navigator.vibrate) {
+        try { navigator.vibrate([80, 30, 80, 30, 120]); } catch(e) {}
+      }
+
+      despawnBoss();
+
+      // Show death alert briefly
+      if (bossAlertEl) {
+        const subEl = document.getElementById('boss-alert-sub');
+        const titleEl = document.getElementById('boss-alert-title');
+        if (titleEl) titleEl.textContent = 'BOSS DIKALAHKAN!';
+        if (subEl) subEl.textContent = `+${BOSS_MAX_HP.toLocaleString()} POIN BONUS`;
+        showBossAlert(() => {
+          // Reset text for next boss
+          if (titleEl) titleEl.textContent = '\u26A0 BOSS MUNCUL!';
+          if (subEl) subEl.textContent = `ERROR 404 TITAN \u2014 HP: ${BOSS_MAX_HP.toLocaleString()}`;
+        });
+      }
+    }
+
+    // Start / Stop Rapid Fire on Hold
+    function startShooting(e) {
+      if (e.target.closest('.top-nav, .buro-dock, button, a')) return;
+      if (e.clientX !== undefined) {
+        aimX = e.clientX;
+        aimY = e.clientY;
+      } else if (e.touches && e.touches[0]) {
+        aimX = e.touches[0].clientX;
+        aimY = e.touches[0].clientY;
+      }
+
+      isShooting = true;
+      targetSpeed = 26; // Accelerate warp speed while shooting!
+
+      const headlineEl = document.getElementById('headline-wrap');
+      if (headlineEl) headlineEl.classList.add('playing');
+
+      fireLaser();
+
+      if (fireInterval) clearInterval(fireInterval);
+      fireInterval = setInterval(() => {
+        if (isShooting) {
+          fireLaser();
+        }
+      }, 95); // Rapid auto-fire
+    }
+
+    function stopShooting() {
+      isShooting = false;
+      targetSpeed = 7.5;
+      if (fireInterval) {
+        clearInterval(fireInterval);
+        fireInterval = null;
+      }
+      const headlineEl = document.getElementById('headline-wrap');
+      if (headlineEl) headlineEl.classList.remove('playing');
+    }
+
+    window.addEventListener('mousedown', startShooting);
+    window.addEventListener('mouseup', stopShooting);
+    window.addEventListener('mouseleave', stopShooting);
+    window.addEventListener('touchstart', startShooting, { passive: true });
+    window.addEventListener('touchend', stopShooting, { passive: true });
+    window.addEventListener('touchcancel', stopShooting, { passive: true });
+
+    // Boost on 404 + button
+    const boostBtn = document.getElementById('warp-boost-btn');
+    if (boostBtn) {
+      boostBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        initAudio();
+        targetSpeed = 48;
+        setTimeout(() => { targetSpeed = 7.5; }, 1400);
+      });
+    }
+
+    // 60FPS Game & Render Loop
+    function render() {
+      currentSpeed += (targetSpeed - currentSpeed) * 0.09;
+      currentAngleX += (targetAngleX - currentAngleX) * 0.06;
+      currentAngleY += (targetAngleY - currentAngleY) * 0.06;
+
+      // Screen shake translation
+      let shakeX = 0;
+      let shakeY = 0;
+      if (screenShake > 0.1) {
+        shakeX = (Math.random() - 0.5) * screenShake * 2;
+        shakeY = (Math.random() - 0.5) * screenShake * 2;
+        screenShake *= 0.82;
+      } else {
+        screenShake = 0;
+      }
+
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+
+      // Clear Canvas Fast
+      ctx.fillStyle = isDark ? (targetSpeed > 20 ? 'rgba(9, 9, 11, 0.45)' : '#09090b') : (targetSpeed > 20 ? 'rgba(255, 255, 255, 0.45)' : '#faf9f5');
+      ctx.fillRect(0, 0, width, height);
+
+      ctx.save();
+      if (shakeX || shakeY) {
+        ctx.translate(shakeX, shakeY);
+      }
+
+      // Render Starfield
+      for (let i = 0; i < stars.length; i++) {
+        stars[i].update(currentSpeed);
+        stars[i].draw(isDark);
+      }
+
+      // Render & Update 3D SkillSphere Stars
+      for (let i = 0; i < debrisList.length; i++) {
+        debrisList[i].update(currentSpeed);
+        debrisList[i].draw(isDark);
+      }
+
+      // Render Boss — wrapped in try-catch so any draw error never kills the RAF loop
+      if (boss) {
+        try {
+          boss.update(currentSpeed);
+          boss.draw(isDark);
+        } catch(bossErr) {
+          console.warn('Boss draw error:', bossErr);
+          despawnBoss();
+        }
+      }
+
+      // Update & Render 3D Perspective Lasers
+      for (let i = lasers.length - 1; i >= 0; i--) {
+        const laser = lasers[i];
+        laser.update();
+        laser.draw(isDark);
+        if (!laser.alive) {
+          lasers.splice(i, 1);
+        }
+      }
+
+      // Update & Render Explosion Particles
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.update();
+        p.draw(isDark);
+        if (p.alpha <= 0) {
+          particles.splice(i, 1);
+        }
+      }
+
+      // Update & Render Score Popups
+      for (let i = popups.length - 1; i >= 0; i--) {
+        const popup = popups[i];
+        popup.update();
+        popup.draw(isDark);
+        if (popup.alpha <= 0) {
+          popups.splice(i, 1);
+        }
+      }
+
+      // Draw High-Performance Precision Aim Crosshair (Zero shadowBlur)
+      ctx.save();
+      const aimColor = isDark ? '#ffffff' : '#09090b';
+      ctx.strokeStyle = aimColor;
+      ctx.lineWidth = 1.4;
+
+      // Reticle Ring
+      const recoilScale = isShooting ? 1.25 : 1.0;
+      ctx.beginPath();
+      ctx.arc(aimX, aimY, 13 * recoilScale, 0, Math.PI * 2);
+      ctx.stroke();
+
+      // Center Aim Dot
+      ctx.beginPath();
+      ctx.arc(aimX, aimY, isShooting ? 3 : 1.8, 0, Math.PI * 2);
+      ctx.fillStyle = aimColor;
+      ctx.fill();
+
+      // Precision Crosshair Ticks
+      ctx.beginPath();
+      ctx.moveTo(aimX - 22 * recoilScale, aimY);
+      ctx.lineTo(aimX - 6 * recoilScale, aimY);
+      ctx.moveTo(aimX + 6 * recoilScale, aimY);
+      ctx.lineTo(aimX + 22 * recoilScale, aimY);
+      ctx.moveTo(aimX, aimY - 22 * recoilScale);
+      ctx.lineTo(aimX, aimY - 6 * recoilScale);
+      ctx.moveTo(aimX, aimY + 6 * recoilScale);
+      ctx.lineTo(aimX, aimY + 22 * recoilScale);
+      ctx.stroke();
+      ctx.restore();
+
+      ctx.restore(); // Restore shake transform
+
+      requestAnimationFrame(render);
+    }
+    render();
+  </script>
+</body>
+</html>

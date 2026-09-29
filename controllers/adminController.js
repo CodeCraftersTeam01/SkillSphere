@@ -8,6 +8,7 @@ const {
   Transaction,
   WalletTransaction,
   Course,
+  Category,
   Enrollment,
 } = require('../models');
 const { Op } = require('sequelize');
@@ -171,7 +172,7 @@ exports.getTutorApplicationById = async (req, res) => {
 };
 
 /**
- * Approve Tutor Application
+ * Approve Tutor Application (supports approving pending or previously rejected applications)
  */
 exports.approveTutorApplication = async (req, res) => {
   try {
@@ -185,13 +186,6 @@ exports.approveTutorApplication = async (req, res) => {
       return res.status(404).json({
         success: false,
         message: 'Pengajuan tutor tidak ditemukan.',
-      });
-    }
-
-    if (application.status === 'approved') {
-      return res.status(400).json({
-        success: false,
-        message: 'Pengajuan tutor ini sudah disetujui sebelumnya.',
       });
     }
 
@@ -236,19 +230,16 @@ exports.approveTutorApplication = async (req, res) => {
 };
 
 /**
- * Reject Tutor Application
+ * Reject Tutor Application (supports rejecting pending or previously approved applications)
  */
 exports.rejectTutorApplication = async (req, res) => {
   try {
     const { id } = req.params;
     const { reason } = req.body;
 
-    if (!reason || reason.trim().length === 0) {
-      return res.status(400).json({
-        success: false,
-        message: 'Alasan penolakan pengajuan wajib diisi.',
-      });
-    }
+    const rejectionReason = (reason && reason.trim().length > 0) 
+      ? reason.trim() 
+      : 'Berkas atau kualifikasi pendaftaran belum memenuhi kriteria platform.';
 
     const application = await TutorApplication.findByPk(id, {
       include: [{ model: User, as: 'applicant' }],
@@ -262,8 +253,15 @@ exports.rejectTutorApplication = async (req, res) => {
     }
 
     application.status = 'rejected';
-    application.rejection_reason = reason.trim();
+    application.rejection_reason = rejectionReason;
     await application.save();
+
+    // If user was previously approved as tutor, revert role to student
+    const user = application.applicant;
+    if (user && user.role === 'tutor') {
+      user.role = 'student';
+      await user.save();
+    }
 
     return res.status(200).json({
       success: true,
@@ -275,6 +273,50 @@ exports.rejectTutorApplication = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: 'Gagal menolak pengajuan tutor.',
+      error: err.message,
+    });
+  }
+};
+
+/**
+ * Reset Tutor Application back to Pending
+ */
+exports.resetTutorApplication = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const application = await TutorApplication.findByPk(id, {
+      include: [{ model: User, as: 'applicant' }],
+    });
+
+    if (!application) {
+      return res.status(404).json({
+        success: false,
+        message: 'Pengajuan tutor tidak ditemukan.',
+      });
+    }
+
+    application.status = 'pending';
+    application.rejection_reason = null;
+    await application.save();
+
+    // Revert user role to student while pending
+    const user = application.applicant;
+    if (user && user.role === 'tutor') {
+      user.role = 'student';
+      await user.save();
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: `Status pendaftaran tutor ${user ? user.name : ''} berhasil dikembalikan ke Menunggu Review.`,
+      data: application,
+    });
+  } catch (err) {
+    console.error('Error in resetTutorApplication:', err);
+    return res.status(500).json({
+      success: false,
+      message: 'Gagal mereset status pengajuan tutor.',
       error: err.message,
     });
   }
@@ -476,6 +518,132 @@ exports.getFinancialData = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: 'Gagal memuat data finansial.',
+      error: err.message,
+    });
+  }
+};
+
+/**
+ * Get all courses for Admin with filter & search
+ */
+exports.getAllCourses = async (req, res) => {
+  try {
+    const { status, search, limit = 50, offset = 0 } = req.query;
+    const whereClause = {};
+    if (status && status !== 'all') {
+      whereClause.status = status;
+    }
+    if (search) {
+      whereClause.title = { [Op.like]: `%${search}%` };
+    }
+
+    const { count, rows: courses } = await Course.findAndCountAll({
+      where: whereClause,
+      include: [
+        {
+          model: User,
+          as: 'tutor',
+          attributes: ['id', 'name', 'email'],
+        },
+        {
+          model: Category,
+          as: 'category',
+          attributes: ['id', 'name', 'slug'],
+        },
+      ],
+      order: [['created_at', 'DESC']],
+      limit: parseInt(limit, 10),
+      offset: parseInt(offset, 10),
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: 'Data kursus admin berhasil dimuat.',
+      data: {
+        total: count,
+        courses,
+      },
+    });
+  } catch (err) {
+    console.error('Error in getAllCourses:', err);
+    return res.status(500).json({
+      success: false,
+      message: 'Gagal memuat data kursus platform.',
+      error: err.message,
+    });
+  }
+};
+
+/**
+ * Approve / Publish Course (Admin Action)
+ */
+exports.approveCourse = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const course = await Course.findByPk(id, {
+      include: [
+        { model: User, as: 'tutor', attributes: ['id', 'name', 'email'] },
+      ],
+    });
+
+    if (!course) {
+      return res.status(404).json({
+        success: false,
+        message: 'Kursus tidak ditemukan.',
+      });
+    }
+
+    course.status = 'published';
+    await course.save();
+
+    return res.status(200).json({
+      success: true,
+      message: `Kursus "${course.title}" berhasil disetujui dan dipublikasikan.`,
+      data: course,
+    });
+  } catch (err) {
+    console.error('Error in approveCourse:', err);
+    return res.status(500).json({
+      success: false,
+      message: 'Gagal menyetujui kursus.',
+      error: err.message,
+    });
+  }
+};
+
+/**
+ * Suspend / Freeze Course (Admin Action)
+ */
+exports.suspendCourse = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { reason } = req.body || {};
+    const course = await Course.findByPk(id, {
+      include: [
+        { model: User, as: 'tutor', attributes: ['id', 'name', 'email'] },
+      ],
+    });
+
+    if (!course) {
+      return res.status(404).json({
+        success: false,
+        message: 'Kursus tidak ditemukan.',
+      });
+    }
+
+    course.status = 'suspended';
+    await course.save();
+
+    return res.status(200).json({
+      success: true,
+      message: `Kursus "${course.title}" berhasil disuspend / dibekukan.${reason ? ' Alasan: ' + reason : ''}`,
+      data: course,
+    });
+  } catch (err) {
+    console.error('Error in suspendCourse:', err);
+    return res.status(500).json({
+      success: false,
+      message: 'Gagal membekukan kursus.',
       error: err.message,
     });
   }

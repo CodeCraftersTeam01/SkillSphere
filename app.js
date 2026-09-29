@@ -17,6 +17,30 @@ const apiRouter = require('./routes/api');
 
 const app = express();
 
+// Trust proxy for reverse proxies / tunnels (Cloudflare, ngrok, HTTPS tunnels)
+app.set('trust proxy', 1);
+
+// Optional Force HTTPS redirection
+if (process.env.FORCE_HTTPS === 'true') {
+  app.use((req, res, next) => {
+    if (!req.secure && req.get('x-forwarded-proto') !== 'https') {
+      return res.redirect(301, 'https://' + req.get('host') + req.originalUrl);
+    }
+    next();
+  });
+}
+
+// Global locals for EJS views (API Base URL and App URL from env)
+app.use((req, res, next) => {
+  const protocol = req.secure || req.get('x-forwarded-proto') === 'https' ? 'https' : 'http';
+  const defaultHost = req.get('host') || 'localhost:3000';
+  res.locals.APP_URL = (process.env.APP_URL || `${protocol}://${defaultHost}`).replace(/\/+$/, '');
+  const rawApiBase = (process.env.API_BASE_URL || '').trim().replace(/\/+$/, '').replace(/\/api$/, '');
+  res.locals.API_BASE_URL = rawApiBase;
+  res.locals.CURRENT_PATH = req.path;
+  next();
+});
+
 // Enable Gzip/Deflate compression for all responses
 app.use(compressionMiddleware);
 
@@ -56,6 +80,9 @@ if (process.env.NODE_ENV !== 'test') {
       if (dialect === 'mysql') {
         await sequelize.query('SET FOREIGN_KEY_CHECKS = 0;');
         await sequelize.sync();
+        try {
+          await sequelize.query("ALTER TABLE `courses` MODIFY COLUMN `status` ENUM('draft', 'published', 'archived', 'suspended') NOT NULL DEFAULT 'draft';");
+        } catch (_) {}
         await sequelize.query('SET FOREIGN_KEY_CHECKS = 1;');
       } else {
         await sequelize.sync();
@@ -80,26 +107,33 @@ app.use(function(req, res, next) {
       message: `API endpoint '${req.originalUrl}' tidak ditemukan.`,
     });
   }
-  next(createError(404));
+  res.status(404).render('404');
 });
 
 // Global error handler
 app.use(function(err, req, res, next) {
+  const status = err.status || 500;
+
   // API error JSON response
   if (req.path.startsWith('/api')) {
-    return res.status(err.status || 500).json({
+    return res.status(status).json({
       success: false,
       message: err.message || 'Terjadi kesalahan internal server.',
       error: req.app.get('env') === 'development' ? err : {},
     });
   }
 
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
+  // Render 404 page if status is 404
+  if (status === 404) {
+    return res.status(404).render('404');
+  }
+
+  // set locals
+  res.locals.message = err.message || 'Terjadi Gangguan pada Server';
+  res.locals.error = { status };
 
   // render the error page
-  res.status(err.status || 500);
+  res.status(status);
   res.render('error');
 });
 
