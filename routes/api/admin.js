@@ -15,6 +15,7 @@ router.get('/tutor-applications', adminController.getTutorApplications);
 router.get('/tutor-applications/:id', adminController.getTutorApplicationById);
 router.put('/tutor-applications/:id/approve', invalidateCacheMiddleware(['cache:/api/admin*', 'cache:/api/courses*']), adminController.approveTutorApplication);
 router.put('/tutor-applications/:id/reject', invalidateCacheMiddleware(['cache:/api/admin*']), adminController.rejectTutorApplication);
+router.put('/tutor-applications/:id/reset', invalidateCacheMiddleware(['cache:/api/admin*']), adminController.resetTutorApplication);
 
 // Tutor Certifications Validation
 router.get('/tutor-certifications', adminController.getTutorCertifications);

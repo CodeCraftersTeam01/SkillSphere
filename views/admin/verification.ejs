@@ -1574,15 +1574,34 @@
 
     <!-- Reject Reason Input Modal -->
     <div class="modal-overlay" id="reject-reason-modal">
-      <div class="modal-card" style="max-width: 480px;">
+      <div class="modal-card" style="max-width: 520px;">
         <div class="modal-header">
-          <h3 class="modal-title">Alasan Penolakan Pendaftaran</h3>
+          <h3 class="modal-title" id="reject-modal-header-title">Tolak Pendaftaran Pengajar</h3>
           <button class="modal-close-btn" onclick="closeModal('reject-reason-modal')"><i class="fas fa-xmark"></i></button>
         </div>
         
         <div style="margin-bottom: 20px;">
-          <label style="display:block; font-size:12px; font-weight:600; color:var(--text-primary); margin-bottom:6px;">Berikan Catatan untuk Pelamar *</label>
-          <textarea id="reject-reason-input" class="input-field" rows="4" placeholder="Contoh: Berkas portofolio belum melampirkan bukti sertifikasi atau CV belum lengkap."></textarea>
+          <div style="font-size:12px; color:var(--text-secondary); margin-bottom:10px;" id="reject-target-applicant-info">
+            Pilih alasan cepat atau ketik catatan untuk pelamar:
+          </div>
+
+          <div style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:12px;">
+            <button type="button" class="btn btn-outline btn-sm" style="font-size:11px; padding:4px 8px;" onclick="applyQuickRejectReason('Berkas CV dan portofolio belum memenuhi kriteria spesialisasi kurikulum.')">
+              <i class="fas fa-file-circle-xmark"></i> CV / Portofolio Kurang
+            </button>
+            <button type="button" class="btn btn-outline btn-sm" style="font-size:11px; padding:4px 8px;" onclick="applyQuickRejectReason('Pengalaman mengajar belum memenuhi standar minimum platform (min. 1 tahun).')">
+              <i class="fas fa-user-clock"></i> Pengalaman Kurang
+            </button>
+            <button type="button" class="btn btn-outline btn-sm" style="font-size:11px; padding:4px 8px;" onclick="applyQuickRejectReason('Tautan berkas portofolio atau sertifikat tidak dapat diakses / bermasalah.')">
+              <i class="fas fa-link-slash"></i> Tautan Rusak
+            </button>
+            <button type="button" class="btn btn-outline btn-sm" style="font-size:11px; padding:4px 8px;" onclick="applyQuickRejectReason('Kualifikasi belum selaras dengan standar mutu instruktur SkillSphere AI.')">
+              <i class="fas fa-shield-xmark"></i> Standar Mutu
+            </button>
+          </div>
+
+          <label style="display:block; font-size:12px; font-weight:600; color:var(--text-primary); margin-bottom:6px;">Catatan Penolakan *</label>
+          <textarea id="reject-reason-input" class="input-field" rows="3" placeholder="Ketik atau klik salah satu alasan cepat di atas..."></textarea>
         </div>
 
         <div style="display:flex; justify-content:flex-end; gap:10px;">
@@ -2065,6 +2084,45 @@
         const expYears = app.experience_years !== undefined ? app.experience_years : (app.years_of_experience || 0);
         const dateStr = new Date(app.created_at || app.createdAt || Date.now()).toLocaleDateString('id-ID', { year: 'numeric', month: 'short', day: 'numeric' });
 
+        let actionButtons = '';
+        if (app.status === 'pending') {
+          actionButtons = `
+            <button class="btn btn-success btn-sm" onclick="approveApplication(${app.id}, '${escapeHtml(applicantName)}')" title="Setujui pendaftaran jadi Tutor" style="font-size:11.5px; padding:4px 10px;">
+              <i class="fas fa-check"></i> ACC
+            </button>
+            <button class="btn btn-danger btn-sm" onclick="openRejectModal(${app.id}, '${escapeHtml(applicantName)}')" title="Tolak pendaftaran" style="font-size:11.5px; padding:4px 10px;">
+              <i class="fas fa-ban"></i> Tolak
+            </button>
+            <button class="btn btn-outline btn-sm" onclick="viewApplicationDetail(${app.id})" title="Review berkas lengkap" style="font-size:11.5px; padding:4px 8px;">
+              <i class="fas fa-eye"></i>
+            </button>
+          `;
+        } else if (app.status === 'approved') {
+          actionButtons = `
+            <button class="btn btn-outline btn-sm" onclick="viewApplicationDetail(${app.id})" title="Lihat detail berkas" style="font-size:11.5px; padding:4px 10px;">
+              <i class="fas fa-eye"></i> Detail
+            </button>
+            <button class="btn btn-danger btn-sm" onclick="openRejectModal(${app.id}, '${escapeHtml(applicantName)}', true)" title="Ubah status: Batalkan ACC / Tolak" style="font-size:11.5px; padding:4px 10px;">
+              <i class="fas fa-ban"></i> Tolak
+            </button>
+            <button class="btn btn-outline btn-sm" onclick="resetApplicationStatus(${app.id}, '${escapeHtml(applicantName)}')" title="Reset ke status Menunggu" style="font-size:11px; padding:4px 8px;">
+              <i class="fas fa-rotate-left"></i>
+            </button>
+          `;
+        } else if (app.status === 'rejected') {
+          actionButtons = `
+            <button class="btn btn-success btn-sm" onclick="approveApplication(${app.id}, '${escapeHtml(applicantName)}')" title="Ubah keputusan: ACC / Setujui jadi Tutor" style="font-size:11.5px; padding:4px 10px;">
+              <i class="fas fa-check"></i> ACC
+            </button>
+            <button class="btn btn-outline btn-sm" onclick="viewApplicationDetail(${app.id})" title="Lihat alasan penolakan & berkas" style="font-size:11.5px; padding:4px 10px;">
+              <i class="fas fa-eye"></i> Detail
+            </button>
+            <button class="btn btn-outline btn-sm" onclick="resetApplicationStatus(${app.id}, '${escapeHtml(applicantName)}')" title="Reset ke status Menunggu" style="font-size:11px; padding:4px 8px;">
+              <i class="fas fa-rotate-left"></i>
+            </button>
+          `;
+        }
+
         return `
           <tr>
             <td>
@@ -2081,18 +2139,8 @@
             <td>${dateStr}</td>
             <td>${statusBadge}</td>
             <td>
-              <div class="action-cell-group">
-                <button class="btn btn-outline btn-sm" onclick="viewApplicationDetail(${app.id})">
-                  <i class="fas fa-eye"></i> Review
-                </button>
-                ${app.status === 'pending' ? `
-                  <button class="btn btn-success btn-sm" onclick="approveApplication(${app.id}, '${escapeHtml(applicantName)}')">
-                    <i class="fas fa-check"></i> Setujui
-                  </button>
-                  <button class="btn btn-danger btn-sm" onclick="openRejectModal(${app.id})">
-                    <i class="fas fa-ban"></i> Tolak
-                  </button>
-                ` : ''}
+              <div class="action-cell-group" style="display:flex; gap:5px; align-items:center; justify-content:flex-start;">
+                ${actionButtons}
               </div>
             </td>
           </tr>
@@ -2109,9 +2157,29 @@
       const expertise = app.institution_name || app.expertise_field || 'Pengajar';
       const expYears = app.experience_years !== undefined ? app.experience_years : (app.years_of_experience || 0);
 
+      let statusInfoBadge = '<span class="status-pill status-pending"><i class="fas fa-clock"></i> Status: Menunggu Review</span>';
+      if (app.status === 'approved') statusInfoBadge = '<span class="status-pill status-active"><i class="fas fa-check"></i> Status: Disetujui (Tutor Aktif)</span>';
+      if (app.status === 'rejected') statusInfoBadge = '<span class="status-pill status-rejected"><i class="fas fa-xmark"></i> Status: Ditolak</span>';
+
       document.getElementById('modal-app-title').textContent = `Review Pendaftaran: ${applicantName}`;
 
       document.getElementById('modal-app-content').innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:8px;">
+          <div>${statusInfoBadge}</div>
+          <div style="font-size:12px; color:var(--text-secondary);"><i class="fas fa-envelope" style="margin-right:4px;"></i> ${escapeHtml(app.applicant ? app.applicant.email : '-')}</div>
+        </div>
+
+        ${app.status === 'rejected' && app.rejection_reason ? `
+          <div style="background:rgba(239, 68, 68, 0.08); border:1px solid rgba(239, 68, 68, 0.25); border-radius:var(--radius-md); padding:12px 14px; margin-bottom:16px;">
+            <div style="font-size:11.5px; font-weight:700; color:var(--color-danger); text-transform:uppercase; margin-bottom:4px;">
+              <i class="fas fa-circle-exclamation" style="margin-right:4px;"></i> Catatan Penolakan Sebelumnya:
+            </div>
+            <div style="font-size:13px; color:var(--text-primary); line-height:1.5;">
+              "${escapeHtml(app.rejection_reason)}"
+            </div>
+          </div>
+        ` : ''}
+
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:18px;">
           <div style="background:var(--bg-surface-subtle); padding:14px; border-radius:var(--radius-md); border:1px solid var(--border-subtle);">
             <div style="font-size:11px; font-weight:700; color:var(--text-secondary); text-transform:uppercase;">Institusi / Bidang Keahlian</div>
@@ -2140,11 +2208,31 @@
       if (app.status === 'pending') {
         actionsContainer.innerHTML = `
           <button class="btn btn-outline" onclick="closeModal('application-detail-modal')">Tutup</button>
-          <button class="btn btn-danger" onclick="closeModal('application-detail-modal'); openRejectModal(${app.id})">
-            <i class="fas fa-ban"></i> Tolak
+          <button class="btn btn-danger" onclick="closeModal('application-detail-modal'); openRejectModal(${app.id}, '${escapeHtml(applicantName)}')">
+            <i class="fas fa-ban"></i> Tolak Pendaftaran
           </button>
           <button class="btn btn-success" onclick="closeModal('application-detail-modal'); approveApplication(${app.id}, '${escapeHtml(applicantName)}')">
-            <i class="fas fa-check"></i> Setujui Jadi Tutor
+            <i class="fas fa-check"></i> Setujui Jadi Tutor (ACC)
+          </button>
+        `;
+      } else if (app.status === 'approved') {
+        actionsContainer.innerHTML = `
+          <button class="btn btn-outline" onclick="closeModal('application-detail-modal')">Tutup</button>
+          <button class="btn btn-outline" onclick="closeModal('application-detail-modal'); resetApplicationStatus(${app.id}, '${escapeHtml(applicantName)}')">
+            <i class="fas fa-rotate-left"></i> Reset ke Menunggu
+          </button>
+          <button class="btn btn-danger" onclick="closeModal('application-detail-modal'); openRejectModal(${app.id}, '${escapeHtml(applicantName)}', true)">
+            <i class="fas fa-ban"></i> Batalkan ACC (Tolak)
+          </button>
+        `;
+      } else if (app.status === 'rejected') {
+        actionsContainer.innerHTML = `
+          <button class="btn btn-outline" onclick="closeModal('application-detail-modal')">Tutup</button>
+          <button class="btn btn-outline" onclick="closeModal('application-detail-modal'); resetApplicationStatus(${app.id}, '${escapeHtml(applicantName)}')">
+            <i class="fas fa-rotate-left"></i> Reset ke Menunggu
+          </button>
+          <button class="btn btn-success" onclick="closeModal('application-detail-modal'); approveApplication(${app.id}, '${escapeHtml(applicantName)}')">
+            <i class="fas fa-check"></i> Ubah Jadi Disetujui (ACC)
           </button>
         `;
       } else {
@@ -2154,12 +2242,12 @@
       openModal('application-detail-modal');
     }
 
-    // Approve Application
+    // Approve Application (ACC)
     async function approveApplication(id, name) {
       const confirmed = await showCustomConfirm({
-        title: 'Setujui Pendaftaran Tutor',
-        message: `Setujui pendaftaran "${name}"? Peran akun akan diubah menjadi Tutor dan Dompet Virtual diaktifkan secara otomatis.`,
-        confirmText: 'Ya, Setujui',
+        title: 'Setujui Pendaftaran Tutor (ACC)',
+        message: `Setujui pendaftaran "${name}"? Peran akun akan diaktifkan sebagai Tutor dan Dompet Virtual langsung aktif.`,
+        confirmText: 'Ya, Setujui (ACC)',
         cancelText: 'Batal',
         type: 'success',
         icon: 'fa-user-check'
@@ -2177,7 +2265,7 @@
         });
         const json = await res.json();
         if (res.ok && json.success) {
-          showToast(`Pendaftaran "${name}" berhasil disetujui!`, 'success');
+          showToast(`Pendaftaran "${name}" berhasil disetujui (ACC)!`, 'success');
           fetchApplications();
           fetchAdminStats();
         } else {
@@ -2188,10 +2276,65 @@
       }
     }
 
+    // Reset Application Status
+    async function resetApplicationStatus(id, name) {
+      const confirmed = await showCustomConfirm({
+        title: 'Kembalikan ke Menunggu Review?',
+        message: `Apakah Anda yakin ingin mengembalikan status pendaftaran "${name}" ke "Menunggu Review"?`,
+        confirmText: 'Ya, Reset Status',
+        cancelText: 'Batal',
+        type: 'warning',
+        icon: 'fa-rotate-left'
+      });
+
+      if (!confirmed) return;
+
+      try {
+        const res = await fetch(`/api/admin/tutor-applications/${id}/reset`, {
+          method: 'PUT',
+          headers: {
+            'Authorization': 'Bearer ' + token,
+            'Content-Type': 'application/json',
+          },
+        });
+        const json = await res.json();
+        if (res.ok && json.success) {
+          showToast(json.message || `Status "${name}" berhasil direset ke Menunggu Review.`, 'info');
+          fetchApplications();
+          fetchAdminStats();
+        } else {
+          showToast(json.message || 'Gagal mereset status pendaftaran.', 'error');
+        }
+      } catch (e) {
+        showToast('Kesalahan jaringan saat mereset status.', 'error');
+      }
+    }
+
+    // Quick Reason Pill Helper
+    function applyQuickRejectReason(text) {
+      const input = document.getElementById('reject-reason-input');
+      if (input) {
+        input.value = text;
+        input.focus();
+      }
+    }
+
     // Reject Application Modal
-    function openRejectModal(id) {
+    function openRejectModal(id, applicantName = '', isReversal = false) {
       pendingRejectId = id;
-      document.getElementById('reject-reason-input').value = '';
+      const titleEl = document.getElementById('reject-modal-header-title');
+      const infoEl = document.getElementById('reject-target-applicant-info');
+      const input = document.getElementById('reject-reason-input');
+      
+      if (titleEl) {
+        titleEl.textContent = isReversal ? 'Batalkan Persetujuan & Tolak' : 'Tolak Pendaftaran Pengajar';
+      }
+      if (infoEl) {
+        infoEl.textContent = applicantName ? `Pelamar: ${applicantName}. Pilih alasan cepat atau ketik catatan penolakan:` : 'Pilih alasan cepat atau ketik catatan untuk pelamar:';
+      }
+      if (input) {
+        input.value = '';
+      }
       openModal('reject-reason-modal');
     }
 
@@ -2199,7 +2342,7 @@
       if (!pendingRejectId) return;
       const reason = document.getElementById('reject-reason-input').value.trim();
       if (!reason) {
-        showToast('Alasan penolakan wajib diisi.', 'error');
+        showToast('Alasan penolakan wajib diisi atau pilih alasan cepat di atas.', 'error');
         return;
       }
 

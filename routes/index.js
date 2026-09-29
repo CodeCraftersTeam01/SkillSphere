@@ -46,6 +46,11 @@ router.get('/tutor/materials', function(req, res, next) {
   res.render('tutor/materials', { title: 'Portal Manajemen & Upload Materi | Tutor SkillSphere' });
 });
 
+/* GET Standalone Tutor Verification Form Page */
+router.get(['/tutor/verify', '/tutor/verification', '/dashboard/tutor-verify'], function(req, res, next) {
+  res.render('tutor/verify', { title: 'Verifikasi Akun Pengajar | SkillSphere AI' });
+});
+
 /* GET Terms of Service page */
 router.get(['/terms', '/terms-of-service', '/syarat-ketentuan'], function(req, res, next) {
   res.render('terms', { title: 'Syarat dan Ketentuan Layanan | SkillSphere AI' });
