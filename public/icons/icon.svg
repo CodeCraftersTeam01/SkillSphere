@@ -21,9 +21,9 @@
   <!-- Subtle border highlight -->
   <rect x="2" y="2" width="508" height="508" rx="110" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="4"/>
   
-  <!-- 4-pointed AI Sparkle Star -->
+  <!-- 8-pointed AI Sparkle Star with subtle diagonal glow -->
   <g transform="translate(100, 100) scale(13)">
-    <!-- Path from brand icon: d="M12 0L13.8 8.2L22 10L13.8 11.8L12 20L10.2 11.8L2 10L10.2 8.2L12 0Z" -->
+    <path opacity="0.38" d="M12 7.6L17.3 4.7L14.4 10L17.3 15.3L12 12.4L6.7 15.3L9.6 10L6.7 4.7Z" fill="url(#starGrad)"/>
     <path d="M12 0L13.8 8.2L22 10L13.8 11.8L12 20L10.2 11.8L2 10L10.2 8.2L12 0Z" fill="url(#starGrad)" filter="url(#glow)"/>
   </g>
 </svg>

@@ -1110,6 +1110,95 @@ body {
   animation: fadeIn 0.3s ease;
 }
 
+/* ==========================================================================
+   Claude Universal Button System
+   ========================================================================== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 16px;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  border: 1px solid transparent;
+  text-decoration: none;
+  line-height: 1.25;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.btn:active {
+  transform: scale(0.97);
+}
+
+.btn-sm {
+  padding: 6px 12px;
+  font-size: 12px;
+  gap: 5px;
+}
+
+.btn-xs {
+  padding: 4px 9px;
+  font-size: 11px;
+  gap: 4px;
+}
+
+.btn-primary {
+  background: var(--accent-primary);
+  color: var(--accent-text);
+  border-color: var(--accent-primary);
+}
+
+.btn-primary:hover {
+  background: var(--accent-primary-hover);
+  border-color: var(--accent-primary-hover);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-outline {
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  border-color: var(--border-subtle);
+}
+
+.btn-outline:hover {
+  background: var(--bg-surface-subtle);
+  border-color: var(--border-strong);
+  color: var(--text-primary);
+}
+
+.btn-success {
+  background: var(--color-success-bg);
+  color: var(--color-success);
+  border-color: rgba(22, 163, 74, 0.3);
+}
+
+.btn-success:hover {
+  background: var(--color-success);
+  color: #FFFFFF;
+  border-color: var(--color-success);
+  box-shadow: 0 2px 8px rgba(22, 163, 74, 0.25);
+}
+
+.btn-danger {
+  background: var(--color-danger-bg);
+  color: var(--color-danger);
+  border-color: rgba(220, 38, 38, 0.3);
+}
+
+.btn-danger:hover {
+  background: var(--color-danger);
+  color: #FFFFFF;
+  border-color: var(--color-danger);
+  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.25);
+}
+
+
 
 
 

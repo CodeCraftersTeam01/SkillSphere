@@ -80,26 +80,33 @@ app.use(function(req, res, next) {
       message: `API endpoint '${req.originalUrl}' tidak ditemukan.`,
     });
   }
-  next(createError(404));
+  res.status(404).render('404');
 });
 
 // Global error handler
 app.use(function(err, req, res, next) {
+  const status = err.status || 500;
+
   // API error JSON response
   if (req.path.startsWith('/api')) {
-    return res.status(err.status || 500).json({
+    return res.status(status).json({
       success: false,
       message: err.message || 'Terjadi kesalahan internal server.',
       error: req.app.get('env') === 'development' ? err : {},
     });
   }
 
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
+  // Render 404 page if status is 404
+  if (status === 404) {
+    return res.status(404).render('404');
+  }
+
+  // set locals
+  res.locals.message = err.message || 'Terjadi Gangguan pada Server';
+  res.locals.error = { status };
 
   // render the error page
-  res.status(err.status || 500);
+  res.status(status);
   res.render('error');
 });
 
