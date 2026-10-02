@@ -22,6 +22,11 @@ const { upload } = require('../../utils/imageHelper');
 // Protected routes (Requires valid JWT)
 router.get('/me', authenticateJWT, authController.getProfile);
 router.put('/profile', authenticateJWT, validateProfileUpdate, authController.updateProfile);
+router.post('/upload-avatar', authenticateJWT, upload.single('avatar'), authController.uploadAvatar);
+router.put('/two-factor', authenticateJWT, authController.toggleTwoFactor);
+router.get('/devices', authenticateJWT, authController.getTrustedDevices);
+router.delete('/devices/:id', authenticateJWT, authController.revokeTrustedDevice);
+router.delete('/devices', authenticateJWT, authController.revokeAllOtherDevices);
 router.post('/upload-certificate', authenticateJWT, upload.single('certificate'), authController.uploadCertificate);
 router.post('/personalize', authenticateJWT, authController.personalize);
 router.post('/apply-tutor', authenticateJWT, authController.applyTutor);

@@ -952,6 +952,97 @@
       background: var(--bg-surface-subtle);
     }
 
+    /* Tutor Earnings & Financial Overview Banner */
+    .tutor-earnings-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 22px 24px;
+      margin-bottom: 24px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    }
+
+    .earnings-header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .earnings-tag {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--accent-primary);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 4px;
+    }
+
+    .earnings-main-title {
+      font-family: var(--font-serif);
+      font-size: 21px;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin: 0;
+    }
+
+    .earnings-split-badge {
+      background: var(--bg-surface-subtle);
+      border: 1px solid var(--border-subtle);
+      padding: 6px 14px;
+      border-radius: var(--radius-full);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .earnings-metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+    }
+
+    .earnings-metric-box {
+      background: var(--bg-surface-subtle);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      transition: border-color 0.15s ease;
+    }
+
+    .earnings-metric-box:hover {
+      border-color: var(--border-strong);
+    }
+
+    .metric-box-label {
+      font-size: 11.5px;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    .metric-box-val {
+      font-family: var(--font-mono, monospace);
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .metric-box-sub {
+      font-size: 11px;
+      color: var(--text-tertiary);
+    }
+
     /* Exact Google Classroom Card Grid */
     .classroom-grid {
       display: grid;
@@ -1037,6 +1128,7 @@
       line-height: 1.3;
       display: -webkit-box;
       -webkit-line-clamp: 2;
+      line-clamp: 2;
       -webkit-box-orient: vertical;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -1089,13 +1181,15 @@
 
     /* Card Middle Body */
     .classroom-card-body {
-      height: 116px;
-      padding: 34px 18px 12px;
+      min-height: 144px;
+      height: auto;
+      padding: 32px 18px 14px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
       background: var(--bg-surface);
       box-sizing: border-box;
+      gap: 8px;
     }
 
     .classroom-card-body-text {
@@ -1105,6 +1199,7 @@
       margin: 0;
       display: -webkit-box;
       -webkit-line-clamp: 2;
+      line-clamp: 2;
       -webkit-box-orient: vertical;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -1225,10 +1320,14 @@
 
     @media (max-width: 860px) {
       .navbar {
-        padding: 10px 16px 8px;
+        padding: 10px 16px;
         flex-direction: column;
         align-items: stretch;
         gap: 8px;
+      }
+
+      .navbar.no-subnav {
+        gap: 0;
       }
 
       .desktop-only {
@@ -1236,8 +1335,28 @@
       }
 
       .mobile-only {
-        display: block !important;
+        display: block;
         width: 100%;
+      }
+
+      .mobile-only.is-hidden,
+      .mobile-only[style*="display: none"] {
+        display: none !important;
+      }
+
+      .nav-brand-group {
+        gap: 8px;
+      }
+
+      .classroom-sidebar-toggle-btn {
+        width: 34px;
+        height: 34px;
+        font-size: 15px;
+      }
+
+      .brand-logo span {
+        font-size: 17px;
+        white-space: nowrap;
       }
 
       .nav-mobile-row {
@@ -1276,42 +1395,65 @@
       }
 
       .nav-actions {
-        gap: 8px;
-      }
-
-      .theme-toggle-btn #theme-text {
-        display: none;
-      }
-
-      .theme-toggle-btn {
-        padding: 6px 10px;
-      }
-
-      .user-profile-badge {
-        padding: 3px 8px 3px 3px;
         gap: 6px;
       }
 
-      .user-name-label {
-        max-width: 80px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        font-size: 12px;
+      .streak-badge {
+        padding: 4px 8px;
+        font-size: 11px;
       }
 
-      .logout-btn span {
-        display: none;
+      .theme-toggle-btn {
+        width: 34px;
+        height: 34px;
+        padding: 0;
+        border-radius: var(--radius-full);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .theme-toggle-btn #theme-text {
+        display: none !important;
+      }
+
+      .user-profile-badge {
+        padding: 0;
+        background: transparent;
+        border: none;
+        cursor: pointer;
+      }
+
+      .user-profile-badge .user-avatar-sm {
+        width: 32px;
+        height: 32px;
+        font-size: 12px;
+        border: 1.5px solid var(--border-subtle);
+      }
+
+      .user-profile-badge .user-name-label,
+      .user-profile-badge .user-role-tag {
+        display: none !important;
       }
 
       .logout-btn {
-        padding: 6px 10px;
+        width: 34px;
+        height: 34px;
+        padding: 0;
+        border-radius: var(--radius-full);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .logout-btn span {
+        display: none !important;
       }
     }
 
     @media (max-width: 640px) {
       .brand-logo span {
-        font-size: 17px;
+        font-size: 16px;
       }
 
       .streak-badge {
@@ -1383,7 +1525,7 @@
     <!-- Top Navigation Bar -->
     <header class="navbar">
       <div class="nav-main-row">
-        <div style="display:flex; align-items:center; gap:14px;">
+        <div class="nav-brand-group">
           <!-- Classroom Sidebar Hamburger Button (Visible for Tutor) -->
           <button class="classroom-sidebar-toggle-btn" id="classroom-sidebar-toggle" style="display:none;" onclick="toggleClassroomSidebar()" title="Menu Utama" aria-label="Menu Utama">
             <i class="fas fa-bars"></i>
@@ -1422,8 +1564,8 @@
             <span id="theme-text">Mode Gelap</span>
           </button>
 
-          <!-- User Profile Pill -->
-          <div class="user-profile-badge">
+          <!-- User Profile Pill (Clickable) -->
+          <div class="user-profile-badge" onclick="window.location.href='/profile'" style="cursor:pointer;" title="Buka Pengaturan Profil Saya">
             <div class="user-avatar-sm" id="nav-avatar">U</div>
             <span class="user-name-label" id="nav-user-name">Memuat...</span>
             <span class="user-role-tag" id="nav-user-role">Siswa</span>
@@ -1520,9 +1662,48 @@
 
       <!-- Main Classroom Content Pane -->
       <main class="classroom-main-pane">
+        <!-- Tutor Earnings & Financial Overview Banner -->
+        <div class="tutor-earnings-card" id="tutor-earnings-overview">
+          <div class="earnings-header-row">
+            <div class="earnings-title-group">
+              <div class="earnings-tag"><i class="fas fa-wallet"></i> Tutor Financial Hub</div>
+              <h2 class="earnings-main-title">Ringkasan Pendapatan & Dompet Pengajar</h2>
+            </div>
+            <div class="earnings-split-badge" title="20% Biaya Platform / 80% Bagi Hasil Tutor">
+              <i class="fas fa-chart-pie"></i> Bagi Hasil 80% Bersih
+            </div>
+          </div>
+          
+          <div class="earnings-metrics-grid">
+            <div class="earnings-metric-box">
+              <div class="metric-box-label">Saldo Siap Ditarik (Dompet)</div>
+              <div class="metric-box-val" id="tutor-wallet-balance">Rp 0</div>
+              <div class="metric-box-sub" id="tutor-wallet-withdraw-hint">Batas min. penarikan Rp 100.000</div>
+            </div>
+
+            <div class="earnings-metric-box">
+              <div class="metric-box-label">Dana Holding (7 Hari)</div>
+              <div class="metric-box-val" id="tutor-wallet-pending">Rp 0</div>
+              <div class="metric-box-sub">Proteksi sengketa transaksi</div>
+            </div>
+
+            <div class="earnings-metric-box">
+              <div class="metric-box-label">Total Akumulasi Penghasilan</div>
+              <div class="metric-box-val" id="tutor-total-earnings">Rp 0</div>
+              <div class="metric-box-sub" id="tutor-total-students-count">0 Siswa Terdaftar</div>
+            </div>
+
+            <div class="earnings-metric-box">
+              <div class="metric-box-label">Total Kelas Aktif</div>
+              <div class="metric-box-val" id="tutor-total-courses">0 Kelas</div>
+              <div class="metric-box-sub" id="tutor-total-modules-count">0 Bab Kurikulum</div>
+            </div>
+          </div>
+        </div>
+
         <!-- Classroom Top Header: "Kelas" on left, "+ Tambahkan kelas" on right -->
         <div class="classroom-top-header">
-          <h1 class="classroom-title-text">Kelas</h1>
+          <h1 class="classroom-title-text">Daftar Kelas Mengajar</h1>
           <button class="classroom-add-link" onclick="openCreateCourseModal()">
             <i class="fas fa-plus"></i> <span>Tambahkan kelas</span>
           </button>
@@ -1948,17 +2129,29 @@
       const desktopNav = document.getElementById('desktop-nav-menu');
       const mobileNavRow = document.getElementById('mobile-nav-row');
       const sidebarToggle = document.getElementById('classroom-sidebar-toggle');
+      const streakBadge = document.querySelector('.streak-badge');
+      const navbar = document.querySelector('.navbar');
       
-      if (role === 'tutor') {
+      if (role === 'tutor' || role === 'admin') {
         // Hide horizontal navbar text links for tutor (per Google Classroom design)
         if (desktopNav) desktopNav.style.display = 'none';
-        if (mobileNavRow) mobileNavRow.style.display = 'none';
+        if (mobileNavRow) {
+          mobileNavRow.style.display = 'none';
+          mobileNavRow.classList.add('is-hidden');
+        }
+        if (navbar) navbar.classList.add('no-subnav');
+        if (streakBadge) streakBadge.style.display = 'none';
         // Show Classroom Drawer Hamburger button
-        if (sidebarToggle) sidebarToggle.style.display = 'flex';
+        if (sidebarToggle) sidebarToggle.style.display = 'inline-flex';
       } else {
         // Show standard navigation links for students
         if (desktopNav) desktopNav.style.display = 'flex';
-        if (mobileNavRow) mobileNavRow.style.display = '';
+        if (mobileNavRow) {
+          mobileNavRow.style.display = 'block';
+          mobileNavRow.classList.remove('is-hidden');
+        }
+        if (navbar) navbar.classList.remove('no-subnav');
+        if (streakBadge) streakBadge.style.display = 'inline-flex';
         // Hide Classroom Drawer Hamburger button for students
         if (sidebarToggle) sidebarToggle.style.display = 'none';
         toggleClassroomSidebar(false);
@@ -2068,9 +2261,18 @@
         const tutorName = currentUser && currentUser.name ? escapeHtml(currentUser.name) : 'Instruktur';
         const tutorInitial = currentUser && currentUser.name ? currentUser.name.trim().charAt(0).toUpperCase() : 'T';
 
+        let totalEarningsAcc = 0;
+        let totalStudentsAcc = 0;
+        let totalModulesAcc = 0;
+        let totalSectionsAcc = 0;
+
         grid.innerHTML = courses.map((c, idx) => {
           const themeClass = `card-theme-${idx % themesCount}`;
           const categoryName = c.category ? escapeHtml(c.category.name) : 'Teknologi';
+          const thumbUrl = c.thumbnail_url || c.thumbnail || '';
+          const headerBgStyle = thumbUrl 
+            ? `background-image: linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.78) 100%), url('${thumbUrl}'); background-size: cover; background-position: center;`
+            : '';
           
           let sectionsCount = 0;
           let materialsCount = 0;
@@ -2083,20 +2285,31 @@
             });
           }
 
+          const enrollmentsCount = (c.enrollments && Array.isArray(c.enrollments)) ? c.enrollments.length : 0;
+          const priceNumber = Number(c.price) || 0;
+          const courseGross = enrollmentsCount * priceNumber;
+          const courseNet = courseGross * 0.8; // 80% Tutor Revenue Split
+
+          totalEarningsAcc += courseNet;
+          totalStudentsAcc += enrollmentsCount;
+          totalModulesAcc += materialsCount;
+          totalSectionsAcc += sectionsCount;
+
           const descText = c.description ? escapeHtml(c.description) : 'Belum ada tugas tenggat waktu.';
           const levelMap = { 'beginner': 'Pemula', 'intermediate': 'Menengah', 'advanced': 'Mahir' };
           const levelLabel = levelMap[c.level] || 'Semua Tingkat';
           const priceFormatted = (c.price && c.price > 0) ? 'Rp ' + Number(c.price).toLocaleString('id-ID') : 'Gratis';
+          const courseEarningsFormatted = priceNumber > 0 ? ('Rp ' + Math.round(courseNet).toLocaleString('id-ID')) : 'Rp 0 (Gratis)';
 
           return `
             <div class="classroom-card" id="course-card-${c.id}">
               <!-- Header Banner -->
-              <div class="classroom-card-header ${themeClass}">
+              <div class="classroom-card-header ${themeClass}" style="${headerBgStyle}">
                 <button class="classroom-card-menu-btn" title="Opsi lainnya" onclick="openCourseMenu(${c.id}, event)">
                   <i class="fas fa-ellipsis-vertical"></i>
                 </button>
                 <div class="classroom-card-titles">
-                  <a href="/tutor/materials" class="classroom-card-title" title="${escapeHtml(c.title)}">${escapeHtml(c.title)}</a>
+                  <a href="/tutor/materials?courseId=${c.id}" class="classroom-card-title" title="${escapeHtml(c.title)}">${escapeHtml(c.title)}</a>
                   <div class="classroom-card-subtitle">${categoryName} • ${levelLabel}</div>
                   <div class="classroom-card-tutor">${tutorName}</div>
                 </div>
@@ -2110,8 +2323,12 @@
               <div class="classroom-card-body">
                 <p class="classroom-card-body-text">${descText}</p>
                 <div class="classroom-card-body-meta">
-                  <span>${sectionsCount} Bab • ${materialsCount} Modul</span>
+                  <span>${sectionsCount} Bab • ${enrollmentsCount} Siswa</span>
                   <span style="font-weight:600; color:var(--text-primary);">${priceFormatted}</span>
+                </div>
+                <div style="margin-top:6px; padding-top:6px; border-top:1px dashed var(--border-subtle); display:flex; justify-content:space-between; align-items:center; font-size:11.5px;">
+                  <span style="color:var(--text-secondary);"><i class="fas fa-coins" style="color:var(--accent-primary); margin-right:4px;"></i> Hasil Tutor (80%):</span>
+                  <span style="font-family:var(--font-mono, monospace); font-weight:700; color:var(--text-primary);">${courseEarningsFormatted}</span>
                 </div>
               </div>
 
@@ -2120,7 +2337,7 @@
                 <a href="/courses/${c.id}" class="classroom-card-footer-icon" title="Lihat Pratinjau Publik Kursus">
                   <i class="fa-regular fa-address-card"></i>
                 </a>
-                <a href="/tutor/materials" class="classroom-card-footer-icon" title="Buka Folder Modul Materi">
+                <a href="/tutor/materials?courseId=${c.id}" class="classroom-card-footer-icon" title="Buka Folder Modul Materi">
                   <i class="fa-regular fa-folder-open"></i>
                 </a>
                 <button class="classroom-card-footer-icon" title="Opsi lainnya" onclick="openCourseMenu(${c.id}, event)">
@@ -2130,6 +2347,26 @@
             </div>
           `;
         }).join('');
+
+        // Populate Tutor Financial Overview Banner
+        const wallet = currentUser && currentUser.wallet ? currentUser.wallet : null;
+        const walletBalance = wallet ? (Number(wallet.balance) || 0) : 0;
+        const walletPending = wallet ? (Number(wallet.pending_balance) || 0) : 0;
+        const totalRevenueDisplay = (totalEarningsAcc > 0) ? totalEarningsAcc : (walletBalance + walletPending);
+
+        const elBalance = document.getElementById('tutor-wallet-balance');
+        const elPending = document.getElementById('tutor-wallet-pending');
+        const elTotal = document.getElementById('tutor-total-earnings');
+        const elStudents = document.getElementById('tutor-total-students-count');
+        const elCourses = document.getElementById('tutor-total-courses');
+        const elModules = document.getElementById('tutor-total-modules-count');
+
+        if (elBalance) elBalance.textContent = 'Rp ' + Math.round(walletBalance).toLocaleString('id-ID');
+        if (elPending) elPending.textContent = 'Rp ' + Math.round(walletPending).toLocaleString('id-ID');
+        if (elTotal) elTotal.textContent = 'Rp ' + Math.round(totalRevenueDisplay).toLocaleString('id-ID');
+        if (elStudents) elStudents.textContent = `${totalStudentsAcc} Siswa Terdaftar`;
+        if (elCourses) elCourses.textContent = `${courses.length} Kelas`;
+        if (elModules) elModules.textContent = `${totalSectionsAcc} Bab • ${totalModulesAcc} Modul`;
 
       } catch (err) {
         console.error('Failed to load tutor classroom courses:', err);

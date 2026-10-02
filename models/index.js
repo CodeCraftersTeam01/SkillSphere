@@ -19,6 +19,7 @@ const Transaction = require('./Transaction');
 const TutorWallet = require('./TutorWallet');
 const WalletTransaction = require('./WalletTransaction');
 const WithdrawalRequest = require('./WithdrawalRequest');
+const UserDevice = require('./UserDevice');
 
 // 1. User <-> UserProfile (1:1)
 User.hasOne(UserProfile, { foreignKey: 'user_id', as: 'profile', onDelete: 'CASCADE' });
@@ -111,6 +112,10 @@ WithdrawalRequest.belongsTo(TutorWallet, { foreignKey: 'wallet_id', as: 'wallet'
 User.hasMany(WithdrawalRequest, { foreignKey: 'tutor_id', as: 'withdrawal_requests', onDelete: 'CASCADE' });
 WithdrawalRequest.belongsTo(User, { foreignKey: 'tutor_id', as: 'tutor' });
 
+// 19. User <-> UserDevice (1:N)
+User.hasMany(UserDevice, { foreignKey: 'user_id', as: 'devices', onDelete: 'CASCADE' });
+UserDevice.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
+
 module.exports = {
   sequelize,
   User,
@@ -132,4 +137,5 @@ module.exports = {
   TutorWallet,
   WalletTransaction,
   WithdrawalRequest,
+  UserDevice,
 };

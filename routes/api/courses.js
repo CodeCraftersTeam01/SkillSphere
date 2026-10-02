@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const courseController = require('../../controllers/courseController');
-const { authenticateJWT, authorizeRoles } = require('../../middleware/auth');
+const { authenticateJWT, authorizeRoles, optionalAuth } = require('../../middleware/auth');
 const { cacheMiddleware, invalidateCacheMiddleware } = require('../../middleware/cache');
 
 // Public / General categories list (Cache for 10 minutes)
@@ -20,14 +20,15 @@ router.get('/student/my-learning', authenticateJWT, courseController.getMyLearni
 // Course enrollment
 router.post('/:id/enroll', authenticateJWT, invalidateCacheMiddleware(['cache:/api/courses*', 'cache:/api/admin*']), courseController.enrollCourse);
 
-// Course details (Cache for 5 minutes)
-router.get('/:id', cacheMiddleware(300), courseController.getCourseById);
+// Course details
+router.get('/:id', optionalAuth, courseController.getCourseById);
 
 const adminController = require('../../controllers/adminController');
 
-// Course creation & modification (Tutor & Admin) -> Invalidate courses cache
+// Course creation, modification & deletion (Tutor & Admin) -> Invalidate courses cache
 router.post('/', authenticateJWT, authorizeRoles('tutor', 'admin'), invalidateCacheMiddleware(['cache:/api/courses*', 'cache:/api/admin*']), courseController.createCourse);
 router.put('/:id', authenticateJWT, authorizeRoles('tutor', 'admin'), invalidateCacheMiddleware(['cache:/api/courses*', 'cache:/api/admin*']), courseController.updateCourse);
+router.delete('/:id', authenticateJWT, authorizeRoles('tutor', 'admin'), invalidateCacheMiddleware(['cache:/api/courses*', 'cache:/api/admin*']), courseController.deleteCourse);
 
 // Direct Moderation Endpoints (/api/courses/:id/approve & /api/courses/:id/suspend)
 router.put('/:id/approve', authenticateJWT, authorizeRoles('admin'), invalidateCacheMiddleware(['cache:/api/courses*', 'cache:/api/admin*']), adminController.approveCourse);
