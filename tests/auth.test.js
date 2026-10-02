@@ -3,6 +3,7 @@ const assert = require('assert');
 const http = require('http');
 const app = require('../app');
 const { sequelize, User } = require('../models');
+const { Op } = require('sequelize');
 
 let server;
 let port;
@@ -49,9 +50,17 @@ async function runAuthTests() {
     // 1. Safe non-destructive sync
     await sequelize.sync();
 
-    // 2. Clean up only test fixture emails (preserve all seeded data)
+    // 2. Clean up only test fixture emails and names (preserve seeded data)
     const testEmails = ['rian@student.com', 'arjuna@tutor.com'];
-    await User.destroy({ where: { email: testEmails } }).catch(() => {});
+    const testNames = ['Rian Pratama', 'Arjuna Tutor'];
+    await User.destroy({
+      where: {
+        [Op.or]: [
+          { email: { [Op.in]: testEmails } },
+          { name: { [Op.in]: testNames } },
+        ],
+      },
+    }).catch(() => {});
 
     server = app.listen(0);
     port = server.address().port;

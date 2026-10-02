@@ -257,6 +257,11 @@ async function runTutorMaterialsPortalTests() {
     assert.strictEqual(deleteSecRes.status, 200);
     console.log('  ✔ DELETE /api/courses/sections/:id: Cleaned up section.');
 
+    // Clean up created test course and remaining test materials
+    await CourseMaterial.destroy({ where: { id: material2.id } });
+    await CourseSection.destroy({ where: { course_id: course.id } });
+    await Course.destroy({ where: { id: course.id } });
+
     console.log('\n======================================================');
     console.log('🎉 ALL TUTOR MATERIALS PORTAL TESTS PASSED (SPRINT 2 - SATRIO)!');
     console.log('======================================================\n');

@@ -44,6 +44,8 @@ router.get(['/courses', '/catalog', '/katalog'], function(req, res, next) {
 /* GET Course Detail & Syllabus Page (Sprint 2 - Fadiyah) */
 router.get('/courses/:id', function(req, res, next) {
   res.render('courses/detail', { title: 'Detail Kursus | SkillSphere AI', courseId: req.params.id });
+});
+
 /* GET cinematic warp transition page */
 router.get('/warp', function(req, res, next) {
   res.render('warp', { title: 'Memasuki Ruang Belajar | SkillSphere AI' });

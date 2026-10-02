@@ -10,8 +10,10 @@ const {
   Course,
   Category,
   Enrollment,
+  Certificate,
 } = require('../models');
 const { Op } = require('sequelize');
+const bcrypt = require('bcryptjs');
 
 /**
  * Get Admin Dashboard & Verification Stats
@@ -644,6 +646,556 @@ exports.suspendCourse = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: 'Gagal membekukan kursus.',
+      error: err.message,
+    });
+  }
+};
+
+/**
+ * Get all users with filters, search, and pagination
+ */
+exports.getAllUsers = async (req, res) => {
+  try {
+    const { role, status, search, limit = 50, offset = 0, sort = 'created_at', order = 'DESC' } = req.query;
+
+    const whereClause = {};
+
+    // Filter by role
+    if (role && role !== 'all') {
+      whereClause.role = role;
+    }
+
+    // Filter by status (active, inactive, verified, unverified)
+    if (status && status !== 'all') {
+      if (status === 'active') {
+        whereClause.is_active = true;
+      } else if (status === 'inactive' || status === 'suspended') {
+        whereClause.is_active = false;
+      } else if (status === 'verified') {
+        whereClause.is_verified = true;
+      } else if (status === 'unverified') {
+        whereClause.is_verified = false;
+      }
+    }
+
+    // Search query on name or email
+    if (search && search.trim() !== '') {
+      whereClause[Op.or] = [
+        { name: { [Op.like]: `%${search.trim()}%` } },
+        { email: { [Op.like]: `%${search.trim()}%` } },
+      ];
+    }
+
+    const { count, rows: users } = await User.findAndCountAll({
+      where: whereClause,
+      attributes: ['id', 'name', 'email', 'role', 'is_active', 'is_verified', 'created_at', 'updated_at'],
+      include: [
+        {
+          model: UserProfile,
+          as: 'profile',
+          attributes: ['full_name', 'avatar_url', 'bio', 'phone_number', 'career_goal', 'linkedin_url', 'portfolio_url'],
+        },
+        {
+          model: TutorWallet,
+          as: 'wallet',
+          attributes: ['balance', 'pending_balance'],
+          required: false,
+        },
+      ],
+      order: [[sort, order.toUpperCase() === 'ASC' ? 'ASC' : 'DESC']],
+      limit: parseInt(limit, 10),
+      offset: parseInt(offset, 10),
+    });
+
+    // Counts summary
+    const totalUsers = await User.count();
+    const totalStudents = await User.count({ where: { role: 'student' } });
+    const totalTutors = await User.count({ where: { role: 'tutor' } });
+    const totalAdmins = await User.count({ where: { role: 'admin' } });
+    const totalActive = await User.count({ where: { is_active: true } });
+    const totalInactive = await User.count({ where: { is_active: false } });
+
+    return res.status(200).json({
+      success: true,
+      message: 'Data pengguna berhasil dimuat.',
+      data: {
+        total: count,
+        users,
+        summary: {
+          totalUsers,
+          totalStudents,
+          totalTutors,
+          totalAdmins,
+          totalActive,
+          totalInactive,
+        },
+      },
+    });
+  } catch (err) {
+    console.error('Error in getAllUsers:', err);
+    return res.status(500).json({
+      success: false,
+      message: 'Gagal memuat data pengguna.',
+      error: err.message,
+    });
+  }
+};
+
+/**
+ * Get detailed user information by ID
+ */
+exports.getUserById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const user = await User.findByPk(id, {
+      attributes: ['id', 'name', 'email', 'role', 'is_active', 'is_verified', 'created_at', 'updated_at'],
+      include: [
+        {
+          model: UserProfile,
+          as: 'profile',
+        },
+        {
+          model: TutorWallet,
+          as: 'wallet',
+          required: false,
+        },
+        {
+          model: Course,
+          as: 'taught_courses',
+          attributes: ['id', 'title', 'slug', 'price', 'status', 'level', 'created_at'],
+          required: false,
+        },
+        {
+          model: Enrollment,
+          as: 'enrollments',
+          attributes: ['id', 'course_id', 'status', 'progress_percentage', 'enrolled_at', 'completed_at'],
+          include: [
+            {
+              model: Course,
+              as: 'course',
+              attributes: ['id', 'title', 'slug', 'thumbnail_url'],
+            },
+          ],
+          required: false,
+        },
+        {
+          model: Certificate,
+          as: 'certificates',
+          attributes: ['id', 'certificate_code', 'issue_date', 'certificate_url'],
+          required: false,
+        },
+      ],
+    });
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'Pengguna tidak ditemukan.',
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: 'Detail pengguna berhasil dimuat.',
+      data: user,
+    });
+  } catch (err) {
+    console.error('Error in getUserById:', err);
+    return res.status(500).json({
+      success: false,
+      message: 'Gagal memuat detail pengguna.',
+      error: err.message,
+    });
+  }
+};
+
+/**
+ * Create a new user (Admin action)
+ */
+exports.createUser = async (req, res) => {
+  try {
+    const {
+      name,
+      email,
+      password,
+      role = 'student',
+      is_active = true,
+      is_verified = true,
+      phone_number = null,
+      bio = null,
+      career_goal = null,
+    } = req.body;
+
+    if (!name || !email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: 'Nama, email, dan kata sandi wajib diisi.',
+      });
+    }
+
+    if (password.length < 6) {
+      return res.status(400).json({
+        success: false,
+        message: 'Kata sandi minimal harus terdiri dari 6 karakter.',
+      });
+    }
+
+    const validRoles = ['student', 'tutor', 'admin'];
+    if (!validRoles.includes(role)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Peran akun tidak valid. Pilih antara student, tutor, atau admin.',
+      });
+    }
+
+    const normalizedEmail = email.toLowerCase().trim();
+    const existingUser = await User.findOne({ where: { email: normalizedEmail } });
+    if (existingUser) {
+      return res.status(409).json({
+        success: false,
+        message: 'Email sudah terdaftar dalam sistem.',
+      });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const newUser = await User.create({
+      name: name.trim(),
+      email: normalizedEmail,
+      password: hashedPassword,
+      role,
+      is_active: is_active === true || is_active === 'true' || is_active === 1,
+      is_verified: is_verified === true || is_verified === 'true' || is_verified === 1,
+    });
+
+    // Create UserProfile
+    await UserProfile.create({
+      user_id: newUser.id,
+      full_name: name.trim(),
+      phone_number: phone_number ? phone_number.trim() : null,
+      bio: bio ? bio.trim() : null,
+      career_goal: career_goal ? career_goal.trim() : null,
+    });
+
+    // If role is tutor, initialize TutorWallet
+    if (role === 'tutor') {
+      await TutorWallet.findOrCreate({
+        where: { tutor_id: newUser.id },
+        defaults: {
+          tutor_id: newUser.id,
+          balance: 0.00,
+          pending_balance: 0.00,
+        },
+      });
+    }
+
+    const createdUser = await User.findByPk(newUser.id, {
+      attributes: ['id', 'name', 'email', 'role', 'is_active', 'is_verified', 'created_at'],
+      include: [{ model: UserProfile, as: 'profile' }],
+    });
+
+    return res.status(201).json({
+      success: true,
+      message: `Pengguna baru "${createdUser.name}" (${createdUser.role}) berhasil ditambahkan.`,
+      data: createdUser,
+    });
+  } catch (err) {
+    console.error('Error in createUser:', err);
+    return res.status(500).json({
+      success: false,
+      message: 'Gagal membuat pengguna baru.',
+      error: err.message,
+    });
+  }
+};
+
+/**
+ * Update user details (Admin action)
+ */
+exports.updateUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const {
+      name,
+      email,
+      role,
+      is_active,
+      is_verified,
+      phone_number,
+      bio,
+      career_goal,
+      password,
+    } = req.body;
+
+    const user = await User.findByPk(id, {
+      include: [{ model: UserProfile, as: 'profile' }],
+    });
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'Pengguna tidak ditemukan.',
+      });
+    }
+
+    // Safety guard: Admin cannot deactivate or demote their own account
+    if (req.user && req.user.id === parseInt(id, 10)) {
+      if (is_active === false || is_active === 'false' || is_active === 0) {
+        return res.status(400).json({
+          success: false,
+          message: 'Anda tidak dapat menonaktifkan akun admin Anda sendiri.',
+        });
+      }
+      if (role && role !== 'admin') {
+        return res.status(400).json({
+          success: false,
+          message: 'Anda tidak dapat mengubah peran akun admin Anda sendiri.',
+        });
+      }
+    }
+
+    // Email check if changed
+    if (email && email.toLowerCase().trim() !== user.email.toLowerCase()) {
+      const normalizedEmail = email.toLowerCase().trim();
+      const existingUser = await User.findOne({ where: { email: normalizedEmail } });
+      if (existingUser && existingUser.id !== user.id) {
+        return res.status(409).json({
+          success: false,
+          message: 'Email sudah digunakan oleh akun lain.',
+        });
+      }
+      user.email = normalizedEmail;
+    }
+
+    if (name) user.name = name.trim();
+
+    if (role && ['student', 'tutor', 'admin'].includes(role)) {
+      const oldRole = user.role;
+      user.role = role;
+      if (role === 'tutor' && oldRole !== 'tutor') {
+        await TutorWallet.findOrCreate({
+          where: { tutor_id: user.id },
+          defaults: {
+            tutor_id: user.id,
+            balance: 0.00,
+            pending_balance: 0.00,
+          },
+        });
+      }
+    }
+
+    if (typeof is_active !== 'undefined') {
+      user.is_active = is_active === true || is_active === 'true' || is_active === 1;
+    }
+
+    if (typeof is_verified !== 'undefined') {
+      user.is_verified = is_verified === true || is_verified === 'true' || is_verified === 1;
+    }
+
+    if (password && password.trim().length >= 6) {
+      user.password = await bcrypt.hash(password.trim(), 10);
+    }
+
+    await user.save();
+
+    // Update or create UserProfile
+    let profile = await UserProfile.findOne({ where: { user_id: user.id } });
+    if (profile) {
+      if (name) profile.full_name = name.trim();
+      if (typeof phone_number !== 'undefined') profile.phone_number = phone_number ? phone_number.trim() : null;
+      if (typeof bio !== 'undefined') profile.bio = bio ? bio.trim() : null;
+      if (typeof career_goal !== 'undefined') profile.career_goal = career_goal ? career_goal.trim() : null;
+      await profile.save();
+    } else {
+      profile = await UserProfile.create({
+        user_id: user.id,
+        full_name: user.name,
+        phone_number: phone_number ? phone_number.trim() : null,
+        bio: bio ? bio.trim() : null,
+        career_goal: career_goal ? career_goal.trim() : null,
+      });
+    }
+
+    const updatedUser = await User.findByPk(user.id, {
+      attributes: ['id', 'name', 'email', 'role', 'is_active', 'is_verified', 'created_at', 'updated_at'],
+      include: [{ model: UserProfile, as: 'profile' }],
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: `Data pengguna "${updatedUser.name}" berhasil diperbarui.`,
+      data: updatedUser,
+    });
+  } catch (err) {
+    console.error('Error in updateUser:', err);
+    return res.status(500).json({
+      success: false,
+      message: 'Gagal memperbarui data pengguna.',
+      error: err.message,
+    });
+  }
+};
+
+/**
+ * Toggle user active/suspended status
+ */
+exports.toggleUserStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { is_active, reason } = req.body;
+
+    const user = await User.findByPk(id);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'Pengguna tidak ditemukan.',
+      });
+    }
+
+    // Safety guard
+    if (req.user && req.user.id === parseInt(id, 10)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Anda tidak dapat mengubah status akun Anda sendiri.',
+      });
+    }
+
+    const newStatus = typeof is_active !== 'undefined'
+      ? (is_active === true || is_active === 'true' || is_active === 1)
+      : !user.is_active;
+
+    user.is_active = newStatus;
+    await user.save();
+
+    const statusText = newStatus ? 'diaktifkan kembali' : 'disuspend / dinonaktifkan';
+    const reasonText = reason ? ` Alasan: ${reason}` : '';
+
+    return res.status(200).json({
+      success: true,
+      message: `Akun "${user.name}" berhasil ${statusText}.${reasonText}`,
+      data: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        is_active: user.is_active,
+      },
+    });
+  } catch (err) {
+    console.error('Error in toggleUserStatus:', err);
+    return res.status(500).json({
+      success: false,
+      message: 'Gagal mengubah status akun pengguna.',
+      error: err.message,
+    });
+  }
+};
+
+/**
+ * Change user role (student <-> tutor <-> admin)
+ */
+exports.changeUserRole = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { role } = req.body;
+
+    const validRoles = ['student', 'tutor', 'admin'];
+    if (!role || !validRoles.includes(role)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Peran akun tidak valid. Pilih antara student, tutor, atau admin.',
+      });
+    }
+
+    const user = await User.findByPk(id);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'Pengguna tidak ditemukan.',
+      });
+    }
+
+    // Guard: Don't let current admin demote themselves
+    if (req.user && req.user.id === parseInt(id, 10) && role !== 'admin') {
+      return res.status(400).json({
+        success: false,
+        message: 'Anda tidak dapat menurunkan peran admin pada akun Anda sendiri.',
+      });
+    }
+
+    const oldRole = user.role;
+    user.role = role;
+    await user.save();
+
+    // If upgraded to tutor, create wallet
+    if (role === 'tutor' && oldRole !== 'tutor') {
+      await TutorWallet.findOrCreate({
+        where: { tutor_id: user.id },
+        defaults: {
+          tutor_id: user.id,
+          balance: 0.00,
+          pending_balance: 0.00,
+        },
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: `Peran akun "${user.name}" berhasil diubah dari ${oldRole} menjadi ${role}.`,
+      data: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
+    });
+  } catch (err) {
+    console.error('Error in changeUserRole:', err);
+    return res.status(500).json({
+      success: false,
+      message: 'Gagal mengubah peran akun pengguna.',
+      error: err.message,
+    });
+  }
+};
+
+/**
+ * Delete a user (Admin action)
+ */
+exports.deleteUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const user = await User.findByPk(id);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'Pengguna tidak ditemukan.',
+      });
+    }
+
+    // Guard: Prevent deleting own account
+    if (req.user && req.user.id === parseInt(id, 10)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Anda tidak dapat menghapus akun admin Anda sendiri.',
+      });
+    }
+
+    const userName = user.name;
+    const userEmail = user.email;
+    await user.destroy();
+
+    return res.status(200).json({
+      success: true,
+      message: `Akun "${userName}" (${userEmail}) berhasil dihapus dari sistem.`,
+    });
+  } catch (err) {
+    console.error('Error in deleteUser:', err);
+    return res.status(500).json({
+      success: false,
+      message: 'Gagal menghapus akun pengguna.',
       error: err.message,
     });
   }

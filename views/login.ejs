@@ -368,6 +368,28 @@
       width: 100% !important;
     }
 
+    @media (max-width: 640px) {
+      .login-header {
+        padding: 12px 16px;
+      }
+      .brand-logo span {
+        font-size: 16px;
+        white-space: nowrap;
+      }
+      .theme-toggle-btn {
+        width: 34px;
+        height: 34px;
+        padding: 0;
+        border-radius: var(--radius-full);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .theme-toggle-btn #theme-text {
+        display: none !important;
+      }
+    }
+
     @media (max-width: 480px) {
       .oauth-grid {
         grid-template-columns: 1fr !important;
@@ -939,6 +961,16 @@
       });
     }
 
+    // --- Device Fingerprint Identifier Helper ---
+    function getOrCreateDeviceId() {
+      let deviceId = localStorage.getItem('skillsphere_device_id');
+      if (!deviceId) {
+        deviceId = 'dev_' + Math.random().toString(36).substring(2, 15) + '_' + Date.now().toString(36);
+        localStorage.setItem('skillsphere_device_id', deviceId);
+      }
+      return deviceId;
+    }
+
     renderSavedAccounts();
 
     // --- 4. Form Submission & AJAX Login ---
@@ -974,18 +1006,20 @@
       btnSpinner.style.display = 'inline-block';
       btnText.textContent = 'Memverifikasi...';
 
+      const deviceId = getOrCreateDeviceId();
+
       try {
         const response = await fetch('/api/auth/login', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ email, password }),
+          body: JSON.stringify({ email, password, device_id: deviceId }),
         });
 
         const result = await response.json();
 
-        // 1. Case A: User has pending / unverified OTP
+        // 1. Case A: User has pending / unverified OTP or new device 2FA
         if (result.requireOtp || result.require_otp) {
           activeLoginOtpEmail = result.email || email;
           activeLoginPassword = password;
@@ -1002,7 +1036,7 @@
             stepLoginOtp.style.display = 'block';
             stepLoginOtp.className = 'framer-enter-up';
             document.getElementById('target-otp-email').textContent = activeLoginOtpEmail;
-            showLoginOtpAlert('success', result.message || 'Akun Anda belum aktif. Masukkan kode OTP dari email.');
+            showLoginOtpAlert('success', result.message || 'Masukkan kode OTP 6-digit yang dikirim ke email.');
             startLoginOtpResendCountdown();
             resetLoginOtpDeck();
             setTimeout(() => loginOtpBoxes[0].focus(), 300);
@@ -1201,7 +1235,11 @@
         const response = await fetch('/api/auth/verify-otp', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: activeLoginOtpEmail, otp: otpCode }),
+          body: JSON.stringify({
+            email: activeLoginOtpEmail,
+            otp: otpCode,
+            device_id: getOrCreateDeviceId(),
+          }),
         });
 
         const result = await response.json();

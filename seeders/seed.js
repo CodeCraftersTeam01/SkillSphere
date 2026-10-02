@@ -208,21 +208,42 @@ async function seedDatabase() {
       name: 'AI & Machine Learning',
       slug: 'ai-machine-learning',
       description: 'Pelajari integrasi LLM, Gemini API, prompt engineering, dan computer vision.',
-      icon: 'sparkles',
+      icon: 'fas fa-brain',
     });
 
     const catBackend = await Category.create({
       name: 'Backend & Cloud Architecture',
       slug: 'backend-cloud-architecture',
       description: 'Mastering Node.js, Express, REST API, Database Relasional, dan Microservices.',
-      icon: 'server',
+      icon: 'fas fa-server',
     });
 
     const catFrontend = await Category.create({
       name: 'Frontend & UI/UX Engineering',
       slug: 'frontend-ui-ux',
       description: 'Membangun antarmuka modern dengan React, Vue, dan Claude aesthetic styling.',
-      icon: 'palette',
+      icon: 'fas fa-palette',
+    });
+
+    const catMobile = await Category.create({
+      name: 'Mobile App Development',
+      slug: 'mobile-app-development',
+      description: 'Pengembangan aplikasi multiplatform Android dan iOS dengan Flutter & React Native.',
+      icon: 'fas fa-mobile-screen-button',
+    });
+
+    const catSecurity = await Category.create({
+      name: 'Cybersecurity & Cloud Security',
+      slug: 'cybersecurity-cloud-security',
+      description: 'Keamanan aplikasi web, ethical hacking, enkripsi data, dan mitigasi vulnerabilitas.',
+      icon: 'fas fa-shield-halved',
+    });
+
+    const catData = await Category.create({
+      name: 'Data Science & Analytics',
+      slug: 'data-science-analytics',
+      description: 'Pengolahan big data, visualisasi interaktif, machine learning, dan analisis bisnis.',
+      icon: 'fas fa-chart-pie',
     });
 
     // 5. Course & Content Hierarchy
@@ -233,7 +254,7 @@ async function seedDatabase() {
       title: 'Mastering Enterprise Backend Architecture & AI Integration',
       slug: 'mastering-enterprise-backend-ai',
       description: 'Panduan lengkap membangun backend handal, payment gateway, dan integrasi AI cerdas.',
-      thumbnail_url: 'https://storage.skillsphere.id/courses/backend_ai_hero.jpg',
+      thumbnail_url: '/uploads/courses/thumbnails/thumb_1790952970838_0f6a6bb44dae.webp',
       price: coursePrice,
       level: 'intermediate',
       rating_avg: 4.9,
@@ -271,6 +292,209 @@ async function seedDatabase() {
       duration_minutes: 15,
       is_preview: false,
       order_index: 2,
+    });
+
+    // Course 2: Dasar Pemrograman Web Modern (Beginner / Free)
+    const course2 = await Course.create({
+      tutor_id: tutor.id,
+      category_id: catFrontend.id,
+      title: 'Dasar Pemrograman Web Modern: HTML5, CSS3 & JavaScript ES6+',
+      slug: 'dasar-pemrograman-web-modern',
+      description: 'Mulai perjalanan karir Anda sebagai web developer dari pondasi dasar sintaks, semantik HTML5, CSS Grid/Flexbox, dan JavaScript modern.',
+      thumbnail_url: null,
+      price: 0.00,
+      level: 'beginner',
+      rating_avg: 4.8,
+      rating_count: 94,
+      status: 'published',
+    });
+    const c2Sec1 = await CourseSection.create({
+      course_id: course2.id,
+      title: 'Bab 1: Struktur Web & Semantik Modern',
+      order_index: 1,
+    });
+    await CourseMaterial.create({
+      section_id: c2Sec1.id,
+      title: '1.1 Pengantar HTML5 Semantik & Aksesibilitas Web',
+      content_type: 'video',
+      file_url: 'https://storage.skillsphere.id/materials/html5_intro.mp4',
+      duration_minutes: 20,
+      is_preview: true,
+      order_index: 1,
+    });
+
+    // Course 3: Mastering Large Language Models & AI Agent Engineering (Advanced)
+    const course3 = await Course.create({
+      tutor_id: tutor.id,
+      category_id: catAI.id,
+      title: 'Mastering Large Language Models & AI Agent Engineering',
+      slug: 'mastering-llm-ai-agent-engineering',
+      description: 'Pelajari arsitektur agen AI mandiri, Retrieval-Augmented Generation (RAG), Function Calling, dan integrasi Gemini Multimodal API.',
+      thumbnail_url: null,
+      price: 450000.00,
+      level: 'advanced',
+      rating_avg: 5.0,
+      rating_count: 62,
+      status: 'published',
+    });
+    const c3Sec1 = await CourseSection.create({
+      course_id: course3.id,
+      title: 'Bab 1: Teori LLM, Prompt Structuring & Parameter Tuning',
+      order_index: 1,
+    });
+    await CourseMaterial.create({
+      section_id: c3Sec1.id,
+      title: '1.1 Pengenalan Arsitektur LLM & Transformer',
+      content_type: 'video',
+      file_url: 'https://storage.skillsphere.id/materials/llm_arch.mp4',
+      duration_minutes: 30,
+      is_preview: true,
+      order_index: 1,
+    });
+
+    // Course 4: Membangun Aplikasi Multiplatform Flutter (Intermediate)
+    const course4 = await Course.create({
+      tutor_id: tutor.id,
+      category_id: catMobile.id,
+      title: 'Membangun Aplikasi Multiplatform dengan Flutter & Clean Architecture',
+      slug: 'flutter-multiplatform-clean-arch',
+      description: 'Kuasai state management BLoC, integrasi REST API, offline caching SQLite, dan animasi UI interaktif untuk Android & iOS.',
+      thumbnail_url: null,
+      price: 375000.00,
+      level: 'intermediate',
+      rating_avg: 4.85,
+      rating_count: 48,
+      status: 'published',
+    });
+    const c4Sec1 = await CourseSection.create({
+      course_id: course4.id,
+      title: 'Bab 1: Widget Tree, Layout Responsif & Theme Mode',
+      order_index: 1,
+    });
+    await CourseMaterial.create({
+      section_id: c4Sec1.id,
+      title: '1.1 Membangun Liquid UI dengan Flutter',
+      content_type: 'video',
+      file_url: 'https://storage.skillsphere.id/materials/flutter_ui.mp4',
+      duration_minutes: 22,
+      is_preview: true,
+      order_index: 1,
+    });
+
+    // Course 5: Cloud Native & Kubernetes (Advanced)
+    const course5 = await Course.create({
+      tutor_id: tutor.id,
+      category_id: catBackend.id,
+      title: 'Cloud Native & Container Orchestration dengan Docker dan Kubernetes',
+      slug: 'cloud-native-docker-kubernetes-k8s',
+      description: 'Bangun cluster production-ready, konfigurasi Ingress, Persistent Volume, Helm chart, dan auto-scaling beban tinggi.',
+      thumbnail_url: null,
+      price: 420000.00,
+      level: 'advanced',
+      rating_avg: 4.95,
+      rating_count: 73,
+      status: 'published',
+    });
+    const c5Sec1 = await CourseSection.create({
+      course_id: course5.id,
+      title: 'Bab 1: Containerization & Dockerfile Best Practices',
+      order_index: 1,
+    });
+    await CourseMaterial.create({
+      section_id: c5Sec1.id,
+      title: '1.1 Multi-stage Build & Security Scanning',
+      content_type: 'video',
+      file_url: 'https://storage.skillsphere.id/materials/docker_k8s.mp4',
+      duration_minutes: 28,
+      is_preview: true,
+      order_index: 1,
+    });
+
+    // Course 6: UI/UX Design Masterclass Figma (Beginner)
+    const course6 = await Course.create({
+      tutor_id: tutor.id,
+      category_id: catFrontend.id,
+      title: 'UI/UX Design Masterclass: Dari Wireframe hingga Prototyping Figma',
+      slug: 'ui-ux-design-masterclass-figma',
+      description: 'Panduan praktis desain antarmuka estetis, design token, auto-layout, komponen modular, dan pengujian kegunaan pengguna.',
+      thumbnail_url: null,
+      price: 250000.00,
+      level: 'beginner',
+      rating_avg: 4.9,
+      rating_count: 110,
+      status: 'published',
+    });
+    const c6Sec1 = await CourseSection.create({
+      course_id: course6.id,
+      title: 'Bab 1: Prinsip Tipografi, Warna & Skala Visual',
+      order_index: 1,
+    });
+    await CourseMaterial.create({
+      section_id: c6Sec1.id,
+      title: '1.1 Eksplorasi Claude Warm Paper Design System',
+      content_type: 'video',
+      file_url: 'https://storage.skillsphere.id/materials/figma_design.mp4',
+      duration_minutes: 18,
+      is_preview: true,
+      order_index: 1,
+    });
+
+    // Course 7: Pondasi Keamanan Siber & Ethical Hacking (Intermediate)
+    const course7 = await Course.create({
+      tutor_id: tutor.id,
+      category_id: catSecurity.id,
+      title: 'Pondasi Keamanan Siber & Ethical Hacking untuk Web Developer',
+      slug: 'keamanan-siber-ethical-hacking-web',
+      description: 'Kenali OWASP Top 10, teknik SQL Injection, XSS, CSRF, Secure Headers, dan pengujian penetrasi aplikasi modern.',
+      thumbnail_url: null,
+      price: 380000.00,
+      level: 'intermediate',
+      rating_avg: 4.78,
+      rating_count: 51,
+      status: 'published',
+    });
+    const c7Sec1 = await CourseSection.create({
+      course_id: course7.id,
+      title: 'Bab 1: Audit Keamanan & OWASP Vulnerability Checklist',
+      order_index: 1,
+    });
+    await CourseMaterial.create({
+      section_id: c7Sec1.id,
+      title: '1.1 Identifikasi Celah Keamanan & Sanitasi Input',
+      content_type: 'video',
+      file_url: 'https://storage.skillsphere.id/materials/sec_intro.mp4',
+      duration_minutes: 25,
+      is_preview: true,
+      order_index: 1,
+    });
+
+    // Course 8: Data Science & Machine Learning Python (Beginner / Free)
+    const course8 = await Course.create({
+      tutor_id: tutor.id,
+      category_id: catData.id,
+      title: 'Data Science & Machine Learning Dasar dengan Python & Pandas',
+      slug: 'data-science-machine-learning-python',
+      description: 'Eksplorasi dataset riil, visualisasi data interaktif dengan Matplotlib & Seaborn, serta pembuatan model klasifikasi dasar.',
+      thumbnail_url: null,
+      price: 0.00,
+      level: 'beginner',
+      rating_avg: 4.88,
+      rating_count: 85,
+      status: 'published',
+    });
+    const c8Sec1 = await CourseSection.create({
+      course_id: course8.id,
+      title: 'Bab 1: Setup Environment Python, Jupyter & Pandas',
+      order_index: 1,
+    });
+    await CourseMaterial.create({
+      section_id: c8Sec1.id,
+      title: '1.1 Manipulasi Dataframe & Eksplorasi Statistik',
+      content_type: 'video',
+      file_url: 'https://storage.skillsphere.id/materials/python_ds.mp4',
+      duration_minutes: 24,
+      is_preview: true,
+      order_index: 1,
     });
 
     // 6. Course Milestone & Discount Reward

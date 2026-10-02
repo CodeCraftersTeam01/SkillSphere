@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Portal Manajemen Materi Kursus | SkillSphere AI</title>
-  <meta name="description" content="Portal upload materi multi-format, struktur kurikulum, dan streaming konten pembelajaran untuk Tutor SkillSphere AI.">
+  <title>Portal Kelas & Kurikulum Tutor | SkillSphere AI</title>
+  <meta name="description" content="Studio kurikulum, upload materi multi-format, dan pengelolaan kelas Google Classroom style untuk Tutor SkillSphere AI.">
   
   <!-- PWA Manifest & App Icons -->
   <link rel="manifest" href="/manifest.json">
@@ -28,40 +28,209 @@
   <link rel="stylesheet" href="/stylesheets/claude-theme.css?v=2.0">
 
   <style>
-    .dashboard-layout {
+    /* ========================================================= */
+    /* --- GOOGLE CLASSROOM INTERIOR LAYOUT & CLAUDE THEME ----- */
+    /* ========================================================= */
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: var(--bg-app);
+      font-family: var(--font-sans);
+      color: var(--text-primary);
+      overflow-x: hidden;
+    }
+
+    .classroom-shell {
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       background-color: var(--bg-app);
     }
 
+    /* Top Sticky Navigation Bar */
     .navbar {
       background: var(--bg-surface);
       border-bottom: 1px solid var(--border-subtle);
-      padding: 16px 32px;
+      padding: 0 20px;
+      height: 56px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       position: sticky;
       top: 0;
       z-index: 100;
+      gap: 16px;
+      box-sizing: border-box;
+    }
+
+    .nav-brand-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+
+    .classroom-sidebar-toggle-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-full);
+      border: none;
+      background: transparent;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.15s ease;
+      flex-shrink: 0;
+    }
+
+    .classroom-sidebar-toggle-btn:hover {
+      background: var(--bg-surface-subtle);
+    }
+
+    .brand-logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .brand-logo span {
+      font-family: 'Newsreader', serif;
+      font-size: 19px;
+      font-weight: 700;
+      color: var(--text-primary);
+      white-space: nowrap;
+    }
+
+    .header-breadcrumb {
+      display: none;
+    }
+
+    /* Classroom Center Tabs (Forum, Tugas Kelas, Anggota) */
+    .classroom-top-nav-tabs {
+      display: flex;
+      align-items: stretch;
+      gap: 4px;
+      margin: 0 auto;
+      height: 56px;
+    }
+
+    .classroom-nav-tab {
+      padding: 0 18px;
+      height: 56px;
+      font-size: 13.5px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap !important;
+      transition: all 0.15s ease;
+      position: relative;
+      text-decoration: none;
+      box-sizing: border-box;
+    }
+
+    .classroom-nav-tab span {
+      white-space: nowrap !important;
+    }
+
+    .classroom-nav-tab:hover {
+      color: var(--text-primary);
+      background: var(--bg-surface-subtle);
+    }
+
+    .classroom-nav-tab.active {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    .classroom-nav-tab.active::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--accent-primary);
+      border-radius: 3px 3px 0 0;
     }
 
     .nav-actions {
       display: flex;
       align-items: center;
-      gap: 14px;
-      flex-wrap: wrap;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .btn-dashboard-back {
+      font-size: 12.5px;
+      font-weight: 500;
+      padding: 6px 14px;
+      border-radius: var(--radius-full);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: transparent;
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: all 0.15s ease;
+    }
+
+    .btn-dashboard-back:hover {
+      color: var(--text-primary);
+      background: var(--bg-surface-subtle);
+      border-color: var(--border-strong);
+    }
+
+    .theme-toggle-btn {
+      width: 36px;
+      height: 36px;
+      padding: 0;
+      border-radius: var(--radius-full);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .theme-toggle-btn:hover {
+      color: var(--text-primary);
+      background: var(--bg-surface-subtle);
+    }
+
+    .theme-toggle-btn #theme-text {
+      display: none !important;
     }
 
     .user-profile-badge {
-      display: flex;
+      display: inline-flex;
       align-items: center;
-      gap: 10px;
-      padding: 6px 14px 6px 8px;
+      gap: 8px;
+      padding: 3px 10px 3px 3px;
       border-radius: var(--radius-full);
       background: var(--bg-surface-subtle);
       border: 1px solid var(--border-subtle);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .user-profile-badge:hover {
+      border-color: var(--border-strong);
     }
 
     .user-avatar-sm {
@@ -75,235 +244,534 @@
       justify-content: center;
       font-size: 11px;
       font-weight: 700;
+      flex-shrink: 0;
     }
 
     .user-name-label {
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 600;
       color: var(--text-primary);
-    }
-
-    .user-role-tag {
-      font-size: 10px;
-      font-weight: 600;
-      text-transform: uppercase;
-      padding: 2px 6px;
-      border-radius: var(--radius-full);
-      background: var(--bg-surface);
-      border: 1px solid var(--border-subtle);
-      color: var(--text-secondary);
+      max-width: 100px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     .logout-btn {
+      width: 36px;
+      height: 36px;
+      padding: 0;
+      border-radius: var(--radius-full);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       background: transparent;
       border: 1px solid var(--border-subtle);
       color: var(--text-secondary);
-      padding: 8px 14px;
-      border-radius: var(--radius-full);
       font-size: 13px;
-      font-weight: 500;
       cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      transition: all 0.2s ease;
       text-decoration: none;
+      transition: all 0.15s ease;
     }
 
     .logout-btn:hover {
-      background: var(--color-danger-bg);
-      border-color: var(--color-danger);
       color: var(--color-danger);
+      border-color: var(--color-danger);
+      background: var(--color-danger-bg);
     }
 
-    .dashboard-content {
-      max-width: 1140px;
+    .logout-btn span {
+      display: none !important;
+    }
+
+    /* Container for Sidebar + Main Content */
+    .classroom-app-container {
+      display: flex;
       width: 100%;
-      margin: 0 auto;
-      padding: 40px 24px 80px;
+      min-height: calc(100vh - 60px);
+    }
+
+    /* Google Classroom Drawer / Docked Sidebar */
+    .classroom-sidebar-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.45);
+      backdrop-filter: blur(2px);
+      z-index: 140;
+    }
+
+    .classroom-sidebar-backdrop.active {
+      display: block;
+    }
+
+    .classroom-left-sidebar {
+      width: 270px;
+      background: var(--bg-surface);
+      border-right: 1px solid var(--border-subtle);
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      height: calc(100vh - 60px);
+      position: sticky;
+      top: 60px;
+      transition: width 0.2s ease, transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      overflow-y: auto;
+      z-index: 90;
+    }
+
+    .classroom-left-sidebar.collapsed {
+      width: 0;
+      overflow: hidden;
+      border-right: none;
+    }
+
+    .sidebar-scroll-body {
+      padding: 12px 0 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .sidebar-nav-group {
+      display: flex;
+      flex-direction: column;
+      padding-right: 12px;
+    }
+
+    .sidebar-nav-pill {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 10px 24px;
+      font-size: 13.5px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      text-decoration: none;
+      border-radius: 0 24px 24px 0;
+      transition: all 0.15s ease;
+      cursor: pointer;
+    }
+
+    .sidebar-nav-pill:hover {
+      color: var(--text-primary);
+      background: var(--bg-surface-subtle);
+    }
+
+    .sidebar-nav-pill.active {
+      color: var(--text-primary);
+      font-weight: 600;
+      background: var(--bg-surface-subtle);
+    }
+
+    .sidebar-nav-icon {
+      font-size: 16px;
+      width: 22px;
+      text-align: center;
+      color: var(--text-secondary);
+      flex-shrink: 0;
+    }
+
+    .sidebar-nav-pill.active .sidebar-nav-icon {
+      color: var(--text-primary);
+    }
+
+    .sidebar-divider-line {
+      height: 1px;
+      background: var(--border-subtle);
+      margin: 8px 0;
+    }
+
+    .sidebar-section-header {
+      padding: 10px 24px 6px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .sidebar-class-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 8px 24px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      text-decoration: none;
+      border-radius: 0 24px 24px 0;
+      transition: all 0.15s ease;
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    .sidebar-class-row:hover {
+      color: var(--text-primary);
+      background: var(--bg-surface-subtle);
+    }
+
+    .sidebar-class-row.active {
+      color: var(--text-primary);
+      font-weight: 600;
+      background: var(--bg-surface-subtle);
+    }
+
+    .sidebar-class-circle {
+      width: 28px;
+      height: 28px;
+      border-radius: var(--radius-full);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      color: #FFFFFF;
+      background: var(--accent-primary);
+      flex-shrink: 0;
+    }
+
+    .sidebar-class-text {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
       flex: 1;
     }
 
-    .welcome-hero {
-      margin-bottom: 28px;
-    }
-
-    .welcome-title {
-      font-family: var(--font-serif);
-      font-size: 32px;
-      font-weight: 500;
+    .sidebar-class-title {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-size: 13px;
       color: var(--text-primary);
-      letter-spacing: -0.02em;
-      margin-bottom: 8px;
     }
 
-    .welcome-desc {
-      font-size: 15px;
-      color: var(--text-secondary);
-      max-width: 720px;
-      line-height: 1.5;
+    .sidebar-class-subtitle {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-size: 11px;
+      color: var(--text-tertiary);
     }
 
-    .sprint-badge {
-      display: inline-flex;
+    /* Main Content Pane */
+    .classroom-main-pane {
+      flex: 1;
+      min-width: 0;
+      padding: 24px 32px 80px;
+      max-width: 1180px;
+      margin: 0 auto;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    /* ========================================================= */
+    /* --- TAB 1: FORUM (STREAM / HERO BANNER & 2-COLUMN) ------ */
+    /* ========================================================= */
+    .classroom-hero-banner {
+      width: 100%;
+      min-height: 210px;
+      border-radius: var(--radius-xl);
+      background: linear-gradient(135deg, #1F1E1B 0%, #2A2926 100%);
+      color: #FFFFFF;
+      padding: 28px 32px;
+      box-sizing: border-box;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      border: 1px solid var(--border-subtle);
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 24px;
+    }
+
+    .classroom-hero-banner::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(15, 14, 13, 0.35) 0%, rgba(15, 14, 13, 0.85) 100%);
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .banner-bg-img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.85;
+      filter: brightness(0.85);
+      transition: transform 0.4s ease;
+      z-index: 0;
+    }
+
+    .classroom-hero-banner:hover .banner-bg-img {
+      transform: scale(1.02);
+    }
+
+    .banner-content {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .banner-badges {
+      display: flex;
       align-items: center;
       gap: 8px;
-      background: var(--accent-primary-light);
-      color: var(--text-primary);
-      border: 1px solid var(--border-subtle);
+      flex-wrap: wrap;
+      margin-bottom: 4px;
+    }
+
+    .banner-title {
+      font-family: var(--font-serif);
+      font-size: 30px;
+      font-weight: 500;
+      color: #FFFFFF;
+      margin: 0;
+      line-height: 1.25;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+    }
+
+    .banner-subtitle {
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.88);
+      margin: 0;
+      max-width: 680px;
+      line-height: 1.45;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    }
+
+    .banner-footer-row {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .banner-edit-btn {
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      color: #FFFFFF;
+      padding: 7px 14px;
       border-radius: var(--radius-full);
-      padding: 6px 14px;
       font-size: 12px;
       font-weight: 600;
-      margin-bottom: 12px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
     }
 
-    .stats-grid {
+    .banner-edit-btn:hover {
+      background: rgba(255, 255, 255, 0.28);
+      color: #FFFFFF;
+    }
+
+    /* 2-Column Stream Layout */
+    .classroom-stream-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 16px;
-      margin-bottom: 28px;
+      grid-template-columns: 240px 1fr;
+      gap: 24px;
+      align-items: flex-start;
     }
 
-    .stat-card {
+    /* Left Card: Summary & Quick Info */
+    .stream-info-card {
       background: var(--bg-surface);
       border: 1px solid var(--border-subtle);
       border-radius: var(--radius-lg);
       padding: 20px;
       box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .info-card-header {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-primary);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .info-metric-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      padding: 6px 0;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .info-metric-item:last-child {
+      border-bottom: none;
+    }
+
+    .info-metric-label {
+      color: var(--text-secondary);
+    }
+
+    .info-metric-val {
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .btn-stream-link {
+      color: var(--accent-primary);
+      font-size: 12.5px;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: none;
+      border: none;
+      padding: 0;
+      margin-top: 4px;
+    }
+
+    .btn-stream-link:hover {
+      text-decoration: underline;
+    }
+
+    /* Right Feed Column */
+    .stream-feed-column {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* Stream Post Bar (Umumkan / Upload) */
+    .stream-announcement-bar {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      box-shadow: var(--shadow-sm);
+      cursor: pointer;
       transition: all 0.2s ease;
     }
 
-    .stat-card:hover {
-      box-shadow: var(--shadow-md);
+    .stream-announcement-bar:hover {
       border-color: var(--border-strong);
-      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
     }
 
-    .stat-label {
-      font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: var(--text-secondary);
-      font-weight: 600;
-      margin-bottom: 10px;
+    .announcement-user-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-full);
+      background: var(--accent-primary);
+      color: var(--accent-text);
       display: flex;
-      justify-content: space-between;
       align-items: center;
-    }
-
-    .stat-value {
-      font-size: 24px;
+      justify-content: center;
       font-weight: 700;
-      color: var(--text-primary);
-      font-feature-settings: "tnum";
-    }
-
-    .stat-meta {
-      font-size: 12px;
-      color: var(--text-tertiary);
-      margin-top: 6px;
-    }
-
-    .section-card {
-      background: var(--bg-surface);
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-xl);
-      padding: 28px;
-      box-shadow: var(--shadow-sm);
-      margin-bottom: 28px;
-    }
-
-    .section-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-      border-bottom: 1px solid var(--border-subtle);
-      padding-bottom: 14px;
-      flex-wrap: wrap;
-      gap: 12px;
-    }
-
-    .section-title {
-      font-family: var(--font-serif);
-      font-size: 22px;
-      font-weight: 500;
-      color: var(--text-primary);
-    }
-
-    /* Course Banner Card */
-    .course-overview-grid {
-      display: flex;
-      gap: 24px;
-      align-items: flex-start;
-      flex-wrap: wrap;
-    }
-
-    .course-thumb-container {
-      position: relative;
-      width: 240px;
-      height: 145px;
-      border-radius: var(--radius-lg);
-      overflow: hidden;
-      background: var(--bg-surface-subtle);
-      border: 1px solid var(--border-subtle);
+      font-size: 13px;
       flex-shrink: 0;
     }
 
-    .course-thumb-img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
+    .announcement-placeholder-text {
+      font-size: 13.5px;
+      color: var(--text-secondary);
+      flex: 1;
     }
 
-    .thumb-edit-overlay {
-      position: absolute;
-      inset: 0;
-      background: rgba(15, 14, 13, 0.65);
-      backdrop-filter: blur(2px);
-      color: #ffffff;
+    /* Feed Items */
+    .stream-post-item {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 18px 22px;
+      box-shadow: var(--shadow-sm);
       display: flex;
-      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      transition: all 0.15s ease;
+    }
+
+    .stream-post-item:hover {
+      border-color: var(--border-strong);
+      box-shadow: var(--shadow-md);
+    }
+
+    .post-icon-circle {
+      width: 42px;
+      height: 42px;
+      border-radius: var(--radius-full);
+      background: var(--bg-surface-subtle);
+      color: var(--text-primary);
+      border: 1px solid var(--border-subtle);
+      display: flex;
       align-items: center;
       justify-content: center;
-      opacity: 0;
-      cursor: pointer;
-      transition: opacity 0.2s ease;
-      font-size: 12px;
-      font-weight: 600;
-      gap: 6px;
+      font-size: 16px;
+      flex-shrink: 0;
     }
 
-    .course-thumb-container:hover .thumb-edit-overlay {
-      opacity: 1;
-    }
-
-    .course-meta-details {
+    .post-main-content {
       flex: 1;
-      min-width: 280px;
+      min-width: 0;
     }
 
-    .course-title-display {
-      font-family: var(--font-serif);
-      font-size: 24px;
-      font-weight: 500;
+    .post-title {
+      font-size: 14.5px;
+      font-weight: 600;
       color: var(--text-primary);
-      line-height: 1.3;
-      margin-bottom: 8px;
+      margin-bottom: 4px;
+      word-break: break-word;
     }
 
-    /* Curriculum Section Containers */
+    .post-date-meta {
+      font-size: 12px;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* ========================================================= */
+    /* --- TAB 2: TUGAS KELAS (CLASSWORK / CURRICULUM TREE) ---- */
+    /* ========================================================= */
+    .classwork-action-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      gap: 14px;
+    }
+
     .sections-container {
       display: flex;
       flex-direction: column;
-      gap: 20px;
+      gap: 24px;
     }
 
     .section-box {
       background: var(--bg-surface);
       border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-xl);
+      border-radius: var(--radius-lg);
       overflow: hidden;
       box-shadow: var(--shadow-sm);
       transition: border-color 0.2s ease;
@@ -326,8 +794,8 @@
 
     .section-title-text {
       font-family: var(--font-serif);
-      font-size: 18px;
-      font-weight: 500;
+      font-size: 19px;
+      font-weight: 600;
       color: var(--text-primary);
       display: flex;
       align-items: center;
@@ -335,16 +803,16 @@
     }
 
     .material-list {
-      padding: 8px 16px;
+      padding: 6px 12px;
     }
 
     .material-item-row {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 14px 16px;
-      border-radius: var(--radius-lg);
-      margin: 6px 0;
+      padding: 12px 14px;
+      border-radius: var(--radius-md);
+      margin: 4px 0;
       border: 1px solid transparent;
       background: var(--bg-surface);
       transition: all 0.15s ease;
@@ -357,13 +825,13 @@
     }
 
     .material-icon-box {
-      width: 40px;
-      height: 40px;
+      width: 36px;
+      height: 36px;
       border-radius: var(--radius-md);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 15px;
+      font-size: 14px;
       flex-shrink: 0;
       background: var(--bg-surface-subtle);
       color: var(--text-primary);
@@ -377,16 +845,16 @@
 
     .material-title-text {
       font-weight: 600;
-      font-size: 14px;
+      font-size: 13.5px;
       color: var(--text-primary);
-      margin-bottom: 4px;
+      margin-bottom: 3px;
     }
 
     .material-meta-row {
       display: flex;
       align-items: center;
-      gap: 10px;
-      font-size: 12px;
+      gap: 8px;
+      font-size: 11.5px;
       color: var(--text-secondary);
       flex-wrap: wrap;
     }
@@ -395,7 +863,7 @@
       display: inline-flex;
       align-items: center;
       gap: 5px;
-      padding: 3px 8px;
+      padding: 2px 8px;
       border-radius: var(--radius-full);
       font-size: 11px;
       font-weight: 600;
@@ -413,6 +881,220 @@
       border: 1px solid var(--border-subtle);
     }
 
+    /* ========================================================= */
+    /* --- TAB 3: ANGGOTA (PEOPLE / CLASS MEMBERS) ------------- */
+    /* ========================================================= */
+    .people-section {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 24px 28px;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 24px;
+    }
+
+    .people-section-header {
+      font-family: var(--font-serif);
+      font-size: 24px;
+      font-weight: 500;
+      color: var(--text-primary);
+      border-bottom: 2px solid var(--accent-primary);
+      padding-bottom: 12px;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+
+    .people-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .people-item-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .people-item-row:last-child {
+      border-bottom: none;
+    }
+
+    .people-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-full);
+      background: var(--accent-primary);
+      color: var(--accent-text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+
+    .people-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .people-email {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    /* Modals System (Upload, New Section, Media Preview) */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(15, 14, 13, 0.65);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      visibility: hidden;
+      transition: opacity 0.2s ease, visibility 0.2s ease;
+      box-sizing: border-box;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+      visibility: visible;
+    }
+
+    .modal-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-xl);
+      max-width: 600px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+      padding: 24px;
+      position: relative;
+      transform: translateY(8px) scale(0.98);
+      transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      box-sizing: border-box;
+    }
+
+    .modal-overlay.active .modal-card {
+      transform: translateY(0) scale(1);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .modal-title {
+      font-family: var(--font-serif);
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin: 0;
+      display: flex;
+      align-items: center;
+    }
+
+    .modal-close-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      font-size: 16px;
+      cursor: pointer;
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius-full);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
+    }
+
+    .modal-close-btn:hover {
+      background: var(--bg-surface-subtle);
+      color: var(--text-primary);
+    }
+
+    .input-field {
+      width: 100%;
+      background: var(--bg-surface-subtle);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 10px 14px;
+      font-size: 13.5px;
+      color: var(--text-primary);
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+      box-sizing: border-box;
+    }
+
+    .input-field:focus {
+      border-color: var(--accent-primary);
+      box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.06);
+    }
+
+    /* Toast System */
+    .toast-container {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 2000;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      pointer-events: none;
+    }
+
+    .toast {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.18);
+      border-radius: var(--radius-lg);
+      padding: 12px 18px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-primary);
+      min-width: 260px;
+      max-width: 420px;
+      pointer-events: auto;
+      animation: toastSlideIn 0.25s ease;
+    }
+
+    @keyframes toastSlideIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
     /* Multi-format Drag and Drop Zone */
     .drop-zone {
       border: 2px dashed var(--border-strong);
@@ -427,20 +1109,60 @@
 
     .drop-zone.dragover {
       border-color: var(--accent-primary);
-      background: var(--accent-primary-light);
+      background: var(--bg-surface);
     }
 
     .drop-zone-icon {
-      font-size: 32px;
+      font-size: 40px;
       color: var(--text-secondary);
-      margin-bottom: 10px;
+      margin-bottom: 12px;
+      transition: transform 0.2s ease;
+    }
+
+    .format-selector-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+
+    .format-card-btn {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 10px 6px;
+      text-align: center;
+      cursor: pointer;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      transition: all 0.15s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .format-card-btn:hover {
+      border-color: var(--border-strong);
+      color: var(--text-primary);
+    }
+
+    .format-card-btn.active {
+      border-color: var(--accent-primary);
+      background: var(--accent-primary);
+      color: var(--accent-text);
+    }
+
+    .format-card-btn.active i {
+      color: var(--accent-text);
     }
 
     .progress-bar-container {
       width: 100%;
       height: 6px;
       background: var(--border-subtle);
-      border-radius: 99px;
+      border-radius: var(--radius-full);
       overflow: hidden;
       margin-top: 14px;
       display: none;
@@ -453,253 +1175,159 @@
       transition: width 0.2s ease;
     }
 
-    /* Modal Styling */
-    .modal-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: rgba(15, 14, 13, 0.6);
-      backdrop-filter: blur(4px);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-      z-index: 1000;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.2s ease;
-    }
-
-    .modal-overlay.active {
-      opacity: 1;
-      pointer-events: auto;
-    }
-
-    .modal-card {
-      background: var(--bg-surface);
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-xl);
-      max-width: 620px;
-      width: 100%;
-      max-height: 90vh;
-      overflow-y: auto;
-      box-shadow: var(--shadow-floating);
-      padding: 28px;
-      position: relative;
-    }
-
-    .modal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-      padding-bottom: 14px;
-      border-bottom: 1px solid var(--border-subtle);
-    }
-
-    .modal-title {
-      font-family: var(--font-serif);
-      font-size: 20px;
-      font-weight: 500;
-      color: var(--text-primary);
-    }
-
-    .modal-close-btn {
-      background: transparent;
-      border: none;
-      color: var(--text-secondary);
-      font-size: 16px;
-      cursor: pointer;
-      padding: 6px;
-      border-radius: var(--radius-sm);
-      transition: color 0.15s ease;
-    }
-
-    .modal-close-btn:hover {
-      color: var(--text-primary);
-    }
-
     .media-player-container {
+      position: relative;
       width: 100%;
+      aspect-ratio: 16 / 9;
+      background: #000000;
       border-radius: var(--radius-lg);
       overflow: hidden;
-      background: #000000;
-      margin-bottom: 16px;
+      box-shadow: var(--shadow-md);
     }
 
-    video {
+    .media-player-container video {
       width: 100%;
-      height: auto;
-      display: block;
-      max-height: 380px;
+      height: 100%;
+      object-fit: contain;
     }
 
-    .format-selector-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(95px, 1fr));
-      gap: 8px;
-      margin-bottom: 20px;
-    }
-
-    .format-card-btn {
-      border: 1px solid var(--border-subtle);
-      background: var(--bg-surface);
-      border-radius: var(--radius-md);
-      padding: 12px 6px;
-      text-align: center;
-      cursor: pointer;
-      transition: all 0.15s ease;
-      color: var(--text-secondary);
-      font-size: 11px;
-      font-weight: 600;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .format-card-btn i {
-      font-size: 18px;
-      color: var(--text-secondary);
-    }
-
-    .format-card-btn:hover {
-      border-color: var(--border-strong);
-      background: var(--bg-surface-subtle);
-    }
-
-    .format-card-btn.active {
-      border-color: var(--accent-primary);
-      background: var(--accent-primary-light);
-      color: var(--text-primary);
-    }
-
-    .format-card-btn.active i {
-      color: var(--text-primary);
-    }
-
-    /* Toast Container */
-    .toast-container {
-      position: fixed;
-      bottom: 24px;
-      right: 24px;
-      z-index: 2000;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .toast {
-      background: var(--bg-surface);
-      border: 1px solid var(--border-subtle);
-      box-shadow: var(--shadow-floating);
-      border-radius: var(--radius-lg);
-      padding: 14px 20px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--text-primary);
-      min-width: 280px;
-      max-width: 420px;
-    }
-
-    /* Top Full-Width Announcement Bar (Dicoding / Claude Warm Paper Style) */
+    /* Top Full-Width Verification Bar */
     .top-announcement-bar {
-      background: #1C1B18;
-      color: #FAF9F5;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-      font-size: 13px;
-      font-weight: 500;
+      background: var(--bg-surface-subtle);
+      border-bottom: 1px solid var(--border-subtle);
       padding: 10px 24px;
+      font-size: 13px;
+      color: var(--text-secondary);
       display: none;
       align-items: center;
       justify-content: center;
-      position: relative;
-      z-index: 105;
-      line-height: 1.4;
-      transition: background-color 0.2s ease;
-    }
-
-    [data-theme="dark"] .top-announcement-bar {
-      background: #141312;
-      border-bottom: 1px solid var(--border-subtle);
+      gap: 12px;
+      text-align: center;
     }
 
     .top-announcement-content {
-      display: flex;
+      display: inline-flex;
       align-items: center;
-      justify-content: center;
-      flex-wrap: wrap;
       gap: 10px;
-      text-align: center;
-      max-width: 1200px;
-      margin: 0 auto;
+      flex-wrap: wrap;
+      justify-content: center;
     }
 
     .top-bar-badge {
-      font-size: 10.5px;
+      background: var(--accent-primary);
+      color: var(--accent-text);
+      font-size: 10px;
       font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 0.04em;
-      padding: 2px 7px;
-      border-radius: 4px;
-      background: rgba(255, 255, 255, 0.15);
-      color: #FFFFFF;
-      display: inline-block;
-    }
-
-    .top-bar-text {
-      color: rgba(255, 255, 255, 0.92);
-      font-size: 13px;
-    }
-
-    .top-bar-divider {
-      color: rgba(255, 255, 255, 0.35);
-      font-size: 13px;
-      user-select: none;
+      padding: 2px 8px;
+      border-radius: var(--radius-full);
     }
 
     .top-bar-cta {
-      background: none;
-      border: none;
-      color: #FFFFFF;
       font-weight: 600;
-      font-size: 13px;
-      cursor: pointer;
+      color: var(--text-primary);
+      text-decoration: underline;
       display: inline-flex;
       align-items: center;
-      gap: 5px;
-      padding: 0;
-      text-decoration: underline;
-      text-underline-offset: 3px;
-      transition: opacity 0.15s ease;
-      font-family: inherit;
+      gap: 4px;
     }
 
-    .top-bar-cta:hover {
-      opacity: 0.82;
+    /* ========================================================= */
+    /* --- RESPONSIVE STYLES (MOBILE & TABLET) ----------------- */
+    /* ========================================================= */
+    @media (max-width: 1024px) {
+      .classroom-left-sidebar {
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        height: 100vh;
+        z-index: 150;
+        transform: translateX(-100%);
+      }
+
+      .classroom-left-sidebar.drawer-open {
+        transform: translateX(0);
+        box-shadow: 4px 0 24px rgba(0, 0, 0, 0.25);
+      }
     }
 
-    @media (max-width: 768px) {
-      .top-announcement-bar {
+    @media (max-width: 860px) {
+      .navbar {
         padding: 8px 16px;
-        font-size: 12px;
       }
-      .top-bar-text {
-        font-size: 12px;
-      }
-      .top-bar-cta {
-        font-size: 12px;
-      }
-      .top-announcement-content {
-        gap: 6px;
-      }
-      .top-bar-divider {
+
+      .header-breadcrumb {
         display: none;
+      }
+
+      .classroom-stream-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .classroom-main-pane {
+        padding: 16px 16px 60px;
+      }
+
+      .classroom-hero-banner {
+        min-height: 170px;
+        padding: 20px;
+      }
+
+      .banner-title {
+        font-size: 22px;
+      }
+
+      .banner-subtitle {
+        font-size: 13px;
+      }
+
+      .classroom-top-nav-tabs {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+      }
+
+      .classroom-nav-tab {
+        padding: 8px 12px;
+        font-size: 13px;
+        white-space: nowrap;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .brand-logo span {
+        font-size: 16px;
+      }
+
+      .theme-toggle-btn span,
+      .logout-btn span,
+      .user-profile-badge .user-name-label {
+        display: none !important;
+      }
+
+      .theme-toggle-btn,
+      .logout-btn {
+        width: 34px;
+        height: 34px;
+        padding: 0;
+        border-radius: var(--radius-full);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .user-profile-badge {
+        padding: 0;
+        background: transparent;
+        border: none;
+      }
+
+      .user-profile-badge .user-avatar-sm {
+        width: 32px;
+        height: 32px;
+        font-size: 12px;
+        border: 1.5px solid var(--border-subtle);
       }
     }
   </style>
@@ -715,164 +1343,292 @@
 </head>
 <body>
 
-  <div class="dashboard-layout">
+  <div class="classroom-shell">
     <!-- Top Full-Width Verification Announcement Bar -->
     <div class="top-announcement-bar" id="materials-verification-bar">
       <div class="top-announcement-content">
         <span class="top-bar-badge">Verifikasi Pengajar</span>
         <span class="top-bar-text">Akun Anda belum menyelesaikan verifikasi kualifikasi pengajar resmi SkillSphere AI.</span>
-        <span class="top-bar-divider">|</span>
+        <span>|</span>
         <a href="/dashboard" class="top-bar-cta">
           Ke Dashboard Verifikasi <i class="fas fa-arrow-right" style="font-size:10px;"></i>
         </a>
       </div>
     </div>
 
-    <!-- Navbar -->
+    <!-- Google Classroom Drawer Sidebar Backdrop -->
+    <div class="classroom-sidebar-backdrop" id="classroom-sidebar-backdrop" onclick="toggleClassroomSidebar(false)"></div>
+
+    <!-- Top Sticky Navigation Bar -->
     <header class="navbar">
-      <div style="display: flex; align-items: center; gap: 14px;">
+      <div class="nav-brand-group">
+        <!-- Sidebar Hamburger Button -->
+        <button class="classroom-sidebar-toggle-btn" id="classroom-sidebar-toggle" onclick="toggleClassroomSidebar()" title="Menu Utama" aria-label="Menu Utama">
+          <i class="fas fa-bars"></i>
+        </button>
+
         <a href="/dashboard" class="brand-logo" style="text-decoration:none;">
           <div class="brand-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
               <path opacity="0.38" d="M12 7.6L17.3 4.7L14.4 10L17.3 15.3L12 12.4L6.7 15.3L9.6 10L6.7 4.7Z" />
               <path d="M12 0L13.8 8.2L22 10L13.8 11.8L12 20L10.2 11.8L2 10L10.2 8.2L12 0Z" />
             </svg>
           </div>
           <span>SkillSphere AI</span>
         </a>
-        <span class="user-role-tag" style="background:var(--accent-primary); color:var(--accent-text); border:none; padding:4px 8px; font-weight:700;">
-          <i class="fas fa-chalkboard-user"></i> Portal Tutor
-        </span>
       </div>
 
+      <!-- Center Tabs (Google Classroom Standard: Forum, Tugas kelas, Anggota) -->
+      <nav class="classroom-top-nav-tabs">
+        <button class="classroom-nav-tab active" id="tab-btn-forum" onclick="switchClassroomTab('forum')">
+          <i class="fas fa-comments"></i>
+          <span>Forum</span>
+        </button>
+        <button class="classroom-nav-tab" id="tab-btn-classwork" onclick="switchClassroomTab('classwork')">
+          <i class="fas fa-book-open"></i>
+          <span>Tugas kelas</span>
+        </button>
+        <button class="classroom-nav-tab" id="tab-btn-people" onclick="switchClassroomTab('people')">
+          <i class="fas fa-user-group"></i>
+          <span>Anggota</span>
+        </button>
+      </nav>
+
+      <!-- Right Header Actions -->
       <div class="nav-actions">
         <!-- Back to Dashboard -->
-        <a href="/dashboard" class="logout-btn">
+        <a href="/dashboard" class="btn-dashboard-back" title="Kembali ke Dashboard Studio">
           <i class="fas fa-arrow-left"></i>
           <span>Dashboard</span>
         </a>
 
         <!-- Theme Toggle -->
-        <button class="theme-toggle-btn" id="theme-toggle-btn" type="button" aria-label="Toggle dark/light mode">
+        <button class="theme-toggle-btn" id="theme-toggle-btn" type="button" aria-label="Toggle dark/light mode" title="Ganti Mode Tampilan">
           <i class="fas fa-sun" id="theme-icon-sun" style="display:none;"></i>
           <i class="fas fa-moon" id="theme-icon-moon"></i>
-          <span id="theme-text">Mode Gelap</span>
         </button>
 
-        <!-- User Profile Pill -->
-        <div class="user-profile-badge">
+        <!-- User Profile Pill (Clickable) -->
+        <div class="user-profile-badge" onclick="window.location.href='/profile'" style="cursor:pointer;" title="Buka Pengaturan Profil Saya">
           <div class="user-avatar-sm" id="nav-avatar">T</div>
           <span class="user-name-label" id="nav-user-name">Memuat...</span>
-          <span class="user-role-tag" id="nav-user-role">Tutor</span>
         </div>
 
         <!-- Logout Button -->
-        <button class="logout-btn" id="logout-btn" type="button">
+        <button class="logout-btn" id="logout-btn" type="button" title="Keluar">
           <i class="fas fa-arrow-right-from-bracket"></i>
-          <span>Keluar</span>
         </button>
       </div>
     </header>
 
-    <!-- Main Content -->
-    <main class="dashboard-content">
-
-      <!-- Welcome Hero -->
-      <section class="welcome-hero">
-        <h1 class="welcome-title">Studio Manajemen & Upload Materi</h1>
-        <p class="welcome-desc">
-          Kelola kurikulum kursus, unggah materi pembelajaran multi-format (Video, PPT, PDF, DOC, dan Digital Book), serta optimasi gambar sampul WebP.
-        </p>
-      </section>
-
-      <!-- Active Course Card & Controls -->
-      <section class="section-card">
-        <div class="section-header">
-          <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
-            <label style="font-size:13px; font-weight:600; color:var(--text-secondary);">Pilih Kursus Aktif:</label>
-            <select id="course-selector" class="input-field" style="max-width:340px; padding:8px 14px; font-size:13px;" onchange="changeActiveCourse(this.value)">
-              <option value="">Memuat daftar kursus...</option>
-            </select>
+    <!-- Google Classroom App Shell: Left Sidebar + Main Content -->
+    <div class="classroom-app-container">
+      <!-- Left Sidebar (Docked on Desktop, Drawer on Mobile) -->
+      <aside class="classroom-left-sidebar" id="classroom-left-sidebar">
+        <div class="sidebar-scroll-body">
+          <div class="sidebar-nav-group">
+            <a href="/dashboard" class="sidebar-nav-pill">
+              <i class="fas fa-home sidebar-nav-icon"></i>
+              <span>Beranda</span>
+            </a>
+            <a href="/dashboard" class="sidebar-nav-pill">
+              <i class="fas fa-calendar-days sidebar-nav-icon"></i>
+              <span>Kalender</span>
+            </a>
           </div>
 
-          <div style="display:flex; gap:10px; flex-wrap:wrap;">
-            <button class="btn btn-outline" onclick="openModal('new-section-modal')">
-              <i class="fas fa-folder-plus"></i> Tambah Bab Baru
-            </button>
-            <button class="btn btn-primary" onclick="openUploadModal()">
-              <i class="fas fa-cloud-arrow-up"></i> Upload Materi Multi-Format
-            </button>
+          <div class="sidebar-divider-line"></div>
+
+          <!-- Section: Mengajar -->
+          <div class="sidebar-section-header">
+            <span>Mengajar</span>
+            <i class="fas fa-chalkboard-user" style="font-size:13px; color:var(--text-tertiary);"></i>
+          </div>
+
+          <div class="sidebar-nav-group" id="sidebar-courses-list">
+            <!-- Dynamically populated courses list -->
+            <div style="padding:10px 24px; font-size:12px; color:var(--text-tertiary);">Memuat kelas...</div>
+          </div>
+
+          <div class="sidebar-divider-line"></div>
+
+          <div class="sidebar-nav-group">
+            <a href="/dashboard" class="sidebar-nav-pill">
+              <i class="fas fa-clipboard-check sidebar-nav-icon"></i>
+              <span>Periksa Tugas</span>
+            </a>
+            <a href="/profile" class="sidebar-nav-pill">
+              <i class="fas fa-gear sidebar-nav-icon"></i>
+              <span>Setelan Profil</span>
+            </a>
           </div>
         </div>
+      </aside>
 
-        <!-- Course Overview Banner -->
-        <div class="course-overview-grid" id="course-banner-card">
-          <div class="course-thumb-container">
-            <img src="/icons/icon-512.png" id="course-thumb-preview" class="course-thumb-img" alt="Thumbnail Kursus">
-            <label for="thumb-file-input" class="thumb-edit-overlay">
-              <i class="fas fa-camera" style="font-size: 18px;"></i>
-              <span>Ubah Sampul (WebP)</span>
-            </label>
-            <input type="file" id="thumb-file-input" accept="image/*" style="display:none;" onchange="handleThumbnailUpload(this)">
-          </div>
-
-          <div class="course-meta-details">
-            <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px;">
-              <span class="status-pill status-active" id="course-status-badge">Published</span>
-              <span class="status-pill status-locked" id="course-category-badge">Kategori</span>
-              <span class="status-pill status-locked" id="course-level-badge">Level</span>
+      <!-- Right Main Content Area -->
+      <main class="classroom-main-pane">
+        
+        <!-- ========================================================= -->
+        <!-- TAB 1: FORUM (STREAM & HERO BANNER) --------------------- -->
+        <!-- ========================================================= -->
+        <div id="classroom-tab-forum" class="tab-pane-content">
+          <!-- Course Hero Banner -->
+          <section class="classroom-hero-banner" id="course-hero-banner">
+            <img src="/icons/icon-512.png" id="banner-bg-img" class="banner-bg-img" alt="Sampul Kelas">
+            
+            <div class="banner-content">
+              <div class="banner-badges">
+                <span class="status-pill status-active" id="banner-status-badge">PUBLISHED</span>
+                <span class="status-pill status-locked" id="banner-category-badge">Kategori</span>
+                <span class="status-pill status-locked" id="banner-level-badge">Level</span>
+              </div>
+              <h1 class="banner-title" id="banner-course-title">Memuat Kelas Pembelajaran...</h1>
+              <p class="banner-subtitle" id="banner-course-desc">Memuat deskripsi lengkap materi dan kurikulum...</p>
             </div>
 
-            <h2 class="course-title-display" id="course-title-display">Memuat Detail Kursus...</h2>
-            <p style="font-size:14px; color:var(--text-secondary); line-height:1.5; margin-bottom:16px;" id="course-desc-display">Memuat deskripsi kursus...</p>
+            <div class="banner-footer-row">
+              <div style="font-size:13px; color:rgba(255,255,255,0.85);" id="banner-tutor-name">
+                <i class="fas fa-chalkboard-user" style="margin-right:6px;"></i> Pengajar: Tutor SkillSphere
+              </div>
+
+              <!-- WebP Thumbnail Upload Trigger -->
+              <label for="thumb-file-input" class="banner-edit-btn">
+                <i class="fas fa-camera"></i>
+                <span>Ubah Sampul (WebP)</span>
+              </label>
+              <input type="file" id="thumb-file-input" accept="image/*" style="display:none;" onchange="handleThumbnailUpload(this)">
+            </div>
+          </section>
+
+          <!-- 2-Column Stream Layout -->
+          <div class="classroom-stream-grid">
+            <!-- Left Info Card -->
+            <div class="stream-info-card">
+              <div class="info-card-header">
+                <span>Ringkasan Kelas</span>
+                <i class="fas fa-circle-info" style="color:var(--text-secondary);"></i>
+              </div>
+
+              <div class="info-metric-item">
+                <span class="info-metric-label">Total Bab</span>
+                <span class="info-metric-val" id="stream-stat-sections">0 Bab</span>
+              </div>
+
+              <div class="info-metric-item">
+                <span class="info-metric-label">Total Materi</span>
+                <span class="info-metric-val" id="stream-stat-materials">0 Unit</span>
+              </div>
+
+              <div class="info-metric-item">
+                <span class="info-metric-label">Estimasi Durasi</span>
+                <span class="info-metric-val" id="stream-stat-duration">0 Menit</span>
+              </div>
+
+              <div class="info-metric-item">
+                <span class="info-metric-label">Harga Kelas</span>
+                <span class="info-metric-val" id="stream-stat-price">Rp 0</span>
+              </div>
+
+              <button class="btn-stream-link" onclick="switchClassroomTab('classwork')">
+                <span>Buka Tugas Kelas</span>
+                <i class="fas fa-arrow-right" style="font-size:11px;"></i>
+              </button>
+
+              <div style="display:flex; flex-direction:column; gap:8px; margin-top:8px; padding-top:12px; border-top:1px solid var(--border-subtle);">
+                <button class="btn btn-outline" style="width:100%; font-size:12px; padding:7px 10px;" onclick="openModal('new-section-modal')">
+                  <i class="fas fa-folder-plus"></i> Tambah Bab
+                </button>
+                <button class="btn btn-primary" style="width:100%; font-size:12px; padding:7px 10px;" onclick="openUploadModal()">
+                  <i class="fas fa-cloud-arrow-up"></i> Upload Materi
+                </button>
+              </div>
+            </div>
+
+            <!-- Right Feed Column -->
+            <div class="stream-feed-column">
+              <!-- Announcement / Post Trigger Bar -->
+              <div class="stream-announcement-bar" onclick="openUploadModal()">
+                <div class="announcement-user-avatar" id="announcement-avatar">T</div>
+                <div class="announcement-placeholder-text">Umumkan materi pembelajaran atau upload konten baru ke kelas...</div>
+                <button class="btn btn-outline" style="padding:6px 14px; font-size:12px; pointer-events:none;">
+                  <i class="fas fa-paper-plane"></i>
+                </button>
+              </div>
+
+              <!-- Published Materials Stream Feed List -->
+              <div id="forum-materials-feed" style="display:flex; flex-direction:column; gap:12px;">
+                <!-- Dynamically populated from activeCourse materials -->
+              </div>
+            </div>
           </div>
         </div>
-      </section>
 
-      <!-- Live Course Metrics Grid -->
-      <div class="stats-grid">
-        <div class="stat-card">
-          <div class="stat-label">
-            <span>Total Bab</span>
-            <i class="fas fa-layer-group" style="color: var(--text-secondary);"></i>
+        <!-- ========================================================= -->
+        <!-- TAB 2: TUGAS KELAS (CLASSWORK / ACCORDION CURRICULUM) ---- -->
+        <!-- ========================================================= -->
+        <div id="classroom-tab-classwork" class="tab-pane-content" style="display:none;">
+          <div class="classwork-action-header">
+            <div>
+              <h2 style="font-family:var(--font-serif); font-size:24px; font-weight:500; margin:0 0 4px;">Struktur Kurikulum & Bab</h2>
+              <p style="font-size:13px; color:var(--text-secondary); margin:0;">Susun materi video, slide PPT, dokumen PDF, dan atur urutan pembelajaran.</p>
+            </div>
+
+            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+              <button class="btn btn-outline" onclick="openModal('new-section-modal')">
+                <i class="fas fa-folder-plus"></i> Tambah Bab Baru
+              </button>
+              <button class="btn btn-primary" onclick="openUploadModal()">
+                <i class="fas fa-cloud-arrow-up"></i> Upload Materi Multi-Format
+              </button>
+            </div>
           </div>
-          <div class="stat-value" id="stat-sections-count">0</div>
-          <div class="stat-meta">Modul / Bab Terstruktur</div>
+
+          <!-- Curriculum Sections List -->
+          <div class="sections-container" id="sections-container">
+            <!-- Dynamically populated -->
+          </div>
         </div>
 
-        <div class="stat-card">
-          <div class="stat-label">
-            <span>Total Materi</span>
-            <i class="fas fa-file-video" style="color: var(--text-secondary);"></i>
-          </div>
-          <div class="stat-value" id="stat-materials-count">0</div>
-          <div class="stat-meta">Unit Video, Slide & Dokumen</div>
+        <!-- ========================================================= -->
+        <!-- TAB 3: ANGGOTA (PEOPLE / CLASS MEMBERS) ----------------- -->
+        <!-- ========================================================= -->
+        <div id="classroom-tab-people" class="tab-pane-content" style="display:none;">
+          <!-- Pengajar Section -->
+          <section class="people-section">
+            <div class="people-section-header">
+              <span>Pengajar</span>
+            </div>
+            <div class="people-list" id="people-tutors-list">
+              <div class="people-item-row">
+                <div class="people-avatar" id="people-tutor-avatar">T</div>
+                <div>
+                  <div class="people-name" id="people-tutor-name">Tutor SkillSphere</div>
+                  <div class="people-email" id="people-tutor-email">tutor@skillsphere.id</div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Siswa Terdaftar Section -->
+          <section class="people-section">
+            <div class="people-section-header">
+              <span>Siswa Terdaftar</span>
+              <span style="font-family:var(--font-sans); font-size:13px; color:var(--text-secondary); font-weight:600;" id="people-student-count">0 Siswa</span>
+            </div>
+            <div class="people-list" id="people-students-list">
+              <div style="padding:24px 0; text-align:center; color:var(--text-secondary); font-size:13px;">
+                Belum ada siswa yang terdaftar di kelas ini. Kursus Anda siap diakses publik di katalog pembelajaran.
+              </div>
+            </div>
+          </section>
         </div>
 
-        <div class="stat-card">
-          <div class="stat-label">
-            <span>Durasi Belajar</span>
-            <i class="fas fa-clock" style="color: var(--text-secondary);"></i>
-          </div>
-          <div class="stat-value" id="stat-duration-count">0 Menit</div>
-          <div class="stat-meta">Estimasi Waktu Penyelesaian</div>
-        </div>
+      </main>
+    </div>
 
-        <div class="stat-card">
-          <div class="stat-label">
-            <span>Harga Kursus</span>
-            <i class="fas fa-tag" style="color: var(--text-secondary);"></i>
-          </div>
-          <div class="stat-value" id="stat-price-display">Rp 0</div>
-          <div class="stat-meta">Bagi Hasil 80% Tutor</div>
-        </div>
-      </div>
-
-      <!-- Curriculum Sections List -->
-      <div class="sections-container" id="sections-container">
-        <!-- Dynamically rendered -->
-      </div>
-    </main>
+    <!-- ========================================================= -->
+    <!-- MODALS (UPLOAD, CREATE SECTION, LIVE MEDIA PREVIEW) ----- -->
+    <!-- ========================================================= -->
 
     <!-- Upload Multi-Format Material Modal -->
     <div class="modal-overlay" id="upload-material-modal">
@@ -1034,7 +1790,7 @@
       if (type === 'error') icon = '<i class="fas fa-circle-exclamation" style="color: var(--color-danger); font-size: 16px;"></i>';
       if (type === 'info') icon = '<i class="fas fa-circle-info" style="color: var(--text-primary); font-size: 16px;"></i>';
 
-      toast.innerHTML = `${icon}<span>${message}</span>`;
+      toast.innerHTML = `${icon}<span>${escapeHtml(message)}</span>`;
       container.appendChild(toast);
 
       setTimeout(() => {
@@ -1045,13 +1801,57 @@
       }, 4000);
     }
 
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
     // Modal Helpers
     function openModal(id) { document.getElementById(id).classList.add('active'); }
     function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 
+    // Tab Switcher (Forum, Tugas Kelas, Anggota)
+    function switchClassroomTab(tabName) {
+      const tabs = ['forum', 'classwork', 'people'];
+      tabs.forEach(t => {
+        const btn = document.getElementById(`tab-btn-${t}`);
+        const pane = document.getElementById(`classroom-tab-${t}`);
+        if (btn) btn.classList.toggle('active', t === tabName);
+        if (pane) pane.style.display = (t === tabName) ? 'block' : 'none';
+      });
+    }
+
+    // Classroom Sidebar Drawer Toggle
+    function toggleClassroomSidebar(open) {
+      const sidebar = document.getElementById('classroom-left-sidebar');
+      const backdrop = document.getElementById('classroom-sidebar-backdrop');
+      if (!sidebar) return;
+      const isMobile = window.innerWidth <= 1024;
+      if (isMobile) {
+        const shouldOpen = (open !== undefined) ? open : !sidebar.classList.contains('drawer-open');
+        if (shouldOpen) {
+          sidebar.classList.add('drawer-open');
+          if (backdrop) backdrop.classList.add('active');
+          document.body.style.overflow = 'hidden';
+        } else {
+          sidebar.classList.remove('drawer-open');
+          if (backdrop) backdrop.classList.remove('active');
+          document.body.style.overflow = '';
+        }
+      } else {
+        sidebar.classList.toggle('collapsed');
+      }
+    }
+
     // State Variables
     let currentCourses = [];
     let activeCourse = null;
+    let currentUser = null;
     let selectedContentType = 'video';
     let selectedMaterialFile = null;
 
@@ -1075,14 +1875,19 @@
         });
         const json = await res.json();
         if (json.success && json.data) {
-          const user = json.data;
-          document.getElementById('nav-user-name').textContent = user.name || user.email;
-          document.getElementById('nav-avatar').textContent = (user.name || 'T')[0].toUpperCase();
-          document.getElementById('nav-user-role').textContent = user.role.toUpperCase();
+          currentUser = json.data;
+          document.getElementById('nav-user-name').textContent = currentUser.name || currentUser.email;
+          document.getElementById('nav-avatar').textContent = (currentUser.name || 'T')[0].toUpperCase();
+          document.getElementById('announcement-avatar').textContent = (currentUser.name || 'T')[0].toUpperCase();
 
-          const apps = Array.isArray(user.tutor_applications) ? user.tutor_applications : [];
+          document.getElementById('people-tutor-name').textContent = currentUser.name || 'Tutor SkillSphere';
+          document.getElementById('people-tutor-email').textContent = currentUser.email || 'tutor@skillsphere.id';
+          document.getElementById('people-tutor-avatar').textContent = (currentUser.name || 'T')[0].toUpperCase();
+          document.getElementById('banner-tutor-name').innerHTML = `<i class="fas fa-chalkboard-user" style="margin-right:6px;"></i> Pengajar: ${escapeHtml(currentUser.name || 'Tutor')}`;
+
+          const apps = Array.isArray(currentUser.tutor_applications) ? currentUser.tutor_applications : [];
           const latestApp = apps.length > 0 ? apps[apps.length - 1] : null;
-          const isVerifiedTutor = (user.role === 'tutor' && latestApp && latestApp.status === 'approved') || user.role === 'admin';
+          const isVerifiedTutor = (currentUser.role === 'tutor' && latestApp && latestApp.status === 'approved') || currentUser.role === 'admin';
 
           const verifBar = document.getElementById('materials-verification-bar');
           if (verifBar) {
@@ -1123,25 +1928,24 @@
           return;
         }
 
-        currentCourses = json.data;
-        const select = document.getElementById('course-selector');
+        currentCourses = Array.isArray(json.data) ? json.data : [];
 
         if (!currentCourses.length) {
-          select.innerHTML = `<option value="">Belum ada kelas yang diajar</option>`;
-          document.getElementById('course-title-display').textContent = 'Anda belum memiliki kursus.';
-          document.getElementById('course-desc-display').textContent = 'Silakan buat kursus terlebih dahulu.';
+          document.getElementById('banner-course-title').textContent = 'Anda belum memiliki kelas.';
+          document.getElementById('banner-course-desc').textContent = 'Silakan buat kelas baru melalui dashboard utama.';
+          const crumbTitle = document.getElementById('crumb-course-title');
+          if (crumbTitle) crumbTitle.textContent = 'Belum Ada Kelas';
+          document.getElementById('sidebar-courses-list').innerHTML = `
+            <div style="padding:10px 24px; font-size:12px; color:var(--text-tertiary);">Belum ada kelas diajar.</div>`;
           return;
         }
 
-        select.innerHTML = currentCourses.map(c => `
-          <option value="${c.id}">${c.title}</option>
-        `).join('');
+        renderSidebarCourses();
 
         const urlParams = new URLSearchParams(window.location.search);
-        const courseIdParam = urlParams.get('courseId');
+        const courseIdParam = urlParams.get('courseId') || urlParams.get('course_id') || urlParams.get('id');
         const defaultId = courseIdParam ? parseInt(courseIdParam, 10) : currentCourses[0].id;
-        
-        select.value = defaultId;
+
         changeActiveCourse(defaultId);
 
       } catch (err) {
@@ -1149,7 +1953,27 @@
       }
     }
 
-    // Change Active Course & Render Details
+    // Render Courses in Sidebar
+    function renderSidebarCourses() {
+      const list = document.getElementById('sidebar-courses-list');
+      if (!list) return;
+
+      list.innerHTML = currentCourses.map(c => {
+        const isActive = activeCourse && activeCourse.id === c.id;
+        const initial = (c.title || 'K')[0].toUpperCase();
+        return `
+          <div class="sidebar-class-row${isActive ? ' active' : ''}" onclick="changeActiveCourse(${c.id}); toggleClassroomSidebar(false);" title="${escapeHtml(c.title)}">
+            <div class="sidebar-class-circle">${initial}</div>
+            <div class="sidebar-class-text">
+              <span class="sidebar-class-title">${escapeHtml(c.title)}</span>
+              <span class="sidebar-class-subtitle">${c.category ? escapeHtml(c.category.name) : 'Umum'} • ${(c.sections || []).length} Bab</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Change Active Course & Load Curriculum
     async function changeActiveCourse(courseId) {
       if (!courseId) return;
       try {
@@ -1160,6 +1984,7 @@
         if (!json.success) return;
 
         activeCourse = json.data;
+        renderSidebarCourses();
         renderActiveCourse(activeCourse);
       } catch (e) {
         console.error(e);
@@ -1167,48 +1992,123 @@
     }
 
     function renderActiveCourse(course) {
-      document.getElementById('course-title-display').textContent = course.title;
-      document.getElementById('course-desc-display').textContent = course.description || 'Tidak ada deskripsi kursus.';
-      document.getElementById('course-status-badge').textContent = (course.status || 'draft').toUpperCase();
-      document.getElementById('course-category-badge').textContent = course.category ? course.category.name : 'Umum';
-      document.getElementById('course-level-badge').textContent = (course.level || 'beginner').toUpperCase();
+      const rupiah = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 });
 
+      // Breadcrumb & Hero Banner
+      const crumbTitle = document.getElementById('crumb-course-title');
+      if (crumbTitle) crumbTitle.textContent = course.title;
+      document.getElementById('banner-course-title').textContent = course.title;
+      document.getElementById('banner-course-desc').textContent = course.description || 'Tidak ada deskripsi tambahan.';
+      document.getElementById('banner-status-badge').textContent = (course.status || 'draft').toUpperCase();
+      document.getElementById('banner-category-badge').textContent = course.category ? course.category.name : 'Umum';
+      document.getElementById('banner-level-badge').textContent = (course.level || 'beginner').toUpperCase();
+
+      const bannerImg = document.getElementById('banner-bg-img');
       if (course.thumbnail_url) {
-        document.getElementById('course-thumb-preview').src = course.thumbnail_url;
+        bannerImg.src = course.thumbnail_url;
+        bannerImg.style.display = 'block';
       } else {
-        document.getElementById('course-thumb-preview').src = '/icons/icon-512.png';
+        bannerImg.src = '';
+        bannerImg.style.display = 'none';
       }
 
       const sections = course.sections || [];
       let totalMaterials = 0;
       let totalDuration = 0;
+      const allMaterialsFlat = [];
 
       sections.forEach(s => {
         const mats = s.materials || [];
         totalMaterials += mats.length;
-        mats.forEach(m => totalDuration += (m.duration_minutes || 0));
+        mats.forEach(m => {
+          totalDuration += (m.duration_minutes || 0);
+          allMaterialsFlat.push({ ...m, section_title: s.title, section_id: s.id });
+        });
       });
 
-      document.getElementById('stat-sections-count').textContent = sections.length;
-      document.getElementById('stat-materials-count').textContent = totalMaterials;
-      document.getElementById('stat-duration-count').textContent = `${totalDuration} Menit`;
-      document.getElementById('stat-price-display').textContent = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(course.price || 0);
+      // Stream Metrics
+      document.getElementById('stream-stat-sections').textContent = `${sections.length} Bab`;
+      document.getElementById('stream-stat-materials').textContent = `${totalMaterials} Unit`;
+      document.getElementById('stream-stat-duration').textContent = `${totalDuration} Menit`;
+      document.getElementById('stream-stat-price').textContent = rupiah.format(course.price || 0);
 
-      // Render Section Selector in Upload Modal
+      // Render Upload Modal Section Selector
       const sectionSelect = document.getElementById('material-section-select');
       sectionSelect.innerHTML = sections.map(s => `
-        <option value="${s.id}">${s.title}</option>
+        <option value="${s.id}">${escapeHtml(s.title)}</option>
       `).join('');
 
-      // Render Curriculum Sections
+      // Render Tab 1: Forum Stream Feed
+      renderForumFeed(allMaterialsFlat);
+
+      // Render Tab 2: Tugas Kelas (Curriculum Tree)
+      renderClassworkSections(sections);
+    }
+
+    // Render Forum Stream Feed Items
+    function renderForumFeed(materialsList) {
+      const feedContainer = document.getElementById('forum-materials-feed');
+      if (!materialsList.length) {
+        feedContainer.innerHTML = `
+          <div style="background:var(--bg-surface); border:1px dashed var(--border-subtle); border-radius:var(--radius-lg); padding:36px 20px; text-align:center; color:var(--text-secondary);">
+            <i class="fas fa-clipboard-list" style="font-size:32px; color:var(--text-tertiary); margin-bottom:10px; display:block;"></i>
+            <div style="font-weight:600; font-size:14px; color:var(--text-primary); margin-bottom:4px;">Belum Ada Materi Diumumkan</div>
+            <div style="font-size:12.5px;">Klik "Upload Materi" untuk memposting video, slide, atau modul pembelajaran ke kelas ini.</div>
+          </div>
+        `;
+        return;
+      }
+
+      feedContainer.innerHTML = materialsList.map(mat => {
+        let icon = 'fa-file-video';
+        if (mat.content_type === 'ppt') icon = 'fa-file-powerpoint';
+        if (mat.content_type === 'pdf') icon = 'fa-file-pdf';
+        if (mat.content_type === 'doc') icon = 'fa-file-lines';
+        if (mat.content_type === 'book') icon = 'fa-book-open';
+
+        return `
+          <div class="stream-post-item" id="stream-item-${mat.id}">
+            <div style="display:flex; align-items:center; gap:16px; flex:1; min-width:0;">
+              <div class="post-icon-circle">
+                <i class="fas ${icon}"></i>
+              </div>
+              <div class="post-main-content">
+                <div class="post-title">${escapeHtml(mat.title)}</div>
+                <div class="post-date-meta">
+                  <span><i class="fas fa-folder" style="font-size:11px;"></i> ${escapeHtml(mat.section_title)}</span>
+                  <span>•</span>
+                  <span><i class="fas fa-clock" style="font-size:11px;"></i> ${mat.duration_minutes || 0} Menit</span>
+                  <span>•</span>
+                  <span>${mat.content_type.toUpperCase()}</span>
+                  <span>•</span>
+                  ${mat.is_preview ? '<span class="status-pill status-active">Gratis Preview</span>' : '<span class="status-pill status-locked">Terkunci</span>'}
+                </div>
+              </div>
+            </div>
+
+            <div style="display:flex; align-items:center; gap:8px;">
+              <button class="btn btn-outline" style="padding:6px 12px; font-size:12px;" onclick="previewMaterial(${mat.id})">
+                <i class="fas fa-play"></i> Putar / Lihat
+              </button>
+              <button class="logout-btn" style="padding:6px 10px; font-size:12px;" onclick="deleteMaterial(${mat.id}, '${escapeHtml(mat.title)}')" title="Hapus Materi">
+                <i class="fas fa-trash-can"></i>
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Render Tab 2: Tugas Kelas Accordion
+    function renderClassworkSections(sections) {
       const container = document.getElementById('sections-container');
       if (!sections.length) {
         container.innerHTML = `
-          <div class="section-card" style="text-align:center; padding:48px 24px;">
+          <div style="background:var(--bg-surface); border:1px dashed var(--border-subtle); border-radius:var(--radius-xl); padding:48px 24px; text-align:center;">
             <i class="fas fa-folder-open" style="font-size:36px; color:var(--text-tertiary); margin-bottom:14px; display:block;"></i>
             <h3 style="font-family:var(--font-serif); font-size:20px; color:var(--text-primary); margin-bottom:8px;">Belum Ada Bab Materi</h3>
             <p style="font-size:14px; color:var(--text-secondary); margin-bottom:20px; max-width:440px; margin-left:auto; margin-right:auto;">
-              Buat bab pertama Anda untuk mulai mengunggah materi multi-format.
+              Buat bab pertama Anda untuk mulai mengunggah kurikulum multi-format.
             </p>
             <button class="btn btn-primary" onclick="openModal('new-section-modal')"><i class="fas fa-plus"></i> Buat Bab Pertama</button>
           </div>
@@ -1223,14 +2123,14 @@
             <div class="section-header-bar">
               <div class="section-title-text">
                 <i class="fas fa-folder" style="color:var(--text-secondary);"></i>
-                <span>${sec.title}</span>
+                <span>${escapeHtml(sec.title)}</span>
                 <span style="font-family:var(--font-sans); font-size:12px; color:var(--text-secondary); font-weight:500;">(${materials.length} Materi)</span>
               </div>
               <div style="display:flex; align-items:center; gap:8px;">
                 <button class="btn btn-outline" style="padding:6px 12px; font-size:12px;" onclick="openUploadModalForSection(${sec.id})">
                   <i class="fas fa-plus"></i> Tambah Materi
                 </button>
-                <button class="logout-btn" style="padding:6px 10px; font-size:12px;" onclick="deleteSection(${sec.id}, '${sec.title}')" title="Hapus Bab">
+                <button class="logout-btn" style="padding:6px 10px; font-size:12px;" onclick="deleteSection(${sec.id}, '${escapeHtml(sec.title)}')" title="Hapus Bab">
                   <i class="fas fa-trash-can"></i>
                 </button>
               </div>
@@ -1250,12 +2150,12 @@
 
                 return `
                   <div class="material-item-row" id="material-row-${mat.id}">
-                    <div style="display:flex; align-items:center; gap:14px; flex:1;">
+                    <div style="display:flex; align-items:center; gap:14px; flex:1; min-width:0;">
                       <div class="material-icon-box">
                         <i class="fas ${typeIcon}"></i>
                       </div>
                       <div class="material-info">
-                        <div class="material-title-text">${mat.title}</div>
+                        <div class="material-title-text">${escapeHtml(mat.title)}</div>
                         <div class="material-meta-row">
                           <span><i class="fas fa-clock" style="font-size:11px;"></i> ${mat.duration_minutes || 0} Menit</span>
                           <span>•</span>
@@ -1279,7 +2179,7 @@
                         <i class="fas fa-arrow-down"></i>
                       </button>
 
-                      <button class="logout-btn" style="padding:6px 10px; font-size:12px;" onclick="deleteMaterial(${mat.id}, '${mat.title}')" title="Hapus Materi">
+                      <button class="logout-btn" style="padding:6px 10px; font-size:12px;" onclick="deleteMaterial(${mat.id}, '${escapeHtml(mat.title)}')" title="Hapus Materi">
                         <i class="fas fa-trash-can"></i>
                       </button>
                     </div>
@@ -1524,8 +2424,8 @@
       if (!confirm(`Apakah Anda yakin ingin menghapus materi "${materialTitle}"? File pada server akan dibersihkan secara otomatis.`)) return;
       try {
         const res = await fetch(`/api/materials/${materialId}`, {
-          method: 'DELETE',
-          headers: { 'Authorization': 'Bearer ' + token }
+          headers: { 'Authorization': 'Bearer ' + token },
+          method: 'DELETE'
         });
         const json = await res.json();
         if (res.ok && json.success) {
@@ -1633,7 +2533,12 @@
             body: JSON.stringify({ thumbnail_url: webpUrl }),
           });
 
-          document.getElementById('course-thumb-preview').src = webpUrl;
+          activeCourse.thumbnail_url = webpUrl;
+          const bannerImg = document.getElementById('banner-bg-img');
+          if (bannerImg) {
+            bannerImg.src = webpUrl;
+            bannerImg.style.display = 'block';
+          }
           showToast(`Sampul kursus berhasil dikonversi ke WebP (${uploadJson.data.savingsPercent} lebih hemat)!`, 'success');
         } else {
           showToast(uploadJson.message || 'Gagal mengunggah thumbnail.', 'error');

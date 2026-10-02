@@ -860,6 +860,82 @@
       padding: 9px 16px;
     }
 
+    /* Role Badges & User Management Styles */
+    .role-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 8px;
+      border-radius: var(--radius-full);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+    .role-badge.student {
+      background: var(--bg-surface-subtle);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-subtle);
+    }
+    .role-badge.tutor {
+      background: rgba(14, 165, 233, 0.12);
+      color: #0284c7;
+      border: 1px solid rgba(14, 165, 233, 0.25);
+    }
+    [data-theme="dark"] .role-badge.tutor {
+      background: rgba(14, 165, 233, 0.2);
+      color: #38bdf8;
+      border-color: rgba(56, 189, 248, 0.3);
+    }
+    .role-badge.admin {
+      background: rgba(139, 92, 246, 0.12);
+      color: #7c3aed;
+      border: 1px solid rgba(139, 92, 246, 0.25);
+    }
+    [data-theme="dark"] .role-badge.admin {
+      background: rgba(139, 92, 246, 0.2);
+      color: #a78bfa;
+      border-color: rgba(167, 139, 250, 0.3);
+    }
+    .user-table-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-full);
+      background: var(--accent-primary-light);
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 12.5px;
+      flex-shrink: 0;
+      border: 1px solid var(--border-subtle);
+    }
+    .user-cell-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .user-cell-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .user-cell-name {
+      font-weight: 600;
+      color: var(--text-primary);
+      font-size: 13.5px;
+    }
+    .user-cell-email {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+    .user-actions-group {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 6px;
+    }
+
     /* Modals & Drawers */
     .modal-overlay {
       position: fixed;
@@ -993,10 +1069,12 @@
       .admin-header {
         padding: 10px 14px;
         gap: 8px;
+        height: auto;
+        min-height: 56px;
       }
 
       .header-right-side {
-        gap: 8px;
+        gap: 6px;
       }
 
       .header-breadcrumb span:nth-child(2),
@@ -1005,33 +1083,69 @@
         display: none;
       }
 
-      .theme-toggle-btn #theme-text {
-        display: none;
-      }
-
-      .theme-toggle-btn {
-        padding: 6px 10px;
-      }
-
-      .user-profile-badge {
-        padding: 3px 8px 3px 3px;
-        gap: 6px;
-      }
-
-      .user-profile-badge .user-name-label {
-        max-width: 75px;
+      .header-breadcrumb strong {
+        max-width: 140px;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
-        font-size: 12px;
+        font-size: 13px;
       }
 
-      .logout-btn span {
-        display: none;
+      .theme-toggle-btn {
+        width: 34px;
+        height: 34px;
+        padding: 0;
+        border-radius: var(--radius-full);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .theme-toggle-btn #theme-text {
+        display: none !important;
+      }
+
+      .user-profile-badge {
+        padding: 0;
+        background: transparent;
+        border: none;
+        cursor: pointer;
+      }
+
+      .user-profile-badge .user-avatar-sm {
+        width: 32px;
+        height: 32px;
+        font-size: 12px;
+        border: 1.5px solid var(--border-subtle);
+      }
+
+      .user-profile-badge .user-name-label,
+      .user-profile-badge .user-role-tag {
+        display: none !important;
       }
 
       .logout-btn {
-        padding: 6px 10px;
+        width: 34px;
+        height: 34px;
+        padding: 0;
+        border-radius: var(--radius-full);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .logout-btn span {
+        display: none !important;
+      }
+
+      .mobile-menu-toggle {
+        width: 36px;
+        height: 36px;
+        padding: 0;
+        border-radius: var(--radius-full);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
       }
 
       .metrics-grid {
@@ -1125,6 +1239,11 @@
 
         <div class="nav-group-label">Manajemen Sistem</div>
 
+        <button class="sidebar-nav-item" data-view="users" onclick="switchAdminView('users')">
+          <span><i class="fas fa-users-gear"></i> Manajemen Pengguna</span>
+          <span class="sidebar-count-badge" id="badge-users-total">0</span>
+        </button>
+
         <button class="sidebar-nav-item" data-view="courses" onclick="switchAdminView('courses')">
           <span><i class="fas fa-graduation-cap"></i> Data Kursus & Materi</span>
         </button>
@@ -1135,7 +1254,7 @@
       </nav>
 
       <div class="sidebar-footer">
-        <div class="sidebar-user-info">
+        <div class="sidebar-user-info" onclick="window.location.href='/profile'" style="cursor:pointer;" title="Buka Pengaturan Profil Saya">
           <div class="sidebar-user-avatar" id="sidebar-avatar">A</div>
           <div class="sidebar-user-meta">
             <span class="sidebar-user-name" id="sidebar-user-name">Admin</span>
@@ -1174,8 +1293,8 @@
             <span id="theme-text">Mode Gelap</span>
           </button>
 
-          <!-- User Profile Pill -->
-          <div class="user-profile-badge">
+          <!-- User Profile Pill (Clickable) -->
+          <div class="user-profile-badge" onclick="window.location.href='/profile'" style="cursor:pointer;" title="Buka Pengaturan Profil Saya">
             <div class="user-avatar-sm" id="header-avatar">AS</div>
             <span class="user-name-label" id="header-user-name">Admin SkillSphere</span>
             <span class="user-role-tag" id="header-user-role">ADMIN</span>
@@ -1263,6 +1382,18 @@
               </p>
               <div style="font-size:13px; font-weight:600; color:var(--text-primary); display:flex; align-items:center; gap:6px;">
                 Buka Validasi Sertifikat <i class="fas fa-arrow-right" style="font-size:11px;"></i>
+              </div>
+            </div>
+
+            <div class="section-card" style="margin-bottom:0; cursor:pointer;" onclick="switchAdminView('users')">
+              <div class="section-title" style="margin-bottom:8px;">
+                <i class="fas fa-users-gear"></i> Manajemen Pengguna
+              </div>
+              <p style="font-size:13px; color:var(--text-secondary); line-height:1.5; margin-bottom:16px;">
+                Kelola hak akses akun Siswa, Pengajar, dan Administrator, atur status aktivasi, dan tambah akun baru.
+              </p>
+              <div style="font-size:13px; font-weight:600; color:var(--text-primary); display:flex; align-items:center; gap:6px;">
+                Buka Manajemen Pengguna <i class="fas fa-arrow-right" style="font-size:11px;"></i>
               </div>
             </div>
           </div>
@@ -1378,24 +1509,27 @@
         <!-- VIEW 4: COURSES MANAGEMENT OVERVIEW -->
         <section class="dashboard-view-section" id="view-courses">
           <div class="section-card">
-            <div class="section-header" style="flex-wrap:wrap; gap:12px;">
+            <div class="section-header" style="flex-wrap:wrap; gap:12px; align-items:center; justify-content:space-between;">
               <div>
                 <h2 class="section-title">
-                  <i class="fas fa-graduation-cap"></i> Manajemen Kursus & Materi Pembelajaran
+                  <i class="fas fa-graduation-cap"></i> Manajemen & Kontrol Kursus Platform
                 </h2>
                 <p style="font-size:12.5px; color:var(--text-secondary); margin-top:4px;">
-                  Moderasi, setujui (approve), atau bekukan (suspend) kursus instruktur platform.
+                  Kelola kursus instruktur, kurikulum & sub-bab materi, moderasi status publikasi, dan buat kursus baru secara langsung.
                 </p>
               </div>
-              <div style="display:flex; gap:8px;">
-                <a href="/tutor/materials" class="btn btn-outline" style="font-size:12px; padding:6px 14px;">
-                  <i class="fas fa-arrow-up-right-from-square"></i> Portal Upload Materi
+              <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                <button class="btn btn-primary" onclick="openAdminCreateCourseModal()" style="font-size:12.5px; padding:7px 16px; display:inline-flex; align-items:center; gap:6px;">
+                  <i class="fas fa-plus"></i> Buat Kursus Baru
+                </button>
+                <a href="/tutor/materials" class="btn btn-outline" style="font-size:12px; padding:7px 14px;">
+                  <i class="fas fa-arrow-up-right-from-square"></i> Portal Upload Tutor
                 </a>
               </div>
             </div>
 
             <!-- Course Moderation Filter Bar -->
-            <div class="filter-bar" style="margin-top: 14px;">
+            <div class="filter-bar" style="margin-top: 16px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
               <div class="filter-btn-group" id="course-status-filter-group">
                 <button class="filter-btn active" data-status="all" onclick="filterAdminCourses('all', this)">Semua</button>
                 <button class="filter-btn" data-status="published" onclick="filterAdminCourses('published', this)">Published</button>
@@ -1403,7 +1537,7 @@
                 <button class="filter-btn" data-status="draft" onclick="filterAdminCourses('draft', this)">Draft</button>
               </div>
 
-              <div class="search-box" style="position:relative; min-width:240px;">
+              <div class="search-box" style="position:relative; min-width:260px;">
                 <input 
                   type="text" 
                   id="admin-course-search-input" 
@@ -1426,7 +1560,7 @@
                     <th>Harga</th>
                     <th>Level</th>
                     <th>Status</th>
-                    <th style="text-align:right;">Aksi Moderasi</th>
+                    <th style="text-align:right; min-width:240px;">Kontrol & Aksi</th>
                   </tr>
                 </thead>
                 <tbody id="admin-courses-table-body">
@@ -1444,60 +1578,65 @@
         <!-- VIEW 5: FINANCIAL & SPLIT REVENUE 20%/80% -->
         <section class="dashboard-view-section" id="view-financial">
           <div class="welcome-hero" style="margin-bottom:20px;">
-            <h2 class="welcome-title" style="font-size:26px;">Model Finansial & Revenue Sharing 20% / 80%</h2>
+            <h2 class="welcome-title" style="font-size:26px;">Model Finansial &amp; Bagi Hasil 20% / 80%</h2>
             <p class="welcome-desc">
-              Sistem revenue sharing SkillSphere membagi 20% biaya platform (infrastruktur server, AI Gemini API, operasional) dan 80% pendapatan bersih diberikan kepada Tutor dengan batas minimum penarikan Rp 100.000 dan masa holding 7 hari.
+              SkillSphere membagi 20% biaya platform untuk operasional (infrastruktur server, token AI Gemini API) dan 80% pendapatan bersih masuk otomatis ke dompet virtual Tutor, dengan batas minimum penarikan Rp 100.000 dan masa holding 7 hari.
             </p>
           </div>
 
+          <!-- Revenue Split Metrics -->
           <div class="metrics-grid" style="margin-bottom: 24px;">
-            <div class="stat-card">
-              <div class="stat-label">
+            <div class="metric-card">
+              <div class="metric-header">
                 <span>Fee Platform</span>
-                <span style="color:var(--text-primary); font-weight:700;">20%</span>
+                <i class="fas fa-percent" style="color:var(--text-secondary);"></i>
               </div>
-              <div class="stat-value">Operasional & AI</div>
-              <div class="stat-meta">Infrastruktur Server & LLM Token</div>
+              <div class="metric-number">20%</div>
+              <div class="metric-sub">Operasional Server &amp; Token AI Gemini</div>
             </div>
 
-            <div class="stat-card">
-              <div class="stat-label">
+            <div class="metric-card">
+              <div class="metric-header">
                 <span>Bagi Hasil Tutor</span>
-                <span style="color:var(--color-success); font-weight:700;">80%</span>
+                <i class="fas fa-hand-holding-dollar" style="color:var(--color-success);"></i>
               </div>
-              <div class="stat-value">Pendapatan Bersih</div>
-              <div class="stat-meta">Masuk Otomatis ke Virtual Wallet</div>
+              <div class="metric-number" style="color:var(--color-success);">80%</div>
+              <div class="metric-sub">Masuk Otomatis ke Virtual Wallet Tutor</div>
             </div>
 
-            <div class="stat-card">
-              <div class="stat-label">
+            <div class="metric-card">
+              <div class="metric-header">
                 <span>Holding Period</span>
                 <i class="fas fa-clock" style="color:var(--text-secondary);"></i>
               </div>
-              <div class="stat-value">7 Hari</div>
-              <div class="stat-meta">Mitigasi Risiko Refund / Dispute</div>
+              <div class="metric-number">7 Hari</div>
+              <div class="metric-sub">Mitigasi Risiko Refund / Dispute</div>
             </div>
 
-            <div class="stat-card">
-              <div class="stat-label">
+            <div class="metric-card">
+              <div class="metric-header">
                 <span>Min. Withdrawal</span>
                 <i class="fas fa-money-bill-transfer" style="color:var(--text-secondary);"></i>
               </div>
-              <div class="stat-value">Rp 100.000</div>
-              <div class="stat-meta">Pencairan ke Rekening Bank / E-Wallet</div>
+              <div class="metric-number" style="font-size:24px;">Rp 100.000</div>
+              <div class="metric-sub">Pencairan ke Rekening Bank / E-Wallet</div>
             </div>
           </div>
 
           <!-- Tutor Virtual Wallets Table -->
-          <div class="table-container" style="margin-bottom: 24px;">
-            <div class="table-header-box">
+          <div class="section-card">
+            <div class="section-header">
               <div>
-                <h3 style="font-size:16px; font-weight:700; color:var(--text-primary);">Daftar Saldo Dompet Virtual Tutor (80% Bagi Hasil)</h3>
-                <p style="font-size:13px; color:var(--text-secondary); margin-top:2px;">Saldo bersih yang dihasilkan dari pendaftaran kursus berbayar.</p>
+                <h3 class="section-title">
+                  <i class="fas fa-wallet"></i> Dompet Virtual Tutor (80% Bagi Hasil)
+                </h3>
+                <p style="font-size:12.5px; color:var(--text-secondary); margin-top:4px;">
+                  Saldo bersih yang dihasilkan dari pendaftaran kursus berbayar, dipisahkan antara saldo tersedia dan saldo tertahan.
+                </p>
               </div>
             </div>
             <div class="table-responsive">
-              <table class="data-table">
+              <table class="styled-table">
                 <thead>
                   <tr>
                     <th>Nama Tutor</th>
@@ -1520,15 +1659,19 @@
           </div>
 
           <!-- Withdrawal Requests Table -->
-          <div class="table-container">
-            <div class="table-header-box">
+          <div class="section-card" style="margin-bottom:0;">
+            <div class="section-header">
               <div>
-                <h3 style="font-size:16px; font-weight:700; color:var(--text-primary);">Riwayat Permintaan Penarikan Dana (Withdrawal)</h3>
-                <p style="font-size:13px; color:var(--text-secondary); margin-top:2px;">Pengajuan pencairan dana ke rekening bank / e-wallet tutor.</p>
+                <h3 class="section-title">
+                  <i class="fas fa-money-bill-transfer"></i> Riwayat Permintaan Penarikan Dana
+                </h3>
+                <p style="font-size:12.5px; color:var(--text-secondary); margin-top:4px;">
+                  Pengajuan pencairan dana ke rekening bank atau e-wallet tutor.
+                </p>
               </div>
             </div>
             <div class="table-responsive">
-              <table class="data-table">
+              <table class="styled-table">
                 <thead>
                   <tr>
                     <th>Tutor</th>
@@ -1551,7 +1694,591 @@
           </div>
         </section>
 
+        <!-- VIEW 6: USER MANAGEMENT (SISWA, TUTOR, ADMIN) -->
+        <section class="dashboard-view-section" id="view-users">
+          <div class="welcome-hero" style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:16px; margin-bottom:24px;">
+            <div>
+              <h2 class="welcome-title" style="font-size:26px;">Manajemen Pengguna (Siswa, Tutor, Admin)</h2>
+              <p class="welcome-desc">
+                Kelola seluruh akun pengguna platform, atur peran (RBAC), aktivasi / suspensi akun, dan tambah pengguna baru secara instan.
+              </p>
+            </div>
+            <button class="btn btn-primary" onclick="openAddUserModal()" style="display:inline-flex; align-items:center; gap:8px; padding:10px 18px;">
+              <i class="fas fa-user-plus"></i>
+              <span>Tambah Pengguna Baru</span>
+            </button>
+          </div>
+
+          <!-- User Management Metrics Grid -->
+          <div class="metrics-grid" style="margin-bottom: 24px;">
+            <div class="metric-card">
+              <div class="metric-header">
+                <span>Total Pengguna</span>
+                <i class="fas fa-users" style="color:var(--text-secondary);"></i>
+              </div>
+              <div class="metric-number" id="stat-users-total">0</div>
+              <div class="metric-sub">Seluruh Akun Terdaftar</div>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-header">
+                <span>Siswa (Student)</span>
+                <i class="fas fa-user-graduate" style="color:var(--text-secondary);"></i>
+              </div>
+              <div class="metric-number" id="stat-users-student">0</div>
+              <div class="metric-sub">Peserta Pembelajaran</div>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-header">
+                <span>Instruktur (Tutor)</span>
+                <i class="fas fa-chalkboard-user" style="color:var(--text-secondary);"></i>
+              </div>
+              <div class="metric-number" id="stat-users-tutor">0</div>
+              <div class="metric-sub">Pengajar & Pembuat Materi</div>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-header">
+                <span>Administrator</span>
+                <i class="fas fa-shield-halved" style="color:var(--text-secondary);"></i>
+              </div>
+              <div class="metric-number" id="stat-users-admin">0</div>
+              <div class="metric-sub">Pengelola Platform</div>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-header">
+                <span>Akun Nonaktif</span>
+                <i class="fas fa-user-slash" style="color:var(--color-danger);"></i>
+              </div>
+              <div class="metric-number" id="stat-users-inactive" style="color:var(--color-danger);">0</div>
+              <div class="metric-sub">Suspended / Dibekukan</div>
+            </div>
+          </div>
+
+          <!-- Section Card with Users Table -->
+          <div class="section-card">
+            <div class="section-header" style="flex-wrap:wrap; gap:12px; margin-bottom:16px;">
+              <div>
+                <h3 class="section-title">
+                  <i class="fas fa-users-gear"></i> Daftar Direktori Pengguna
+                </h3>
+                <p style="font-size:12.5px; color:var(--text-secondary); margin-top:4px;">
+                  Cari, saring berdasarkan peran atau status, dan kelola hak akses akun secara real-time.
+                </p>
+              </div>
+            </div>
+
+            <!-- Filter & Search Toolbar -->
+            <div class="filter-bar" style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:12px; margin-bottom:18px;">
+              <div class="filter-btn-group" id="users-role-filter-group" style="display:flex; gap:6px; flex-wrap:wrap;">
+                <button class="filter-btn active" data-role="all" onclick="filterAdminUsersRole('all', this)">Semua Peran</button>
+                <button class="filter-btn" data-role="student" onclick="filterAdminUsersRole('student', this)"><i class="fas fa-user-graduate"></i> Siswa</button>
+                <button class="filter-btn" data-role="tutor" onclick="filterAdminUsersRole('tutor', this)"><i class="fas fa-chalkboard-user"></i> Tutor</button>
+                <button class="filter-btn" data-role="admin" onclick="filterAdminUsersRole('admin', this)"><i class="fas fa-shield-halved"></i> Admin</button>
+              </div>
+
+              <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+                <select id="user-status-filter" class="input-field" style="height:36px; font-size:12.5px; min-width:160px; padding:4px 10px;" onchange="filterAdminUsersStatus(this.value)">
+                  <option value="all">Semua Status</option>
+                  <option value="active">Hanya Aktif</option>
+                  <option value="inactive">Nonaktif / Suspended</option>
+                  <option value="verified">Email Terverifikasi</option>
+                  <option value="unverified">Belum Verifikasi</option>
+                </select>
+
+                <div class="search-box" style="position:relative; min-width:260px;">
+                  <input 
+                    type="text" 
+                    id="admin-user-search-input" 
+                    class="input-field" 
+                    placeholder="Cari nama atau email..." 
+                    style="padding-left:34px; height:36px; font-size:12.5px;"
+                    oninput="debounceAdminUserSearch(this.value)"
+                  >
+                  <i class="fas fa-magnifying-glass" style="position:absolute; left:12px; top:11px; color:var(--text-secondary); font-size:12px;"></i>
+                </div>
+              </div>
+            </div>
+
+            <!-- Users Table -->
+            <div class="table-responsive">
+              <table class="styled-table">
+                <thead>
+                  <tr>
+                    <th>Pengguna</th>
+                    <th>Peran (Role)</th>
+                    <th>Status Akun</th>
+                    <th>Verifikasi Email</th>
+                    <th>Terdaftar</th>
+                    <th style="text-align:right;">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="admin-users-table-body">
+                  <tr>
+                    <td colspan="6" style="text-align:center; padding:32px; color:var(--text-secondary);">
+                      <i class="fas fa-spinner fa-spin" style="margin-right:8px;"></i> Memuat data pengguna...
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Table Footer & Pagination -->
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-top:16px; padding-top:16px; border-top:1px solid var(--border-subtle); font-size:12.5px; color:var(--text-secondary);">
+              <div id="users-pagination-info">
+                Menampilkan 0 pengguna
+              </div>
+              <div style="display:flex; gap:6px;" id="users-pagination-controls">
+                <button class="btn btn-outline btn-sm" id="btn-users-prev" onclick="changeUsersPage(-1)" disabled>
+                  <i class="fas fa-chevron-left"></i> Sebelumnya
+                </button>
+                <button class="btn btn-outline btn-sm" id="btn-users-next" onclick="changeUsersPage(1)" disabled>
+                  Berikutnya <i class="fas fa-chevron-right"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
       </main>
+    </div>
+
+    <!-- Add User Modal -->
+    <div class="modal-overlay" id="modal-add-user">
+      <div class="modal-card" style="max-width: 580px;">
+        <div class="modal-header">
+          <h3 class="modal-title"><i class="fas fa-user-plus" style="margin-right:8px;"></i> Tambah Pengguna Baru</h3>
+          <button class="modal-close-btn" onclick="closeModal('modal-add-user')"><i class="fas fa-xmark"></i></button>
+        </div>
+        
+        <form id="form-add-user" onsubmit="submitAddUserForm(event)" style="margin-top: 14px;">
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:14px; margin-bottom:14px;">
+            <div>
+              <label style="display:block; font-size:12px; font-weight:600; color:var(--text-primary); margin-bottom:6px;">Nama Lengkap *</label>
+              <input type="text" id="add-user-name" class="input-field" placeholder="cth. Budi Santoso" required>
+            </div>
+            <div>
+              <label style="display:block; font-size:12px; font-weight:600; color:var(--text-primary); margin-bottom:6px;">Alamat Email *</label>
+              <input type="email" id="add-user-email" class="input-field" placeholder="budi@example.com" required>
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:14px; margin-bottom:14px;">
+            <div>
+              <label style="display:block; font-size:12px; font-weight:600; color:var(--text-primary); margin-bottom:6px;">Kata Sandi * (min. 6 karakter)</label>
+              <input type="password" id="add-user-password" class="input-field" placeholder="••••••••" minlength="6" required>
+            </div>
+            <div>
+              <label style="display:block; font-size:12px; font-weight:600; color:var(--text-primary); margin-bottom:6px;">Peran Akun (Role) *</label>
+              <select id="add-user-role" class="input-field" required>
+                <option value="student">Siswa (Student)</option>
+                <option value="tutor">Pengajar (Tutor)</option>
+                <option value="admin">Administrator</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:14px; margin-bottom:14px;">
+            <div>
+              <label style="display:block; font-size:12px; font-weight:600; color:var(--text-primary); margin-bottom:6px;">Nomor Telepon / WA</label>
+              <input type="text" id="add-user-phone" class="input-field" placeholder="08123456789">
+            </div>
+            <div>
+              <label style="display:block; font-size:12px; font-weight:600; color:var(--text-primary); margin-bottom:6px;">Target Karier / Minat</label>
+              <input type="text" id="add-user-career" class="input-field" placeholder="cth. Cloud Architect">
+            </div>
+          </div>
+
+          <div style="margin-bottom:16px;">
+            <label style="display:block; font-size:12px; font-weight:600; color:var(--text-primary); margin-bottom:6px;">Bio / Catatan Singkat</label>
+            <textarea id="add-user-bio" class="input-field" rows="2" placeholder="Deskripsi atau profil singkat pengguna..."></textarea>
+          </div>
+
+          <div style="display:flex; gap:20px; align-items:center; margin-bottom:20px; padding:12px 16px; background:var(--bg-surface-subtle); border-radius:var(--radius-md); border:1px solid var(--border-subtle);">
+            <label style="display:flex; align-items:center; gap:8px; font-size:13px; font-weight:500; cursor:pointer;">
+              <input type="checkbox" id="add-user-active" checked style="accent-color:var(--accent-primary);">
+              <span>Akun Aktif Langsung</span>
+            </label>
+            <label style="display:flex; align-items:center; gap:8px; font-size:13px; font-weight:500; cursor:pointer;">
+              <input type="checkbox" id="add-user-verified" checked style="accent-color:var(--accent-primary);">
+              <span>Email Terverifikasi</span>
+            </label>
+          </div>
+
+          <div style="display:flex; justify-content:flex-end; gap:10px; padding-top:14px; border-top:1px solid var(--border-subtle);">
+            <button type="button" class="btn btn-outline" onclick="closeModal('modal-add-user')">Batal</button>
+            <button type="submit" class="btn btn-primary" id="btn-submit-add-user">
+              <i class="fas fa-check"></i> Simpan & Buat Pengguna
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Edit & Detail User Modal -->
+    <div class="modal-overlay" id="modal-edit-user">
+      <div class="modal-card" style="max-width: 650px;">
+        <div class="modal-header">
+          <h3 class="modal-title" id="edit-user-modal-title"><i class="fas fa-user-pen" style="margin-right:8px;"></i> Detail & Edit Pengguna</h3>
+          <button class="modal-close-btn" onclick="closeModal('modal-edit-user')"><i class="fas fa-xmark"></i></button>
+        </div>
+        
+        <div id="edit-user-header-info" style="display:flex; align-items:center; gap:14px; padding:16px; background:var(--bg-surface-subtle); border-radius:var(--radius-lg); border:1px solid var(--border-subtle); margin-top:14px; margin-bottom:18px;">
+          <!-- Populated dynamically -->
+        </div>
+
+        <form id="form-edit-user" onsubmit="submitEditUserForm(event)">
+          <input type="hidden" id="edit-user-id">
+
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:14px; margin-bottom:14px;">
+            <div>
+              <label style="display:block; font-size:12px; font-weight:600; color:var(--text-primary); margin-bottom:6px;">Nama Lengkap *</label>
+              <input type="text" id="edit-user-name" class="input-field" required>
+            </div>
+            <div>
+              <label style="display:block; font-size:12px; font-weight:600; color:var(--text-primary); margin-bottom:6px;">Alamat Email *</label>
+              <input type="email" id="edit-user-email" class="input-field" required>
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:14px; margin-bottom:14px;">
+            <div>
+              <label style="display:block; font-size:12px; font-weight:600; color:var(--text-primary); margin-bottom:6px;">Peran Akun (Role) *</label>
+              <select id="edit-user-role" class="input-field" required>
+                <option value="student">Siswa (Student)</option>
+                <option value="tutor">Pengajar (Tutor)</option>
+                <option value="admin">Administrator</option>
+              </select>
+            </div>
+            <div>
+              <label style="display:block; font-size:12px; font-weight:600; color:var(--text-primary); margin-bottom:6px;">Nomor Telepon</label>
+              <input type="text" id="edit-user-phone" class="input-field" placeholder="Belum diisi">
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:14px; margin-bottom:14px;">
+            <div>
+              <label style="display:block; font-size:12px; font-weight:600; color:var(--text-primary); margin-bottom:6px;">Target Karier</label>
+              <input type="text" id="edit-user-career" class="input-field" placeholder="Belum diisi">
+            </div>
+            <div>
+              <label style="display:block; font-size:12px; font-weight:600; color:var(--text-primary); margin-bottom:6px;">Ubah Kata Sandi (Opsional)</label>
+              <input type="password" id="edit-user-password" class="input-field" placeholder="Kosongkan jika tidak diubah" minlength="6">
+            </div>
+          </div>
+
+          <div style="margin-bottom:14px;">
+            <label style="display:block; font-size:12px; font-weight:600; color:var(--text-primary); margin-bottom:6px;">Bio Profil</label>
+            <textarea id="edit-user-bio" class="input-field" rows="2" placeholder="Bio atau keterangan pengguna..."></textarea>
+          </div>
+
+          <div style="display:flex; gap:20px; align-items:center; margin-bottom:20px; padding:12px 16px; background:var(--bg-surface-subtle); border-radius:var(--radius-md); border:1px solid var(--border-subtle);">
+            <label style="display:flex; align-items:center; gap:8px; font-size:13px; font-weight:500; cursor:pointer;">
+              <input type="checkbox" id="edit-user-active" style="accent-color:var(--accent-primary);">
+              <span>Akun Aktif (Bisa Login)</span>
+            </label>
+            <label style="display:flex; align-items:center; gap:8px; font-size:13px; font-weight:500; cursor:pointer;">
+              <input type="checkbox" id="edit-user-verified" style="accent-color:var(--accent-primary);">
+              <span>Email Terverifikasi</span>
+            </label>
+          </div>
+
+          <!-- Dynamic Context Statistics (Courses, Enrolled, Wallet) -->
+          <div id="edit-user-extra-stats" style="margin-bottom:18px; font-size:12.5px; color:var(--text-secondary);">
+            <!-- Populated dynamically -->
+          </div>
+
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; padding-top:14px; border-top:1px solid var(--border-subtle);">
+            <button type="button" class="btn btn-outline btn-sm" id="btn-delete-user-modal" style="color:var(--color-danger); border-color:var(--color-danger);">
+              <i class="fas fa-trash"></i> Hapus Akun
+            </button>
+            <div style="display:flex; gap:8px;">
+              <button type="button" class="btn btn-outline" onclick="closeModal('modal-edit-user')">Batal</button>
+              <button type="submit" class="btn btn-primary" id="btn-submit-edit-user">
+                <i class="fas fa-save"></i> Simpan Perubahan
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Admin Create Course Modal -->
+    <div class="modal-overlay" id="modal-admin-create-course">
+      <div class="modal-card" style="max-width: 650px;">
+        <div class="modal-header">
+          <h3 class="modal-title"><i class="fas fa-plus-circle" style="margin-right:8px;"></i> Buat Kursus Baru (Admin)</h3>
+          <button class="modal-close-btn" onclick="closeModal('modal-admin-create-course')"><i class="fas fa-xmark"></i></button>
+        </div>
+        
+        <form id="form-admin-create-course" onsubmit="submitAdminCreateCourse(event)" style="margin-top: 14px;">
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:14px; margin-bottom:14px;">
+            <div style="grid-column: 1 / -1;">
+              <label style="display:block; font-size:12px; font-weight:600; color:var(--text-primary); margin-bottom:6px;">Judul Kursus *</label>
+              <input type="text" id="create-course-title" class="input-field" placeholder="cth. Mastering Cloud Native & Kubernetes" required>
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:14px; margin-bottom:14px;">
+            <div>
+              <label style="display:block; font-size:12px; font-weight:600; color:var(--text-primary); margin-bottom:6px;">Tutor Pengajar *</label>
+              <select id="create-course-tutor-select" class="input-field" required>
+                <option value="">-- Pilih Tutor --</option>
+              </select>
+            </div>
+            <div>
+              <label style="display:block; font-size:12px; font-weight:600; color:var(--text-primary); margin-bottom:6px;">Kategori *</label>
+              <select id="create-course-category-select" class="input-field" required>
+                <option value="">-- Pilih Kategori --</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:12px; margin-bottom:14px;">
+            <div>
+              <label style="display:block; font-size:12px; font-weight:600; color:var(--text-primary); margin-bottom:6px;">Tingkat Kesulitan *</label>
+              <select id="create-course-level-select" class="input-field" required>
+                <option value="beginner">Beginner (Pemula)</option>
+                <option value="intermediate">Intermediate (Menengah)</option>
+                <option value="advanced">Advanced (Mahir)</option>
+              </select>
+            </div>
+            <div>
+              <label style="display:block; font-size:12px; font-weight:600; color:var(--text-primary); margin-bottom:6px;">Harga (Rp)</label>
+              <input type="number" id="create-course-price" class="input-field" value="0" min="0" step="1000" placeholder="0 = Gratis">
+            </div>
+            <div>
+              <label style="display:block; font-size:12px; font-weight:600; color:var(--text-primary); margin-bottom:6px;">Status Awal</label>
+              <select id="create-course-status-select" class="input-field" required>
+                <option value="published">Published (Terbit)</option>
+                <option value="draft" selected>Draft (Konsep)</option>
+                <option value="suspended">Suspended (Beku)</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="margin-bottom:14px;">
+            <label style="display:block; font-size:12px; font-weight:600; color:var(--text-primary); margin-bottom:6px;">Judul Bab Perdana</label>
+            <input type="text" id="create-course-initial-section" class="input-field" value="Bab 1: Pengantar &amp; Dasar Teori">
+          </div>
+
+          <div style="margin-bottom:14px;">
+            <label style="display:block; font-size:12px; font-weight:600; color:var(--text-primary); margin-bottom:6px;">URL Gambar Thumbnail</label>
+            <input type="text" id="create-course-thumbnail" class="input-field" placeholder="cth. /images/default-course.webp atau https://...">
+          </div>
+
+          <div style="margin-bottom:16px;">
+            <label style="display:block; font-size:12px; font-weight:600; color:var(--text-primary); margin-bottom:6px;">Deskripsi Kursus</label>
+            <textarea id="create-course-description" class="input-field" rows="3" placeholder="Jelaskan silabus, tujuan pembelajaran, dan prasyarat kursus..."></textarea>
+          </div>
+
+          <div style="display:flex; justify-content:flex-end; gap:10px; padding-top:14px; border-top:1px solid var(--border-subtle);">
+            <button type="button" class="btn btn-outline" onclick="closeModal('modal-admin-create-course')">Batal</button>
+            <button type="submit" class="btn btn-primary" id="btn-submit-admin-create-course">
+              <i class="fas fa-check"></i> Simpan &amp; Buat Kursus
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Admin Edit Course Modal -->
+    <div class="modal-overlay" id="modal-admin-edit-course">
+      <div class="modal-card" style="max-width: 650px;">
+        <div class="modal-header">
+          <h3 class="modal-title" id="edit-course-modal-title"><i class="fas fa-pen-to-square" style="margin-right:8px;"></i> Edit Kursus Platform</h3>
+          <button class="modal-close-btn" onclick="closeModal('modal-admin-edit-course')"><i class="fas fa-xmark"></i></button>
+        </div>
+        
+        <form id="form-admin-edit-course" onsubmit="submitAdminEditCourse(event)" style="margin-top: 14px;">
+          <input type="hidden" id="edit-course-id">
+
+          <div style="margin-bottom:14px;">
+            <label style="display:block; font-size:12px; font-weight:600; color:var(--text-primary); margin-bottom:6px;">Judul Kursus *</label>
+            <input type="text" id="edit-course-title" class="input-field" required>
+          </div>
+
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:14px; margin-bottom:14px;">
+            <div>
+              <label style="display:block; font-size:12px; font-weight:600; color:var(--text-primary); margin-bottom:6px;">Tutor Pengajar *</label>
+              <select id="edit-course-tutor-select" class="input-field" required>
+                <!-- Populated dynamically -->
+              </select>
+            </div>
+            <div>
+              <label style="display:block; font-size:12px; font-weight:600; color:var(--text-primary); margin-bottom:6px;">Kategori *</label>
+              <select id="edit-course-category-select" class="input-field" required>
+                <!-- Populated dynamically -->
+              </select>
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:12px; margin-bottom:14px;">
+            <div>
+              <label style="display:block; font-size:12px; font-weight:600; color:var(--text-primary); margin-bottom:6px;">Level *</label>
+              <select id="edit-course-level-select" class="input-field" required>
+                <option value="beginner">Beginner</option>
+                <option value="intermediate">Intermediate</option>
+                <option value="advanced">Advanced</option>
+              </select>
+            </div>
+            <div>
+              <label style="display:block; font-size:12px; font-weight:600; color:var(--text-primary); margin-bottom:6px;">Harga (Rp)</label>
+              <input type="number" id="edit-course-price" class="input-field" min="0" step="1000">
+            </div>
+            <div>
+              <label style="display:block; font-size:12px; font-weight:600; color:var(--text-primary); margin-bottom:6px;">Status Publikasi</label>
+              <select id="edit-course-status-select" class="input-field" required>
+                <option value="published">Published</option>
+                <option value="draft">Draft</option>
+                <option value="suspended">Suspended</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="margin-bottom:14px;">
+            <label style="display:block; font-size:12px; font-weight:600; color:var(--text-primary); margin-bottom:6px;">URL Thumbnail</label>
+            <input type="text" id="edit-course-thumbnail" class="input-field">
+          </div>
+
+          <div style="margin-bottom:16px;">
+            <label style="display:block; font-size:12px; font-weight:600; color:var(--text-primary); margin-bottom:6px;">Deskripsi Kursus</label>
+            <textarea id="edit-course-description" class="input-field" rows="3"></textarea>
+          </div>
+
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; padding-top:14px; border-top:1px solid var(--border-subtle);">
+            <button type="button" class="btn btn-outline btn-sm" id="btn-delete-course-from-edit" style="color:var(--color-danger); border-color:var(--color-danger);">
+              <i class="fas fa-trash"></i> Hapus Kursus
+            </button>
+            <div style="display:flex; gap:8px;">
+              <button type="button" class="btn btn-outline" onclick="closeModal('modal-admin-edit-course')">Batal</button>
+              <button type="submit" class="btn btn-primary" id="btn-submit-admin-edit-course">
+                <i class="fas fa-save"></i> Simpan Perubahan
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Admin Course Curriculum Manager Modal (Bab & Sub-Bab Materi) -->
+    <div class="modal-overlay" id="modal-admin-curriculum">
+      <div class="modal-card" style="max-width: 860px; max-height: 88vh; display: flex; flex-direction: column;">
+        <div class="modal-header">
+          <div>
+            <h3 class="modal-title" id="curriculum-modal-title"><i class="fas fa-list-check" style="margin-right:8px;"></i> Kurikulum &amp; Sub-Bab Kursus</h3>
+            <p id="curriculum-modal-subtitle" style="font-size:12.5px; color:var(--text-secondary); margin-top:3px;">Kelola modul bab dan sub-materi kursus.</p>
+          </div>
+          <button class="modal-close-btn" onclick="closeModal('modal-admin-curriculum')"><i class="fas fa-xmark"></i></button>
+        </div>
+        
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; padding: 12px 0; margin-bottom:12px; border-bottom:1px solid var(--border-subtle);">
+          <div style="font-size:13px; font-weight:600; color:var(--text-primary);" id="curriculum-stats-summary">
+            Memuat statistik kurikulum...
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="openAddSectionPrompt()" style="font-size:12px; padding:6px 14px;">
+            <i class="fas fa-plus"></i> Tambah Bab Baru
+          </button>
+        </div>
+
+        <div id="admin-curriculum-sections-container" style="flex:1; overflow-y:auto; padding-right:6px; display:flex; flex-direction:column; gap:16px;">
+          <!-- Sections & Materials rendered dynamically -->
+        </div>
+
+        <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:16px; padding-top:14px; border-top:1px solid var(--border-subtle);">
+          <button type="button" class="btn btn-outline" onclick="closeModal('modal-admin-curriculum')">Tutup</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Admin Section Form Modal (Tambah / Edit Judul Bab) -->
+    <div class="modal-overlay" id="modal-admin-section-form" style="z-index: 2100;">
+      <div class="modal-card" style="max-width: 480px;">
+        <div class="modal-header">
+          <h3 class="modal-title" id="section-form-modal-title">Kelola Bab Kursus</h3>
+          <button class="modal-close-btn" onclick="closeModal('modal-admin-section-form')"><i class="fas fa-xmark"></i></button>
+        </div>
+        <form id="form-admin-section" onsubmit="submitAdminSectionForm(event)" style="margin-top:14px;">
+          <input type="hidden" id="section-form-mode" value="create">
+          <input type="hidden" id="section-form-id">
+          <div style="margin-bottom:14px;">
+            <label style="display:block; font-size:12px; font-weight:600; color:var(--text-primary); margin-bottom:6px;">Judul Bab / Modul *</label>
+            <input type="text" id="section-title-input" class="input-field" placeholder="cth. Bab 2: Arsitektur Microservices" required>
+          </div>
+          <div style="margin-bottom:16px;">
+            <label style="display:block; font-size:12px; font-weight:600; color:var(--text-primary); margin-bottom:6px;">Nomor Urutan (Order Index)</label>
+            <input type="number" id="section-order-input" class="input-field" value="1" min="1">
+          </div>
+          <div style="display:flex; justify-content:flex-end; gap:10px;">
+            <button type="button" class="btn btn-outline" onclick="closeModal('modal-admin-section-form')">Batal</button>
+            <button type="submit" class="btn btn-primary" id="btn-submit-section-form">
+              <i class="fas fa-check"></i> Simpan Bab
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Admin Material Form Modal (Tambah / Edit Materi Sub-Bab) -->
+    <div class="modal-overlay" id="modal-admin-material-form" style="z-index: 2100;">
+      <div class="modal-card" style="max-width: 560px;">
+        <div class="modal-header">
+          <h3 class="modal-title" id="material-form-modal-title">Kelola Materi Pembelajaran</h3>
+          <button class="modal-close-btn" onclick="closeModal('modal-admin-material-form')"><i class="fas fa-xmark"></i></button>
+        </div>
+        <form id="form-admin-material" onsubmit="submitAdminMaterialForm(event)" style="margin-top:14px;">
+          <input type="hidden" id="material-form-mode" value="create">
+          <input type="hidden" id="material-form-section-id">
+          <input type="hidden" id="material-form-id">
+          
+          <div style="margin-bottom:14px;">
+            <label style="display:block; font-size:12px; font-weight:600; color:var(--text-primary); margin-bottom:6px;">Judul Materi *</label>
+            <input type="text" id="material-title-input" class="input-field" placeholder="cth. 1.1 Konfigurasi Kubernetes Cluster" required>
+          </div>
+
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-bottom:14px;">
+            <div>
+              <label style="display:block; font-size:12px; font-weight:600; color:var(--text-primary); margin-bottom:6px;">Format Konten *</label>
+              <select id="material-type-select" class="input-field" required>
+                <option value="video">Video Pembelajaran (MP4/Stream)</option>
+                <option value="pdf">Dokumen PDF (E-Book/Guide)</option>
+                <option value="ppt">Slide Presentasi (PPT/PPTX)</option>
+                <option value="doc">Modul Teks / Word (DOCX)</option>
+                <option value="book">Buku Digital (EPUB)</option>
+              </select>
+            </div>
+            <div>
+              <label style="display:block; font-size:12px; font-weight:600; color:var(--text-primary); margin-bottom:6px;">Estimasi Durasi (Menit)</label>
+              <input type="number" id="material-duration-input" class="input-field" value="10" min="1">
+            </div>
+          </div>
+
+          <div style="margin-bottom:14px;">
+            <label style="display:block; font-size:12px; font-weight:600; color:var(--text-primary); margin-bottom:6px;">URL File Materi / Link Stream *</label>
+            <input type="text" id="material-url-input" class="input-field" placeholder="cth. /uploads/materials/videos/... atau https://..." required>
+          </div>
+
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; padding:12px 14px; background:var(--bg-surface-subtle); border-radius:var(--radius-md); border:1px solid var(--border-subtle);">
+            <label style="display:flex; align-items:center; gap:8px; font-size:13px; font-weight:500; cursor:pointer;">
+              <input type="checkbox" id="material-preview-checkbox" style="accent-color:var(--accent-primary);">
+              <span>Akses Gratis (Preview Tanpa Pembelian)</span>
+            </label>
+            <div style="display:flex; align-items:center; gap:6px;">
+              <span style="font-size:12px; color:var(--text-secondary);">Urutan:</span>
+              <input type="number" id="material-order-input" class="input-field" style="width:70px; height:32px; font-size:12px;" value="1" min="1">
+            </div>
+          </div>
+
+          <div style="display:flex; justify-content:flex-end; gap:10px;">
+            <button type="button" class="btn btn-outline" onclick="closeModal('modal-admin-material-form')">Batal</button>
+            <button type="submit" class="btn btn-primary" id="btn-submit-material-form">
+              <i class="fas fa-check"></i> Simpan Materi
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
 
     <!-- Application Detail Modal -->
@@ -1847,6 +2574,16 @@
     let currentCertFilter = 'all';
     let pendingRejectId = null;
 
+    // User Management State
+    let allUsers = [];
+    let currentUserRoleFilter = 'all';
+    let currentUserStatusFilter = 'all';
+    let currentUserSearchQuery = '';
+    let currentUserPage = 0;
+    const USERS_PER_PAGE = 15;
+    let userSearchTimeout = null;
+    let currentAdminUserId = null;
+
     document.addEventListener('DOMContentLoaded', () => {
       fetchAdminProfile();
       fetchAdminStats();
@@ -1854,6 +2591,7 @@
       fetchCertifications();
       fetchPlatformCourses();
       fetchFinancialData();
+      fetchAdminUsers();
       setupLogout();
     });
 
@@ -1872,6 +2610,7 @@
       const breadcrumbMap = {
         overview: 'Ringkasan Platform',
         verification: 'Verifikasi & Sertifikasi',
+        users: 'Manajemen Pengguna',
         courses: 'Data Kursus & Materi',
         financial: 'Bagi Hasil & Finansial',
       };
@@ -1879,6 +2618,10 @@
 
       if (viewName === 'verification' && subTab) {
         switchVerificationSubTab(subTab);
+      }
+
+      if (viewName === 'users') {
+        fetchAdminUsers();
       }
 
       if (viewName === 'financial') {
@@ -1929,6 +2672,7 @@
             window.location.href = '/dashboard';
             return;
           }
+          currentAdminUserId = user.id;
           const name = user.name || 'Admin SkillSphere';
           const initials = name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() || 'AS';
           
@@ -2509,12 +3253,15 @@
     }
 
     // =========================================================
-    // --- Course Management & Moderation Logic (Approve & Suspend) ---
+    // --- Course Management & Moderation Logic (Full CRUD & Curriculum) ---
     // =========================================================
     let currentAdminCourseStatus = 'all';
     let adminCourseSearchQuery = '';
     let adminCourseSearchTimeout = null;
     let currentCoursesMap = {};
+    let cachedCategories = [];
+    let cachedTutors = [];
+    let activeCurriculumCourse = null;
     window.showConfirmDialog = showCustomConfirm;
 
     function filterAdminCourses(status, btnElement) {
@@ -2533,6 +3280,50 @@
         adminCourseSearchQuery = (val || '').trim();
         fetchPlatformCourses();
       }, 300);
+    }
+
+    // Populate Course Dropdowns (Tutors & Categories)
+    async function populateCourseDropdowns() {
+      try {
+        if (!cachedCategories.length) {
+          const resCat = await fetch('/api/courses/categories');
+          const jsonCat = await resCat.json();
+          if (jsonCat.success && Array.isArray(jsonCat.data)) {
+            cachedCategories = jsonCat.data;
+          }
+        }
+
+        if (!cachedTutors.length) {
+          const resTut = await fetch('/api/admin/users?role=tutor&limit=100', {
+            headers: { 'Authorization': 'Bearer ' + token }
+          });
+          const jsonTut = await resTut.json();
+          if (jsonTut.success && jsonTut.data && Array.isArray(jsonTut.data.users)) {
+            cachedTutors = jsonTut.data.users;
+          }
+        }
+
+        const populateSelect = (selectId, items, placeholder, getValue, getText, selectedVal = null) => {
+          const el = document.getElementById(selectId);
+          if (!el) return;
+          el.innerHTML = `<option value="">${placeholder}</option>` + items.map(item => {
+            const val = getValue(item);
+            const txt = getText(item);
+            const isSelected = selectedVal !== null && String(selectedVal) === String(val);
+            return `<option value="${escapeHtml(val)}" ${isSelected ? 'selected' : ''}>${escapeHtml(txt)}</option>`;
+          }).join('');
+        };
+
+        // Create modal selects
+        populateSelect('create-course-tutor-select', cachedTutors, '-- Pilih Tutor Pengajar --', t => t.id, t => `${t.name} (${t.email})`);
+        populateSelect('create-course-category-select', cachedCategories, '-- Pilih Kategori --', c => c.id, c => c.name);
+
+        // Edit modal selects
+        populateSelect('edit-course-tutor-select', cachedTutors, '-- Pilih Tutor Pengajar --', t => t.id, t => `${t.name} (${t.email})`);
+        populateSelect('edit-course-category-select', cachedCategories, '-- Pilih Kategori --', c => c.id, c => c.name);
+      } catch (err) {
+        console.error('Error populating course dropdowns:', err);
+      }
     }
 
     // Fetch Platform Courses for Admin Management
@@ -2556,7 +3347,6 @@
         });
 
         if (!res.ok) {
-          // Fallback to general courses endpoint if admin auth check fails
           res = await fetch('/api/courses?limit=100' + (currentAdminCourseStatus !== 'all' ? `&status=${encodeURIComponent(currentAdminCourseStatus)}` : ''));
         }
 
@@ -2578,33 +3368,33 @@
         tbody.innerHTML = courses.map(c => {
           const status = (c.status || 'draft').toLowerCase();
           let statusBadge = '';
-          let actionButtons = '';
+          let toggleStatusButton = '';
 
           if (status === 'published') {
             statusBadge = `<span class="status-pill status-active"><i class="fas fa-circle-check"></i> PUBLISHED</span>`;
-            actionButtons = `
-              <button class="btn btn-danger btn-sm" onclick="suspendCoursePrompt(${c.id})" style="font-size:11.5px; padding:4px 10px;">
+            toggleStatusButton = `
+              <button class="btn btn-outline btn-sm" onclick="suspendCoursePrompt(${c.id})" style="font-size:11.5px; padding:4px 8px; color:var(--color-warning);" title="Bekukan (Suspend) Kursus">
                 <i class="fas fa-ban"></i> Suspend
               </button>
             `;
           } else if (status === 'suspended') {
             statusBadge = `<span class="status-pill status-rejected"><i class="fas fa-ban"></i> SUSPENDED</span>`;
-            actionButtons = `
-              <button class="btn btn-success btn-sm" onclick="approveCoursePrompt(${c.id})" style="font-size:11.5px; padding:4px 10px;">
-                <i class="fas fa-check"></i> Approve & Publish
+            toggleStatusButton = `
+              <button class="btn btn-success btn-sm" onclick="approveCoursePrompt(${c.id})" style="font-size:11.5px; padding:4px 8px;" title="Setujui & Terbitkan Kursus">
+                <i class="fas fa-check"></i> Terbitkan
               </button>
             `;
           } else if (status === 'draft') {
             statusBadge = `<span class="status-pill status-pending"><i class="fas fa-file-lines"></i> DRAFT</span>`;
-            actionButtons = `
-              <button class="btn btn-success btn-sm" onclick="approveCoursePrompt(${c.id})" style="font-size:11.5px; padding:4px 10px;">
-                <i class="fas fa-check"></i> Approve & Publish
+            toggleStatusButton = `
+              <button class="btn btn-success btn-sm" onclick="approveCoursePrompt(${c.id})" style="font-size:11.5px; padding:4px 8px;" title="Setujui & Publikasikan Kursus">
+                <i class="fas fa-check"></i> Terbitkan
               </button>
             `;
           } else {
             statusBadge = `<span class="status-pill status-locked">${escapeHtml(status.toUpperCase())}</span>`;
-            actionButtons = `
-              <button class="btn btn-success btn-sm" onclick="approveCoursePrompt(${c.id})" style="font-size:11.5px; padding:4px 10px;">
+            toggleStatusButton = `
+              <button class="btn btn-success btn-sm" onclick="approveCoursePrompt(${c.id})" style="font-size:11.5px; padding:4px 8px;" title="Publikasikan Kursus">
                 <i class="fas fa-check"></i> Publish
               </button>
             `;
@@ -2622,11 +3412,32 @@
               <td><span class="status-pill status-locked">${escapeHtml((c.level || 'beginner').toUpperCase())}</span></td>
               <td id="course-status-cell-${c.id}">${statusBadge}</td>
               <td style="text-align:right;">
-                <div style="display:inline-flex; gap:6px; justify-content:flex-end; align-items:center;">
-                  <span id="course-action-cell-${c.id}">${actionButtons}</span>
-                  <a href="/tutor/materials?courseId=${c.id}" target="_blank" class="btn btn-outline btn-sm" style="font-size:11.5px; padding:4px 8px;" title="Lihat Materi Kursus">
-                    <i class="fas fa-folder-open"></i>
-                  </a>
+                <div style="display:inline-flex; gap:6px; justify-content:flex-end; align-items:center; flex-wrap:nowrap;">
+                  <button 
+                    class="btn btn-primary btn-sm" 
+                    onclick="openAdminCurriculumModal(${c.id})" 
+                    style="font-size:11.5px; padding:4px 9px; display:inline-flex; align-items:center; gap:5px;" 
+                    title="Kelola Sub-Bab & Materi Kursus"
+                  >
+                    <i class="fas fa-list-check"></i> Sub-Bab & Materi
+                  </button>
+                  <button 
+                    class="btn btn-outline btn-sm" 
+                    onclick="openAdminEditCourseModal(${c.id})" 
+                    style="font-size:11.5px; padding:4px 8px;" 
+                    title="Edit Informasi Kursus"
+                  >
+                    <i class="fas fa-pen-to-square"></i>
+                  </button>
+                  ${toggleStatusButton}
+                  <button 
+                    class="btn btn-outline btn-sm" 
+                    onclick="deleteCoursePrompt(${c.id})" 
+                    style="font-size:11.5px; padding:4px 8px; color:var(--color-danger);" 
+                    title="Hapus Kursus"
+                  >
+                    <i class="fas fa-trash"></i>
+                  </button>
                 </div>
               </td>
             </tr>
@@ -2635,6 +3446,659 @@
       } catch (e) {
         console.error('Error fetching courses overview:', e);
         tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:32px; color:var(--color-danger);">Gagal memuat kursus platform: ${escapeHtml(e.message || 'Kesalahan data.')}</td></tr>`;
+      }
+    }
+
+    // Modal Create Course (Admin)
+    async function openAdminCreateCourseModal() {
+      await populateCourseDropdowns();
+      const form = document.getElementById('form-admin-create-course');
+      if (form) form.reset();
+      const levelSelect = document.getElementById('create-course-level-select');
+      if (levelSelect) levelSelect.value = 'beginner';
+      const statusSelect = document.getElementById('create-course-status-select');
+      if (statusSelect) statusSelect.value = 'draft';
+      const initSec = document.getElementById('create-course-initial-section');
+      if (initSec) initSec.value = 'Bab 1: Pengantar & Dasar Teori';
+
+      openModal('modal-admin-create-course');
+    }
+
+    async function submitAdminCreateCourse(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btn-submit-admin-create-course');
+      const origText = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
+
+      const payload = {
+        title: document.getElementById('create-course-title').value.trim(),
+        tutor_id: document.getElementById('create-course-tutor-select').value,
+        category_id: document.getElementById('create-course-category-select').value,
+        level: document.getElementById('create-course-level-select').value,
+        price: parseFloat(document.getElementById('create-course-price').value) || 0,
+        status: document.getElementById('create-course-status-select').value,
+        initial_section_title: document.getElementById('create-course-initial-section').value.trim(),
+        thumbnail_url: document.getElementById('create-course-thumbnail').value.trim() || null,
+        description: document.getElementById('create-course-description').value.trim() || null,
+      };
+
+      try {
+        const res = await fetch('/api/courses', {
+          method: 'POST',
+          headers: {
+            'Authorization': 'Bearer ' + token,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(payload),
+        });
+
+        const json = await res.json();
+        if (res.ok && json.success) {
+          showToast(json.message || 'Kursus baru berhasil dibuat!', 'success');
+          closeModal('modal-admin-create-course');
+          fetchPlatformCourses();
+          fetchAdminStats();
+        } else {
+          showToast(json.message || 'Gagal membuat kursus baru.', 'error');
+        }
+      } catch (err) {
+        console.error('Error creating course:', err);
+        showToast('Kesalahan jaringan saat membuat kursus.', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = origText;
+      }
+    }
+
+    // Modal Edit Course (Admin)
+    async function openAdminEditCourseModal(courseId) {
+      await populateCourseDropdowns();
+
+      try {
+        const res = await fetch(`/api/courses/${courseId}`, {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        const json = await res.json();
+
+        if (!json.success || !json.data) {
+          showToast('Gagal memuat detail kursus.', 'error');
+          return;
+        }
+
+        const course = json.data;
+        document.getElementById('edit-course-id').value = course.id;
+        document.getElementById('edit-course-title').value = course.title || '';
+        document.getElementById('edit-course-price').value = course.price || 0;
+        document.getElementById('edit-course-level-select').value = course.level || 'beginner';
+        document.getElementById('edit-course-status-select').value = course.status || 'draft';
+        document.getElementById('edit-course-thumbnail').value = course.thumbnail_url || '';
+        document.getElementById('edit-course-description').value = course.description || '';
+
+        // Select Tutor & Category
+        const tutorSelect = document.getElementById('edit-course-tutor-select');
+        if (tutorSelect && course.tutor_id) {
+          tutorSelect.value = course.tutor_id;
+        }
+        const categorySelect = document.getElementById('edit-course-category-select');
+        if (categorySelect && course.category_id) {
+          categorySelect.value = course.category_id;
+        }
+
+        // Delete button inside edit modal
+        const delBtn = document.getElementById('btn-delete-course-from-edit');
+        if (delBtn) {
+          delBtn.onclick = () => {
+            closeModal('modal-admin-edit-course');
+            deleteCoursePrompt(course.id);
+          };
+        }
+
+        openModal('modal-admin-edit-course');
+      } catch (err) {
+        console.error('Error fetching course for edit:', err);
+        showToast('Kesalahan saat memuat detail kursus.', 'error');
+      }
+    }
+
+    async function submitAdminEditCourse(e) {
+      e.preventDefault();
+      const courseId = document.getElementById('edit-course-id').value;
+      const btn = document.getElementById('btn-submit-admin-edit-course');
+      const origText = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
+
+      const payload = {
+        title: document.getElementById('edit-course-title').value.trim(),
+        tutor_id: document.getElementById('edit-course-tutor-select').value,
+        category_id: document.getElementById('edit-course-category-select').value,
+        level: document.getElementById('edit-course-level-select').value,
+        price: parseFloat(document.getElementById('edit-course-price').value) || 0,
+        status: document.getElementById('edit-course-status-select').value,
+        thumbnail_url: document.getElementById('edit-course-thumbnail').value.trim() || null,
+        description: document.getElementById('edit-course-description').value.trim() || null,
+      };
+
+      try {
+        const res = await fetch(`/api/courses/${courseId}`, {
+          method: 'PUT',
+          headers: {
+            'Authorization': 'Bearer ' + token,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(payload),
+        });
+
+        const json = await res.json();
+        if (res.ok && json.success) {
+          showToast(json.message || 'Perubahan informasi kursus berhasil disimpan!', 'success');
+          closeModal('modal-admin-edit-course');
+          fetchPlatformCourses();
+          fetchAdminStats();
+        } else {
+          showToast(json.message || 'Gagal menyimpan perubahan kursus.', 'error');
+        }
+      } catch (err) {
+        console.error('Error updating course:', err);
+        showToast('Kesalahan jaringan saat memperbarui kursus.', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = origText;
+      }
+    }
+
+    // Delete Course Action
+    async function deleteCoursePrompt(courseId) {
+      const course = currentCoursesMap[courseId] || {};
+      const courseTitle = course.title || `Kursus #${courseId}`;
+
+      const confirmed = await showCustomConfirm({
+        title: `Hapus Kursus?`,
+        message: `PERINGATAN: Apakah Anda yakin ingin menghapus kursus "${courseTitle}"? Seluruh bab kurikulum, materi video/dokumen, serta riwayat enrollment terkait akan dihapus secara permanen.`,
+        type: 'danger',
+        confirmText: 'Ya, Hapus Kursus',
+        cancelText: 'Batal',
+        icon: 'fa-triangle-exclamation'
+      });
+
+      if (!confirmed) return;
+
+      try {
+        const res = await fetch(`/api/courses/${courseId}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': 'Bearer ' + token },
+        });
+
+        const json = await res.json();
+        if (res.ok && json.success) {
+          showToast(json.message || 'Kursus berhasil dihapus.', 'success');
+          fetchPlatformCourses();
+          fetchAdminStats();
+        } else {
+          showToast(json.message || 'Gagal menghapus kursus.', 'error');
+        }
+      } catch (err) {
+        console.error('Error deleting course:', err);
+        showToast('Kesalahan jaringan saat menghapus kursus.', 'error');
+      }
+    }
+
+    // =========================================================
+    // --- Admin Curriculum & Sub-Bab Manager (Sections & Materials) ---
+    // =========================================================
+
+    async function openAdminCurriculumModal(courseId) {
+      const container = document.getElementById('admin-curriculum-sections-container');
+      const titleEl = document.getElementById('curriculum-modal-title');
+      const subtitleEl = document.getElementById('curriculum-modal-subtitle');
+      const statsEl = document.getElementById('curriculum-stats-summary');
+
+      if (container) {
+        container.innerHTML = `
+          <div style="text-align:center; padding:40px; color:var(--text-secondary);">
+            <i class="fas fa-spinner fa-spin" style="font-size:20px; margin-bottom:10px; display:block;"></i>
+            Memuat kurikulum & sub-bab materi...
+          </div>
+        `;
+      }
+
+      openModal('modal-admin-curriculum');
+
+      try {
+        const res = await fetch(`/api/courses/${courseId}`, {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        const json = await res.json();
+
+        if (!json.success || !json.data) {
+          showToast('Gagal memuat data kurikulum kursus.', 'error');
+          closeModal('modal-admin-curriculum');
+          return;
+        }
+
+        activeCurriculumCourse = json.data;
+        const course = activeCurriculumCourse;
+        const sections = Array.isArray(course.sections) ? course.sections : [];
+
+        if (titleEl) {
+          titleEl.innerHTML = `<i class="fas fa-list-check" style="margin-right:8px;"></i> ${escapeHtml(course.title)}`;
+        }
+        if (subtitleEl) {
+          const tutorName = course.tutor ? course.tutor.name : 'Tutor';
+          const catName = course.category ? course.category.name : 'Umum';
+          subtitleEl.textContent = `Tutor: ${tutorName} • Kategori: ${catName} • ID: #${course.id}`;
+        }
+
+        // Calculate Stats
+        let totalMaterials = 0;
+        let totalDuration = 0;
+        sections.forEach(s => {
+          const mats = Array.isArray(s.materials) ? s.materials : [];
+          totalMaterials += mats.length;
+          mats.forEach(m => {
+            totalDuration += (Number(m.duration_minutes) || 0);
+          });
+        });
+
+        if (statsEl) {
+          statsEl.innerHTML = `
+            <span style="display:inline-flex; align-items:center; gap:16px;">
+              <span><i class="fas fa-layer-group" style="color:var(--text-secondary); margin-right:4px;"></i> <strong>${sections.length}</strong> Bab Modul</span>
+              <span><i class="fas fa-file-lines" style="color:var(--text-secondary); margin-right:4px;"></i> <strong>${totalMaterials}</strong> Sub-Materi</span>
+              <span><i class="fas fa-clock" style="color:var(--text-secondary); margin-right:4px;"></i> <strong>${totalDuration}</strong> Menit Total</span>
+            </span>
+          `;
+        }
+
+        renderAdminCurriculumSections(sections);
+      } catch (err) {
+        console.error('Error opening curriculum modal:', err);
+        showToast('Kesalahan saat memuat kurikulum kursus.', 'error');
+        if (container) {
+          container.innerHTML = `<div style="text-align:center; padding:30px; color:var(--color-danger);">Gagal memuat kurikulum: ${escapeHtml(err.message)}</div>`;
+        }
+      }
+    }
+
+    function renderAdminCurriculumSections(sections) {
+      const container = document.getElementById('admin-curriculum-sections-container');
+      if (!container) return;
+
+      if (!sections.length) {
+        container.innerHTML = `
+          <div style="text-align:center; padding:40px; background:var(--bg-surface-subtle); border-radius:var(--radius-lg); border:1px dashed var(--border-subtle); color:var(--text-secondary);">
+            <i class="fas fa-folder-open" style="font-size:28px; margin-bottom:10px; display:block; opacity:0.5;"></i>
+            Belum ada bab/modul pada kursus ini.
+            <div style="margin-top:12px;">
+              <button class="btn btn-primary btn-sm" onclick="openAddSectionPrompt()">
+                <i class="fas fa-plus"></i> Tambah Bab Perdana
+              </button>
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      const formatIcons = {
+        video: 'fa-play-circle',
+        pdf: 'fa-file-pdf',
+        ppt: 'fa-file-powerpoint',
+        doc: 'fa-file-word',
+        book: 'fa-book-open',
+      };
+
+      container.innerHTML = sections.map((sec, secIdx) => {
+        const materials = Array.isArray(sec.materials) ? sec.materials : [];
+
+        const materialsListHtml = materials.length ? `
+          <div style="display:flex; flex-direction:column; gap:8px; margin-top:12px; padding-top:12px; border-top:1px solid var(--border-subtle);">
+            ${materials.map((mat, matIdx) => {
+              const iconClass = formatIcons[mat.content_type] || 'fa-file-lines';
+              return `
+                <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 12px; background:var(--bg-primary); border-radius:var(--radius-md); border:1px solid var(--border-subtle);">
+                  <div style="display:flex; align-items:center; gap:10px; flex:1; min-width:0;">
+                    <div style="width:28px; height:28px; border-radius:var(--radius-sm); background:var(--bg-surface-subtle); display:flex; align-items:center; justify-content:center; color:var(--text-primary); font-size:12px; flex-shrink:0;">
+                      <i class="fas ${iconClass}"></i>
+                    </div>
+                    <div style="min-width:0; flex:1;">
+                      <div style="font-size:13px; font-weight:600; color:var(--text-primary); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                        ${escapeHtml(mat.title)}
+                      </div>
+                      <div style="font-size:11.5px; color:var(--text-secondary); display:flex; gap:10px; align-items:center; margin-top:2px;">
+                        <span><i class="fas fa-clock" style="font-size:10px;"></i> ${mat.duration_minutes || 0} menit</span>
+                        <span class="user-role-tag" style="font-size:9.5px; padding:1px 5px;">${escapeHtml((mat.content_type || 'doc').toUpperCase())}</span>
+                        ${mat.is_preview ? '<span style="color:var(--color-success); font-weight:600;"><i class="fas fa-unlock"></i> Gratis Preview</span>' : '<span style="color:var(--text-tertiary);"><i class="fas fa-lock"></i> Premium</span>'}
+                      </div>
+                    </div>
+                  </div>
+                  <div style="display:flex; align-items:center; gap:6px; margin-left:12px; flex-shrink:0;">
+                    <button 
+                      class="btn btn-outline btn-sm" 
+                      onclick="openEditMaterialModal(${sec.id}, ${mat.id})" 
+                      style="padding:4px 8px; font-size:11px;" 
+                      title="Edit Materi"
+                    >
+                      <i class="fas fa-pen"></i>
+                    </button>
+                    <button 
+                      class="btn btn-outline btn-sm" 
+                      onclick="deleteMaterialPrompt(${mat.id}, '${escapeHtml(mat.title)}')" 
+                      style="padding:4px 8px; font-size:11px; color:var(--color-danger);" 
+                      title="Hapus Materi"
+                    >
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        ` : `
+          <div style="margin-top:10px; padding:12px; background:var(--bg-primary); border-radius:var(--radius-md); border:1px dashed var(--border-subtle); text-align:center; font-size:12px; color:var(--text-secondary);">
+            Belum ada sub-materi di bab ini. Klik <strong>"+ Tambah Materi"</strong> untuk mengunggah materi pertama.
+          </div>
+        `;
+
+        return `
+          <div style="background:var(--bg-surface-subtle); border-radius:var(--radius-lg); border:1px solid var(--border-subtle); padding:14px 16px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+              <div style="display:flex; align-items:center; gap:10px;">
+                <span class="status-pill status-locked" style="font-weight:700;">#${sec.order_index || (secIdx + 1)}</span>
+                <strong style="font-size:14.5px; color:var(--text-primary);">${escapeHtml(sec.title)}</strong>
+                <span class="user-role-tag" style="font-size:10px;">${materials.length} Materi</span>
+              </div>
+              <div style="display:flex; align-items:center; gap:6px;">
+                <button 
+                  class="btn btn-primary btn-sm" 
+                  onclick="openAddMaterialModal(${sec.id})" 
+                  style="font-size:11.5px; padding:4px 10px; display:inline-flex; align-items:center; gap:4px;"
+                >
+                  <i class="fas fa-plus"></i> Tambah Materi
+                </button>
+                <button 
+                  class="btn btn-outline btn-sm" 
+                  onclick="openEditSectionPrompt(${sec.id}, '${escapeHtml(sec.title)}', ${sec.order_index || (secIdx + 1)})" 
+                  style="font-size:11.5px; padding:4px 8px;" 
+                  title="Edit Judul Bab"
+                >
+                  <i class="fas fa-pen"></i>
+                </button>
+                <button 
+                  class="btn btn-outline btn-sm" 
+                  onclick="deleteSectionPrompt(${sec.id}, '${escapeHtml(sec.title)}')" 
+                  style="font-size:11.5px; padding:4px 8px; color:var(--color-danger);" 
+                  title="Hapus Bab"
+                >
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+            </div>
+            ${materialsListHtml}
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Section Handlers
+    function openAddSectionPrompt() {
+      if (!activeCurriculumCourse) return;
+      document.getElementById('section-form-modal-title').textContent = 'Tambah Bab Baru';
+      document.getElementById('section-form-mode').value = 'create';
+      document.getElementById('section-form-id').value = '';
+      document.getElementById('section-title-input').value = '';
+      
+      const sections = activeCurriculumCourse.sections || [];
+      document.getElementById('section-order-input').value = sections.length + 1;
+
+      openModal('modal-admin-section-form');
+    }
+
+    function openEditSectionPrompt(sectionId, currentTitle, currentOrder) {
+      document.getElementById('section-form-modal-title').textContent = 'Edit Judul Bab';
+      document.getElementById('section-form-mode').value = 'edit';
+      document.getElementById('section-form-id').value = sectionId;
+      document.getElementById('section-title-input').value = currentTitle || '';
+      document.getElementById('section-order-input').value = currentOrder || 1;
+
+      openModal('modal-admin-section-form');
+    }
+
+    async function submitAdminSectionForm(e) {
+      e.preventDefault();
+      if (!activeCurriculumCourse) return;
+
+      const mode = document.getElementById('section-form-mode').value;
+      const sectionId = document.getElementById('section-form-id').value;
+      const title = document.getElementById('section-title-input').value.trim();
+      const order_index = parseInt(document.getElementById('section-order-input').value, 10) || 1;
+
+      const btn = document.getElementById('btn-submit-section-form');
+      const origText = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
+
+      try {
+        let url = `/api/courses/${activeCurriculumCourse.id}/sections`;
+        let method = 'POST';
+
+        if (mode === 'edit') {
+          url = `/api/courses/sections/${sectionId}`;
+          method = 'PUT';
+        }
+
+        const res = await fetch(url, {
+          method,
+          headers: {
+            'Authorization': 'Bearer ' + token,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ title, order_index }),
+        });
+
+        const json = await res.json();
+        if (res.ok && json.success) {
+          showToast(json.message || 'Bab berhasil disimpan!', 'success');
+          closeModal('modal-admin-section-form');
+          openAdminCurriculumModal(activeCurriculumCourse.id);
+          fetchPlatformCourses();
+        } else {
+          showToast(json.message || 'Gagal menyimpan bab.', 'error');
+        }
+      } catch (err) {
+        console.error('Error saving section:', err);
+        showToast('Kesalahan jaringan saat menyimpan bab.', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = origText;
+      }
+    }
+
+    async function deleteSectionPrompt(sectionId, sectionTitle) {
+      const confirmed = await showCustomConfirm({
+        title: `Hapus Bab "${sectionTitle}"?`,
+        message: `PERINGATAN: Menghapus bab ini akan menghapus seluruh sub-materi yang ada di dalamnya secara permanen.`,
+        type: 'danger',
+        confirmText: 'Ya, Hapus Bab',
+        cancelText: 'Batal',
+        icon: 'fa-trash'
+      });
+
+      if (!confirmed) return;
+
+      try {
+        const res = await fetch(`/api/courses/sections/${sectionId}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': 'Bearer ' + token },
+        });
+
+        const json = await res.json();
+        if (res.ok && json.success) {
+          showToast(json.message || 'Bab berhasil dihapus.', 'success');
+          if (activeCurriculumCourse) {
+            openAdminCurriculumModal(activeCurriculumCourse.id);
+          }
+          fetchPlatformCourses();
+        } else {
+          showToast(json.message || 'Gagal menghapus bab.', 'error');
+        }
+      } catch (err) {
+        console.error('Error deleting section:', err);
+        showToast('Kesalahan jaringan saat menghapus bab.', 'error');
+      }
+    }
+
+    // Material Handlers
+    function openAddMaterialModal(sectionId) {
+      document.getElementById('material-form-modal-title').textContent = 'Tambah Materi Sub-Bab';
+      document.getElementById('material-form-mode').value = 'create';
+      document.getElementById('material-form-section-id').value = sectionId;
+      document.getElementById('material-form-id').value = '';
+      document.getElementById('material-title-input').value = '';
+      document.getElementById('material-type-select').value = 'video';
+      document.getElementById('material-duration-input').value = '10';
+      document.getElementById('material-url-input').value = '';
+      document.getElementById('material-preview-checkbox').checked = false;
+
+      // Find highest order in section
+      let nextOrder = 1;
+      if (activeCurriculumCourse && activeCurriculumCourse.sections) {
+        const sec = activeCurriculumCourse.sections.find(s => String(s.id) === String(sectionId));
+        if (sec && sec.materials) {
+          nextOrder = sec.materials.length + 1;
+        }
+      }
+      document.getElementById('material-order-input').value = nextOrder;
+
+      openModal('modal-admin-material-form');
+    }
+
+    async function openEditMaterialModal(sectionId, materialId) {
+      let mat = null;
+      if (activeCurriculumCourse && activeCurriculumCourse.sections) {
+        const sec = activeCurriculumCourse.sections.find(s => String(s.id) === String(sectionId));
+        if (sec && sec.materials) {
+          mat = sec.materials.find(m => String(m.id) === String(materialId));
+        }
+      }
+
+      if (!mat) {
+        try {
+          const res = await fetch(`/api/materials/${materialId}`, {
+            headers: { 'Authorization': 'Bearer ' + token }
+          });
+          const json = await res.json();
+          if (json.success && json.data) mat = json.data;
+        } catch (_) {}
+      }
+
+      if (!mat) {
+        showToast('Data materi tidak ditemukan.', 'error');
+        return;
+      }
+
+      document.getElementById('material-form-modal-title').textContent = 'Edit Materi Sub-Bab';
+      document.getElementById('material-form-mode').value = 'edit';
+      document.getElementById('material-form-section-id').value = sectionId;
+      document.getElementById('material-form-id').value = mat.id;
+      document.getElementById('material-title-input').value = mat.title || '';
+      document.getElementById('material-type-select').value = mat.content_type || 'video';
+      document.getElementById('material-duration-input').value = mat.duration_minutes || 10;
+      document.getElementById('material-url-input').value = mat.file_url || '';
+      document.getElementById('material-preview-checkbox').checked = !!mat.is_preview;
+      document.getElementById('material-order-input').value = mat.order_index || 1;
+
+      openModal('modal-admin-material-form');
+    }
+
+    async function submitAdminMaterialForm(e) {
+      e.preventDefault();
+      if (!activeCurriculumCourse) return;
+
+      const mode = document.getElementById('material-form-mode').value;
+      const sectionId = document.getElementById('material-form-section-id').value;
+      const materialId = document.getElementById('material-form-id').value;
+
+      const btn = document.getElementById('btn-submit-material-form');
+      const origText = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
+
+      const payload = {
+        section_id: sectionId,
+        title: document.getElementById('material-title-input').value.trim(),
+        content_type: document.getElementById('material-type-select').value,
+        duration_minutes: parseInt(document.getElementById('material-duration-input').value, 10) || 0,
+        file_url: document.getElementById('material-url-input').value.trim(),
+        is_preview: document.getElementById('material-preview-checkbox').checked,
+        order_index: parseInt(document.getElementById('material-order-input').value, 10) || 1,
+      };
+
+      try {
+        let url = '/api/materials';
+        let method = 'POST';
+
+        if (mode === 'edit') {
+          url = `/api/materials/${materialId}`;
+          method = 'PUT';
+        }
+
+        const res = await fetch(url, {
+          method,
+          headers: {
+            'Authorization': 'Bearer ' + token,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(payload),
+        });
+
+        const json = await res.json();
+        if (res.ok && json.success) {
+          showToast(json.message || 'Materi berhasil disimpan!', 'success');
+          closeModal('modal-admin-material-form');
+          openAdminCurriculumModal(activeCurriculumCourse.id);
+        } else {
+          showToast(json.message || 'Gagal menyimpan materi.', 'error');
+        }
+      } catch (err) {
+        console.error('Error saving material:', err);
+        showToast('Kesalahan jaringan saat menyimpan materi.', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = origText;
+      }
+    }
+
+    async function deleteMaterialPrompt(materialId, materialTitle) {
+      const confirmed = await showCustomConfirm({
+        title: `Hapus Materi?`,
+        message: `Apakah Anda yakin ingin menghapus materi "${materialTitle}"? Berkas media terkait di server juga akan dibersihkan.`,
+        type: 'danger',
+        confirmText: 'Ya, Hapus Materi',
+        cancelText: 'Batal',
+        icon: 'fa-trash'
+      });
+
+      if (!confirmed) return;
+
+      try {
+        const res = await fetch(`/api/materials/${materialId}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': 'Bearer ' + token },
+        });
+
+        const json = await res.json();
+        if (res.ok && json.success) {
+          showToast(json.message || 'Materi berhasil dihapus.', 'success');
+          if (activeCurriculumCourse) {
+            openAdminCurriculumModal(activeCurriculumCourse.id);
+          }
+        } else {
+          showToast(json.message || 'Gagal menghapus materi.', 'error');
+        }
+      } catch (err) {
+        console.error('Error deleting material:', err);
+        showToast('Kesalahan jaringan saat menghapus materi.', 'error');
       }
     }
 
@@ -2664,7 +4128,6 @@
         });
 
         if (!res.ok) {
-          // Fallback directly to general course update endpoint
           res = await fetch(`/api/courses/${courseId}`, {
             method: 'PUT',
             headers: {
@@ -2716,7 +4179,6 @@
         });
 
         if (!res.ok) {
-          // Fallback directly to general course update endpoint
           res = await fetch(`/api/courses/${courseId}`, {
             method: 'PUT',
             headers: {
@@ -2812,6 +4274,599 @@
             `;
           }).join('');
         }
+      }
+    }
+
+    // ==========================================
+    // USER MANAGEMENT FUNCTIONS (SISWA, TUTOR, ADMIN)
+    // ==========================================
+
+    async function fetchAdminUsers() {
+      const tbody = document.getElementById('admin-users-table-body');
+      if (tbody) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="6" style="text-align:center; padding:32px; color:var(--text-secondary);">
+              <i class="fas fa-spinner fa-spin" style="margin-right:8px;"></i> Memuat data pengguna...
+            </td>
+          </tr>
+        `;
+      }
+
+      try {
+        const offset = currentUserPage * USERS_PER_PAGE;
+        let queryParams = new URLSearchParams({
+          limit: USERS_PER_PAGE,
+          offset: offset,
+          sort: 'created_at',
+          order: 'DESC'
+        });
+
+        if (currentUserRoleFilter && currentUserRoleFilter !== 'all') {
+          queryParams.append('role', currentUserRoleFilter);
+        }
+        if (currentUserStatusFilter && currentUserStatusFilter !== 'all') {
+          queryParams.append('status', currentUserStatusFilter);
+        }
+        if (currentUserSearchQuery && currentUserSearchQuery.trim() !== '') {
+          queryParams.append('search', currentUserSearchQuery.trim());
+        }
+
+        const res = await fetch(`/api/admin/users?${queryParams.toString()}`, {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        const json = await res.json();
+
+        if (json.success && json.data) {
+          const { total, users, summary } = json.data;
+          allUsers = Array.isArray(users) ? users : [];
+
+          // Update Summary Statistics
+          if (summary) {
+            const totalBadge = document.getElementById('badge-users-total');
+            if (totalBadge) totalBadge.textContent = summary.totalUsers || 0;
+
+            const statTotal = document.getElementById('stat-users-total');
+            if (statTotal) statTotal.textContent = summary.totalUsers || 0;
+
+            const statStudent = document.getElementById('stat-users-student');
+            if (statStudent) statStudent.textContent = summary.totalStudents || 0;
+
+            const statTutor = document.getElementById('stat-users-tutor');
+            if (statTutor) statTutor.textContent = summary.totalTutors || 0;
+
+            const statAdmin = document.getElementById('stat-users-admin');
+            if (statAdmin) statAdmin.textContent = summary.totalAdmins || 0;
+
+            const statInactive = document.getElementById('stat-users-inactive');
+            if (statInactive) statInactive.textContent = summary.totalInactive || 0;
+          }
+
+          renderUsersTable(allUsers, total, offset);
+        } else {
+          if (tbody) {
+            tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:32px; color:var(--color-danger);">${escapeHtml(json.message || 'Gagal memuat pengguna.')}</td></tr>`;
+          }
+        }
+      } catch (err) {
+        console.error('Error fetching users:', err);
+        if (tbody) {
+          tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:32px; color:var(--color-danger);">Terjadi kesalahan koneksi jaringan.</td></tr>`;
+        }
+      }
+    }
+
+    function renderUsersTable(users, total = 0, offset = 0) {
+      const tbody = document.getElementById('admin-users-table-body');
+      if (!tbody) return;
+
+      if (!users.length) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="6" style="text-align:center; padding:40px; color:var(--text-secondary);">
+              <i class="fas fa-users-slash" style="font-size:24px; margin-bottom:10px; display:block; opacity:0.6;"></i>
+              Tidak ada data pengguna yang sesuai dengan filter pencarian.
+            </td>
+          </tr>
+        `;
+        updateUsersPagination(0, 0, 0);
+        return;
+      }
+
+      tbody.innerHTML = users.map(u => {
+        const initials = (u.name || 'User').split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() || 'U';
+        const profile = u.profile || {};
+        const isSelf = currentAdminUserId && u.id === currentAdminUserId;
+
+        // Role Badge
+        let roleBadge = '<span class="role-badge student"><i class="fas fa-user-graduate"></i> Siswa</span>';
+        if (u.role === 'tutor') {
+          roleBadge = '<span class="role-badge tutor"><i class="fas fa-chalkboard-user"></i> Tutor</span>';
+        } else if (u.role === 'admin') {
+          roleBadge = '<span class="role-badge admin"><i class="fas fa-shield-halved"></i> Admin</span>';
+        }
+
+        // Status Badge
+        const statusBadge = u.is_active
+          ? '<span class="status-pill status-active"><i class="fas fa-check"></i> Aktif</span>'
+          : '<span class="status-pill status-rejected"><i class="fas fa-ban"></i> Suspended</span>';
+
+        // Verified Badge
+        const verifiedBadge = u.is_verified
+          ? '<span style="color:var(--color-success); font-size:12px; font-weight:600; display:inline-flex; align-items:center; gap:4px;"><i class="fas fa-circle-check"></i> Terverifikasi</span>'
+          : '<span style="color:var(--text-tertiary); font-size:12px; display:inline-flex; align-items:center; gap:4px;"><i class="fas fa-clock"></i> Belum</span>';
+
+        // Registered Date
+        const dateStr = new Date(u.created_at || u.createdAt || Date.now()).toLocaleDateString('id-ID', {
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric'
+        });
+
+        return `
+          <tr>
+            <td>
+              <div class="user-cell-info">
+                <div class="user-table-avatar">${escapeHtml(initials)}</div>
+                <div class="user-cell-meta">
+                  <div class="user-cell-name">
+                    ${escapeHtml(u.name)}
+                    ${isSelf ? '<span class="user-role-tag" style="margin-left:6px; font-size:9.5px; background:var(--accent-primary); color:var(--accent-text);">AKUN ANDA</span>' : ''}
+                  </div>
+                  <div class="user-cell-email">${escapeHtml(u.email)}</div>
+                </div>
+              </div>
+            </td>
+            <td>${roleBadge}</td>
+            <td>${statusBadge}</td>
+            <td>${verifiedBadge}</td>
+            <td style="font-size:12.5px; color:var(--text-secondary);">${dateStr}</td>
+            <td style="text-align:right;">
+              <div class="user-actions-group">
+                <button 
+                  class="btn btn-outline btn-sm" 
+                  onclick="openEditUserModal(${u.id})" 
+                  title="Detail & Edit Pengguna"
+                  style="padding:5px 9px; font-size:11.5px;"
+                >
+                  <i class="fas fa-pen-to-square"></i>
+                </button>
+                <button 
+                  class="btn btn-outline btn-sm" 
+                  onclick="quickChangeRoleAction(${u.id}, '${u.role}', '${escapeHtml(u.name)}')" 
+                  title="Ubah Peran (Role)"
+                  style="padding:5px 9px; font-size:11.5px;"
+                  ${isSelf ? 'disabled' : ''}
+                >
+                  <i class="fas fa-user-tag"></i>
+                </button>
+                <button 
+                  class="btn btn-outline btn-sm" 
+                  onclick="toggleUserStatusAction(${u.id}, ${u.is_active}, '${escapeHtml(u.name)}')" 
+                  title="${u.is_active ? 'Suspend / Bekukan Akun' : 'Aktifkan Kembali Akun'}"
+                  style="padding:5px 9px; font-size:11.5px; ${u.is_active ? 'color:var(--color-warning);' : 'color:var(--color-success);'}"
+                  ${isSelf ? 'disabled' : ''}
+                >
+                  <i class="fas ${u.is_active ? 'fa-user-slash' : 'fa-user-check'}"></i>
+                </button>
+                <button 
+                  class="btn btn-outline btn-sm" 
+                  onclick="deleteUserAction(${u.id}, '${escapeHtml(u.name)}', '${escapeHtml(u.email)}')" 
+                  title="Hapus Akun Pengguna"
+                  style="padding:5px 9px; font-size:11.5px; color:var(--color-danger);"
+                  ${isSelf ? 'disabled' : ''}
+                >
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      updateUsersPagination(total, offset, users.length);
+    }
+
+    function updateUsersPagination(total, offset, currentCount) {
+      const infoEl = document.getElementById('users-pagination-info');
+      const prevBtn = document.getElementById('btn-users-prev');
+      const nextBtn = document.getElementById('btn-users-next');
+
+      if (infoEl) {
+        if (total === 0) {
+          infoEl.textContent = 'Menampilkan 0 pengguna';
+        } else {
+          const start = offset + 1;
+          const end = offset + currentCount;
+          infoEl.textContent = `Menampilkan ${start}-${end} dari ${total} pengguna`;
+        }
+      }
+
+      if (prevBtn) {
+        prevBtn.disabled = currentUserPage <= 0;
+      }
+      if (nextBtn) {
+        nextBtn.disabled = (offset + currentCount) >= total;
+      }
+    }
+
+    function changeUsersPage(delta) {
+      currentUserPage += delta;
+      if (currentUserPage < 0) currentUserPage = 0;
+      fetchAdminUsers();
+    }
+
+    function filterAdminUsersRole(role, btn) {
+      currentUserRoleFilter = role;
+      currentUserPage = 0;
+
+      const group = document.getElementById('users-role-filter-group');
+      if (group) {
+        group.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      }
+      if (btn) btn.classList.add('active');
+
+      fetchAdminUsers();
+    }
+
+    function filterAdminUsersStatus(status) {
+      currentUserStatusFilter = status;
+      currentUserPage = 0;
+      fetchAdminUsers();
+    }
+
+    function debounceAdminUserSearch(val) {
+      if (userSearchTimeout) clearTimeout(userSearchTimeout);
+      userSearchTimeout = setTimeout(() => {
+        currentUserSearchQuery = val;
+        currentUserPage = 0;
+        fetchAdminUsers();
+      }, 350);
+    }
+
+    // Modal Add User
+    function openAddUserModal() {
+      const form = document.getElementById('form-add-user');
+      if (form) form.reset();
+      const activeCb = document.getElementById('add-user-active');
+      const verifiedCb = document.getElementById('add-user-verified');
+      if (activeCb) activeCb.checked = true;
+      if (verifiedCb) verifiedCb.checked = true;
+
+      openModal('modal-add-user');
+    }
+
+    async function submitAddUserForm(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btn-submit-add-user');
+      const origText = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
+
+      const payload = {
+        name: document.getElementById('add-user-name').value.trim(),
+        email: document.getElementById('add-user-email').value.trim(),
+        password: document.getElementById('add-user-password').value,
+        role: document.getElementById('add-user-role').value,
+        phone_number: document.getElementById('add-user-phone').value.trim(),
+        career_goal: document.getElementById('add-user-career').value.trim(),
+        bio: document.getElementById('add-user-bio').value.trim(),
+        is_active: document.getElementById('add-user-active').checked,
+        is_verified: document.getElementById('add-user-verified').checked,
+      };
+
+      try {
+        const res = await fetch('/api/admin/users', {
+          method: 'POST',
+          headers: {
+            'Authorization': 'Bearer ' + token,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(payload),
+        });
+
+        const json = await res.json();
+        if (res.ok && json.success) {
+          showToast(json.message || 'Pengguna baru berhasil ditambahkan!', 'success');
+          closeModal('modal-add-user');
+          fetchAdminUsers();
+          fetchAdminStats();
+        } else {
+          showToast(json.message || 'Gagal menambahkan pengguna.', 'error');
+        }
+      } catch (err) {
+        console.error('Error adding user:', err);
+        showToast('Terjadi kesalahan jaringan saat membuat pengguna.', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = origText;
+      }
+    }
+
+    // Modal Edit & Detail User
+    async function openEditUserModal(userId) {
+      try {
+        const res = await fetch(`/api/admin/users/${userId}`, {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        const json = await res.json();
+
+        if (!json.success || !json.data) {
+          showToast('Gagal memuat rincian data pengguna.', 'error');
+          return;
+        }
+
+        const u = json.data;
+        const profile = u.profile || {};
+        const isSelf = currentAdminUserId && u.id === currentAdminUserId;
+
+        document.getElementById('edit-user-id').value = u.id;
+        document.getElementById('edit-user-name').value = u.name || '';
+        document.getElementById('edit-user-email').value = u.email || '';
+        document.getElementById('edit-user-role').value = u.role || 'student';
+        document.getElementById('edit-user-phone').value = profile.phone_number || '';
+        document.getElementById('edit-user-career').value = profile.career_goal || '';
+        document.getElementById('edit-user-bio').value = profile.bio || '';
+        document.getElementById('edit-user-password').value = '';
+        document.getElementById('edit-user-active').checked = !!u.is_active;
+        document.getElementById('edit-user-verified').checked = !!u.is_verified;
+
+        // Role & status disable if self
+        document.getElementById('edit-user-role').disabled = isSelf;
+        document.getElementById('edit-user-active').disabled = isSelf;
+
+        // Header meta info
+        const initials = (u.name || 'User').split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() || 'U';
+        const dateStr = new Date(u.created_at || u.createdAt || Date.now()).toLocaleDateString('id-ID', {
+          year: 'numeric', month: 'long', day: 'numeric'
+        });
+
+        let roleBadge = '<span class="role-badge student"><i class="fas fa-user-graduate"></i> Siswa</span>';
+        if (u.role === 'tutor') {
+          roleBadge = '<span class="role-badge tutor"><i class="fas fa-chalkboard-user"></i> Tutor</span>';
+        } else if (u.role === 'admin') {
+          roleBadge = '<span class="role-badge admin"><i class="fas fa-shield-halved"></i> Admin</span>';
+        }
+
+        document.getElementById('edit-user-header-info').innerHTML = `
+          <div class="user-table-avatar" style="width:44px; height:44px; font-size:15px;">${escapeHtml(initials)}</div>
+          <div style="flex:1;">
+            <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+              <strong style="font-size:15px; color:var(--text-primary);">${escapeHtml(u.name)}</strong>
+              ${roleBadge}
+              ${u.is_active ? '<span class="status-pill status-active" style="font-size:10px;">Aktif</span>' : '<span class="status-pill status-rejected" style="font-size:10px;">Suspended</span>'}
+            </div>
+            <div style="font-size:12px; color:var(--text-secondary); margin-top:3px;">
+              ID: #${u.id} • ${escapeHtml(u.email)} • Terdaftar sejak ${dateStr}
+            </div>
+          </div>
+        `;
+
+        // Extra stats section
+        let extraStatsHtml = '';
+        if (u.role === 'tutor') {
+          const wallet = u.wallet || { balance: 0, pending_balance: 0 };
+          const taughtCourses = Array.isArray(u.taught_courses) ? u.taught_courses.length : 0;
+          extraStatsHtml = `
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; padding:12px; background:var(--bg-surface-subtle); border-radius:var(--radius-md); border:1px solid var(--border-subtle);">
+              <div>
+                <span style="font-size:11px; text-transform:uppercase; color:var(--text-tertiary); font-weight:700;">Total Kursus Dibuat</span>
+                <div style="font-size:16px; font-weight:700; color:var(--text-primary); margin-top:2px;">${taughtCourses} Kursus</div>
+              </div>
+              <div>
+                <span style="font-size:11px; text-transform:uppercase; color:var(--text-tertiary); font-weight:700;">Saldo Dompet Tutor</span>
+                <div style="font-size:16px; font-weight:700; color:var(--color-success); margin-top:2px;">Rp ${Number(wallet.balance || 0).toLocaleString('id-ID')}</div>
+              </div>
+            </div>
+          `;
+        } else if (u.role === 'student') {
+          const enrollments = Array.isArray(u.enrollments) ? u.enrollments.length : 0;
+          const certificates = Array.isArray(u.certificates) ? u.certificates.length : 0;
+          extraStatsHtml = `
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; padding:12px; background:var(--bg-surface-subtle); border-radius:var(--radius-md); border:1px solid var(--border-subtle);">
+              <div>
+                <span style="font-size:11px; text-transform:uppercase; color:var(--text-tertiary); font-weight:700;">Kursus Diikuti</span>
+                <div style="font-size:16px; font-weight:700; color:var(--text-primary); margin-top:2px;">${enrollments} Kursus</div>
+              </div>
+              <div>
+                <span style="font-size:11px; text-transform:uppercase; color:var(--text-tertiary); font-weight:700;">Sertifikat Diraih</span>
+                <div style="font-size:16px; font-weight:700; color:var(--text-primary); margin-top:2px;">${certificates} Sertifikat</div>
+              </div>
+            </div>
+          `;
+        }
+        document.getElementById('edit-user-extra-stats').innerHTML = extraStatsHtml;
+
+        // Delete button inside modal
+        const deleteBtn = document.getElementById('btn-delete-user-modal');
+        if (deleteBtn) {
+          deleteBtn.style.display = isSelf ? 'none' : 'inline-flex';
+          deleteBtn.onclick = () => {
+            closeModal('modal-edit-user');
+            deleteUserAction(u.id, u.name, u.email);
+          };
+        }
+
+        openModal('modal-edit-user');
+      } catch (err) {
+        console.error('Error fetching user detail:', err);
+        showToast('Terjadi kesalahan saat memuat rincian pengguna.', 'error');
+      }
+    }
+
+    async function submitEditUserForm(e) {
+      e.preventDefault();
+      const userId = document.getElementById('edit-user-id').value;
+      const btn = document.getElementById('btn-submit-edit-user');
+      const origText = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
+
+      const payload = {
+        name: document.getElementById('edit-user-name').value.trim(),
+        email: document.getElementById('edit-user-email').value.trim(),
+        role: document.getElementById('edit-user-role').value,
+        phone_number: document.getElementById('edit-user-phone').value.trim(),
+        career_goal: document.getElementById('edit-user-career').value.trim(),
+        bio: document.getElementById('edit-user-bio').value.trim(),
+        is_active: document.getElementById('edit-user-active').checked,
+        is_verified: document.getElementById('edit-user-verified').checked,
+      };
+
+      const newPass = document.getElementById('edit-user-password').value.trim();
+      if (newPass) {
+        payload.password = newPass;
+      }
+
+      try {
+        const res = await fetch(`/api/admin/users/${userId}`, {
+          method: 'PUT',
+          headers: {
+            'Authorization': 'Bearer ' + token,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(payload),
+        });
+
+        const json = await res.json();
+        if (res.ok && json.success) {
+          showToast(json.message || 'Perubahan data pengguna berhasil disimpan!', 'success');
+          closeModal('modal-edit-user');
+          fetchAdminUsers();
+          fetchAdminStats();
+        } else {
+          showToast(json.message || 'Gagal menyimpan perubahan pengguna.', 'error');
+        }
+      } catch (err) {
+        console.error('Error updating user:', err);
+        showToast('Terjadi kesalahan jaringan saat menyimpan data pengguna.', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = origText;
+      }
+    }
+
+    // Toggle Suspend / Reactivate Status
+    async function toggleUserStatusAction(userId, currentStatus, userName) {
+      const willSuspend = currentStatus === true || currentStatus === 1 || currentStatus === 'true';
+      const confirmed = await showCustomConfirm({
+        title: willSuspend ? `Suspend Akun ${userName}?` : `Aktifkan Kembali Akun ${userName}?`,
+        message: willSuspend
+          ? `Akun "${userName}" tidak akan dapat login ke platform SkillSphere selama masa suspensi berlangsung.`
+          : `Akun "${userName}" akan diaktifkan kembali dan dapat login serta mengakses fitur platform seperti biasa.`,
+        type: willSuspend ? 'danger' : 'success',
+        confirmText: willSuspend ? 'Ya, Suspend Akun' : 'Ya, Aktifkan Akun',
+        cancelText: 'Batal',
+        icon: willSuspend ? 'fa-user-slash' : 'fa-user-check'
+      });
+
+      if (!confirmed) return;
+
+      try {
+        const res = await fetch(`/api/admin/users/${userId}/status`, {
+          method: 'PUT',
+          headers: {
+            'Authorization': 'Bearer ' + token,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ is_active: !willSuspend }),
+        });
+
+        const json = await res.json();
+        if (res.ok && json.success) {
+          showToast(json.message || 'Status akun berhasil diperbarui!', willSuspend ? 'warning' : 'success');
+          fetchAdminUsers();
+          fetchAdminStats();
+        } else {
+          showToast(json.message || 'Gagal mengubah status akun.', 'error');
+        }
+      } catch (err) {
+        console.error('Error toggling status:', err);
+        showToast('Kesalahan jaringan saat memproses status akun.', 'error');
+      }
+    }
+
+    // Quick Change Role
+    async function quickChangeRoleAction(userId, currentRole, userName) {
+      // Cycle or choose role
+      let nextRole = 'tutor';
+      let nextRoleLabel = 'Pengajar (Tutor)';
+      if (currentRole === 'tutor') {
+        nextRole = 'admin';
+        nextRoleLabel = 'Administrator (Admin)';
+      } else if (currentRole === 'admin') {
+        nextRole = 'student';
+        nextRoleLabel = 'Siswa (Student)';
+      } else {
+        nextRole = 'tutor';
+        nextRoleLabel = 'Pengajar (Tutor)';
+      }
+
+      const confirmed = await showCustomConfirm({
+        title: `Ubah Peran Akun ${userName}`,
+        message: `Ubah peran akun "${userName}" dari ${currentRole.toUpperCase()} menjadi ${nextRoleLabel}?`,
+        type: 'primary',
+        confirmText: `Ubah ke ${nextRole.toUpperCase()}`,
+        cancelText: 'Batal',
+        icon: 'fa-user-tag'
+      });
+
+      if (!confirmed) return;
+
+      try {
+        const res = await fetch(`/api/admin/users/${userId}/role`, {
+          method: 'PUT',
+          headers: {
+            'Authorization': 'Bearer ' + token,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ role: nextRole }),
+        });
+
+        const json = await res.json();
+        if (res.ok && json.success) {
+          showToast(json.message || 'Peran akun berhasil diubah!', 'success');
+          fetchAdminUsers();
+          fetchAdminStats();
+        } else {
+          showToast(json.message || 'Gagal mengubah peran akun.', 'error');
+        }
+      } catch (err) {
+        console.error('Error changing role:', err);
+        showToast('Kesalahan jaringan saat mengubah peran pengguna.', 'error');
+      }
+    }
+
+    // Delete User Action
+    async function deleteUserAction(userId, userName, userEmail) {
+      const confirmed = await showCustomConfirm({
+        title: `Hapus Akun ${userName}?`,
+        message: `PERINGATAN: Akun "${userName}" (${userEmail}) beserta seluruh data profil terkait akan dihapus secara permanen dari sistem. Tindakan ini tidak dapat dibatalkan.`,
+        type: 'danger',
+        confirmText: 'Hapus Akun Permanen',
+        cancelText: 'Batal',
+        icon: 'fa-triangle-exclamation'
+      });
+
+      if (!confirmed) return;
+
+      try {
+        const res = await fetch(`/api/admin/users/${userId}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': 'Bearer ' + token },
+        });
+
+        const json = await res.json();
+        if (res.ok && json.success) {
+          showToast(json.message || 'Akun pengguna berhasil dihapus!', 'success');
+          fetchAdminUsers();
+          fetchAdminStats();
+        } else {
+          showToast(json.message || 'Gagal menghapus akun pengguna.', 'error');
+        }
+      } catch (err) {
+        console.error('Error deleting user:', err);
+        showToast('Kesalahan jaringan saat menghapus akun pengguna.', 'error');
       }
     }
 

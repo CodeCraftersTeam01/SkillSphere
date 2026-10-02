@@ -1,6 +1,7 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { User, UserProfile, TutorWallet, TutorApplication, TutorCertification, sequelize } = require('../models');
+const { Op } = require('sequelize');
+const { User, UserProfile, TutorWallet, TutorApplication, TutorCertification, UserDevice, sequelize } = require('../models');
 const { sendOTPEmail } = require('../config/mailer');
 const { processAndConvertToWebP } = require('../utils/imageHelper');
 
@@ -8,6 +9,41 @@ const JWT_SECRET = process.env.JWT_SECRET || 'skillsphere_super_secret_jwt_key_2
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '24h';
 const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || 'skillsphere_super_secret_refresh_jwt_key_2026';
 const JWT_REFRESH_EXPIRES_IN = process.env.JWT_REFRESH_EXPIRES_IN || '7d';
+
+/**
+ * Helper to parse browser and OS info from User-Agent
+ */
+const parseDeviceInfo = (userAgent = '', clientIp = '') => {
+  let browser = 'Browser Web';
+  let os = 'Sistem Operasi';
+
+  if (/edg/i.test(userAgent)) {
+    browser = 'Microsoft Edge';
+  } else if (/opr\/|opera/i.test(userAgent)) {
+    browser = 'Opera';
+  } else if (/chrome|crios/i.test(userAgent)) {
+    browser = 'Google Chrome';
+  } else if (/safari/i.test(userAgent)) {
+    browser = 'Apple Safari';
+  } else if (/firefox|fxios/i.test(userAgent)) {
+    browser = 'Mozilla Firefox';
+  }
+
+  if (/macintosh|mac os x/i.test(userAgent)) {
+    os = 'macOS';
+  } else if (/windows nt/i.test(userAgent)) {
+    os = 'Windows';
+  } else if (/android/i.test(userAgent)) {
+    os = 'Android';
+  } else if (/iphone|ipad|ipod/i.test(userAgent)) {
+    os = 'iOS';
+  } else if (/linux/i.test(userAgent)) {
+    os = 'Linux';
+  }
+
+  const deviceName = `${browser} (${os})`;
+  return { browser, os, deviceName, ipAddress: clientIp };
+};
 
 /**
  * Helper to generate access and refresh tokens
@@ -143,7 +179,7 @@ const register = async (req, res) => {
  */
 const verifyOTP = async (req, res) => {
   try {
-    const { email, otp } = req.body;
+    const { email, otp, device_id, deviceId, device_name } = req.body;
 
     if (!email || !otp) {
       return res.status(400).json({
@@ -168,7 +204,7 @@ const verifyOTP = async (req, res) => {
       });
     }
 
-    if (user.is_verified) {
+    if (user.is_verified && !user.two_factor_enabled && !user.otp_code) {
       return res.status(400).json({
         success: false,
         message: 'Akun ini sudah terverifikasi sebelumnya. Silakan langsung login.',
@@ -201,6 +237,40 @@ const verifyOTP = async (req, res) => {
       refresh_token: refreshToken,
     });
 
+    // Register / trust the device in database upon successful OTP verification
+    const activeDeviceId = device_id || deviceId;
+    if (activeDeviceId) {
+      const clientIp = req.headers['x-forwarded-for'] ? req.headers['x-forwarded-for'].split(',')[0].trim() : (req.socket.remoteAddress || '127.0.0.1');
+      const userAgent = req.headers['user-agent'] || '';
+      const parsedDevice = parseDeviceInfo(userAgent, clientIp);
+      const activeDeviceName = device_name || parsedDevice.deviceName;
+
+      const [device] = await UserDevice.findOrCreate({
+        where: { user_id: user.id, device_id: String(activeDeviceId).trim() },
+        defaults: {
+          user_id: user.id,
+          device_id: String(activeDeviceId).trim(),
+          device_name: activeDeviceName,
+          browser: parsedDevice.browser,
+          os: parsedDevice.os,
+          ip_address: clientIp,
+          user_agent: userAgent,
+          is_trusted: true,
+          last_login_at: new Date(),
+        },
+      });
+
+      if (device) {
+        await device.update({
+          is_trusted: true,
+          last_login_at: new Date(),
+          ip_address: clientIp,
+          user_agent: userAgent,
+          device_name: activeDeviceName,
+        });
+      }
+    }
+
     const userSanitized = user.toJSON();
     delete userSanitized.password;
     delete userSanitized.refresh_token;
@@ -208,7 +278,7 @@ const verifyOTP = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      message: 'Verifikasi email berhasil! Selamat datang di SkillSphere AI.',
+      message: 'Verifikasi berhasil! Perangkat telah diverifikasi.',
       data: {
         user: userSanitized,
         accessToken,
@@ -249,7 +319,7 @@ const resendOTP = async (req, res) => {
       });
     }
 
-    if (user.is_verified) {
+    if (user.is_verified && !user.two_factor_enabled) {
       return res.status(400).json({
         success: false,
         message: 'Akun sudah terverifikasi. Silakan langsung login.',
@@ -281,11 +351,11 @@ const resendOTP = async (req, res) => {
 };
 
 /**
- * Login User
+ * Login User with Intelligent Device Recognition & 2FA
  */
 const login = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, device_id, deviceId, device_name } = req.body;
     const normalizedEmail = email.trim().toLowerCase();
 
     const user = await User.findOne({
@@ -335,6 +405,81 @@ const login = async (req, res) => {
         success: false,
         message: 'Akun Anda dinonaktifkan. Hubungi admin.',
       });
+    }
+
+    // Extract device metadata
+    const rawDeviceId = device_id || deviceId || req.headers['x-device-id'] || null;
+    const clientIp = req.headers['x-forwarded-for'] ? req.headers['x-forwarded-for'].split(',')[0].trim() : (req.socket.remoteAddress || '127.0.0.1');
+    const userAgent = req.headers['user-agent'] || '';
+    const parsedDevice = parseDeviceInfo(userAgent, clientIp);
+    const activeDeviceName = device_name || parsedDevice.deviceName;
+
+    // Check Two-Factor Authentication (2FA) with Device Awareness
+    if (user.two_factor_enabled) {
+      let trustedDevice = null;
+      if (rawDeviceId) {
+        trustedDevice = await UserDevice.findOne({
+          where: {
+            user_id: user.id,
+            device_id: String(rawDeviceId).trim(),
+            is_trusted: true,
+          },
+        });
+      }
+
+      // If device is already registered and trusted, bypass 2FA OTP!
+      if (trustedDevice) {
+        await trustedDevice.update({
+          last_login_at: new Date(),
+          ip_address: clientIp,
+          user_agent: userAgent,
+          device_name: activeDeviceName || trustedDevice.device_name,
+        });
+      } else {
+        // Device is NOT recognized / new device -> Trigger 2FA OTP
+        const activeOtp = Math.floor(100000 + Math.random() * 900000).toString();
+        const otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000);
+        await user.update({ otp_code: activeOtp, otp_expires_at: otpExpiresAt });
+        await sendOTPEmail(normalizedEmail, activeOtp, user.name);
+
+        return res.status(200).json({
+          success: true,
+          requireOtp: true,
+          isTwoFactor: true,
+          isNewDevice: true,
+          deviceId: rawDeviceId,
+          email: normalizedEmail,
+          name: user.name,
+          role: user.role,
+          message: 'Perangkat baru terdeteksi. Silakan masukkan kode verifikasi OTP 6 digit yang dikirim ke email Anda untuk mengonfirmasi perangkat ini.',
+        });
+      }
+    } else {
+      // 2FA disabled: Record or update device history
+      if (rawDeviceId) {
+        const [dev] = await UserDevice.findOrCreate({
+          where: { user_id: user.id, device_id: String(rawDeviceId).trim() },
+          defaults: {
+            user_id: user.id,
+            device_id: String(rawDeviceId).trim(),
+            device_name: activeDeviceName,
+            browser: parsedDevice.browser,
+            os: parsedDevice.os,
+            ip_address: clientIp,
+            user_agent: userAgent,
+            is_trusted: true,
+            last_login_at: new Date(),
+          },
+        });
+        if (dev) {
+          await dev.update({
+            last_login_at: new Date(),
+            ip_address: clientIp,
+            user_agent: userAgent,
+            device_name: activeDeviceName,
+          });
+        }
+      }
     }
 
     const { accessToken, refreshToken } = generateTokens(user);
@@ -409,11 +554,16 @@ const getProfile = async (req, res) => {
 const updateProfile = async (req, res) => {
   const t = await sequelize.transaction();
   try {
-    const { name, full_name, bio, phone_number, avatar_url, career_goal, study_preferences } = req.body;
+    const { name, full_name, bio, phone_number, avatar_url, career_goal, study_preferences, two_factor_enabled } = req.body;
     const userId = req.user.id;
 
-    if (name) {
-      await User.update({ name: name.trim() }, { where: { id: userId }, transaction: t });
+    const userUpdateData = {};
+    if (name) userUpdateData.name = name.trim();
+    if (two_factor_enabled !== undefined) {
+      userUpdateData.two_factor_enabled = Boolean(two_factor_enabled);
+    }
+    if (Object.keys(userUpdateData).length > 0) {
+      await User.update(userUpdateData, { where: { id: userId }, transaction: t });
     }
 
     let profile = await UserProfile.findOne({ where: { user_id: userId }, transaction: t });
@@ -462,20 +612,113 @@ const updateProfile = async (req, res) => {
 };
 
 /**
+ * Upload & Update Profile Avatar (Sharp WebP)
+ */
+const uploadAvatar = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: 'Berkas gambar avatar wajib diunggah.',
+      });
+    }
+
+    const { relativeUrl } = await processAndConvertToWebP(req.file.buffer, 'avatars', {
+      maxWidth: 400,
+      maxHeight: 400,
+      quality: 85,
+    });
+
+    const userId = req.user.id;
+    let profile = await UserProfile.findOne({ where: { user_id: userId } });
+    if (!profile) {
+      profile = await UserProfile.create({
+        user_id: userId,
+        full_name: req.user.name,
+        avatar_url: relativeUrl,
+      });
+    } else {
+      await profile.update({ avatar_url: relativeUrl });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: 'Foto profil berhasil diperbarui.',
+      data: {
+        avatar_url: relativeUrl,
+      },
+    });
+  } catch (error) {
+    console.error('Error uploading avatar:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Gagal mengunggah foto profil.',
+      error: error.message,
+    });
+  }
+};
+
+/**
+ * Toggle Two-Factor Authentication (2FA)
+ */
+const toggleTwoFactor = async (req, res) => {
+  try {
+    const { enabled } = req.body;
+    const userId = req.user.id;
+
+    const user = await User.findByPk(userId);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'Pengguna tidak ditemukan.',
+      });
+    }
+
+    const isEnabled = enabled === true || enabled === 'true' || enabled === 1;
+    await user.update({ two_factor_enabled: isEnabled });
+
+    return res.status(200).json({
+      success: true,
+      message: isEnabled
+        ? 'Autentikasi 2-Faktor (2FA) berhasil diaktifkan. Setiap login akan memerlukan verifikasi kode OTP email.'
+        : 'Autentikasi 2-Faktor (2FA) dinonaktifkan.',
+      data: {
+        two_factor_enabled: isEnabled,
+      },
+    });
+  } catch (error) {
+    console.error('Error toggling 2FA:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Gagal mengubah pengaturan Autentikasi 2-Faktor.',
+      error: error.message,
+    });
+  }
+};
+
+/**
  * Change Password
  */
 const changePassword = async (req, res) => {
   try {
-    const { current_password, new_password } = req.body;
+    const { current_password, old_password, new_password } = req.body;
+    const currentPass = current_password || old_password;
     const userId = req.user.id;
 
+    if (!currentPass || !new_password) {
+      return res.status(400).json({
+        success: false,
+        message: 'Kata sandi saat ini dan kata sandi baru wajib diisi.',
+      });
+    }
+
     const user = await User.findByPk(userId);
-    const isMatch = await bcrypt.compare(current_password, user.password);
+    const isMatch = await bcrypt.compare(currentPass, user.password);
 
     if (!isMatch) {
       return res.status(400).json({
         success: false,
-        message: 'Password saat ini tidak cocok.',
+        message: 'Kata sandi saat ini tidak cocok.',
       });
     }
 
@@ -486,13 +729,13 @@ const changePassword = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      message: 'Password berhasil diubah. Silakan login kembali dengan password baru jika diperlukan.',
+      message: 'Kata sandi berhasil diubah. Silakan gunakan kata sandi baru untuk login selanjutnya.',
     });
   } catch (error) {
     console.error('Error changing password:', error);
     return res.status(500).json({
       success: false,
-      message: 'Gagal mengubah password.',
+      message: 'Gagal mengubah kata sandi.',
       error: error.message,
     });
   }
@@ -895,6 +1138,91 @@ const oauthRedirect = async (req, res) => {
   }
 };
 
+/**
+ * Get list of trusted devices for authenticated user
+ */
+const getTrustedDevices = async (req, res) => {
+  try {
+    const devices = await UserDevice.findAll({
+      where: { user_id: req.user.id },
+      order: [['last_login_at', 'DESC']],
+    });
+
+    return res.status(200).json({
+      success: true,
+      data: devices,
+    });
+  } catch (error) {
+    console.error('Error fetching trusted devices:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Gagal mengambil daftar perangkat.',
+      error: error.message,
+    });
+  }
+};
+
+/**
+ * Revoke / remove a trusted device
+ */
+const revokeTrustedDevice = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const deleted = await UserDevice.destroy({
+      where: {
+        id,
+        user_id: req.user.id,
+      },
+    });
+
+    if (!deleted) {
+      return res.status(404).json({
+        success: false,
+        message: 'Perangkat tidak ditemukan atau sudah dihapus.',
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: 'Akses perangkat berhasil dicabut.',
+    });
+  } catch (error) {
+    console.error('Error revoking device:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Gagal mencabut akses perangkat.',
+      error: error.message,
+    });
+  }
+};
+
+/**
+ * Revoke all other trusted devices
+ */
+const revokeAllOtherDevices = async (req, res) => {
+  try {
+    const currentDeviceId = req.query.current_device_id || req.body.current_device_id;
+    const whereClause = { user_id: req.user.id };
+    if (currentDeviceId) {
+      whereClause.device_id = { [Op.ne]: currentDeviceId };
+    }
+
+    await UserDevice.destroy({ where: whereClause });
+
+    return res.status(200).json({
+      success: true,
+      message: 'Semua sesi perangkat lain berhasil dicabut.',
+    });
+  } catch (error) {
+    console.error('Error revoking other devices:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Gagal mencabut sesi perangkat lain.',
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   register,
   verifyOTP,
@@ -902,6 +1230,8 @@ module.exports = {
   login,
   getProfile,
   updateProfile,
+  uploadAvatar,
+  toggleTwoFactor,
   uploadCertificate,
   personalize,
   changePassword,
@@ -909,4 +1239,7 @@ module.exports = {
   logout,
   oauthRedirect,
   applyTutor,
+  getTrustedDevices,
+  revokeTrustedDevice,
+  revokeAllOtherDevices,
 };

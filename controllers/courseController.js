@@ -13,13 +13,19 @@ const {
 exports.getMyCourses = async (req, res) => {
   try {
     const tutorId = req.user.id;
+    const where = req.user.role === 'admin' ? {} : { tutor_id: tutorId };
     const courses = await Course.findAll({
-      where: { tutor_id: tutorId },
+      where,
       include: [
         {
           model: Category,
           as: 'category',
           attributes: ['id', 'name', 'slug', 'icon'],
+        },
+        {
+          model: User,
+          as: 'tutor',
+          attributes: ['id', 'name', 'email', 'role'],
         },
         {
           model: CourseSection,
@@ -28,9 +34,14 @@ exports.getMyCourses = async (req, res) => {
             {
               model: CourseMaterial,
               as: 'materials',
-              attributes: ['id', 'title', 'content_type', 'duration_minutes', 'is_preview', 'order_index'],
+              attributes: ['id', 'title', 'content_type', 'duration_minutes', 'is_preview', 'order_index', 'file_url'],
             },
           ],
+        },
+        {
+          model: Enrollment,
+          as: 'enrollments',
+          attributes: ['id', 'user_id', 'status', 'created_at'],
         },
       ],
       order: [['created_at', 'DESC'], [{ model: CourseSection, as: 'sections' }, 'order_index', 'ASC']],
@@ -91,9 +102,26 @@ exports.getCourseById = async (req, res) => {
       });
     }
 
+    const courseData = course.toJSON();
+    courseData.is_enrolled = false;
+    courseData.is_owner = false;
+
+    // Optional user auth detection if Authorization header is present
+    if (req.user) {
+      if (req.user.id === course.tutor_id || req.user.role === 'admin') {
+        courseData.is_owner = true;
+        courseData.is_enrolled = true;
+      } else {
+        const enrollment = await Enrollment.findOne({
+          where: { user_id: req.user.id, course_id: course.id },
+        });
+        courseData.is_enrolled = !!enrollment;
+      }
+    }
+
     return res.status(200).json({
       success: true,
-      data: course,
+      data: courseData,
     });
   } catch (err) {
     console.error('Error in getCourseById:', err);
@@ -106,11 +134,15 @@ exports.getCourseById = async (req, res) => {
 };
 
 /**
- * Create a new course (Tutor)
+ * Create a new course (Tutor & Admin)
  */
 exports.createCourse = async (req, res) => {
   try {
-    const tutorId = req.user.id;
+    let tutorId = req.user.id;
+    if (req.user.role === 'admin' && req.body.tutor_id) {
+      tutorId = parseInt(req.body.tutor_id, 10);
+    }
+
     const {
       title,
       category_id,
@@ -119,6 +151,7 @@ exports.createCourse = async (req, res) => {
       level = 'beginner',
       thumbnail_url,
       status = 'draft',
+      initial_section_title = 'Bab 1: Pengantar & Dasar Teori',
     } = req.body;
 
     if (!title || !category_id) {
@@ -133,19 +166,19 @@ exports.createCourse = async (req, res) => {
     const course = await Course.create({
       tutor_id: tutorId,
       category_id,
-      title,
+      title: title.trim(),
       slug,
-      description,
+      description: description ? description.trim() : null,
       price: parseFloat(price) || 0,
       level,
-      thumbnail_url,
+      thumbnail_url: thumbnail_url || null,
       status,
     });
 
     // Create default initial section
     const defaultSection = await CourseSection.create({
       course_id: course.id,
-      title: 'Bab 1: Pengantar & Dasar Teori',
+      title: (initial_section_title || 'Bab 1: Pengantar & Dasar Teori').trim(),
       order_index: 1,
     });
 
@@ -198,15 +231,19 @@ exports.updateCourse = async (req, res) => {
       level,
       thumbnail_url,
       status,
+      tutor_id,
     } = req.body;
 
-    if (title) course.title = title;
+    if (title) course.title = title.trim();
     if (category_id) course.category_id = category_id;
-    if (description !== undefined) course.description = description;
+    if (description !== undefined) course.description = description ? description.trim() : null;
     if (price !== undefined) course.price = parseFloat(price);
     if (level) course.level = level;
     if (thumbnail_url !== undefined) course.thumbnail_url = thumbnail_url;
     if (status) course.status = status;
+    if (req.user.role === 'admin' && tutor_id) {
+      course.tutor_id = parseInt(tutor_id, 10);
+    }
 
     await course.save();
 
@@ -220,6 +257,45 @@ exports.updateCourse = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: 'Gagal memperbarui kursus.',
+      error: err.message,
+    });
+  }
+};
+
+/**
+ * Delete a course and cascade sections & materials
+ */
+exports.deleteCourse = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const course = await Course.findByPk(id);
+
+    if (!course) {
+      return res.status(404).json({
+        success: false,
+        message: 'Kursus tidak ditemukan.',
+      });
+    }
+
+    if (req.user.role !== 'admin' && course.tutor_id !== req.user.id) {
+      return res.status(403).json({
+        success: false,
+        message: 'Akses ditolak. Anda tidak memiliki wewenang untuk menghapus kursus ini.',
+      });
+    }
+
+    const courseTitle = course.title;
+    await course.destroy();
+
+    return res.status(200).json({
+      success: true,
+      message: `Kursus "${courseTitle}" berhasil dihapus dari platform.`,
+    });
+  } catch (err) {
+    console.error('Error in deleteCourse:', err);
+    return res.status(500).json({
+      success: false,
+      message: 'Gagal menghapus kursus.',
       error: err.message,
     });
   }
@@ -401,6 +477,8 @@ exports.getAllCourses = async (req, res) => {
     const where = {};
     if (status) {
       where.status = status;
+    } else {
+      where.status = 'published';
     }
     if (category_id) {
       where.category_id = category_id;
@@ -429,7 +507,10 @@ exports.getAllCourses = async (req, res) => {
           attributes: ['id', 'name', 'email', 'role'],
         },
       ],
-      order: [['created_at', 'DESC']],
+      order: [
+        [Course.sequelize.literal('CASE WHEN thumbnail_url IS NOT NULL AND thumbnail_url != "" THEN 0 ELSE 1 END'), 'ASC'],
+        ['created_at', 'DESC'],
+      ],
     });
 
     return res.status(200).json({

@@ -30,4 +30,13 @@ router.get('/courses', adminController.getAllCourses);
 router.put('/courses/:id/approve', invalidateCacheMiddleware(['cache:/api/admin*', 'cache:/api/courses*']), adminController.approveCourse);
 router.put('/courses/:id/suspend', invalidateCacheMiddleware(['cache:/api/admin*', 'cache:/api/courses*']), adminController.suspendCourse);
 
+// User Management (Siswa, Tutor, Admin)
+router.get('/users', adminController.getAllUsers);
+router.get('/users/:id', adminController.getUserById);
+router.post('/users', invalidateCacheMiddleware(['cache:/api/admin*']), adminController.createUser);
+router.put('/users/:id', invalidateCacheMiddleware(['cache:/api/admin*']), adminController.updateUser);
+router.put('/users/:id/status', invalidateCacheMiddleware(['cache:/api/admin*']), adminController.toggleUserStatus);
+router.put('/users/:id/role', invalidateCacheMiddleware(['cache:/api/admin*']), adminController.changeUserRole);
+router.delete('/users/:id', invalidateCacheMiddleware(['cache:/api/admin*']), adminController.deleteUser);
+
 module.exports = router;
