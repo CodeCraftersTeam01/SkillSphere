@@ -65,8 +65,20 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public'), {
-  maxAge: '1d', // 1 day client cache for static assets
+  maxAge: '7d', // 7 days client cache for static assets
   etag: true,
+  lastModified: true,
+  setHeaders: (res, filePath) => {
+    if (filePath.endsWith('.html') || filePath.endsWith('.ejs')) {
+      res.setHeader('Cache-Control', 'no-cache');
+    } else if (filePath.match(/\.(woff2?|ttf|otf|eot)$/)) {
+      res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+    } else if (filePath.match(/\.(webp|jpg|jpeg|png|gif|svg|ico)$/)) {
+      res.setHeader('Cache-Control', 'public, max-age=2592000');
+    } else if (filePath.match(/\.(css|js)$/)) {
+      res.setHeader('Cache-Control', 'public, max-age=604800');
+    }
+  },
 }));
 
 // Database connection & sync

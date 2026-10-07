@@ -2,6 +2,15 @@
  * SkillSphere AI - PWA Service Worker Registration & Modern Morphing Install Sheet
  */
 (function () {
+  // Load Inclusive Accessibility & Text-to-Speech (TTS) Toolkit
+  if (!document.getElementById('a11y-toolkit-script')) {
+    const a11yScript = document.createElement('script');
+    a11yScript.id = 'a11y-toolkit-script';
+    a11yScript.src = '/javascripts/accessibility.js';
+    a11yScript.defer = true;
+    document.head.appendChild(a11yScript);
+  }
+
   // 1. Register Service Worker for lightweight caching and fast performance
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {

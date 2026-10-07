@@ -2,6 +2,7 @@
    SkillSphere AI - Claude.ai Aesthetic Design System
    Monochrome Accent Edition (Black in Light Mode, White in Dark Mode)
    ========================================================================== */
+@import url('./accessibility.css');
 
 :root {
   /* --- Light Theme (Warm Paper / Stone) --- */

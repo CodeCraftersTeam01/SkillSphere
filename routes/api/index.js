@@ -7,6 +7,7 @@ const adminRoutes = require('./admin');
 const courseRoutes = require('./courses');
 const tutorRoutes = require('./tutor');
 const aiRoutes = require('./ai');
+const ttsRoutes = require('./tts');
 
 // Health check endpoint
 router.get('/health', (req, res) => {
@@ -31,6 +32,7 @@ router.get('/health', (req, res) => {
       'AI Study Assistant & Pedagogical Tutor Chatbot (Sprint 2 - Tegar)',
       'AI Practice Quiz & Material Explainer Generator (Sprint 2 - Tegar)',
       'Tutor Material Upload & Management Portal',
+      'Text-to-Speech & Inclusive Accessibility Toolkit (TTS / Screen Reader / Dyslexic / Contrast)',
     ],
   });
 });
@@ -43,5 +45,6 @@ router.use('/courses', courseRoutes);
 router.use('/admin', adminRoutes);
 router.use('/tutor', tutorRoutes);
 router.use('/ai', aiRoutes);
+router.use('/tts', ttsRoutes);
 
 module.exports = router;
