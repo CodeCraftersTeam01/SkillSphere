@@ -1127,4 +1127,568 @@
       transition: box-shadow 0.2s ease, border-color 0.2s ease;
     }
 
-<!-- Stage badges loaded -->
+    .classroom-card:hover {
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.09);
+      border-color: var(--border-strong);
+    }
+
+    /* Card Header Banner */
+    .classroom-card-header {
+      height: 136px;
+      padding: 16px 18px 12px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      color: #FFFFFF;
+      text-decoration: none;
+      border-radius: 8px 8px 0 0;
+      box-sizing: border-box;
+    }
+
+    /* SkillSphere Thematic Palettes */
+    .card-theme-0 { background: #1B384A; }
+    .card-theme-1 { background: #184E3F; }
+    .card-theme-2 { background: #124B5F; }
+    .card-theme-3 { background: #8E3C1B; }
+    .card-theme-4 { background: #2F335C; }
+    .card-theme-5 { background: #6E2346; }
+    .card-theme-6 { background: #5C3D1E; }
+
+    .classroom-card-menu-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius-full);
+      background: transparent;
+      border: none;
+      color: #FFFFFF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background 0.15s ease;
+      z-index: 6;
+      font-size: 15px;
+    }
+
+    .classroom-card-menu-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .classroom-card-titles {
+      padding-right: 36px;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .classroom-card-title {
+      font-size: 17px;
+      font-weight: 600;
+      color: #FFFFFF;
+      margin: 0;
+      line-height: 1.3;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      cursor: pointer;
+    }
+
+    .classroom-card-title:hover {
+      text-decoration: underline;
+    }
+
+    .classroom-card-subtitle {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.88);
+      margin: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .classroom-card-tutor {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.88);
+      margin: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Floating Circle Avatar */
+    .classroom-card-avatar {
+      position: absolute;
+      bottom: -30px;
+      right: 16px;
+      width: 60px;
+      height: 60px;
+      border-radius: var(--radius-full);
+      background: #ea580c;
+      color: #FFFFFF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      font-weight: 700;
+      border: 3px solid var(--bg-surface);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18);
+      z-index: 5;
+      text-transform: uppercase;
+      user-select: none;
+    }
+
+    /* Card Middle Body */
+    .classroom-card-body {
+      min-height: 144px;
+      height: auto;
+      padding: 32px 18px 14px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background: var(--bg-surface);
+      box-sizing: border-box;
+      gap: 8px;
+    }
+
+    .classroom-card-body-text {
+      font-size: 12.5px;
+      color: var(--text-secondary);
+      line-height: 1.45;
+      margin: 0;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .classroom-card-body-meta {
+      font-size: 11.5px;
+      color: var(--text-tertiary);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* Card Bottom Action Footer */
+    .classroom-card-footer {
+      height: 48px;
+      border-top: 1px solid var(--border-subtle);
+      padding: 0 12px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 4px;
+      background: var(--bg-surface);
+      border-radius: 0 0 8px 8px;
+    }
+
+    .classroom-card-footer-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-full);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-secondary);
+      background: transparent;
+      border: none;
+      text-decoration: none;
+      font-size: 15px;
+      transition: background 0.15s ease, color 0.15s ease;
+      cursor: pointer;
+    }
+
+    .classroom-card-footer-icon:hover {
+      background: var(--bg-surface-subtle);
+      color: var(--text-primary);
+    }
+
+    /* Backdrop for Mobile Overlay Sidebar */
+    .classroom-sidebar-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.45);
+      backdrop-filter: blur(2px);
+      z-index: 998;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.2s ease, visibility 0.2s ease;
+    }
+
+    .classroom-sidebar-backdrop.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    @media (max-width: 1024px) {
+      .classroom-left-sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        height: 100vh;
+        z-index: 999;
+        transform: translateX(-100%);
+        box-shadow: 4px 0 24px rgba(0, 0, 0, 0.18);
+      }
+
+      .classroom-left-sidebar.drawer-open {
+        transform: translateX(0);
+      }
+
+      .classroom-main-pane {
+        padding: 20px 16px 48px;
+      }
+    }
+
+    /* ========================================================= */
+    /* --- DASHBOARD MOBILE & TABLET RESPONSIVE STYLES --------- */
+    /* ========================================================= */
+    .nav-main-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      gap: 20px;
+    }
+
+    .desktop-only {
+      display: flex !important;
+    }
+
+    .mobile-only {
+      display: none !important;
+    }
+
+    @media (max-width: 1024px) {
+      .dashboard-container {
+        padding: 20px 16px 60px;
+      }
+
+      .dashboard-grid-layout {
+        grid-template-columns: 1fr;
+        gap: 24px;
+      }
+    }
+
+    @media (max-width: 860px) {
+      .navbar {
+        padding: 10px 16px;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+      }
+
+      .navbar.no-subnav {
+        gap: 0;
+      }
+
+      .desktop-only {
+        display: none !important;
+      }
+
+      .mobile-only {
+        display: block;
+        width: 100%;
+      }
+
+      .mobile-only.is-hidden,
+      .mobile-only[style*="display: none"] {
+        display: none !important;
+      }
+
+      .nav-brand-group {
+        gap: 8px;
+      }
+
+      .classroom-sidebar-toggle-btn {
+        width: 34px;
+        height: 34px;
+        font-size: 15px;
+      }
+
+      .brand-logo span {
+        font-size: 17px;
+        white-space: nowrap;
+      }
+
+      .nav-mobile-row {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+      }
+
+      .nav-mobile-row::-webkit-scrollbar {
+        display: none;
+      }
+
+      .nav-links-menu.mobile-scroll {
+        display: flex;
+        gap: 6px;
+        list-style: none;
+        margin: 0;
+        padding: 2px 0;
+        width: max-content;
+      }
+
+      .nav-links-menu.mobile-scroll .nav-link-item {
+        font-size: 12px;
+        padding: 6px 12px;
+        white-space: nowrap;
+        background: var(--bg-surface-subtle);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-full);
+      }
+
+      .nav-links-menu.mobile-scroll .nav-link-item.active {
+        background: var(--accent-primary);
+        color: var(--accent-text);
+        border-color: var(--accent-primary);
+      }
+
+      .nav-actions {
+        gap: 6px;
+      }
+
+      .streak-badge {
+        padding: 4px 8px;
+        font-size: 11px;
+      }
+
+      .theme-toggle-btn {
+        width: 34px;
+        height: 34px;
+        padding: 0;
+        border-radius: var(--radius-full);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .theme-toggle-btn #theme-text {
+        display: none !important;
+      }
+
+      .user-profile-badge {
+        padding: 0;
+        background: transparent;
+        border: none;
+        cursor: pointer;
+      }
+
+      .user-profile-badge .user-avatar-sm {
+        width: 32px;
+        height: 32px;
+        font-size: 12px;
+        border: 1.5px solid var(--border-subtle);
+      }
+
+      .user-profile-badge .user-name-label,
+      .user-profile-badge .user-role-tag {
+        display: none !important;
+      }
+
+      .logout-btn {
+        width: 34px;
+        height: 34px;
+        padding: 0;
+        border-radius: var(--radius-full);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .logout-btn span {
+        display: none !important;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .brand-logo span {
+        font-size: 16px;
+      }
+
+      .streak-badge {
+        padding: 4px 8px;
+        font-size: 11px;
+      }
+
+      .welcome-hero {
+        padding: 18px 16px;
+      }
+
+      .welcome-title {
+        font-size: 22px;
+      }
+
+      .welcome-desc {
+        font-size: 13px;
+      }
+
+      .courses-recommend-grid {
+        grid-template-columns: 1fr !important;
+        gap: 12px;
+      }
+
+      .activity-course-item {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+        padding: 14px;
+      }
+
+      .btn-continue-learning {
+        width: 100%;
+        justify-content: center;
+      }
+
+      .streak-day-row {
+        gap: 4px;
+      }
+
+      .streak-circle {
+        width: 32px;
+        height: 32px;
+        font-size: 11px;
+      }
+
+      .user-name-label {
+        display: none;
+      }
+    }
+  </style>
+
+  <script>
+    // Initial Theme Script to prevent flash
+    (function() {
+      const savedTheme = localStorage.getItem('skillsphere_theme') || 
+        (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    })();
+  </script>
+</head>
+<body>
+
+  <div class="dashboard-layout">
+    <!-- Top Full-Width Verification Announcement Bar (Dicoding / Claude Warm Paper Style) -->
+    <!-- Google Classroom Drawer Sidebar Backdrop -->
+    <div class="classroom-sidebar-backdrop" id="classroom-sidebar-backdrop" onclick="toggleClassroomSidebar(false)"></div>
+
+    <!-- Top Navigation Bar -->
+    <header class="navbar">
+      <div class="nav-main-row">
+        <div class="nav-brand-group">
+          <!-- Classroom Sidebar Hamburger Button (Visible for Tutor) -->
+          <button class="classroom-sidebar-toggle-btn" id="classroom-sidebar-toggle" style="display:none;" onclick="toggleClassroomSidebar()" title="Menu Utama" aria-label="Menu Utama">
+            <i class="fas fa-bars"></i>
+          </button>
+
+          <a href="/dashboard" class="brand-logo" style="text-decoration:none;">
+            <div class="brand-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path opacity="0.38" d="M12 7.6L17.3 4.7L14.4 10L17.3 15.3L12 12.4L6.7 15.3L9.6 10L6.7 4.7Z" />
+                <path d="M12 0L13.8 8.2L22 10L13.8 11.8L12 20L10.2 11.8L2 10L10.2 8.2L12 0Z" />
+              </svg>
+            </div>
+            <span>SkillSphere AI</span>
+          </a>
+        </div>
+
+        <!-- Desktop Navigation Links (Student Only) -->
+        <ul class="nav-links-menu desktop-only" id="desktop-nav-menu">
+          <li><a href="/dashboard" class="nav-link-item active">Beranda</a></li>
+          <li><a href="#courses-catalog-section" class="nav-link-item">Katalog Kursus</a></li>
+          <li><a href="/dashboard/roadmap" class="nav-link-item">Jalur Belajar AI</a></li>
+          <li><a href="#activities-section" class="nav-link-item">Tantangan</a></li>
+        </ul>
+
+        <div class="nav-actions">
+          <!-- Streak Indicator -->
+          <div class="streak-badge" title="Runtutan Belajar Aktif">
+            <i class="fas fa-bolt" style="color:var(--text-primary); font-size:13px;"></i>
+            <span id="nav-streak-count">1</span>
+          </div>
+
+          <!-- Theme Toggle -->
+          <button class="theme-toggle-btn" id="theme-toggle-btn" type="button" aria-label="Toggle dark/light mode">
+            <i class="fas fa-sun" id="theme-icon-sun" style="display:none;"></i>
+            <i class="fas fa-moon" id="theme-icon-moon"></i>
+            <span id="theme-text">Mode Gelap</span>
+          </button>
+
+          <!-- User Profile Pill (Clickable) -->
+          <div class="user-profile-badge" onclick="window.location.href='/profile'" style="cursor:pointer;" title="Buka Pengaturan Profil Saya">
+            <div class="user-avatar-sm" id="nav-avatar">U</div>
+            <span class="user-name-label" id="nav-user-name">Memuat...</span>
+            <span class="user-role-tag" id="nav-user-role">Siswa</span>
+          </div>
+
+          <!-- Logout Button -->
+          <button class="logout-btn" id="logout-btn" type="button" title="Keluar">
+            <i class="fas fa-arrow-right-from-bracket"></i>
+            <span>Keluar</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Mobile Scrollable Subnav Menu (Student Only) -->
+      <div class="nav-mobile-row mobile-only" id="mobile-nav-row">
+        <ul class="nav-links-menu mobile-scroll" id="mobile-nav-menu">
+          <li><a href="/dashboard" class="nav-link-item active">Beranda</a></li>
+          <li><a href="#courses-catalog-section" class="nav-link-item">Katalog Kursus</a></li>
+          <li><a href="/dashboard/roadmap" class="nav-link-item">Jalur Belajar AI</a></li>
+          <li><a href="#activities-section" class="nav-link-item">Tantangan</a></li>
+        </ul>
+      </div>
+    </header>
+
+    <!-- Top Full-Width Verification Announcement Bar (Dicoding / Claude Warm Paper Style) -->
+    <div class="top-announcement-bar" id="tutor-verification-bar" style="display:none;">
+      <div class="top-announcement-content">
+        <span class="top-bar-badge" id="top-bar-badge">Verifikasi Pengajar</span>
+        <span class="top-bar-text" id="top-bar-text">Mohon lengkapi verifikasi berkas dan portofolio Anda terlebih dahulu sebelum melanjutkan ke Studio Pengajar.</span>
+        <span class="top-bar-divider">|</span>
+        <a href="/tutor/verify" class="top-bar-cta" id="top-bar-cta-btn">
+          <span id="top-bar-cta-label">Lengkapi Sekarang</span> <i class="fas fa-arrow-right" style="font-size:10px;"></i>
+        </a>
+      </div>
+    </div>
+
+    <!-- Tutor Google Classroom Full Layout View (Role === 'tutor') -->
+    <div id="tutor-classroom-section" class="classroom-app-container" style="display:none;">
+      <!-- Docked Left Sidebar on Desktop & Slide-out Drawer on Mobile -->
+      <aside class="classroom-left-sidebar" id="classroom-left-sidebar">
+        <div class="sidebar-scroll-body">
+          <!-- Main Menu Group -->
+          <div class="sidebar-nav-group">
+            <a href="/dashboard" class="sidebar-nav-pill active">
+              <i class="fas fa-house sidebar-nav-icon"></i>
+              <span>Beranda</span>
+            </a>
+            <a href="#kalender" class="sidebar-nav-pill" onclick="showToast('Fitur Kalender adaptif segera hadir pada pembaruan mendatang!', 'success'); return false;">
+              <i class="fas fa-calendar-days sidebar-nav-icon"></i>
+              <span>Kalender</span>
+            </a>
+          </div>
+
+          <div class="sidebar-divider-line"></div>
+
+          <!-- Mengajar (Teaching Section) -->
+          <div class="sidebar-section-header" onclick="toggleSidebarSection('teaching')">
+            <span>Mengajar</span>
+            <i class="fas fa-chevron-down" id="chevron-teaching" style="font-size:10px; color:var(--text-tertiary); transition:transform 0.2s;"></i>
+
+<!-- Career roadmap snapshot loaded -->
