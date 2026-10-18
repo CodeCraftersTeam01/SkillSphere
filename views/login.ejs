@@ -28,6 +28,9 @@
   <link rel="stylesheet" href="/stylesheets/claude-theme.css?v=2.0">
   <!-- Accessibility & Head Tracking Stylesheet -->
   <link rel="stylesheet" href="/stylesheets/accessibility.css">
+  <!-- Custom Alert & Toast Stylesheet & Script -->
+  <link rel="stylesheet" href="/stylesheets/custom-alert.css">
+  <script src="/javascripts/custom-alert.js"></script>
   
   <style>
     /* Framer Motion-grade Gaussian Blur & Spring Animations for Login Page */
@@ -607,7 +610,7 @@
                 <input type="checkbox" id="remember-me" name="remember" checked>
                 <span>Ingat saya di perangkat ini</span>
               </label>
-              <a href="#" class="link" onclick="alert('Fitur reset kata sandi via email akan dihubungkan pada modul notifikasi.'); return false;">Lupa kata sandi?</a>
+              <a href="#" class="link" onclick="showCustomAlert({ title: 'Reset Kata Sandi', message: 'Fitur pemulihan kata sandi via email OTP sedang dalam tahap pengembangan.', type: 'info' }); return false;">Lupa kata sandi?</a>
             </div>
 
             <button type="submit" class="submit-btn framer-stagger-5" id="submit-btn">
