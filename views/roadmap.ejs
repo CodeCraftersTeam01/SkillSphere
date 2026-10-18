@@ -295,5 +295,302 @@
       background: rgba(16, 185, 129, 0.12);
       color: var(--color-success);
       border: 1px solid rgba(16, 185, 129, 0.3);
+    }
 
-<!-- Roadmap hero loaded -->
+    .status-badge.in_progress {
+      background: rgba(59, 130, 246, 0.12);
+      color: #3B82F6;
+      border: 1px solid rgba(59, 130, 246, 0.3);
+    }
+
+    .status-badge.pending {
+      background: var(--bg-surface-subtle);
+      color: var(--text-tertiary);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .milestone-desc {
+      font-size: 13.5px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      margin-bottom: 16px;
+    }
+
+    .milestone-topics-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 18px;
+    }
+
+    .topic-pill {
+      font-size: 11.5px;
+      background: var(--bg-surface-subtle);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      padding: 3px 10px;
+      border-radius: var(--radius-sm);
+    }
+
+    .assignment-box {
+      background: var(--bg-surface-subtle);
+      border: 1px dashed var(--border-medium);
+      border-radius: var(--radius-md);
+      padding: 14px 18px;
+      margin-bottom: 18px;
+    }
+
+    .assignment-header {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--accent-primary);
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .assignment-text {
+      font-size: 13px;
+      color: var(--text-primary);
+      margin: 0;
+      font-weight: 500;
+    }
+
+    .milestone-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+      padding-top: 14px;
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .milestone-duration {
+      font-size: 12px;
+      color: var(--text-tertiary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .milestone-controls {
+      display: flex;
+      gap: 8px;
+    }
+
+    .toast-popup {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      padding: 12px 20px;
+      border-radius: var(--radius-md);
+      font-size: 13px;
+      font-weight: 600;
+      z-index: 1000;
+      box-shadow: var(--shadow-lg);
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .toast-popup.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .toast-success {
+      background: var(--color-success);
+      color: #FFFFFF;
+    }
+
+    .toast-error {
+      background: var(--color-danger);
+      color: #FFFFFF;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="dashboard-layout">
+    <!-- Navigation Bar -->
+    <header class="navbar">
+      <div class="nav-main-row">
+        <div class="nav-brand-group">
+          <a href="/dashboard" class="brand-logo" style="text-decoration:none;">
+            <div class="brand-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path opacity="0.38" d="M12 7.6L17.3 4.7L14.4 10L17.3 15.3L12 12.4L6.7 15.3L9.6 10L6.7 4.7Z" />
+                <path d="M12 0L13.8 8.2L22 10L13.8 11.8L12 20L10.2 11.8L2 10L10.2 8.2L12 0Z" />
+              </svg>
+            </div>
+            <span>SkillSphere AI</span>
+          </a>
+        </div>
+
+        <ul class="nav-links-menu desktop-only">
+          <li><a href="/dashboard" class="nav-link-item">Beranda</a></li>
+          <li><a href="/courses" class="nav-link-item">Katalog Kursus</a></li>
+          <li><a href="/dashboard/roadmap" class="nav-link-item active">Jalur Belajar AI</a></li>
+          <li><a href="/dashboard#activities-section" class="nav-link-item">Tantangan</a></li>
+        </ul>
+
+        <div class="nav-actions">
+          <!-- Theme Toggle -->
+          <button class="theme-toggle-btn" id="theme-toggle-btn" type="button" aria-label="Toggle dark/light mode">
+            <i class="fas fa-sun" id="theme-icon-sun" style="display:none;"></i>
+            <i class="fas fa-moon" id="theme-icon-moon"></i>
+            <span id="theme-text">Mode Gelap</span>
+          </button>
+
+          <!-- User Profile Pill -->
+          <div class="user-profile-badge" onclick="window.location.href='/profile'" style="cursor:pointer;" title="Buka Pengaturan Profil Saya">
+            <div class="user-avatar-sm" id="nav-avatar">U</div>
+            <span class="user-name-label" id="nav-user-name">Memuat...</span>
+            <span class="user-role-tag" id="nav-user-role">Siswa</span>
+          </div>
+
+          <!-- Logout Button -->
+          <button class="logout-btn" id="logout-btn" type="button" title="Keluar">
+            <i class="fas fa-arrow-right-from-bracket"></i>
+            <span>Keluar</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Mobile Scrollable Subnav Menu -->
+      <div class="nav-mobile-row mobile-only">
+        <ul class="nav-links-menu mobile-scroll">
+          <li><a href="/dashboard" class="nav-link-item">Beranda</a></li>
+          <li><a href="/courses" class="nav-link-item">Katalog Kursus</a></li>
+          <li><a href="/dashboard/roadmap" class="nav-link-item active">Jalur Belajar AI</a></li>
+          <li><a href="/dashboard#activities-section" class="nav-link-item">Tantangan</a></li>
+        </ul>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="roadmap-page">
+      <div style="margin-bottom: 16px;">
+        <a href="/dashboard" style="font-size: 13px; color: var(--text-secondary); text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+          <i class="fas fa-arrow-left" style="font-size: 11px;"></i> Kembali ke Dashboard
+        </a>
+      </div>
+
+      <!-- Hero Header -->
+      <section class="roadmap-hero">
+        <div class="roadmap-header-top">
+          <div class="roadmap-title-area">
+            <span class="ai-stage-pill" style="margin-bottom: 8px;">
+              <i class="fas fa-wand-magic-sparkles"></i> AI Adaptive Career Roadmap
+            </span>
+            <h1 id="hero-target-role">Jalur Karir Cerdas</h1>
+            <p id="hero-summary">
+              Kurikulum bertahap yang dipersonalisasi secara otomatis oleh AI berdasarkan target karir, keahlian, dan preferensi belajar Anda.
+            </p>
+          </div>
+
+          <div class="roadmap-actions">
+            <button class="btn btn-outline" id="btn-regenerate-roadmap" onclick="handleRegenerateRoadmap()" style="font-size: 12px; padding: 7px 14px;">
+              <i class="fas fa-rotate" id="refresh-icon"></i> Perbarui Analisis AI
+            </button>
+            <a href="/profile" class="btn btn-outline" style="font-size: 12px; padding: 7px 14px; text-decoration: none;">
+              <i class="fas fa-sliders"></i> Ubah Target Karir
+            </a>
+          </div>
+        </div>
+
+        <div class="roadmap-meta-grid">
+          <div class="meta-stat-box">
+            <div class="meta-stat-label"><i class="fas fa-crosshairs"></i> Target Profesi</div>
+            <div class="meta-stat-value" id="stat-target-role">Memuat...</div>
+          </div>
+          <div class="meta-stat-box">
+            <div class="meta-stat-label"><i class="fas fa-list-check"></i> Total Milestone</div>
+            <div class="meta-stat-value" id="stat-total-steps">0 Tahap</div>
+          </div>
+          <div class="meta-stat-box">
+            <div class="meta-stat-label"><i class="fas fa-clock"></i> Estimasi Waktu</div>
+            <div class="meta-stat-value" id="stat-total-weeks">0 Minggu</div>
+          </div>
+        </div>
+
+        <div style="margin-top: 20px;">
+          <span style="font-size: 12px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.04em;">
+            Keahlian Rekomendasi AI:
+          </span>
+          <div class="skills-pills-wrap" id="recommended-skills-container">
+            <!-- Populated via JS -->
+            <span class="skill-chip"><i class="fas fa-spinner fa-spin"></i> Memuat keahlian...</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Progress Bar Card -->
+      <section class="roadmap-progress-card">
+        <div class="progress-bar-container">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 13.5px; font-weight: 600; color: var(--text-primary);">
+              Progres Penyelesaian Jalur Karir
+            </span>
+            <span style="font-size: 13px; font-weight: 700; color: var(--color-success); font-family: var(--font-mono);" id="progress-percent-label">
+              0% Selesai
+            </span>
+          </div>
+          <div class="progress-bar-track">
+            <div class="progress-bar-fill" id="progress-bar-fill"></div>
+          </div>
+        </div>
+        <div style="font-size: 12.5px; color: var(--text-secondary);" id="progress-status-summary">
+          0 dari 0 milestone selesai
+        </div>
+      </section>
+
+      <!-- Milestone Timeline List -->
+      <section>
+        <div style="margin-bottom: 20px;">
+          <h2 style="font-family: var(--font-serif); font-size: 22px; font-weight: 500; color: var(--text-primary); margin-bottom: 4px;">
+            Daftar Milestone Pembelajaran
+          </h2>
+          <p style="font-size: 13px; color: var(--text-secondary); margin: 0;">
+            Tandai setiap milestone saat Anda menguasai materinya untuk menjaga akurasi pelacakan AI.
+          </p>
+        </div>
+
+        <div class="timeline-container" id="milestones-container">
+          <div style="text-align: center; padding: 48px; color: var(--text-secondary); font-size: 13.5px;">
+            <i class="fas fa-spinner fa-spin" style="margin-right: 8px;"></i> Memuat alur milestone AI...
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer style="border-top: 1px solid var(--border-subtle); padding: 32px 24px; text-align: center; font-size: 12.5px; color: var(--text-tertiary);">
+      &copy; 2026 SkillSphere AI. Platform Pembelajaran Cerdas & Kurikulum Adaptif.
+    </footer>
+  </div>
+
+  <div id="toast" class="toast-popup"></div>
+
+  <!-- JavaScript -->
+  <script>
+    const token = localStorage.getItem('skillsphere_access_token') || localStorage.getItem('access_token');
+    let currentRoadmap = null;
+
+    function showToast(message, type = 'success') {
+      const toast = document.getElementById('toast');
+      if (!toast) return;
+      toast.textContent = message;
+      toast.className = `toast-popup show toast-${type}`;
+      setTimeout(() => {
+        toast.className = 'toast-popup';
+      }, 3500);
+    }
+
+    function escapeHtml(str) {
+
+<!-- Milestone cards loaded -->
