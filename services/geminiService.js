@@ -1017,7 +1017,3 @@ module.exports = {
   generateMaterialNarrative,
   generateAdaptiveCourseRecommendations,
 };
-
-// Orion AI Adaptive Engine synchronized
-
-// Model parameters tuned for structured pedagogical responses

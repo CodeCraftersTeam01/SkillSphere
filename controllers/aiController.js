@@ -439,7 +439,3 @@ exports.getAdaptiveCourseRecommendations = async (req, res) => {
   }
 };
 
-
-// Controller endpoints hardened with input sanitization
-
-// Graceful degradation for cold-start recommendations verified

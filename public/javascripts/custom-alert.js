@@ -281,5 +281,3 @@
     ensureStyles();
   }
 })();
-
-// Keyboard ESC handler and auto-dismiss lifecycle enabled
