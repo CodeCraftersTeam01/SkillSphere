@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title || 'Jalur Belajar AI & Karir | SkillSphere AI' %></title>
+  <meta name="description" content="Jalur belajar karir adaptif berbasis AI dari SkillSphere AI. Pantau milestone pembelajaran, proyek industri, dan progres penguasaan keahlian teknologi.">
+
+  <!-- PWA Manifest & App Icons -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#1F1E1B">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="SkillSphere">
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="shortcut icon" href="/favicon.svg">
+
+  <!-- Google Fonts: Newsreader & Plus Jakarta Sans & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome 6 Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- Claude Design System Stylesheet -->
+  <link rel="stylesheet" href="/stylesheets/claude-theme.css?v=2.0">
+  <!-- Accessibility & Head Tracking Stylesheet -->
+  <link rel="stylesheet" href="/stylesheets/accessibility.css">
+  <!-- Custom Alert & Toast Stylesheet & Script -->
+  <link rel="stylesheet" href="/stylesheets/custom-alert.css">
+  <script src="/javascripts/custom-alert.js"></script>
+
+  <style>
+    .roadmap-page {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 32px 24px 80px 24px;
+    }
+
+    .roadmap-hero {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 32px;
+      margin-bottom: 32px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .roadmap-hero::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 260px;
+      height: 100%;
+      background: radial-gradient(circle at top right, var(--accent-subtle) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .roadmap-header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+
+    .roadmap-title-area h1 {
+      font-family: var(--font-serif);
+      font-size: 28px;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin: 8px 0 6px 0;
+      letter-spacing: -0.02em;
+    }
+
+    .roadmap-title-area p {
+      font-size: 14px;
+      color: var(--text-secondary);
+      max-width: 620px;
+      line-height: 1.5;
+      margin: 0;
+    }
+
+    .roadmap-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .roadmap-meta-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-top: 24px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .meta-stat-box {
+      background: var(--bg-surface-subtle);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 14px 18px;
+    }
+
+    .meta-stat-label {
+      font-size: 11.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-tertiary);
+      font-weight: 600;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .meta-stat-value {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .skills-pills-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .skill-chip {
+      font-size: 12px;
+      font-weight: 600;
+      padding: 5px 12px;
+      border-radius: var(--radius-full);
+      background: var(--bg-surface-subtle);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .roadmap-progress-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 20px 24px;
+      margin-bottom: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .progress-bar-container {
+      flex: 1;
+      min-width: 240px;
+    }
+
+    .progress-bar-track {
+      height: 10px;
+      background: var(--bg-surface-subtle);
+      border-radius: var(--radius-full);
+      overflow: hidden;
+      border: 1px solid var(--border-subtle);
+      margin-top: 8px;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: var(--color-success);
+      width: 0%;
+      transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* Timeline Milestones */
+    .timeline-container {
+      position: relative;
+      padding-left: 36px;
+    }
+
+    .timeline-container::before {
+      content: '';
+      position: absolute;
+      top: 14px;
+      bottom: 20px;
+      left: 15px;
+      width: 2px;
+      background: var(--border-subtle);
+    }
+
+    .milestone-card {
+      position: relative;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      margin-bottom: 24px;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .milestone-card:hover {
+      border-color: var(--border-medium);
+      box-shadow: var(--shadow-md);
+    }
+
+    .milestone-card.status-completed {
+      border-left: 4px solid var(--color-success);
+    }
+
+    .milestone-card.status-in_progress {
+      border-left: 4px solid var(--accent-primary);
+    }
+
+    .milestone-card.status-pending {
+      border-left: 4px solid var(--border-medium);
+    }
+
+    .timeline-node {
+      position: absolute;
+      left: -36px;
+      top: 24px;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--bg-surface);
+      border: 2px solid var(--border-medium);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      z-index: 2;
+    }
+
+    .milestone-card.status-completed .timeline-node {
+      background: var(--color-success);
+      border-color: var(--color-success);
+      color: #FFFFFF;
+    }
+
+    .milestone-card.status-in_progress .timeline-node {
+      background: var(--accent-primary);
+      border-color: var(--accent-primary);
+      color: var(--accent-text);
+    }
+
+    .milestone-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+
+    .milestone-step-badge {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-tertiary);
+      margin-bottom: 4px;
+    }
+
+    .milestone-title {
+      font-family: var(--font-serif);
+      font-size: 20px;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin: 0;
+    }
+
+    .status-badge {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: var(--radius-full);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .status-badge.completed {
+      background: rgba(16, 185, 129, 0.12);
+      color: var(--color-success);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+
+<!-- Roadmap hero loaded -->
