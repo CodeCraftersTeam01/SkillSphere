@@ -329,3 +329,51 @@ exports.explainMaterial = async (req, res) => {
     });
   }
 };
+
+exports.generateMaterialNarrative = async (req, res) => {
+  try {
+    const { material_id, material_title, material_content, context_details, target_level } = req.body;
+
+    let title = material_title;
+    let content = material_content;
+
+    if (material_id && (!title || !content)) {
+      const material = await CourseMaterial.findByPk(material_id);
+      if (material) {
+        title = title || material.title;
+        content = content || `Format: ${material.content_type}, Durasi: ${material.duration_minutes} menit. ${material.description || ''}`;
+      }
+    }
+
+    if (!title) {
+      return res.status(400).json({
+        success: false,
+        message: 'Judul materi atau ID materi wajib disertakan.',
+      });
+    }
+
+    const narrative = await geminiService.generateMaterialNarrative({
+      materialTitle: title,
+      materialContent: content,
+      contextDetails: context_details || '',
+      targetLevel: target_level || 'beginner',
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: 'Narasi detail materi berhasil dibuat oleh Orion AI.',
+      data: narrative,
+    });
+  } catch (err) {
+    console.error('Error in generateMaterialNarrative:', err);
+    return res.status(500).json({
+      success: false,
+      message: 'Gagal menghasilkan narasi pembelajaran AI.',
+      error: err.message,
+    });
+  }
+};
+
+/**
+ * Get AI Adaptive Course Recommendations with Stage-based Progression (Beginner -> Intermediate -> Advanced)
+ */
