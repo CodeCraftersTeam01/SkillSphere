@@ -562,5 +562,569 @@
       background: var(--bg-surface-subtle);
       display: flex;
       align-items: center;
+      justify-content: center;
+      color: var(--text-tertiary);
+      font-size: 24px;
+      object-fit: cover;
+    }
 
-<!-- Dashboard skeleton loaded -->
+    .course-mini-body {
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      justify-content: space-between;
+    }
+
+    .course-mini-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+      line-height: 1.35;
+      margin-bottom: 6px;
+    }
+
+    .course-mini-tutor {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-bottom: 10px;
+    }
+
+    .course-mini-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid var(--border-subtle);
+      padding-top: 8px;
+      margin-top: auto;
+    }
+
+    .course-mini-price {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    /* Top Full-Width Announcement Bar (Dicoding / Claude Warm Paper Aesthetic) */
+    .top-announcement-bar {
+      background: #1C1B18;
+      color: #FAF9F5;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      font-size: 13px;
+      font-weight: 500;
+      padding: 10px 24px;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      z-index: 105;
+      line-height: 1.4;
+      transition: background-color 0.2s ease;
+    }
+
+    [data-theme="dark"] .top-announcement-bar {
+      background: #141312;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .top-announcement-content {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      text-align: center;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .top-bar-badge {
+      font-size: 10.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      padding: 2px 7px;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.15);
+      color: #FFFFFF;
+      display: inline-block;
+    }
+
+    .top-bar-badge.status-pending {
+      background: rgba(245, 158, 11, 0.3);
+      color: #FDE68A;
+    }
+
+    .top-bar-badge.status-rejected {
+      background: rgba(239, 68, 68, 0.3);
+      color: #FECACA;
+    }
+
+    .top-bar-text {
+      color: rgba(255, 255, 255, 0.92);
+      font-size: 13px;
+    }
+
+    .top-bar-divider {
+      color: rgba(255, 255, 255, 0.35);
+      font-size: 13px;
+      user-select: none;
+    }
+
+    .top-bar-cta {
+      background: none;
+      border: none;
+      color: #FFFFFF;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 0;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      transition: opacity 0.15s ease;
+      font-family: inherit;
+    }
+
+    .top-bar-cta:hover {
+      opacity: 0.82;
+    }
+
+    @media (max-width: 768px) {
+      .top-announcement-bar {
+        padding: 8px 16px;
+        font-size: 12px;
+      }
+      .top-bar-text {
+        font-size: 12px;
+      }
+      .top-bar-cta {
+        font-size: 12px;
+      }
+      .top-announcement-content {
+        gap: 6px;
+      }
+      .top-bar-divider {
+        display: none;
+      }
+    }
+    /* Tutor Mode Specific Banner */
+    .tutor-studio-banner {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-xl);
+      padding: 24px;
+      margin-bottom: 24px;
+      display: none;
+    }
+
+    /* ========================================================= */
+    /* --- CREATE COURSE MODAL STYLES -------------------------- */
+    /* ========================================================= */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(4px);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.2s ease, visibility 0.2s ease;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-xl);
+      max-width: 540px;
+      width: 100%;
+      padding: 28px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+      transform: scale(0.96);
+      transition: transform 0.2s ease;
+    }
+
+    .modal-overlay.active .modal-card {
+      transform: scale(1);
+    }
+
+    .form-group-custom {
+      margin-bottom: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-label-custom {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .form-control-custom {
+      background: var(--bg-surface-subtle);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 9px 12px;
+      font-size: 13.5px;
+      color: var(--text-primary);
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.15s ease;
+    }
+
+    .form-control-custom:focus {
+      border-color: var(--accent-primary);
+      background: var(--bg-surface);
+    }
+
+    /* ========================================================= */
+    /* --- GOOGLE CLASSROOM FULL LAYOUT & DOCKED SIDEBAR ------- */
+    /* ========================================================= */
+    .classroom-sidebar-toggle-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-full);
+      border: none;
+      background: transparent;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 17px;
+      cursor: pointer;
+      transition: background 0.15s ease;
+      flex-shrink: 0;
+    }
+
+    .classroom-sidebar-toggle-btn:hover {
+      background: var(--bg-surface-subtle);
+    }
+
+    .classroom-app-container {
+      display: flex;
+      width: 100%;
+      min-height: calc(100vh - 60px);
+    }
+
+    /* Left Sidebar (Docked on Desktop, Drawer on Mobile) */
+    .classroom-left-sidebar {
+      width: 270px;
+      background: var(--bg-surface);
+      border-right: 1px solid var(--border-subtle);
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      height: calc(100vh - 60px);
+      position: sticky;
+      top: 60px;
+      transition: width 0.2s ease, transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      overflow-y: auto;
+      z-index: 90;
+    }
+
+    .classroom-left-sidebar.collapsed {
+      width: 0;
+      overflow: hidden;
+      border-right: none;
+    }
+
+    .sidebar-scroll-body {
+      padding: 12px 0 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .sidebar-nav-group {
+      display: flex;
+      flex-direction: column;
+      padding-right: 12px;
+    }
+
+    .sidebar-nav-pill {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 10px 24px;
+      font-size: 13.5px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      text-decoration: none;
+      border-radius: 0 24px 24px 0;
+      transition: all 0.15s ease;
+      cursor: pointer;
+    }
+
+    .sidebar-nav-pill:hover {
+      color: var(--text-primary);
+      background: var(--bg-surface-subtle);
+    }
+
+    .sidebar-nav-pill.active {
+      color: var(--text-primary);
+      font-weight: 600;
+      background: var(--bg-surface-subtle);
+    }
+
+    .sidebar-nav-icon {
+      font-size: 16px;
+      width: 22px;
+      text-align: center;
+      color: var(--text-secondary);
+      flex-shrink: 0;
+    }
+
+    .sidebar-nav-pill.active .sidebar-nav-icon {
+      color: var(--text-primary);
+    }
+
+    .sidebar-divider-line {
+      height: 1px;
+      background: var(--border-subtle);
+      margin: 8px 0;
+    }
+
+    .sidebar-section-header {
+      padding: 10px 24px 6px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .sidebar-section-header:hover {
+      color: var(--text-primary);
+    }
+
+    .sidebar-class-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 8px 24px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      text-decoration: none;
+      border-radius: 0 24px 24px 0;
+      transition: all 0.15s ease;
+      overflow: hidden;
+    }
+
+    .sidebar-class-row:hover {
+      color: var(--text-primary);
+      background: var(--bg-surface-subtle);
+    }
+
+    .sidebar-class-circle {
+      width: 30px;
+      height: 30px;
+      border-radius: var(--radius-full);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+      color: #FFFFFF;
+      flex-shrink: 0;
+    }
+
+    .sidebar-class-text {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      flex: 1;
+    }
+
+    .sidebar-class-title {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-size: 13px;
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+
+    .sidebar-class-subtitle {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-size: 11px;
+      color: var(--text-tertiary);
+    }
+
+    /* Right Main Classroom Pane */
+    .classroom-main-pane {
+      flex: 1;
+      min-width: 0;
+      padding: 24px 32px 64px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      max-width: 1320px;
+    }
+
+    .classroom-top-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 8px;
+    }
+
+    .classroom-title-text {
+      font-family: var(--font-serif);
+      font-size: 26px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin: 0;
+    }
+
+    .classroom-add-link {
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--text-primary);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 6px 12px;
+      border-radius: var(--radius-md);
+      transition: background 0.15s ease;
+    }
+
+    .classroom-add-link:hover {
+      background: var(--bg-surface-subtle);
+    }
+
+    /* Tutor Earnings & Financial Overview Banner */
+    .tutor-earnings-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 22px 24px;
+      margin-bottom: 24px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    }
+
+    .earnings-header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .earnings-tag {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--accent-primary);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 4px;
+    }
+
+    .earnings-main-title {
+      font-family: var(--font-serif);
+      font-size: 21px;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin: 0;
+    }
+
+    .earnings-split-badge {
+      background: var(--bg-surface-subtle);
+      border: 1px solid var(--border-subtle);
+      padding: 6px 14px;
+      border-radius: var(--radius-full);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .earnings-metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+    }
+
+    .earnings-metric-box {
+      background: var(--bg-surface-subtle);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      transition: border-color 0.15s ease;
+    }
+
+    .earnings-metric-box:hover {
+      border-color: var(--border-strong);
+    }
+
+    .metric-box-label {
+      font-size: 11.5px;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    .metric-box-val {
+      font-family: var(--font-mono, monospace);
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .metric-box-sub {
+      font-size: 11px;
+      color: var(--text-tertiary);
+    }
+
+    /* Exact Google Classroom Card Grid */
+    .classroom-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+      gap: 20px;
+    }
+
+    .classroom-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      transition: box-shadow 0.2s ease, border-color 0.2s ease;
+    }
+
+<!-- Stage badges loaded -->
