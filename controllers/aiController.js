@@ -222,9 +222,14 @@ exports.chatStudyAssistant = async (req, res) => {
         courseContext = {
           title: course.title,
           description: course.description,
+          currentTopic: current_topic || 'Materi Belajar',
           sections: course.sections ? course.sections.map((s) => s.title) : [],
         };
       }
+    } else if (current_topic) {
+      courseContext = {
+        currentTopic: current_topic,
+      };
     }
 
     const response = await geminiService.chatStudyAssistant({
@@ -236,7 +241,7 @@ exports.chatStudyAssistant = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      message: 'Respon asisten belajar AI berhasil dibuat.',
+      message: 'Respon asisten belajar Orion AI berhasil dibuat.',
       data: response,
     });
   } catch (err) {
@@ -330,6 +335,9 @@ exports.explainMaterial = async (req, res) => {
   }
 };
 
+/**
+ * Generate Step-by-Step Speech Narrative for Orion AI Tutor (Pedagogical Teacher)
+ */
 exports.generateMaterialNarrative = async (req, res) => {
   try {
     const { material_id, material_title, material_content, context_details, target_level } = req.body;
@@ -377,3 +385,57 @@ exports.generateMaterialNarrative = async (req, res) => {
 /**
  * Get AI Adaptive Course Recommendations with Stage-based Progression (Beginner -> Intermediate -> Advanced)
  */
+exports.getAdaptiveCourseRecommendations = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { Enrollment, Category } = require('../models');
+
+    const user = await User.findByPk(userId);
+    const profile = await UserProfile.findOne({ where: { user_id: userId } });
+
+    // Fetch student's enrollments
+    const enrollments = await Enrollment.findAll({
+      where: { user_id: userId },
+      include: [
+        {
+          model: Course,
+          as: 'course',
+          include: [
+            { model: Category, as: 'category' },
+          ],
+        },
+      ],
+    });
+
+    // Fetch all published courses
+    const availableCourses = await Course.findAll({
+      where: { status: 'published' },
+      include: [
+        { model: Category, as: 'category' },
+        { model: User, as: 'tutor', attributes: ['id', 'name'] },
+      ],
+      order: [['level', 'ASC'], ['rating_avg', 'DESC']],
+    });
+
+    const recommendations = await geminiService.generateAdaptiveCourseRecommendations({
+      user: user ? user.toJSON() : {},
+      userProfile: profile ? profile.toJSON() : {},
+      enrollments: enrollments.map(e => e.toJSON()),
+      availableCourses: availableCourses.map(c => c.toJSON()),
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: 'Rekomendasi kursus adaptif AI berhasil dibuat berdasarkan personalisasi dan progres Anda.',
+      data: recommendations,
+    });
+  } catch (err) {
+    console.error('Error in getAdaptiveCourseRecommendations:', err);
+    return res.status(500).json({
+      success: false,
+      message: 'Gagal memuat rekomendasi kursus adaptif AI.',
+      error: err.message,
+    });
+  }
+};
+
