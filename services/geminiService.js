@@ -523,3 +523,11 @@ module.exports = {
   generatePracticeQuiz,
   explainCourseMaterial,
 };
+
+/**
+ * System Prompt Guidelines for Orion AI Pedagogical Tutor
+ */
+const ORION_PEDAGOGICAL_GUIDELINES = {
+  tone: 'empathetic, encouraging, structured, and pedagogical',
+  role: 'Expert Educational Mentor & Curriculum Architect',
+};
