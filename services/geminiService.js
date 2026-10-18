@@ -531,3 +531,422 @@ const ORION_PEDAGOGICAL_GUIDELINES = {
   tone: 'empathetic, encouraging, structured, and pedagogical',
   role: 'Expert Educational Mentor & Curriculum Architect',
 };
+
+async function generateMaterialNarrative({ materialTitle, materialContent = '', contextDetails = '', targetLevel = 'beginner' }) {
+  const structuredParagraphs = extractContentParagraphs(materialContent || contextDetails || '');
+
+  const paragraphsPromptList = structuredParagraphs.map((p, idx) => 
+    `[Bagian ${idx + 1}]
+Kutipan Awal (target_text): "${p.firstWords}"
+Konten Materi: ${p.clean}`
+  ).join('\n\n');
+
+  const systemPrompt = `Anda adalah Orion, asisten AI mentor belajar ramah, hangat, komunikatif, dan penuh empati di platform edukasi SkillSphere AI.
+Gaya bicara Anda: Bersikaplah seperti mentor ahli yang duduk santai di samping siswa, membimbing dengan sabar dan memastikan siswa benar-benar memahami esensi dan logika di balik materi, bukan sekadar membaca ulang teks.
+
+PENDEKATAN MENTOR KE SISWA:
+1. Dekatkan diri ke siswa dengan bahasa percakapan yang hidup dan hangat ("kamu" atau "Anda" secara personal).
+2. Bangun pemahaman dari akar masalah: jelaskan mengapa konsep ini ada, analogikan dengan kehidupan nyata, dan jelaskan apa bahayanya jika tidak diterapkan.
+3. Ajak siswa berpikir reflektif (misal: "Coba bayangkan kalau kamu...", "Pernah nggak kamu kepikiran kenapa...", "Nah, di sinilah letak solusinya...").
+4. DILARANG KERAS MENGGUNAKAN FRASA ROBOTIK / KLISE:
+   - SANGAT DILARANG menggunakan kata "Mari kita cermati", "Mari kita simak", "Mari kita telaah", "Perhatikan bagian ini", atau "Berikut adalah penjelasannya".
+   - Gantilah dengan bahasa percakapan mentor sejati yang mengalir alami dan bersahabat.
+5. Dilarang menggunakan tanda em dash (—). Gunakan tanda hubung biasa (-) atau titik dua (:).
+6. Jangan sertakan format Markdown seperti bintang (*, **), pagar (#), atau blok kode di naskah 'text' karena teks ini akan disuarakan langsung oleh Text-to-Speech (TTS).
+
+ATURAN SEGMEN DAN PENYELARASAN LAYAR (SCREEN SYNC):
+1. Buat segmen berurutan untuk setiap [Bagian N] yang ada pada daftar materi di bawah. JANGAN menggabungkan atau melompati bagian.
+2. 'target_text' WAJIB disalin PERSIS (verbatim) dari "Kutipan Awal (target_text)" milik [Bagian N] tersebut!
+   SANGAT PENTING: JANGAN PERNAH mengambil teks dari bagian lain, karena antarmuka web menyorot (highlight) teks tersebut di layar pengguna saat Anda berbicara! Jika Anda sedang membahas Bagian 2, 'target_text' WAJIB persis milik Bagian 2!
+3. 'text': Naskah tuturan suara penjelasan Anda untuk bagian tersebut. Jelaskan inti permasalahan, logika sebab-akibat, dan analogi yang membantu murid paham.
+
+Format output WAJIB JSON:
+{
+  "title": "${materialTitle}",
+  "intro": "Halo! Saya Orion, mentor belajar AI Anda. Senang sekali bisa mendampingi Anda mendalami materi ${materialTitle} ini.",
+  "segments": [
+    {
+      "step": 1,
+      "topic": "Pengantar & Skenario Awal",
+      "target_text": "Kutipan Awal dari Bagian 1",
+      "text": "Naskah penjelasan mentor untuk Bagian 1..."
+    }
+  ]
+}`;
+
+  const userPrompt = `Analisis daftar bagian materi berikut dan buatkan narasi penjelasan bersegmen yang hangat, ramah, dan mendalam:
+Judul Materi: "${materialTitle}"
+Tingkat / Level: ${targetLevel}
+
+Daftar Bagian Materi Siswa:
+${paragraphsPromptList || materialTitle}`;
+
+  const rawResponse = await callGeminiAPI(userPrompt, systemPrompt, 0.4);
+
+  if (rawResponse) {
+    try {
+      const cleanJson = rawResponse.replace(/```json/gi, '').replace(/```/g, '').trim();
+      const parsed = JSON.parse(cleanJson);
+      if (parsed && Array.isArray(parsed.segments) && parsed.segments.length > 0) {
+        return parsed;
+      }
+    } catch (e) {
+      console.warn('[Gemini Service] Material narrative JSON parse error:', e.message);
+    }
+  }
+
+  // Dynamic Context-Aware Variable-Step Fallback based on real text content
+  return buildMaterialNarrativeFallback(materialTitle, materialContent, contextDetails);
+}
+
+function buildMaterialNarrativeFallback(materialTitle, materialContent = '', contextDetails = '') {
+  const fullText = (materialContent || contextDetails || '').trim();
+  const contentChunks = extractContentParagraphs(fullText);
+
+  // If no content parsed, provide a warm default
+  if (contentChunks.length === 0) {
+    return {
+      title: materialTitle,
+      intro: `Halo! Saya Orion, mentor belajar AI Anda. Senang sekali bisa mendampingi Anda di materi ${materialTitle}.`,
+      segments: [
+        {
+          step: 1,
+          topic: 'Orientasi Modul',
+          target_text: materialTitle,
+          text: `Halo teman belajar! Senang sekali bisa mendampingi Anda di materi ${materialTitle}. Yuk, kita pelajari bersama konsep penting ini agar wawasan teknis Anda semakin kuat dan siap diterapkan di dunia profesional.`
+        }
+      ]
+    };
+  }
+
+  // Empathetic, engaging pedagogical mentor transitions
+  const mentorOpeners = [
+    'Nah, coba Anda perhatikan logika penting di bagian ini:',
+    'Kebayang kan mengapa hal ini sangat krusial dalam perancangan sistem?',
+    'Logika di baliknya cukup sederhana namun punya dampak besar:',
+    'Di sinilah letak kunci efisiensinya:',
+    'Biar semakin terbayang di implementasi nyata sehari-hari:',
+    'Coba perhatikan bagaimana prinsip ini saling melengkapi:',
+    'Dari skenario ini, kita bisa melihat solusi elegan yang ditawarkan:'
+  ];
+
+  const segments = [];
+
+  contentChunks.forEach((item, idx) => {
+    const chunk = item.clean;
+    const lower = chunk.toLowerCase();
+    const openingWords = item.firstWords;
+
+    let topicName = `Konsep Inti ${idx + 1}`;
+    let explanationText = '';
+
+    if (lower.includes('bayangkan') || lower.includes('catatan besar')) {
+      topicName = 'Analogi Nyata: Buku Catatan Manual';
+      explanationText = `Halo teman belajar! Senang sekali bisa mendampingi Anda di materi ${materialTitle}. Coba Anda bayangkan situasi nyata ini: kamu punya sebuah buku catatan besar, dan setiap kali ada mahasiswa mengambil mata kuliah, kamu menulis ulang seluruh data dirinya dari awal di setiap baris. Kebayang kan betapa melelahkannya cara manual seperti ini?`;
+    } else if (lower.includes('ketika seorang mahasiswa') || lower.includes('pindah rumah') || lower.includes('5 baris')) {
+      topicName = 'Dampak Redundansi Data & Inkonsistensi';
+      explanationText = `Nah, masalah yang lebih fatal muncul saat data itu berubah: bayangkan kalau mahasiswa tadi mengambil lima mata kuliah sekaligus, lalu dia pindah rumah. Kamu terpaksa mencari dan mengubah lima baris data sekaligus. Kalau ada satu baris saja yang terlewat, alamatnya jadi tidak konsisten dan datanya bertolak belakang. Inilah masalah klasik yang dipecahkan oleh normalisasi basis data.`;
+    } else if (lower.includes('dr. e. f. codd') || lower.includes('definisi & konsep') || lower.includes('logical design')) {
+      topicName = 'Definisi & Teori Dr. E. F. Codd';
+      explanationText = `Untuk mengatasi masalah redundansi tersebut, Dr. Edgar F. Codd merumuskan konsep normalisasi. Logika dasarnya sangat elegan: kita pisahkan data ke dalam tabel-tabel terfokus dengan batas entitas yang jelas. Hasilnya, database kita jadi ramping, efisien, dan bebas dari kerangkapan data yang tidak perlu.`;
+    } else if (lower.includes('tujuan fundamental') || lower.includes('menghilangkan kerangkapan')) {
+      topicName = 'Tiga Tujuan Pokok Normalisasi';
+      explanationText = `Ada tiga tujuan besar yang ingin kita capai dengan teknik ini: pertama, membuang data duplikat yang boros ruang simpan. Kedua, menyederhanakan hubungan antar-tabel agar mudah dikelola. Dan yang paling penting: mencegah tiga anomali fatal saat sistem kita melakukan penambahan, perubahan, atau penghapusan data.`;
+    } else if (lower.includes('anomali penyisipan') || lower.includes('insertion anomaly')) {
+      topicName = 'Bahaya Anomali Penyisipan (Insert)';
+      explanationText = `Pertama, ada anomali penyisipan. Pernah nggak kamu mau input data baru, misalnya mata kuliah baru, tapi sistem menolak hanya karena belum ada mahasiswa yang mendaftar? Itu terjadi kalau kamu memaksakan dua entitas berbeda digabung dalam satu tabel.`;
+    } else if (lower.includes('anomali pembaruan') || lower.includes('update anomaly')) {
+      topicName = 'Bahaya Anomali Pembaruan (Update)';
+      explanationText = `Kedua, anomali pembaruan. Seperti contoh mahasiswa bernama Welli tadi, kalau satu orang punya data alamat di banyak baris, mengeditnya setengah-setengah akan menimbulkan inkonsistensi. Komputer kamu jadi bingung mana data yang valid.`;
+    } else if (lower.includes('anomali penghapusan') || lower.includes('deletion anomaly')) {
+      topicName = 'Bahaya Anomali Penghapusan (Delete)';
+      explanationText = `Dan ketiga, anomali penghapusan. Ini sangat bahaya kalau kamu cuma ingin menghapus satu transaksi mahasiswa yang batal kuliah, tapi gara-gara desain tabelnya salah, data mata kuliah dan dosennya ikut terhapus lenyap dari sistem.`;
+    } else if (lower.includes('syarat basis data normal') || lower.includes('lossless-join') || lower.includes('tiga syarat')) {
+      topicName = 'Syarat Dekomposisi Normal yang Ideal';
+      explanationText = `Nah, supaya pemecahan tabel kamu benar-benar sukses, pastikan memenuhi syarat Lossless-Join Decomposition. Artinya, ketika tabel-tabel pecahan itu digabungkan kembali lewat relasi Foreign Key, informasinya harus utuh persis seperti semula tanpa ada baris data palsu yang tercipta.`;
+    } else if (lower.includes('functional dependency') || lower.includes('ketergantungan')) {
+      topicName = 'Ketergantungan Fungsional (FD)';
+      explanationText = `Kunci utama memahami normalisasi adalah ketergantungan fungsional. Bayangkan ini seperti hubungan nomor induk mahasiswa dengan nama lengkapnya: jika NIM diketahui, maka nama pemiliknya pasti tunggal dan jelas.`;
+    } else if (lower.includes('1nf') || lower.includes('atomik')) {
+      topicName = 'Bentuk Normal Pertama (1NF)';
+      explanationText = `Pada bentuk normal pertama, prinsipnya sangat tegas: setiap kolom wajib bernilai atomik atau tunggal, dan tidak boleh ada perulangan kelompok data dalam satu baris.`;
+    } else if (lower.includes('2nf') || lower.includes('parsial')) {
+      topicName = 'Bentuk Normal Kedua (2NF)';
+      explanationText = `Melangkah ke bentuk normal kedua: seluruh atribut non-kunci wajib bergantung secara penuh pada kunci utama. Kita singkirkan ketergantungan parsial yang membuat tabel rancu.`;
+    } else if (lower.includes('3nf') || lower.includes('transitif')) {
+      topicName = 'Bentuk Normal Ketiga (3NF)';
+      explanationText = `Di tahap bentuk normal ketiga: kita pastikan tidak ada ketergantungan transitif, yaitu kondisi di mana atribut non-kunci malah bergantung pada atribut non-kunci lainnya.`;
+    } else {
+      const opener = mentorOpeners[idx % mentorOpeners.length];
+      explanationText = `${opener} ${chunk.slice(0, 220)}.`;
+    }
+
+    segments.push({
+      step: segments.length + 1,
+      topic: topicName,
+      target_text: openingWords,
+      text: explanationText
+    });
+  });
+
+  // Warm, motivating, encouraging mentor conclusion
+  segments.push({
+    step: segments.length + 1,
+    topic: 'Refleksi & Apresiasi Belajar',
+    target_text: contentChunks[contentChunks.length - 1]?.firstWords || materialTitle,
+    text: `Hebat sekali! Anda telah menuntaskan pembahasan modul ${materialTitle} ini dengan sangat tekun. Memahami konsep rancangan ini adalah bekal berharga untuk menjadi software engineer yang handal. Coba uji pemahaman Anda di kuis latihan di bawah, dan tanyakan kepada saya kapan saja jika ada hal yang ingin didiskusikan lebih lanjut ya. Tetap semangat!`
+  });
+
+  return {
+    title: materialTitle,
+    intro: `Halo! Saya Orion, mentor belajar AI Anda. Senang sekali bisa mendampingi Anda di materi ${materialTitle} ini.`,
+    segments
+  };
+}
+
+/**
+ * Heuristic Fallbacks for Seamless Offline/Dev Execution
+ */
+function buildAdaptiveRoadmapFallback(targetRole, currentSkills) {
+  const isBackend = /backend|node|sql|cloud|api|devops/i.test(targetRole);
+  const isFrontend = /frontend|react|ui|ux|web|mobile|flutter/i.test(targetRole);
+  const isAI = /ai|machine learning|data|ml|llm|intelligence/i.test(targetRole);
+
+  let recommendedSkills = ['Problem Solving', 'Git Version Control', 'REST API', 'Software Testing'];
+  let milestones = [];
+
+  if (isBackend) {
+    recommendedSkills = ['Node.js & Express', 'Sequelize & PostgreSQL/MySQL', 'JWT Security & RBAC', 'Redis Caching', 'Docker & CI/CD'];
+    milestones = [
+      {
+        step: 1,
+        title: 'Pondasi Database Relasional & ORM',
+        description: 'Mendalami perancangan skema relasional, normalisasi data, indeks, dan pemodelan Sequelize.',
+        topics: ['PostgreSQL/MySQL Modeling', 'Sequelize Associations', 'Transactions & ACID'],
+        estimated_weeks: 3,
+        project_assignment: 'Membangun skema ERD 10+ relasi tabel untuk aplikasi e-learning',
+        status: 'in_progress',
+      },
+      {
+        step: 2,
+        title: 'Keamanan REST API & Autentikasi JWT',
+        description: 'Implementasi otentikasi token JWT ganda (Access & Refresh), Role-Based Access Control, dan Helmet security.',
+        topics: ['JWT Token Rotation', 'RBAC Middleware', 'Rate Limiting & OWASP'],
+        estimated_weeks: 4,
+        project_assignment: 'Membuat modul auth enterprise lengkap dengan OTP email verification',
+        status: 'pending',
+      },
+      {
+        step: 3,
+        title: 'Payment Engine & Revenue Split Mechanism',
+        description: 'Mengintegrasikan gateway pembayaran multi-vendor, webhook verifikasi, dan pembagian bagi hasil otomatis.',
+        topics: ['Payment Gateway Webhooks', 'Virtual Wallet Mutation', 'Financial Auditing'],
+        estimated_weeks: 4,
+        project_assignment: 'Sistem split payment 20% platform & 80% tutor dengan automated wallet holding',
+        status: 'pending',
+      },
+      {
+        step: 4,
+        title: 'Arsitektur Skalabilitas & AI Integration',
+        description: 'Penerapan caching Redis resilien, kompresi HTTP gzip, optimasi streaming materi, dan integrasi Gemini API.',
+        topics: ['Redis Cache Strategy', 'HTTP 206 Video Streaming', 'Gemini API Integration', 'Docker Deployment'],
+        estimated_weeks: 5,
+        project_assignment: 'Deploy backend mikro modern ke cloud dengan pemantauan performa real-time',
+        status: 'pending',
+      },
+    ];
+  } else if (isFrontend) {
+    recommendedSkills = ['HTML5 & Modern CSS', 'JavaScript ESNext', 'React / Next.js', 'State Management', 'Responsive Design'];
+    milestones = [
+      {
+        step: 1,
+        title: 'Semantic UI & Warm Paper Design System',
+        description: 'Membangun sistem desain modern berstandar aksesibilitas tinggi dan responsif mobile-first.',
+        topics: ['CSS Custom Properties', 'Accessibility WCAG AA', 'Clean Vanilla Styling'],
+        estimated_weeks: 3,
+        project_assignment: 'Membuat UI dashboard interaktif dengan mode terang/gelap',
+        status: 'in_progress',
+      },
+      {
+        step: 2,
+        title: 'Komponen Interaktif & State Management',
+        description: 'Menangani aliran data dinamis, form validasi real-time, dan micro-animations.',
+        topics: ['State Architecture', 'Asynchronous API Fetching', 'Custom UI Components'],
+        estimated_weeks: 4,
+        project_assignment: 'Membangun portal katalog kursus dengan filter instan dan pencarian dinamis',
+        status: 'pending',
+      },
+      {
+        step: 3,
+        title: 'Media Player & Interactive Learning Portal',
+        description: 'Integrasi pemutar video kustom, pembaca dokumen, dan modul ujian interaktif.',
+        topics: ['Custom Video Player', 'Exam Stepper Engine', 'Gamification Badges'],
+        estimated_weeks: 4,
+        project_assignment: 'Membuat modul belajar siswa terintegrasi dengan pelacakan progres real-time',
+        status: 'pending',
+      },
+      {
+        step: 4,
+        title: 'Optimasi Web Vitals & Production Deployment',
+        description: 'Meningkatkan skor Lighthouse, kompresi aset, dan deployment CI/CD ke Vercel/Netlify.',
+        topics: ['Core Web Vitals', 'Code Splitting', 'PWA & SEO'],
+        estimated_weeks: 5,
+        project_assignment: 'Deploy portofolio frontend enterprise dengan skor performa > 95',
+        status: 'pending',
+      },
+    ];
+  } else {
+    // General AI / Software Engineering
+    recommendedSkills = ['Python / JavaScript', 'AI Prompt Engineering', 'Gemini API & LLMs', 'Data Pipelines', 'API Engineering'];
+    milestones = [
+      {
+        step: 1,
+        title: 'Fondasi Pemrograman & Data Engineering',
+        description: 'Memahami dasar logika algoritma, struktur data terapan, dan pengolahan data terstruktur.',
+        topics: ['Data Structures', 'REST APIs', 'Database Integration'],
+        estimated_weeks: 3,
+        project_assignment: 'Membangun pipeline ekstraksi dan transformasi data otomatis',
+        status: 'in_progress',
+      },
+      {
+        step: 2,
+        title: 'Integrasi Model AI & Prompt Engineering',
+        description: 'Mendalami integrasi API LLM (Gemini), pembuatan prompt terstruktur, dan pemrosesan output JSON.',
+        topics: ['Gemini API SDK', 'Structured JSON Prompting', 'Few-shot Learning'],
+        estimated_weeks: 4,
+        project_assignment: 'Membangun asisten AI karir cerdas dengan respon kontekstual',
+        status: 'pending',
+      },
+      {
+        step: 3,
+        title: 'RAG (Retrieval-Augmented Generation) & Knowledge Base',
+        description: 'Menghubungkan basis data materi kursus dengan AI untuk memberikan jawaban berbasis sumber belajar akurat.',
+        topics: ['Embeddings', 'Context Injection', 'Semantic Search'],
+        estimated_weeks: 4,
+        project_assignment: 'Sistem tanya jawab materi kuliah berbasis konteks cerdas',
+        status: 'pending',
+      },
+      {
+        step: 4,
+        title: 'Deployment & Monitoring Solusi AI',
+        description: 'Mempersiapkan solusi AI untuk produksi dengan rate limiting, caching respon cerdas, dan mitigasi token cost.',
+        topics: ['AI Cost Optimization', 'Response Caching', 'Cloud Microservices'],
+        estimated_weeks: 5,
+        project_assignment: 'Deploy aplikasi AI full-stack siap produksi dengan pemantauan latensi',
+        status: 'pending',
+      },
+    ];
+  }
+
+  return {
+    target_role: targetRole,
+    recommended_skills: recommendedSkills,
+    roadmap_data: {
+      estimated_duration_weeks: 16,
+      summary: `Rencana pembelajaran terstruktur yang dipersonalisasi untuk mencapai posisi ${targetRole}.`,
+      milestones,
+      generated_at: new Date().toISOString(),
+      source: 'heuristic_adaptive_engine',
+    },
+  };
+}
+
+function generateStudyAssistantFallback(message, courseContext) {
+  const msgLower = (message || '').toLowerCase().trim();
+  const currentTopic = (courseContext && (courseContext.currentTopic || courseContext.currentSection)) || 'HTML5 & Modern Web Development';
+
+  // Greeting handling
+  if (msgLower === 'hello' || msgLower === 'halo' || msgLower === 'hai' || msgLower === 'pagi' || msgLower === 'siang' || msgLower === 'sore' || msgLower === 'malam' || msgLower === 'hi') {
+    return `Halo! Saya **Orion**, partner belajar AI Anda. 
+
+Saat ini kita sedang membuka modul: **${currentTopic}**. 
+
+Saya di sini untuk menemani dan memandu proses pemahaman Anda langkah demi langkah. Bagian mana yang ingin kita pelajari atau diskusikan bersama terlebih dahulu?`;
+  }
+
+  // HTML / DOM / Tag Questions (Scaffolded Step 1)
+  if (msgLower.includes('html') || msgLower.includes('dom') || msgLower.includes('tag') || msgLower.includes('struktur')) {
+    return `Pertanyaan yang bagus tentang **${currentTopic}**! Mari kita bedah konsepnya secara bertahap:
+
+**Langkah 1: Intuisi Dasar**
+Bayangkan HTML seperti kerangka tulang sebuah bangunan. Sebelum kita memberi cat (CSS) atau memasang instalasi listrik interaktif (JavaScript), kita butuh pondasi struktur yang kokoh terlebih dahulu.
+
+Elemen paling dasar yang wajib ada di setiap dokumen HTML5 adalah deklarasi \`<!DOCTYPE html>\` dan tag induk \`<html>\`.
+
+*Petunjuk Pemantik:*
+Kira-kira apa yang terjadi jika kita tidak menyertakan \`<!DOCTYPE html>\` di awal dokumen? Coba tebak, atau ketik *"lanjut"* jika ingin kita bahas bersama langkah berikutnya!`;
+  }
+
+  // JWT / Auth Questions
+  if (msgLower.includes('jwt') || msgLower.includes('token') || msgLower.includes('auth')) {
+    return `Topik otentikasi sangat penting. Mari kita pahami dari intinya terlebih dahulu:
+
+**Tahap 1: Konsep Dasar Token**
+JSON Web Token (JWT) ibarat kartu akses digital dengan tanda tangan resmi yang tidak bisa dipalsukan. Kartu ini memuat informasi identitas pengguna (*payload*) dan masa berlaku.
+
+Di SkillSphere, kami memisahkan token menjadi 2:
+1. **Access Token**: Masa aktif singkat (24 jam) untuk mengakses data aman.
+2. **Refresh Token**: Masa aktif panjang (7 hari) untuk memperbarui sesi.
+
+Apakah peran Access Token ini sudah cukup jelas, atau ingin kita simulasikan bagaimana aliran datanya saat pengguna mengakses endpoint rahasia?`;
+  }
+
+  // Split Revenue / Business Rules
+  if (msgLower.includes('split') || msgLower.includes('revenue') || msgLower.includes('20%') || msgLower.includes('80%')) {
+    return `Tentang pembagian hasil kursus di platform:
+
+**Skema Transparan 20% / 80%:**
+- **20% Biaya Platform**: Digunakan untuk pemeliharaan server, integrasi LLM AI Orion, dan operasional.
+- **80% Pendapatan Bersih**: Langsung dialokasikan ke Virtual Wallet Tutor (\`TutorWallet\`).
+
+Terdapat masa holding selama 7 hari sebelum saldo siap dicairkan (minimal penarikan Rp 100.000). Apakah Anda ingin mengetahui alur penarikan dananya secara lebih detail?`;
+  }
+
+  // General Socratic / Scaffolding Response
+  return `Saya menangkap pertanyaan Anda mengenai **"${message}"** pada modul **${currentTopic}**.
+
+Mari kita mulai dengan satu konsep kunci terlebih dahulu:
+1. Setiap fitur atau konsep pemrograman selalu berangkat dari masalah nyata yang ingin dipecahkan.
+2. Coba kita refleksikan: menurut pemahaman Anda saat ini, tujuan utama dari konsep tersebut apa?
+
+Berikan jawaban atau dugaan awal Anda, dan saya (Orion) akan memandu Anda menyempurnakannya langkah demi langkah!`;
+}
+
+function buildQuizFallback(topic, numberOfQuestions, difficulty) {
+  return {
+    topic,
+    difficulty,
+    questions: [
+      {
+        id: 1,
+        question: `Dalam arsitektur sistem berbasis ${topic}, apa tujuan utama dari pemisahan layer controller dan service/model?`,
+        options: [
+          'Mempercepat kompilasi CSS',
+          'Memastikan Separation of Concerns dan kemudahan unit testing',
+          'Mengurangi ukuran database MySQL',
+          'Menghilangkan kebutuhan autentikasi JWT',
+        ],
+        answer_index: 1,
+        explanation: 'Pemisahan controller dan model/service memastikan setiap komponen memiliki tanggung jawab tunggal (Separation of Concerns), sehingga kode mudah dirawat dan diuji.',
+      },
+      {
+        id: 2,
+        question: `Bagaimana praktik terbaik untuk mengamankan data sensitif pengguna pada aplikasi ${topic}?`,
+        options: [
+          'Menyimpan password dalam bentuk plaintext di database',
+          'Menggunakan algoritma hashing kuat seperti bcrypt dengan salt dan HTTPS',
+          'Menampilkan token rahasia pada response URL parameter',
+          'Menonaktifkan CORS dan validasi input',
+        ],
+        answer_index: 1,
+        explanation: 'Password wajib di-hash menggunakan algoritma modern seperti bcryptjs dengan salt rounds yang memadai untuk mencegah kebocoran kredensial.',
+      },
+    ],
+  };
+}
+
+/**
+ * 5. Generate AI Adaptive Course Recommendations with Stage-based Progression
+ */
+
+module.exports.generateMaterialNarrative = generateMaterialNarrative;
