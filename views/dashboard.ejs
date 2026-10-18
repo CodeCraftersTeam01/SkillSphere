@@ -2254,5 +2254,569 @@
     const token = localStorage.getItem('skillsphere_access_token');
     let currentUser = null;
 
+    if (!token) {
+      window.location.href = '/login';
+    } else {
+      // Early check: if user is admin, route immediately to Admin Portal
+      try {
+        const savedUser = localStorage.getItem('skillsphere_user');
+        if (savedUser) {
+          const parsed = JSON.parse(savedUser);
+          if (parsed.role === 'admin') {
+            window.location.href = '/admin';
+          }
+        }
+      } catch (e) {}
 
-<!-- Active courses progress cards loaded -->
+      initAppDashboard(token);
+    }
+
+    async function initAppDashboard(accessToken) {
+      await loadUserProfile(accessToken);
+    }
+
+    async function loadUserProfile(accessToken) {
+      try {
+        const res = await fetch('/api/auth/me', {
+          headers: {
+            'Authorization': 'Bearer ' + accessToken,
+          },
+        });
+
+        if (!res.ok) {
+          localStorage.removeItem('skillsphere_access_token');
+          window.location.href = '/login';
+          return;
+        }
+
+        const json = await res.json();
+        const user = json.data;
+        currentUser = user;
+
+        // Admin role check: Admin only uses Admin Dashboard
+        if (user.role === 'admin') {
+          window.location.href = '/admin';
+          return;
+        }
+
+        // Enforce completed onboarding for new students, allow tutors directly
+        const hasCompletedOnboarding = user.role === 'tutor' || 
+          (user.profile && user.profile.study_preferences && user.profile.study_preferences.onboarding_completed);
+
+        if (!hasCompletedOnboarding) {
+          window.location.href = '/dashboard/onboarding';
+          return;
+        }
+
+        const initials = user.name ? user.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() : 'U';
+        document.getElementById('nav-avatar').textContent = initials;
+        document.getElementById('nav-user-name').textContent = user.name;
+        
+        let roleDisplay = 'Siswa';
+        if (user.role === 'tutor') roleDisplay = 'Tutor';
+        document.getElementById('nav-user-role').textContent = roleDisplay;
+
+        // Dynamic Profile Completeness calculation
+        let percent = 20; // base account
+        if (user.name) percent += 10;
+        if (user.email) percent += 10;
+        if (user.profile) {
+          if (user.profile.bio) percent += 20;
+          if (user.profile.phone_number) percent += 10;
+          if (user.profile.career_goal) percent += 15;
+          if (user.profile.study_preferences && Object.keys(user.profile.study_preferences).length > 0) percent += 15;
+        }
+        percent = Math.min(percent, 100);
+        const percentBadge = document.getElementById('profile-percent-badge');
+        if (percentBadge) percentBadge.textContent = percent + '%';
+
+        const heroTitle = document.getElementById('profile-hero-card-title');
+        const heroDesc = document.getElementById('profile-hero-card-desc');
+        const heroCta = document.getElementById('profile-hero-card-cta');
+        if (percent >= 100) {
+          if (heroTitle) heroTitle.textContent = 'Profil Anda Sudah Lengkap';
+          if (heroDesc) heroDesc.textContent = 'Seluruh preferensi belajar Anda telah tersimpan. Nikmati rekomendasi kurikulum adaptif AI secara optimal.';
+          if (heroCta) {
+            heroCta.innerHTML = 'Lihat Jalur Belajar AI <i class="fas fa-arrow-right" style="font-size:11px;"></i>';
+            heroCta.href = '/dashboard/roadmap';
+          }
+        } else {
+          if (heroTitle) heroTitle.textContent = 'Kelengkapan Profil Anda';
+          if (heroDesc) heroDesc.textContent = 'Lengkapi preferensi dan tujuan karir Anda untuk memaksimalkan rekomendasi kurikulum adaptif AI.';
+          if (heroCta) {
+            heroCta.innerHTML = 'Lengkapi Preferensi <i class="fas fa-arrow-right" style="font-size:11px;"></i>';
+            heroCta.href = '/dashboard/onboarding';
+          }
+        }
+
+        // Dynamic Referral Code for Student
+        const refDisplay = document.getElementById('referral-code-display');
+        if (refDisplay) {
+          const rawName = (user.name || 'STUDENT').replace(/[^a-zA-Z]/g, '').substring(0, 4).toUpperCase();
+          const userRefCode = `SKILL-${user.id}-${rawName || '2026'}`;
+          refDisplay.textContent = userRefCode;
+          refDisplay.setAttribute('data-code', userRefCode);
+        }
+
+        // Tutor verification bar logic
+        const verifBar = document.getElementById('tutor-verification-bar');
+        const topBadge = document.getElementById('top-bar-badge');
+        const topText = document.getElementById('top-bar-text');
+        const topCtaLabel = document.getElementById('top-bar-cta-label');
+        const topCtaBtn = document.getElementById('top-bar-cta-btn');
+
+        const apps = Array.isArray(user.tutor_applications) ? user.tutor_applications : [];
+        const latestApp = apps.length > 0 ? apps[apps.length - 1] : null;
+        const isVerifiedTutor = user.role === 'tutor' && latestApp && latestApp.status === 'approved';
+
+        if (user.role === 'tutor') {
+          // TUTOR ROLE VIEW: Show Google Classroom Section & Hide Student Dashboard Container
+          document.getElementById('tutor-classroom-section').style.display = 'flex';
+          const studentContainer = document.getElementById('student-dashboard-container');
+          if (studentContainer) studentContainer.style.display = 'none';
+
+          // Hide streak badge for tutor
+          const streakBadge = document.querySelector('.streak-badge');
+          if (streakBadge) streakBadge.style.display = 'none';
+
+          // Update desktop & mobile navigation links for tutor
+          updateNavLinksForRole('tutor');
+
+          if (isVerifiedTutor) {
+            if (verifBar) verifBar.style.display = 'none';
+          } else {
+            if (verifBar) {
+              verifBar.style.display = 'flex';
+              if (latestApp && latestApp.status === 'pending') {
+                if (topBadge) { topBadge.className = 'top-bar-badge status-pending'; topBadge.textContent = 'Dalam Review'; }
+                if (topText) topText.textContent = 'Pendaftaran Pengajar Sedang Ditinjau Admin: Berkas CV dan portofolio Anda sedang dalam proses evaluasi.';
+                if (topCtaLabel) topCtaLabel.textContent = 'Lihat Status';
+              } else if (latestApp && latestApp.status === 'rejected') {
+                if (topBadge) { topBadge.className = 'top-bar-badge status-rejected'; topBadge.textContent = 'Perlu Revisi'; }
+                if (topText) topText.textContent = `Verifikasi Pengajar Perlu Revisi: ${latestApp.rejection_reason || 'Mohon lengkapi kualifikasi Anda.'}`;
+                if (topCtaLabel) topCtaLabel.textContent = 'Ajukan Ulang';
+              } else {
+                if (topBadge) { topBadge.className = 'top-bar-badge'; topBadge.textContent = 'Verifikasi Pengajar'; }
+                if (topText) topText.textContent = 'Mohon verifikasi data kualifikasi dan portofolio Anda terlebih dahulu sebelum mengelola kurikulum di Studio Pengajar.';
+                if (topCtaLabel) topCtaLabel.textContent = 'Lengkapi Sekarang';
+              }
+            }
+          }
+
+          // Update wallet display
+          if (user.wallet) {
+            const formatted = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(user.wallet.balance);
+            const wElem = document.getElementById('tutor-wallet-balance-val');
+            if (wElem) wElem.textContent = formatted;
+          }
+
+          // Load Google Classroom Tutor Courses & Categories
+          await loadTutorClassroomCourses(accessToken);
+          loadCategoriesForModal();
+
+        } else {
+          // STUDENT ROLE VIEW: Show Student Section & Hide Tutor Classroom Section
+          document.getElementById('tutor-classroom-section').style.display = 'none';
+          const studentContainer = document.getElementById('student-dashboard-container');
+          if (studentContainer) studentContainer.style.display = 'block';
+          const studentSection = document.getElementById('student-dashboard-section');
+          if (studentSection) studentSection.style.display = 'grid';
+          if (verifBar) verifBar.style.display = 'none';
+
+          updateNavLinksForRole('student');
+          const enrolledIds = await loadStudentActivities(accessToken);
+          await loadCoursesCatalog(enrolledIds);
+          initStreakAndCheckin(user.id);
+        }
+
+      } catch (err) {
+        console.error('Failed to load user profile:', err);
+      }
+    }
+
+    function updateNavLinksForRole(role) {
+      const desktopNav = document.getElementById('desktop-nav-menu');
+      const mobileNavRow = document.getElementById('mobile-nav-row');
+      const sidebarToggle = document.getElementById('classroom-sidebar-toggle');
+      const streakBadge = document.querySelector('.streak-badge');
+      const navbar = document.querySelector('.navbar');
+      
+      if (role === 'tutor' || role === 'admin') {
+        // Hide horizontal navbar text links for tutor (per Google Classroom design)
+        if (desktopNav) {
+          desktopNav.style.display = 'none';
+          desktopNav.classList.add('is-hidden');
+        }
+        if (mobileNavRow) {
+          mobileNavRow.style.display = 'none';
+          mobileNavRow.classList.add('is-hidden');
+        }
+        if (navbar) navbar.classList.add('no-subnav');
+        if (streakBadge) streakBadge.style.display = 'none';
+        // Show Classroom Drawer Hamburger button
+        if (sidebarToggle) sidebarToggle.style.display = 'inline-flex';
+      } else {
+        // Show standard navigation links for students
+        if (desktopNav) {
+          desktopNav.style.display = '';
+          desktopNav.classList.remove('is-hidden');
+        }
+        if (mobileNavRow) {
+          mobileNavRow.style.display = '';
+          mobileNavRow.classList.remove('is-hidden');
+        }
+        if (navbar) navbar.classList.remove('no-subnav');
+        if (streakBadge) streakBadge.style.display = '';
+        // Hide Classroom Drawer Hamburger button for students
+        if (sidebarToggle) sidebarToggle.style.display = 'none';
+        toggleClassroomSidebar(false);
+      }
+    }
+
+    function toggleClassroomSidebar(open) {
+      const sidebar = document.getElementById('classroom-left-sidebar');
+      const backdrop = document.getElementById('classroom-sidebar-backdrop');
+      if (!sidebar) return;
+      const isMobile = window.innerWidth <= 1024;
+      if (isMobile) {
+        const shouldOpen = (open !== undefined) ? open : !sidebar.classList.contains('drawer-open');
+        if (shouldOpen) {
+          sidebar.classList.add('drawer-open');
+          if (backdrop) backdrop.classList.add('active');
+          document.body.style.overflow = 'hidden';
+        } else {
+          sidebar.classList.remove('drawer-open');
+          if (backdrop) backdrop.classList.remove('active');
+          document.body.style.overflow = '';
+        }
+      } else {
+        if (open === false) {
+          sidebar.classList.add('collapsed');
+        } else if (open === true) {
+          sidebar.classList.remove('collapsed');
+        } else {
+          sidebar.classList.toggle('collapsed');
+        }
+      }
+    }
+
+    function toggleSidebarSection(sectionName) {
+      const group = document.getElementById(`sidebar-${sectionName}-group`);
+      const chevron = document.getElementById(`chevron-${sectionName}`);
+      if (!group) return;
+      if (group.style.display === 'none') {
+        group.style.display = 'flex';
+        if (chevron) chevron.style.transform = 'rotate(0deg)';
+      } else {
+        group.style.display = 'none';
+        if (chevron) chevron.style.transform = 'rotate(-90deg)';
+      }
+    }
+
+    // =========================================================
+    // 3. GOOGLE CLASSROOM TUTOR COURSES RENDERER
+    // =========================================================
+    async function loadTutorClassroomCourses(accessToken) {
+      const grid = document.getElementById('tutor-courses-grid');
+      const sidebarClasses = document.getElementById('sidebar-teaching-classes');
+
+      try {
+        const res = await fetch('/api/courses/tutor/my-courses', {
+          headers: {
+            'Authorization': 'Bearer ' + accessToken,
+          },
+        });
+
+        const json = await res.json();
+        const courses = (json.success && Array.isArray(json.data)) ? json.data : [];
+
+        // Populate Left Docked Sidebar Teaching Classes List
+        if (sidebarClasses) {
+          if (!courses.length) {
+            sidebarClasses.innerHTML = `
+              <div style="padding:6px 24px; font-size:12px; color:var(--text-tertiary);">Belum ada kelas</div>
+            `;
+          } else {
+            sidebarClasses.innerHTML = courses.map((c, idx) => {
+              const themeClass = `card-theme-${idx % 7}`;
+              const initial = c.title ? c.title.trim().charAt(0).toUpperCase() : 'K';
+              const categoryName = c.category ? escapeHtml(c.category.name) : 'Kelas';
+              return `
+                <a href="#course-card-${c.id}" class="sidebar-class-row" onclick="if(window.innerWidth<=1024) toggleClassroomSidebar(false)">
+                  <div class="sidebar-class-circle ${themeClass}">${initial}</div>
+                  <div class="sidebar-class-text">
+                    <span class="sidebar-class-title">${escapeHtml(c.title)}</span>
+                    <span class="sidebar-class-subtitle">${categoryName}</span>
+                  </div>
+                </a>
+              `;
+            }).join('');
+          }
+        }
+
+        if (!courses.length) {
+          grid.innerHTML = `
+            <div style="grid-column:1 / -1; text-align:center; padding:48px 20px; background:var(--bg-surface); border:1px dashed var(--border-subtle); border-radius:8px;">
+              <div style="width:60px; height:60px; border-radius:var(--radius-full); background:var(--bg-surface-subtle); display:flex; align-items:center; justify-content:center; margin:0 auto 16px; font-size:24px; color:var(--text-secondary);">
+                <i class="fas fa-chalkboard"></i>
+              </div>
+              <h3 style="font-family:var(--font-serif); font-size:20px; color:var(--text-primary); margin:0 0 6px;">Belum Ada Kelas Mengajar</h3>
+              <p style="font-size:13.5px; color:var(--text-secondary); max-width:440px; margin:0 auto 20px; line-height:1.5;">
+                Mulai buat kelas kursus pertama Anda untuk mempublikasikan materi pembelajaran terstruktur kepada siswa.
+              </p>
+              <button class="btn btn-primary" onclick="openCreateCourseModal()" style="font-size:13px; padding:9px 20px;">
+                <i class="fas fa-plus" style="margin-right:6px;"></i> Buat Kelas Pertama
+              </button>
+            </div>
+          `;
+          return;
+        }
+
+        const themesCount = 7;
+        const tutorName = currentUser && currentUser.name ? escapeHtml(currentUser.name) : 'Instruktur';
+        const tutorInitial = currentUser && currentUser.name ? currentUser.name.trim().charAt(0).toUpperCase() : 'T';
+
+        let totalEarningsAcc = 0;
+        let totalStudentsAcc = 0;
+        let totalModulesAcc = 0;
+        let totalSectionsAcc = 0;
+
+        grid.innerHTML = courses.map((c, idx) => {
+          const themeClass = `card-theme-${idx % themesCount}`;
+          const categoryName = c.category ? escapeHtml(c.category.name) : 'Teknologi';
+          const thumbUrl = c.thumbnail_url || c.thumbnail || '';
+          const headerBgStyle = thumbUrl 
+            ? `background-image: linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.78) 100%), url('${thumbUrl}'); background-size: cover; background-position: center;`
+            : '';
+          
+          let sectionsCount = 0;
+          let materialsCount = 0;
+          if (c.sections && Array.isArray(c.sections)) {
+            sectionsCount = c.sections.length;
+            c.sections.forEach(s => {
+              if (s.materials && Array.isArray(s.materials)) {
+                materialsCount += s.materials.length;
+              }
+            });
+          }
+
+          const enrollmentsCount = (c.enrollments && Array.isArray(c.enrollments)) ? c.enrollments.length : 0;
+          const priceNumber = Number(c.price) || 0;
+          const courseGross = enrollmentsCount * priceNumber;
+          const courseNet = courseGross * 0.8; // 80% Tutor Revenue Split
+
+          totalEarningsAcc += courseNet;
+          totalStudentsAcc += enrollmentsCount;
+          totalModulesAcc += materialsCount;
+          totalSectionsAcc += sectionsCount;
+
+          const descText = c.description ? escapeHtml(c.description) : 'Belum ada tugas tenggat waktu.';
+          const levelMap = { 'beginner': 'Pemula', 'intermediate': 'Menengah', 'advanced': 'Mahir' };
+          const levelLabel = levelMap[c.level] || 'Semua Tingkat';
+          const priceFormatted = (c.price && c.price > 0) ? 'Rp ' + Number(c.price).toLocaleString('id-ID') : 'Gratis';
+          const courseEarningsFormatted = priceNumber > 0 ? ('Rp ' + Math.round(courseNet).toLocaleString('id-ID')) : 'Rp 0 (Gratis)';
+
+          return `
+            <div class="classroom-card" id="course-card-${c.id}">
+              <!-- Header Banner -->
+              <div class="classroom-card-header ${themeClass}" style="${headerBgStyle}">
+                <button class="classroom-card-menu-btn" title="Opsi lainnya" onclick="openCourseMenu(${c.id}, event)">
+                  <i class="fas fa-ellipsis-vertical"></i>
+                </button>
+                <div class="classroom-card-titles">
+                  <a href="/tutor/materials?courseId=${c.id}" class="classroom-card-title" title="${escapeHtml(c.title)}">${escapeHtml(c.title)}</a>
+                  <div class="classroom-card-subtitle">${categoryName} • ${levelLabel}</div>
+                  <div class="classroom-card-tutor">${tutorName}</div>
+                </div>
+                <!-- Overlapping Avatar -->
+                <div class="classroom-card-avatar" title="${tutorName}">
+                  ${tutorInitial}
+                </div>
+              </div>
+
+              <!-- Middle Body -->
+              <div class="classroom-card-body">
+                <p class="classroom-card-body-text">${descText}</p>
+                <div class="classroom-card-body-meta">
+                  <span>${sectionsCount} Bab • ${enrollmentsCount} Siswa</span>
+                  <span style="font-weight:600; color:var(--text-primary);">${priceFormatted}</span>
+                </div>
+                <div style="margin-top:6px; padding-top:6px; border-top:1px dashed var(--border-subtle); display:flex; justify-content:space-between; align-items:center; font-size:11.5px;">
+                  <span style="color:var(--text-secondary);"><i class="fas fa-coins" style="color:var(--accent-primary); margin-right:4px;"></i> Hasil Tutor (80%):</span>
+                  <span style="font-family:var(--font-mono, monospace); font-weight:700; color:var(--text-primary);">${courseEarningsFormatted}</span>
+                </div>
+              </div>
+
+              <!-- Bottom Footer -->
+              <div class="classroom-card-footer">
+                <a href="/courses/${c.id}" class="classroom-card-footer-icon" title="Lihat Pratinjau Publik Kursus">
+                  <i class="fa-regular fa-address-card"></i>
+                </a>
+                <a href="/tutor/materials?courseId=${c.id}" class="classroom-card-footer-icon" title="Buka Folder Modul Materi">
+                  <i class="fa-regular fa-folder-open"></i>
+                </a>
+                <button class="classroom-card-footer-icon" title="Opsi lainnya" onclick="openCourseMenu(${c.id}, event)">
+                  <i class="fas fa-ellipsis-vertical"></i>
+                </button>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        // Populate Tutor Financial Overview Banner
+        const wallet = currentUser && currentUser.wallet ? currentUser.wallet : null;
+        const walletBalance = wallet ? (Number(wallet.balance) || 0) : 0;
+        const walletPending = wallet ? (Number(wallet.pending_balance) || 0) : 0;
+        const totalRevenueDisplay = (totalEarningsAcc > 0) ? totalEarningsAcc : (walletBalance + walletPending);
+
+        const elBalance = document.getElementById('tutor-wallet-balance');
+        const elPending = document.getElementById('tutor-wallet-pending');
+        const elTotal = document.getElementById('tutor-total-earnings');
+        const elStudents = document.getElementById('tutor-total-students-count');
+        const elCourses = document.getElementById('tutor-total-courses');
+        const elModules = document.getElementById('tutor-total-modules-count');
+
+        if (elBalance) elBalance.textContent = 'Rp ' + Math.round(walletBalance).toLocaleString('id-ID');
+        if (elPending) elPending.textContent = 'Rp ' + Math.round(walletPending).toLocaleString('id-ID');
+        if (elTotal) elTotal.textContent = 'Rp ' + Math.round(totalRevenueDisplay).toLocaleString('id-ID');
+        if (elStudents) elStudents.textContent = `${totalStudentsAcc} Siswa Terdaftar`;
+        if (elCourses) elCourses.textContent = `${courses.length} Kelas`;
+        if (elModules) elModules.textContent = `${totalSectionsAcc} Bab • ${totalModulesAcc} Modul`;
+
+      } catch (err) {
+        console.error('Failed to load tutor classroom courses:', err);
+        grid.innerHTML = `
+          <div style="grid-column: 1 / -1; text-align: center; padding: 32px; color: var(--color-danger); font-size: 13.5px;">
+            Gagal memuat daftar kelas mengajar. Silakan coba muat ulang halaman.
+          </div>
+        `;
+      }
+    }
+
+    function openCourseMenu(courseId, event) {
+      if (event) event.stopPropagation();
+      showToast('Pilih opsi: Buka folder materi kursus atau edit kurikulum.', 'info');
+      window.location.href = '/tutor/materials';
+    }
+
+    // =========================================================
+    // 4. CREATE COURSE MODAL LOGIC (TUTOR)
+    // =========================================================
+    function openCreateCourseModal() {
+      const modal = document.getElementById('create-course-modal');
+      if (modal) {
+        modal.classList.add('active');
+        document.getElementById('modal-course-title').focus();
+      }
+    }
+
+    function closeCreateCourseModal() {
+      const modal = document.getElementById('create-course-modal');
+      if (modal) {
+        modal.classList.remove('active');
+        document.getElementById('create-course-form').reset();
+      }
+    }
+
+    async function loadCategoriesForModal() {
+      const select = document.getElementById('modal-course-category');
+      if (!select) return;
+      try {
+        const res = await fetch('/api/courses/categories');
+        const json = await res.json();
+        const categories = (json.success && Array.isArray(json.data)) ? json.data : [];
+        
+        select.innerHTML = '<option value="">Pilih Kategori...</option>' + categories.map(cat => `
+          <option value="${cat.id}">${escapeHtml(cat.name)}</option>
+        `).join('');
+      } catch (e) {
+        console.error('Failed to load categories for modal:', e);
+      }
+    }
+
+    async function handleCreateCourseSubmit(event) {
+      event.preventDefault();
+      const submitBtn = document.getElementById('btn-submit-create-course');
+      const title = document.getElementById('modal-course-title').value.trim();
+      const categoryId = document.getElementById('modal-course-category').value;
+      const level = document.getElementById('modal-course-level').value;
+      const price = parseFloat(document.getElementById('modal-course-price').value) || 0;
+      const description = document.getElementById('modal-course-desc').value.trim();
+
+      if (!title || !categoryId) {
+        showToast('Judul kursus dan kategori wajib diisi.', 'error');
+        return;
+      }
+
+      const originalText = submitBtn.innerHTML;
+      submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
+      submitBtn.disabled = true;
+
+      try {
+        const res = await fetch('/api/courses', {
+          method: 'POST',
+          headers: {
+            'Authorization': 'Bearer ' + token,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            title,
+            category_id: parseInt(categoryId, 10),
+            level,
+            price,
+            description,
+            status: 'published',
+          }),
+        });
+
+        const json = await res.json();
+        if (res.ok && json.success) {
+          showToast('Kelas / Kursus baru berhasil dibuat!', 'success');
+          closeCreateCourseModal();
+          await loadTutorClassroomCourses(token);
+        } else {
+          showToast(json.message || 'Gagal membuat kursus baru.', 'error');
+        }
+      } catch (err) {
+        showToast('Kesalahan jaringan saat membuat kursus.', 'error');
+      } finally {
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+      }
+    }
+
+    // =========================================================
+    // 5. STUDENT ACTIVITIES & DYNAMIC CATALOG LOADERS
+    // =========================================================
+    let currentEnrolledCourseIds = new Set();
+
+    async function loadStudentActivities(accessToken) {
+      const container = document.getElementById('activities-container');
+      const countLabel = document.getElementById('active-courses-count-label');
+      try {
+        const res = await fetch('/api/courses/student/my-learning', {
+          headers: {
+            'Authorization': 'Bearer ' + accessToken,
+          },
+        });
+        const json = await res.json();
+        const enrollments = (json.success && Array.isArray(json.data)) ? json.data : [];
+
+        currentEnrolledCourseIds = new Set(enrollments.map(en => en.course_id || (en.course ? en.course.id : null)).filter(Boolean));
+
+        if (countLabel) {
+          countLabel.textContent = `${enrollments.length} Kursus Aktif`;
+        }
+
+        if (!enrollments.length) {
+          container.innerHTML = `
+            <div style="text-align:center; padding:32px 16px; background:var(--bg-surface-subtle); border-radius:var(--radius-md); border:1px dashed var(--border-subtle);">
+              <div style="font-size:32px; color:var(--text-secondary); margin-bottom:12px;">
+                <i class="fas fa-book-open-reader"></i>
+              </div>
+              <div style="font-size:15px; font-weight:600; color:var(--text-primary); margin-bottom:6px;">
+                Belum Ada Kursus yang Diikuti
+              </div>
+              <p style="font-size:13px; color:var(--text-secondary); max-width:440px; margin:0 auto 16px; line-height:1.5;">
+
+<!-- Quick enroll modal loaded -->
