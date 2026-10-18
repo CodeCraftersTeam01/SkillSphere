@@ -1019,3 +1019,5 @@ module.exports = {
 };
 
 // Orion AI Adaptive Engine synchronized
+
+// Model parameters tuned for structured pedagogical responses
