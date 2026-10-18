@@ -203,7 +203,7 @@ exports.updateMilestoneStatus = async (req, res) => {
  */
 exports.chatStudyAssistant = async (req, res) => {
   try {
-    const { message, conversation_history, course_id } = req.body;
+    const { message, conversation_history, course_id, current_topic } = req.body;
     const studentName = req.user ? req.user.name : 'Pelajar';
 
     if (!message || message.trim().length === 0) {
