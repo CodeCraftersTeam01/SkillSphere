@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const https = require('https');
+const { spawn } = require('child_process');
 
 const KOKORO_TTS_BASE_URL = process.env.KOKORO_TTS_API_URL || 'https://arjnln-kokoro-tts-api.hf.space';
 
@@ -72,7 +73,69 @@ function cleanTextForSpeech(rawText) {
 }
 
 /**
- * Call Kokoro / Bilingual Edge-TTS API on Hugging Face
+ * Fallback to local python edge-tts if remote Hugging Face API is unreachable or rate-limited/403
+ */
+function generateLocalEdgeTts(text, voice = 'id-female', rate = 0, pitch = 0) {
+  return new Promise((resolve, reject) => {
+    const pythonCode = `
+import asyncio, sys, edge_tts
+
+VOICE_MAP = {
+    'id-female': 'id-ID-GadisNeural',
+    'id-male': 'id-ID-ArdiNeural',
+    'en-female': 'en-US-AvaNeural',
+    'en-male': 'en-US-BrianNeural',
+    'multi-female': 'en-US-AvaMultilingualNeural',
+    'multi-male': 'en-US-AndrewMultilingualNeural',
+}
+
+voice = VOICE_MAP.get(sys.argv[1], 'id-ID-GadisNeural')
+text = sys.argv[2]
+rate_val = sys.argv[3]
+pitch_val = sys.argv[4]
+
+rate_str = f"{rate_val}%" if not rate_val.startswith(('+', '-')) and rate_val != '0' else (f"{rate_val}%" if rate_val != '0' else '+0%')
+pitch_str = f"{pitch_val}Hz" if not pitch_val.startswith(('+', '-')) and pitch_val != '0' else (f"{pitch_val}Hz" if pitch_val != '0' else '+0Hz')
+
+async def run():
+    communicate = edge_tts.Communicate(text, voice, rate=rate_str, pitch=pitch_str)
+    audio = b''
+    async for chunk in communicate.stream():
+        if chunk['type'] == 'audio':
+            audio += chunk['data']
+    sys.stdout.buffer.write(audio)
+
+asyncio.run(run())
+`;
+    const rateArg = Number(rate) > 0 ? `+${rate}` : `${rate}`;
+    const pitchArg = Number(pitch) > 0 ? `+${pitch}` : `${pitch}`;
+
+    const proc = spawn('python3', ['-c', pythonCode, voice, text, rateArg, pitchArg]);
+    const chunks = [];
+    const errChunks = [];
+
+    proc.stdout.on('data', (d) => chunks.push(d));
+    proc.stderr.on('data', (d) => errChunks.push(d));
+
+    proc.on('close', (code) => {
+      if (code === 0 && chunks.length > 0) {
+        resolve({
+          statusCode: 200,
+          contentType: 'audio/mpeg',
+          buffer: Buffer.concat(chunks),
+        });
+      } else {
+        const errMsg = Buffer.concat(errChunks).toString('utf8').trim() || `Local Edge-TTS process exited with code ${code}`;
+        reject(new Error(errMsg));
+      }
+    });
+
+    proc.on('error', (err) => reject(err));
+  });
+}
+
+/**
+ * Call Kokoro / Bilingual Edge-TTS API on Hugging Face with resilient local fallback
  */
 function fetchEdgeTtsAudio(payload) {
   return new Promise((resolve, reject) => {
@@ -88,7 +151,7 @@ function fetchEdgeTtsAudio(payload) {
         'Content-Type': 'application/json',
         'Content-Length': Buffer.byteLength(postData),
       },
-      timeout: 20000,
+      timeout: 10000,
     };
 
     const req = https.request(options, (res) => {
@@ -121,6 +184,23 @@ function fetchEdgeTtsAudio(payload) {
     req.write(postData);
     req.end();
   });
+}
+
+/**
+ * Synthesize speech: Try remote HF endpoint, then fallback to local edge-tts
+ */
+async function synthesizeSpeech(payload) {
+  try {
+    return await fetchEdgeTtsAudio(payload);
+  } catch (remoteError) {
+    console.warn(`⚠️ [TTS Remote Notice]: ${remoteError.message}. Beralih ke mesin Edge-TTS lokal...`);
+    try {
+      return await generateLocalEdgeTts(payload.input, payload.voice, payload.rate, payload.pitch);
+    } catch (localError) {
+      console.error('❌ [TTS Local Fallback Error]:', localError.message);
+      throw remoteError;
+    }
+  }
 }
 
 /**
@@ -173,11 +253,11 @@ router.post('/speak', async (req, res) => {
     const ttsPayload = {
       input: cleanedText,
       voice: matchedVoice.id,
-      speed: Number(speed) || 0,
+      rate: Number(req.body.rate !== undefined ? req.body.rate : speed) || 0,
       pitch: Number(pitch) || 0,
     };
 
-    const audioResult = await fetchEdgeTtsAudio(ttsPayload);
+    const audioResult = await synthesizeSpeech(ttsPayload);
 
     res.setHeader('Content-Type', audioResult.contentType);
     res.setHeader('Content-Length', audioResult.buffer.length);
