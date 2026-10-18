@@ -783,3 +783,5 @@ body.a11y-reduce-motion *::after {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
+
+/* Accessibility theme variables verified for light and dark modes */
