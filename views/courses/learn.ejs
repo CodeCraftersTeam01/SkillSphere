@@ -1576,5 +1576,794 @@
 
     /* Outer Ambient Ring Glow */
     .aurora-outer-glow {
+      position: absolute;
+      width: 320px;
+      height: 320px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(59, 130, 246, 0.35) 0%, rgba(37, 99, 235, 0.12) 55%, transparent 75%);
+      filter: blur(24px);
+      z-index: -1;
+      pointer-events: none !important;
+      animation: glowPulse 4s ease-in-out infinite alternate;
+    }
 
-<!-- Curriculum sidebar loaded -->
+    @keyframes glowPulse {
+      0% {
+        transform: scale(0.92);
+        opacity: 0.6;
+      }
+      100% {
+        transform: scale(1.14);
+        opacity: 0.95;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ==================== AURORA SPHERE OVERLAY (Z-INDEX TERTINGGI, 70% BLACK, HANYA BOLA SAJA) ==================== -->
+  <div id="aurora-orb-overlay" class="aurora-orb-overlay">
+    <div class="aurora-orb-center">
+      <!-- Animated Blue Sphere with White Aurora Mist & Equalizer Waves -->
+      <div class="aurora-sphere-wrapper loading" id="aurora-sphere-wrapper">
+        <div class="aurora-sphere loading" id="aurora-sphere-elem">
+          <div class="aurora-atmosphere"></div>
+          <div class="aurora-mist-layer aurora-mist-1"></div>
+          <div class="aurora-mist-layer aurora-mist-2"></div>
+          <div class="aurora-mist-layer aurora-mist-3"></div>
+          <div class="aurora-mist-layer aurora-mist-4"></div>
+
+          <!-- Dynamic White Aurora Equalizer Waves inside Sphere (12 Bands) -->
+          <div class="aurora-equalizer-container" id="aurora-eq-container">
+            <div class="aurora-eq-bar"></div>
+            <div class="aurora-eq-bar"></div>
+            <div class="aurora-eq-bar"></div>
+            <div class="aurora-eq-bar"></div>
+            <div class="aurora-eq-bar"></div>
+            <div class="aurora-eq-bar"></div>
+            <div class="aurora-eq-bar"></div>
+            <div class="aurora-eq-bar"></div>
+            <div class="aurora-eq-bar"></div>
+            <div class="aurora-eq-bar"></div>
+            <div class="aurora-eq-bar"></div>
+            <div class="aurora-eq-bar"></div>
+          </div>
+
+          <div class="aurora-sphere-glare"></div>
+        </div>
+        <div class="aurora-outer-glow"></div>
+      </div>
+
+      <!-- Interactive Choice Prompt Card Under Aurora Sphere -->
+      <div class="aurora-choice-card" id="aurora-choice-card">
+        <div class="aurora-choice-question">
+          Sebelum memulai, apakah Anda ingin saya bantu jelaskan tentang materi ini?
+        </div>
+        <div class="aurora-choice-buttons">
+          <button type="button" class="aurora-btn-choice aurora-btn-no" id="aurora-btn-no" onclick="handleChoiceNo()">
+            Tidak
+          </button>
+          <button type="button" class="aurora-btn-choice aurora-btn-yes" id="aurora-btn-yes" onclick="handleChoiceYes()">
+            Ya
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Orion Next Module Prompt Card (Anchored above docked mini orb) -->
+  <div class="orion-next-choice-card" id="orion-next-choice-card">
+    <div class="orion-next-card-header">
+      <span class="orion-next-tag"><i class="fas fa-sparkles"></i> Selesai Dibahas</span>
+      <button type="button" class="orion-next-close-btn" onclick="dismissNextChoiceCard()" title="Tutup">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="orion-next-card-text">
+      Modul ini telah selesai! Apakah Anda ingin lanjut ke materi berikutnya dan dijelaskan lagi oleh Orion?
+    </div>
+    <div class="orion-next-card-actions">
+      <button type="button" class="aurora-btn-choice aurora-btn-no" style="font-size:12px; padding:6px 14px;" onclick="dismissNextChoiceCard()">
+        Tidak
+      </button>
+      <button type="button" class="aurora-btn-choice aurora-btn-yes" style="font-size:12px; padding:6px 16px;" onclick="proceedToNextModuleAndExplain()">
+        <span>Iya, Lanjut</span> <i class="fas fa-arrow-right" style="font-size:10px;"></i>
+      </button>
+    </div>
+  </div>
+
+  <div class="classroom-layout">
+    <!-- Left Sidebar: Chapters & Modules Tree -->
+    <aside class="classroom-sidebar" id="classroom-sidebar">
+      <div class="sidebar-header">
+        <a href="/dashboard" class="back-corridor-btn" id="btn-back-corridor">
+          <i class="fas fa-arrow-left"></i> Kembali ke Dashboard
+        </a>
+        <button class="sidebar-toggle-trigger" onclick="toggleSidebar(false)" title="Sembunyikan Sidebar">
+          <i class="fas fa-angles-left"></i>
+        </button>
+      </div>
+
+      <div class="course-info-card">
+        <div class="active-class-tag">Kelas Aktif</div>
+        <h2 class="active-course-title" id="sidebar-course-title">Memuat Kursus...</h2>
+        <div style="display:flex; justify-content:space-between; align-items:center; font-size:11.5px; color:var(--text-secondary);">
+          <span id="sidebar-progress-label">0 / 0 modul</span>
+          <span style="font-weight:700; font-family:var(--font-mono);" id="sidebar-progress-percent">0%</span>
+        </div>
+        <div class="progress-track-mini">
+          <div class="progress-fill-mini" id="sidebar-progress-fill"></div>
+        </div>
+      </div>
+
+      <div class="sidebar-tabs-nav">
+        <button class="sidebar-tab-btn active" id="tab-btn-modules" onclick="switchSidebarTab('modules')">
+          <i class="fas fa-list-check" style="margin-right:4px;"></i> Silabus Bab
+        </button>
+        <button class="sidebar-tab-btn" id="tab-btn-notes" onclick="switchSidebarTab('notes')">
+          <i class="fas fa-wand-magic-sparkles" style="margin-right:4px;"></i> Intuisi AI
+        </button>
+      </div>
+
+      <div class="curriculum-tree-scroll" id="curriculum-tree-container">
+        <div style="text-align:center; padding:24px; font-size:12.5px; color:var(--text-secondary);">
+          <i class="fas fa-spinner fa-spin"></i> Memuat silabus per bab...
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Learning Workspace -->
+    <main class="classroom-main">
+      <!-- Topbar -->
+      <header class="classroom-topbar">
+        <div class="topbar-left">
+          <button class="sidebar-toggle-trigger" id="sidebar-toggle-btn" onclick="toggleSidebar()" title="Toggle Silabus">
+            <i class="fas fa-bars"></i>
+          </button>
+          <div class="topbar-breadcrumb" id="topbar-breadcrumb">
+            <span>Kurikulum</span>
+            <i class="fas fa-chevron-right" style="font-size:9px; color:var(--text-tertiary);"></i>
+            <span id="topbar-chapter-title" style="color:var(--text-primary); font-weight:600;">Memuat Bab...</span>
+          </div>
+        </div>
+
+        <div class="topbar-actions">
+          <button class="theme-toggle-btn" id="theme-toggle-btn" type="button" aria-label="Toggle Mode">
+            <i class="fas fa-sun" id="theme-icon-sun" style="display:none;"></i>
+            <i class="fas fa-moon" id="theme-icon-moon"></i>
+            <span id="theme-text">Mode Gelap</span>
+          </button>
+          <button class="btn-ai-header-toggle" id="btn-ai-header-toggle" onclick="toggleAISplitPanel()" title="Akses AI Study Assistant secara split-screen">
+            <i class="fas fa-sparkles" style="color:var(--accent-primary);"></i>
+            <span>Tanya AI</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Side-by-Side Split Workspace -->
+      <div class="classroom-split-workspace" id="classroom-split-workspace">
+        <!-- Dynamic Reader Body (Left Side) -->
+        <div class="classroom-reader-body" id="classroom-reader-body">
+          <div class="reader-article-header">
+            <span class="reader-chapter-pill" id="reader-chapter-badge">BAB 1 • MODUL 1</span>
+            <h1 class="reader-title" id="reader-material-title">Memuat Materi...</h1>
+            <div class="reader-meta-row">
+              <span><i class="fas fa-clock" style="margin-right:4px;"></i> <span id="reader-duration">15 Menit</span></span>
+              <span><i class="fas fa-book-open" style="margin-right:4px;"></i> <span id="reader-format">Materi Teks & Diagram</span></span>
+              <span id="reader-status-tag" style="color:var(--color-success); font-weight:600;"><i class="fas fa-circle-check"></i> Siap Dipelajari</span>
+            </div>
+          </div>
+
+          <!-- Dynamic Multi-Format Content Block -->
+          <div id="material-dynamic-content-area">
+            <div style="text-align:center; padding:48px; color:var(--text-secondary);">
+              <i class="fas fa-spinner fa-spin" style="font-size:24px; margin-bottom:12px;"></i>
+              <p>Memuat isi materi pembelajaran...</p>
+            </div>
+          </div>
+
+          <!-- Concept Analogy & Key Takeaways AI Card -->
+          <div class="callout-box tip" id="ai-concept-box" style="margin-top:36px;">
+            <div style="display:flex; align-items:center; gap:8px; font-weight:700; color:var(--color-success); margin-bottom:8px;">
+              <i class="fas fa-wand-magic-sparkles"></i> Poin Kunci & Intuisi Konsep
+            </div>
+            <p id="ai-concept-summary" style="margin-bottom:8px;">
+              Penguasaan konsep pada bab ini membentuk fondasi arsitektur web modern berstandar industri.
+            </p>
+            <div style="font-size:12.5px; color:var(--text-secondary); font-style:italic;" id="ai-concept-analogy">
+              "Gunakan tombol Tanya AI di header kapan saja jika Anda ingin mengeksplorasi analogi atau contoh kode tambahan secara berdampingan."
+            </div>
+          </div>
+        </div>
+
+        <!-- Realtime Side-by-Side AI Split Panel (Right Side) -->
+        <aside class="ai-split-panel" id="ai-split-panel">
+          <div class="ai-panel-header">
+            <div class="ai-panel-title-wrap">
+              <div class="ai-panel-badge-icon">
+                <i class="fas fa-sparkles"></i>
+              </div>
+              <div>
+                <div class="ai-panel-title" style="display:flex; align-items:center; gap:6px;">
+                  Orion <span style="font-size:10px; font-weight:700; padding:1px 6px; background:var(--bg-surface-subtle); border-radius:var(--radius-full); border:1px solid var(--border-subtle); color:var(--accent-primary);">AI PARTNER</span>
+                </div>
+                <div class="ai-panel-subtitle" id="ai-panel-active-topic">Topik: HTML5 Dokumen</div>
+              </div>
+            </div>
+            <button class="ai-panel-close-btn" onclick="toggleAISplitPanel(false)" title="Tutup Panel Orion AI">
+              <i class="fas fa-xmark"></i>
+            </button>
+          </div>
+
+          <div class="ai-panel-suggestions">
+            <button class="ai-chip-prompt" onclick="quickAskAI('Beri saya analogi sederhana untuk memahami konsep modul ini secara bertahap.')">
+              💡 Analogi Konsep
+            </button>
+            <button class="ai-chip-prompt" onclick="quickAskAI('Berikan 1 petunjuk kode langkah awal untuk topik ini, jangan langsung semua kodenya.')">
+              🧩 Petunjuk Kode Awal
+            </button>
+            <button class="ai-chip-prompt" onclick="quickAskAI('Beri saya 1 pertanyaan pemantik untuk menguji apakah saya sudah paham modul ini.')">
+              ❓ Pertanyaan Pemantik
+            </button>
+            <button class="ai-chip-prompt" onclick="quickAskAI('Konsep awal sudah saya pahami, mari lanjut ke langkah atau elaborasi berikutnya.')">
+              🚀 Langkah Lanjutan
+            </button>
+          </div>
+
+          <div class="ai-panel-chat-stream" id="ai-chat-history">
+            <div class="ai-chat-bubble assistant">
+              <div class="ai-bubble-sender">
+                <i class="fas fa-sparkles" style="color:var(--accent-primary);"></i> Orion • AI Learning Partner
+              </div>
+              <div>
+                Halo! Saya <strong>Orion</strong>, partner belajar AI Anda. Saya akan menemani dan membimbing Anda memahami materi ini secara bertahap. Tanyakan konsep, minta petunjuk awal, atau uji pemahaman Anda kapan saja!
+              </div>
+            </div>
+          </div>
+
+          <div class="ai-panel-footer">
+            <div class="ai-panel-input-box">
+              <input type="text" id="ai-chat-input" class="ai-panel-input" placeholder="Tanyakan apa saja kepada Orion..." onkeypress="if(event.key==='Enter') sendAIChatMessage()">
+              <button class="ai-panel-send-btn" onclick="sendAIChatMessage()" title="Kirim Pesan ke Orion">
+                <i class="fas fa-paper-plane"></i>
+              </button>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; font-size:10.5px; color:var(--text-tertiary); padding:0 4px;">
+              <span>Orion Socratic Learning Partner</span>
+              <span>Tekan Enter untuk mengirim</span>
+            </div>
+          </div>
+        </aside>
+      </div>
+
+      <!-- Bottom Navigation Footer -->
+      <footer class="classroom-bottom-bar">
+        <button class="btn btn-outline" id="btn-prev-module" onclick="goToPrevModule()" style="font-size:13px; padding:8px 18px;">
+          <i class="fas fa-arrow-left"></i> Materi Sebelumnya
+        </button>
+
+        <div style="font-size:12.5px; color:var(--text-secondary); font-family:var(--font-mono);" id="bottom-module-counter">
+          Modul 1 dari 20
+        </div>
+
+        <button class="btn btn-primary" id="btn-next-module" onclick="completeAndNextModule()" style="font-size:13px; padding:8px 20px;">
+          <span>Tandai Selesai & Lanjut</span> <i class="fas fa-arrow-right"></i>
+        </button>
+      </footer>
+    </main>
+  </div>
+
+  <!-- JavaScript Logic -->
+  <script>
+    const token = localStorage.getItem('skillsphere_access_token') || localStorage.getItem('access_token');
+    const pathSegments = window.location.pathname.split('/').filter(Boolean);
+    const serverCourseId = '<%= (typeof courseId !== "undefined" ? courseId : "") %>';
+    const courseIdParam = serverCourseId || pathSegments[1] || 'mastering-modern-html5-expert';
+
+    let courseData = null;
+    let flatMaterials = [];
+    let currentMaterialIndex = 0;
+    let completedMaterialIds = new Set();
+    let isAIPanelOpen = false;
+    let activePlaybackSessionId = 0;
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    // Theme Management
+    const themeBtn = document.getElementById('theme-toggle-btn');
+    const sunIcon = document.getElementById('theme-icon-sun');
+    const moonIcon = document.getElementById('theme-icon-moon');
+    const themeText = document.getElementById('theme-text');
+
+    function updateThemeUI(theme) {
+      if (theme === 'dark') {
+        if (sunIcon) sunIcon.style.display = 'inline-block';
+        if (moonIcon) moonIcon.style.display = 'none';
+        if (themeText) themeText.textContent = 'Mode Terang';
+      } else {
+        if (sunIcon) sunIcon.style.display = 'none';
+        if (moonIcon) moonIcon.style.display = 'inline-block';
+        if (themeText) themeText.textContent = 'Mode Gelap';
+      }
+    }
+
+    const savedTheme = localStorage.getItem('skillsphere_theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    updateThemeUI(savedTheme);
+
+    if (themeBtn) {
+      themeBtn.addEventListener('click', () => {
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        const nextTheme = isDark ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', nextTheme);
+        localStorage.setItem('skillsphere_theme', nextTheme);
+        updateThemeUI(nextTheme);
+      });
+    }
+
+    function toggleSidebar(force) {
+      const sidebar = document.getElementById('classroom-sidebar');
+      if (typeof force === 'boolean') {
+        if (force) sidebar.classList.remove('collapsed');
+        else sidebar.classList.add('collapsed');
+      } else {
+        sidebar.classList.toggle('collapsed');
+      }
+    }
+
+    // Split AI Panel Toggle
+    function toggleAISplitPanel(force) {
+      const workspace = document.getElementById('classroom-split-workspace');
+      const headerBtn = document.getElementById('btn-ai-header-toggle');
+      
+      if (typeof force === 'boolean') {
+        isAIPanelOpen = force;
+      } else {
+        isAIPanelOpen = !isAIPanelOpen;
+      }
+
+      if (isAIPanelOpen) {
+        workspace.classList.add('ai-open');
+        document.body.classList.add('ai-panel-open');
+        headerBtn.classList.add('active');
+        setTimeout(() => {
+          const input = document.getElementById('ai-chat-input');
+          if (input) input.focus();
+        }, 150);
+      } else {
+        workspace.classList.remove('ai-open');
+        document.body.classList.remove('ai-panel-open');
+        headerBtn.classList.remove('active');
+      }
+    }
+
+    // Load Course & Curriculum Structure
+    async function loadClassroom() {
+      if (!token) {
+        showCustomAlert({
+          title: 'Perlu Masuk Akun',
+          message: 'Silakan masuk (login) terlebih dahulu untuk mengakses ruang belajar.',
+          type: 'warning',
+          buttonText: 'Masuk Sekarang'
+        }).then(() => {
+          window.location.href = `/login?redirect=${encodeURIComponent(window.location.pathname)}`;
+        });
+        return;
+      }
+
+      try {
+        const res = await fetch(`/api/courses/${courseIdParam}`, {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        const json = await res.json();
+
+        if (!json.success || !json.data) {
+          showCustomAlert({
+            title: 'Kelas Tidak Ditemukan',
+            message: 'Kursus tidak ditemukan atau belum dipublikasikan.',
+            type: 'error',
+            buttonText: 'Kembali'
+          }).then(() => {
+            window.location.href = '/dashboard';
+          });
+          return;
+        }
+
+        courseData = json.data;
+        document.getElementById('sidebar-course-title').textContent = courseData.title;
+
+        // Build flat material array
+        flatMaterials = [];
+        const sections = courseData.sections || [];
+        sections.forEach((sec, sIdx) => {
+          (sec.materials || []).forEach((mat, mIdx) => {
+            flatMaterials.push({
+              ...mat,
+              section_title: sec.title,
+              section_index: sIdx + 1,
+              material_index: mIdx + 1,
+            });
+          });
+        });
+
+        // Load saved local completed materials
+        const localKey = `skillsphere_completed_${courseData.id}`;
+        try {
+          const saved = JSON.parse(localStorage.getItem(localKey) || '[]');
+          saved.forEach(id => completedMaterialIds.add(id));
+        } catch (e) {}
+
+        renderCurriculumTree();
+        updateProgressUI();
+
+        if (flatMaterials.length > 0) {
+          // Dynamic initial material resolution on page load / reload:
+          // 1. URL search params (?m=index or ?material_id=id)
+          const urlParams = new URLSearchParams(window.location.search);
+          const qMatId = urlParams.get('material_id') || urlParams.get('m_id');
+          const qIndex = urlParams.get('m') !== null ? parseInt(urlParams.get('m'), 10) : null;
+
+          let initialIdx = -1;
+
+          if (qMatId) {
+            const foundById = flatMaterials.findIndex(m => String(m.id) === String(qMatId));
+            if (foundById !== -1) initialIdx = foundById;
+          }
+
+          if (initialIdx === -1 && qIndex !== null && !isNaN(qIndex) && qIndex >= 0 && qIndex < flatMaterials.length) {
+            initialIdx = qIndex;
+          }
+
+          // 2. Saved last active material in localStorage
+          if (initialIdx === -1) {
+            const lastSaved = localStorage.getItem(`skillsphere_last_material_${courseData.id}`);
+            if (lastSaved !== null) {
+              const parsedIdx = parseInt(lastSaved, 10);
+              if (!isNaN(parsedIdx) && parsedIdx >= 0 && parsedIdx < flatMaterials.length) {
+                initialIdx = parsedIdx;
+              }
+            }
+          }
+
+          // 3. First unfinished module in course progression
+          if (initialIdx === -1) {
+            const firstUnfinished = flatMaterials.findIndex(m => !completedMaterialIds.has(m.id));
+            if (firstUnfinished !== -1) {
+              initialIdx = firstUnfinished;
+            } else {
+              initialIdx = 0;
+            }
+          }
+
+          selectMaterial(Math.max(0, initialIdx));
+
+          // Trigger instant speech and equalizer animation now that courseData is verified and loaded
+          playOrionWelcomeSpeech();
+        } else {
+          document.getElementById('material-dynamic-content-area').innerHTML = `
+            <div style="text-align:center; padding:48px; color:var(--text-secondary);">
+              <p>Materi kelas ini sedang disiapkan oleh instruktur.</p>
+            </div>
+          `;
+        }
+      } catch (err) {
+        console.error('Error loading classroom:', err);
+        showToast('Terjadi kesalahan jaringan saat memuat kelas.', 'error');
+      }
+    }
+
+    function renderCurriculumTree() {
+      const container = document.getElementById('curriculum-tree-container');
+      if (!courseData || !courseData.sections || courseData.sections.length === 0) {
+        container.innerHTML = '<div style="padding:16px; color:var(--text-secondary); text-align:center;">Belum ada bab.</div>';
+        return;
+      }
+
+      let globalIdx = 0;
+      container.innerHTML = courseData.sections.map((sec, sIdx) => {
+        const materials = sec.materials || [];
+        const completedInSec = materials.filter(m => completedMaterialIds.has(m.id)).length;
+
+        const itemsHtml = materials.map((mat) => {
+          const thisIndex = globalIdx++;
+          const isCompleted = completedMaterialIds.has(mat.id);
+          const isActive = thisIndex === currentMaterialIndex;
+
+          let statusIcon = `<i class="fas fa-circle-check module-status-icon completed"></i>`;
+          if (!isCompleted) {
+            statusIcon = isActive 
+              ? `<i class="fas fa-circle-play module-status-icon active"></i>`
+              : `<i class="far fa-circle module-status-icon pending"></i>`;
+          }
+
+          const badgeText = 'TEKS';
+
+          return `
+            <button class="module-item-btn ${isActive ? 'active' : ''}" onclick="selectMaterial(${thisIndex})">
+              <div style="display:flex; align-items:center; gap:8px; overflow:hidden;">
+                ${statusIcon}
+                <span class="module-title-truncate">${escapeHtml(mat.title)}</span>
+              </div>
+              <span class="module-format-badge">${badgeText}</span>
+            </button>
+          `;
+        }).join('');
+
+        return `
+          <div class="chapter-group">
+            <div class="chapter-header" onclick="toggleChapterAccordion(this)">
+              <div class="chapter-title-text">
+                <i class="fas fa-folder-open" style="font-size:10px;"></i>
+                <span>Bab ${sIdx + 1}: ${escapeHtml(sec.title.replace(/^Bab\s*\d+\s*:\s*/i, ''))}</span>
+              </div>
+              <span class="chapter-meta-count">${completedInSec}/${materials.length}</span>
+            </div>
+            <div class="chapter-body" style="padding-left:4px; margin-top:2px;">
+              ${itemsHtml}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function toggleChapterAccordion(el) {
+      const body = el.nextElementSibling;
+      if (body) {
+        body.style.display = body.style.display === 'none' ? 'block' : 'none';
+      }
+    }
+
+    function selectMaterial(index) {
+      if (index < 0 || index >= flatMaterials.length) return;
+      currentMaterialIndex = index;
+      const mat = flatMaterials[index];
+
+      // Save last active material to localStorage & update URL state
+      if (courseData) {
+        localStorage.setItem(`skillsphere_last_material_${courseData.id}`, index);
+        try {
+          const currentUrl = new URL(window.location.href);
+          currentUrl.searchParams.set('m', index);
+          if (mat.id) currentUrl.searchParams.set('material_id', mat.id);
+          window.history.replaceState({ materialIndex: index }, '', currentUrl.toString());
+        } catch (e) {}
+      }
+
+      // Update Topbar and Header
+      document.getElementById('topbar-chapter-title').textContent = mat.section_title || 'Materi Belajar';
+      document.getElementById('reader-chapter-badge').textContent = `BAB ${mat.section_index} • MODUL ${index + 1} DARI ${flatMaterials.length}`;
+      document.getElementById('reader-material-title').textContent = mat.title;
+      document.getElementById('reader-duration').textContent = `${mat.duration_minutes || 15} Menit`;
+      document.getElementById('reader-format').textContent = mat.diagram_svg ? 'Materi Teks & Diagram' : (mat.content_type === 'ppt' ? 'Slide Presentasi' : 'Materi Bacaan');
+      document.getElementById('ai-panel-active-topic').textContent = `Topik: ${mat.title}`;
+
+      // Update Status tag
+      const isCompleted = completedMaterialIds.has(mat.id);
+      const statusTag = document.getElementById('reader-status-tag');
+      if (isCompleted) {
+        statusTag.innerHTML = `<i class="fas fa-circle-check" style="color:var(--color-success);"></i> Selesai Dipelajari`;
+      } else {
+        statusTag.innerHTML = `<i class="fas fa-book-open-reader"></i> Sedang Dipelajari`;
+      }
+
+      // Render Dedicated Rich Text Content & Supporting Media per Bab
+      renderChapterSpecificArticle(mat);
+
+      // Bottom bar updates
+      document.getElementById('bottom-module-counter').textContent = `Modul ${index + 1} dari ${flatMaterials.length}`;
+      document.getElementById('btn-prev-module').disabled = index === 0;
+      
+      const nextBtn = document.getElementById('btn-next-module');
+      if (index === flatMaterials.length - 1) {
+        nextBtn.innerHTML = `<span>Tuntaskan Kursus</span> <i class="fas fa-trophy"></i>`;
+      } else {
+        nextBtn.innerHTML = `<span>Tandai Selesai & Lanjut</span> <i class="fas fa-arrow-right"></i>`;
+      }
+
+      // Refresh sidebar active highlight
+      renderCurriculumTree();
+
+      // Scroll reader to top smoothly
+      document.getElementById('classroom-reader-body').scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Helper Markdown-to-HTML parser for Dynamic Database Text Content
+    function parseMarkdownArticle(md) {
+      if (!md) return '';
+      let text = md.trim();
+
+      // 1. Extract and preserve multiline code blocks
+      const codeBlocks = [];
+      text = text.replace(/```([a-zA-Z0-9_-]*)\n([\s\S]*?)```/g, (match, lang, code) => {
+        const placeholder = `___CODE_BLOCK_${codeBlocks.length}___`;
+        codeBlocks.push({
+          lang: lang || 'html',
+          code: code.trim()
+        });
+        return placeholder;
+      });
+
+      // 2. Extract and preserve inline code snippets (e.g. `<ul>`, `<ol>`, `<code>`)
+      const inlineCodes = [];
+      text = text.replace(/`([^`\n]+)`/g, (match, code) => {
+        const placeholder = `___INLINE_CODE_${inlineCodes.length}___`;
+        inlineCodes.push(code);
+        return placeholder;
+      });
+
+      // 3. Headings
+      text = text.replace(/^### (.*$)/gim, '<h3>$1</h3>');
+      text = text.replace(/^## (.*$)/gim, '<h2>$1</h2>');
+      text = text.replace(/^# (.*$)/gim, '<h1>$1</h1>');
+
+      // 4. Blockquotes / Callouts
+      text = text.replace(/^\> (.*$)/gim, '<div class="callout-box"><p>$1</p></div>');
+
+      // 5. Bold & Italic
+      text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+      text = text.replace(/\*(.*?)\*/g, '<em>$1</em>');
+
+      // 6. Lists (Unordered and Ordered)
+      // Ordered lists (1. 2. 3.)
+      text = text.replace(/^\s*\d+\.\s+(.*)$/gim, '<oli>$1</oli>');
+      text = text.replace(/(<oli>.*<\/oli>(\n|(?=<oli>))*)/gim, '<ol>$1</ol>');
+      text = text.replace(/<oli>/g, '<li>').replace(/<\/oli>/g, '</li>');
+
+      // Unordered lists (- or *)
+      text = text.replace(/^\s*[\-\*]\s+(.*)$/gim, '<li>$1</li>');
+      text = text.replace(/(<li>.*<\/li>(\n|(?=<li>))*)/gim, '<ul>$1</ul>');
+
+      // 7. Paragraphs
+      const sections = text.split(/\n\n+/);
+      text = sections.map(sec => {
+        sec = sec.trim();
+        if (!sec) return '';
+        if (sec.startsWith('<h') || sec.startsWith('<ul') || sec.startsWith('<ol') || sec.startsWith('<div') || sec.startsWith('<table') || sec.startsWith('___CODE_BLOCK_')) {
+          return sec;
+        }
+        return `<p>${sec.replace(/\n/g, '<br>')}</p>`;
+      }).join('\n');
+
+      // 8. Restore Inline Code Snippets safely
+      inlineCodes.forEach((code, idx) => {
+        const placeholder = `___INLINE_CODE_${idx}___`;
+        text = text.split(placeholder).join(`<code>${escapeHtml(code)}</code>`);
+      });
+
+      // 9. Restore Code Blocks
+      codeBlocks.forEach((block, idx) => {
+        const placeholder = `___CODE_BLOCK_${idx}___`;
+        const escapedCode = escapeHtml(block.code);
+        const htmlBlock = `
+          <div class="code-editor-box">
+            <div class="code-editor-header">
+              <span>${escapeHtml(block.lang)}.example</span>
+              <button class="code-copy-btn" onclick="copySnippetCode(this)">Salin Kode</button>
+            </div>
+            <pre class="code-editor-body"><code>${escapedCode}</code></pre>
+          </div>
+        `;
+        text = text.split(placeholder).join(htmlBlock);
+      });
+
+      return text;
+    }
+
+    // Dynamic Database-Driven Material Content Renderer
+    function renderChapterSpecificArticle(mat) {
+      const container = document.getElementById('material-dynamic-content-area');
+      const title = mat.title;
+      const sIdx = mat.section_index || 1;
+
+      let html = '';
+
+      const courseTitleLower = ((courseData && courseData.title) || '').toLowerCase();
+      const courseSlugLower = ((courseData && courseData.slug) || '').toLowerCase();
+      const isDbCourse = courseTitleLower.includes('basis data') || courseTitleLower.includes('database') || courseTitleLower.includes('normalisasi') || courseSlugLower.includes('data');
+
+      // Render diagram only if explicitly provided in material data
+      if (mat.diagram_svg) {
+        html += `
+          <div class="diagram-visual-card">
+            <div class="diagram-visual-header">
+              <span class="diagram-visual-title"><i class="fas fa-diagram-project"></i> ${escapeHtml(mat.diagram_title || 'Diagram Visual')}</span>
+            </div>
+            <div class="diagram-svg-wrapper">
+              ${mat.diagram_svg}
+            </div>
+          </div>
+        `;
+      }
+
+      // Dynamic text content from Database Record
+      const rawText = mat.content_text || `## ${escapeHtml(title)}\n\nMateri ini memuat konsep standar industri. Tanyakan kepada Asisten AI jika ingin meminta elaborasi tambahan.`;
+      const parsedArticleHtml = parseMarkdownArticle(rawText);
+
+      html += `
+        <article class="prose-content">
+          ${parsedArticleHtml}
+        </article>
+      `;
+
+      // Dynamic Practice Quiz adapted to Course Content
+      let quizQuestion = `Pertanyaan: Berdasarkan materi pada <strong>${escapeHtml(title)}</strong>, manakah praktik terbaik yang direkomendasikan di standar industri?`;
+      let optA = 'Menggunakan elemen semantik yang tepat, atribut eksplisit (seperti lang &amp; alt), serta mengoptimalkan kinerja CRP';
+      let optB = 'Membungkus semua struktur dalam &lt;div&gt; tanpa atribut semantik sama sekali';
+      let optC = 'Menghilangkan tag &lt;!DOCTYPE html&gt; agar browser masuk ke Quirks Mode';
+
+      if (isDbCourse) {
+        quizQuestion = `Pertanyaan: Berdasarkan materi pada <strong>${escapeHtml(title)}</strong>, manakah prinsip normalisasi relasional yang tepat?`;
+        optA = 'Memastikan nilai atomik (1NF), mengeliminasi ketergantungan parsial (2NF), dan menghilangkan ketergantungan transitif (3NF) guna mencegah anomali data';
+        optB = 'Menyimpan seluruh data entitas dalam satu tabel raksasa universal tanpa primary key';
+        optC = 'Membiarkan data terduplikasi di banyak baris agar pencarian data tidak memerlukan relasi JOIN';
+      }
+
+      html += `
+        <div class="practice-quiz-container" data-no-ai-focus="true" style="background:var(--bg-surface); border:1px solid var(--border-subtle); border-radius:var(--radius-lg); padding:22px; margin:28px 0; box-shadow:var(--shadow-sm);">
+          <div style="display:flex; align-items:center; gap:8px; font-weight:700; font-size:14px; margin-bottom:12px; color:var(--text-primary);">
+            <i class="fas fa-circle-question" style="color:var(--accent-primary);"></i> Kuis Evaluasi Pemahaman Modul
+          </div>
+          <p style="font-size:13.5px; margin-bottom:14px; color:var(--text-primary);">
+            ${quizQuestion}
+          </p>
+          <div style="display:flex; flex-direction:column; gap:10px;">
+            <label style="font-size:13px; display:flex; align-items:center; gap:10px; cursor:pointer; padding:8px 12px; background:var(--bg-surface-subtle); border-radius:var(--radius-md); border:1px solid var(--border-subtle);">
+              <input type="radio" name="practice_quiz" value="a"> ${optA}
+            </label>
+            <label style="font-size:13px; display:flex; align-items:center; gap:10px; cursor:pointer; padding:8px 12px; background:var(--bg-surface-subtle); border-radius:var(--radius-md); border:1px solid var(--border-subtle);">
+              <input type="radio" name="practice_quiz" value="b"> ${optB}
+            </label>
+            <label style="font-size:13px; display:flex; align-items:center; gap:10px; cursor:pointer; padding:8px 12px; background:var(--bg-surface-subtle); border-radius:var(--radius-md); border:1px solid var(--border-subtle);">
+              <input type="radio" name="practice_quiz" value="c"> ${optC}
+            </label>
+          </div>
+          <div style="display:flex; align-items:center; gap:12px; margin-top:16px;">
+            <button class="btn btn-outline" style="font-size:12px; padding:6px 16px;" onclick="checkPracticeQuiz()">
+              Periksa Jawaban
+            </button>
+            <button class="btn btn-outline" style="font-size:12px; padding:6px 14px;" onclick="quickAskAI('Jelaskan jawaban yang benar dan pembahasan detail dari kuis modul ini.')">
+              <i class="fas fa-sparkles" style="color:var(--accent-primary);"></i> Bahas Bersama AI
+            </button>
+          </div>
+          <div id="quiz-feedback" style="margin-top:12px; font-size:13px; display:none; padding:10px 14px; border-radius:var(--radius-md);"></div>
+        </div>
+      `;
+
+      container.innerHTML = html;
+    }
+
+    function checkPracticeQuiz() {
+      const selected = document.querySelector('input[name="practice_quiz"]:checked');
+      const feedback = document.getElementById('quiz-feedback');
+      if (!selected) {
+        showToast('Pilih salah satu opsi jawaban terlebih dahulu.', 'warning');
+        return;
+      }
+      const courseTitleLower = ((courseData && courseData.title) || '').toLowerCase();
+      const isDb = courseTitleLower.includes('basis data') || courseTitleLower.includes('database') || courseTitleLower.includes('normalisasi');
+      
+      feedback.style.display = 'block';
+      if (selected.value === 'a') {
+        feedback.style.background = 'rgba(16, 185, 129, 0.12)';
+        feedback.style.border = '1px solid var(--color-success)';
+        const correctMsg = isDb 
+          ? 'Praktik ini menjamin integritas relasional, pencegahan anomali (insert/update/delete), dan efisiensi penyimpanan database.'
+          : 'Praktik ini menjamin aksesibilitas universal, performa tinggi, dan indeks SEO optimal.';
+        feedback.innerHTML = `<span style="color:var(--color-success); font-weight:700;"><i class="fas fa-circle-check"></i> Jawaban Anda Tepat!</span> ${correctMsg}`;
+      } else {
+        feedback.style.background = 'rgba(239, 68, 68, 0.12)';
+        feedback.style.border = '1px solid var(--color-danger)';
+        feedback.innerHTML = `<span style="color:var(--color-danger); font-weight:700;"><i class="fas fa-circle-xmark"></i> Kurang Tepat.</span> Opsi A adalah jawaban standar industri. Anda dapat mengecek penjelasan lengkap melalui panel AI.`;
+      }
+    }
+
+
+<!-- Audio Toolbar loaded -->
