@@ -2818,5 +2818,568 @@
                 Belum Ada Kursus yang Diikuti
               </div>
               <p style="font-size:13px; color:var(--text-secondary); max-width:440px; margin:0 auto 16px; line-height:1.5;">
+                Pilih kursus unggulan dari instruktur ahli di katalog rekomendasi bawah untuk memulai pembelajaran adaptif Anda.
+              </p>
+              <a href="#courses-catalog-section" class="btn btn-primary" style="font-size:12px; padding:8px 18px; text-decoration:none; display:inline-flex; align-items:center; gap:8px;">
+                <i class="fas fa-compass"></i> Telusuri Rekomendasi Kursus
+              </a>
+            </div>
+          `;
+          return currentEnrolledCourseIds;
+        }
 
-<!-- Quick enroll modal loaded -->
+        container.innerHTML = enrollments.map(en => {
+          const course = en.course || {};
+          const categoryName = course.category ? course.category.name : 'Umum';
+          const progress = Math.round(en.progress_percentage || 0);
+
+          let totalMaterials = 0;
+          if (course.sections && Array.isArray(course.sections)) {
+            course.sections.forEach(s => {
+              if (s.materials && Array.isArray(s.materials)) totalMaterials += s.materials.length;
+            });
+          }
+          const subtitle = totalMaterials > 0 ? `${totalMaterials} modul materi terstruktur` : (en.status === 'completed' ? 'Selesai 100%' : 'Sedang dipelajari');
+          const courseLink = `/courses/${course.slug || course.id}`;
+
+          return `
+            <div class="activity-course-item">
+              <div class="activity-info">
+                <div class="activity-badge-text">Sedang dipelajari • ${escapeHtml(categoryName)}</div>
+                <div class="activity-title">
+                  <a href="${courseLink}" style="color:inherit; text-decoration:none;">${escapeHtml(course.title || 'Kursus')}</a>
+                </div>
+                <div style="font-size:12px; color:var(--text-secondary); display:flex; justify-content:space-between; margin-bottom:6px;">
+                  <span>${subtitle}</span>
+                  <span style="font-weight:600;">${progress}%</span>
+                </div>
+                <div class="activity-progress-bar">
+                  <div class="activity-progress-fill" style="width:${progress}%;"></div>
+                </div>
+              </div>
+              <a href="${courseLink}" class="btn-continue-learning">
+                Lanjutkan Belajar <i class="fas fa-arrow-right"></i>
+              </a>
+            </div>
+          `;
+        }).join('');
+
+        return currentEnrolledCourseIds;
+
+      } catch (e) {
+        console.error('Failed to load student learning activities:', e);
+        container.innerHTML = `
+          <div style="text-align:center; padding:24px; color:var(--text-tertiary); font-size:13px;">
+            Gagal memuat aktivitas belajar. Silakan refresh halaman.
+          </div>
+        `;
+        return currentEnrolledCourseIds;
+      }
+    }
+
+    async function loadCoursesCatalog(enrolledIds) {
+      const container = document.getElementById('courses-container');
+      const enrolledSet = enrolledIds instanceof Set ? enrolledIds : currentEnrolledCourseIds;
+      
+      try {
+        // Fetch courses and AI recommendations in parallel
+        const [coursesRes, aiRes] = await Promise.all([
+          fetch('/api/courses?limit=12&status=published'),
+          fetch('/api/ai/recommendations', {
+            headers: {
+              'Authorization': 'Bearer ' + token,
+            },
+          }).catch(() => null),
+        ]);
+
+        const json = await coursesRes.json();
+        const courses = (json.data && json.data.courses) ? json.data.courses : (Array.isArray(json.data) ? json.data : []);
+
+        let aiData = null;
+        if (aiRes && aiRes.ok) {
+          const aiJson = await aiRes.json();
+          if (aiJson.success && aiJson.data) {
+            aiData = aiJson.data;
+          }
+        }
+
+        // Render AI Recommendation Banner
+        const stageBadge = document.getElementById('ai-stage-badge');
+        const insightQuote = document.getElementById('ai-recommendation-insight');
+        const nextStepsHint = document.getElementById('ai-next-steps-hint');
+
+        if (aiData) {
+          if (stageBadge) stageBadge.innerHTML = `<i class="fas fa-layer-group"></i> ${escapeHtml(aiData.stage_badge || 'Tahap Adaptif')}`;
+          if (insightQuote) insightQuote.textContent = aiData.ai_insight || 'AI telah menyusun rekomendasi kursus terbaik berdasarkan target karir Anda.';
+          if (nextStepsHint) nextStepsHint.textContent = `Langkah Selanjutnya: ${aiData.next_steps_summary || 'Pelajari materi dasar dan raih sertifikasi digital.'}`;
+        } else {
+          if (stageBadge) stageBadge.innerHTML = `<i class="fas fa-graduation-cap"></i> Kurikulum Adaptif`;
+          if (insightQuote) insightQuote.textContent = 'Mulai dari kursus tingkat pemula untuk membangun fondasi yang kuat, lalu lanjutkan ke tingkat menengah dan arsitektur enterprise.';
+          if (nextStepsHint) nextStepsHint.textContent = 'Langkah Selanjutnya: Selesaikan modul dasar HTML5 dan Frontend.';
+        }
+
+        if (!courses.length) {
+          container.innerHTML = `
+            <div style="grid-column: 1 / -1; text-align: center; padding: 32px; color: var(--text-tertiary); font-size: 13px;">
+              Belum ada kursus publik yang tersedia saat ini.
+            </div>
+          `;
+          return;
+        }
+
+        // Filter strictly to AI Recommendations (2-3 focused courses for current stage)
+        const aiRecMap = {};
+        let displayCourses = [];
+
+        if (aiData && Array.isArray(aiData.recommendations) && aiData.recommendations.length > 0) {
+          aiData.recommendations.forEach((rec, idx) => {
+            aiRecMap[rec.course_id] = { ...rec, rank: idx + 1 };
+            const matched = courses.find(c => Number(c.id) === Number(rec.course_id));
+            if (matched) {
+              displayCourses.push({
+                ...matched,
+                aiRec: rec,
+              });
+            }
+          });
+        }
+
+        // Fallback if AI data has no direct course matches: filter only by student's current stage (beginner first, max 3)
+        if (!displayCourses.length) {
+          const targetLevel = (aiData && aiData.current_stage) ? aiData.current_stage : 'beginner';
+          const stageFiltered = courses.filter(c => c.level === targetLevel || (targetLevel === 'beginner' && (!c.level || c.level === 'beginner')));
+          
+          const fallbackPool = stageFiltered.length > 0 ? stageFiltered : courses;
+          displayCourses = fallbackPool.slice(0, 3).map((c, idx) => ({
+            ...c,
+            aiRec: {
+              priority: idx === 0 ? 'current_focus' : 'next_stage',
+              reason: idx === 0
+                ? 'Fondasi penting tingkat pemula untuk membangun keahlian dasar sebelum melangkah ke tingkat lanjutan.'
+                : 'Pondasi lanjutan untuk melengkapi alur belajar Anda.',
+              badge: idx === 0 ? 'Fokus Utama (Pemula)' : 'Fondasi (Pemula)',
+            }
+          }));
+        }
+
+        container.innerHTML = displayCourses.map(c => {
+          const isEnrolled = enrolledSet.has(c.id);
+          const courseLink = `/courses/${c.slug || c.id}`;
+          const formattedPrice = (c.price && c.price > 0) ? `Rp ${(c.price).toLocaleString('id-ID')}` : 'Gratis';
+          const thumbHtml = c.thumbnail_url ? `<img src="${c.thumbnail_url}" alt="${escapeHtml(c.title)}" style="width:100%; height:100%; object-fit:cover;" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">` : '';
+          const aiRec = c.aiRec || aiRecMap[c.id];
+
+          let aiTagHtml = '';
+          if (aiRec) {
+            aiTagHtml = `<span style="font-size:9px; font-weight:700; color:var(--accent-text); background:var(--accent-primary); padding:2px 7px; border-radius:var(--radius-full); display:inline-flex; align-items:center; gap:4px;"><i class="fas fa-sparkles"></i> ${escapeHtml(aiRec.badge || 'Saran AI')}</span>`;
+          }
+
+          return `
+            <div class="course-card-mini" style="${aiRec && aiRec.priority === 'current_focus' ? 'border-color: var(--accent-primary); box-shadow: var(--shadow-md);' : ''}">
+              <div class="course-mini-thumb" onclick="window.location.href='${courseLink}'" style="cursor:pointer; overflow:hidden; display:flex; align-items:center; justify-content:center;">
+                ${thumbHtml}
+                <i class="fas fa-graduation-cap" style="${c.thumbnail_url ? 'display:none;' : ''}"></i>
+              </div>
+              <div class="course-mini-body">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                  <span class="user-role-tag" style="font-size:9px;">
+                    ${c.category ? escapeHtml(c.category.name) : 'Teknologi'}
+                  </span>
+                  ${aiTagHtml}
+                </div>
+                <div class="course-mini-title" onclick="window.location.href='${courseLink}'" style="cursor:pointer;">
+                  ${escapeHtml(c.title)}
+                </div>
+                <div class="course-mini-tutor">
+                  <i class="fas fa-chalkboard-user" style="font-size:11px; margin-right:4px;"></i> ${c.tutor ? escapeHtml(c.tutor.name) : 'Instruktur Ahli'}
+                </div>
+                ${aiRec && aiRec.reason ? `<div style="font-size:11.5px; color:var(--text-secondary); line-height:1.4; margin:6px 0; font-style:italic;">"${escapeHtml(aiRec.reason)}"</div>` : ''}
+                <div class="course-mini-footer" style="margin-top:10px;">
+                  <span class="course-mini-price">${formattedPrice}</span>
+                  <div style="display:flex; align-items:center; gap:6px;">
+                    ${isEnrolled ? `
+                      <span style="font-size:11px; color:var(--color-success); font-weight:600; display:inline-flex; align-items:center; gap:4px;">
+                        <i class="fas fa-circle-check"></i> Terdaftar
+                      </span>
+                    ` : `
+                      <button class="btn btn-outline" style="font-size:11px; padding:4px 8px;" onclick="enrollInCourse(${c.id}, '${escapeHtml(c.title)}')">
+                        <i class="fas fa-plus"></i> Ikuti
+                      </button>
+                    `}
+                    <a href="${courseLink}" style="font-size:11px; font-weight:600; color:var(--text-primary); text-decoration:none; display:flex; align-items:center; gap:4px;">
+                      Materi <i class="fas fa-arrow-right" style="font-size:9px;"></i>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      } catch (e) {
+        console.error('Failed to load courses catalog:', e);
+      }
+    }
+
+    async function refreshAIRecommendations() {
+      const icon = document.getElementById('ai-refresh-icon');
+      if (icon) icon.classList.add('fa-spin');
+      showToast('Memperbarui analisis rekomendasi kurikulum adaptif AI...', 'success');
+      await loadCoursesCatalog(currentEnrolledCourseIds);
+      if (icon) icon.classList.remove('fa-spin');
+    }
+
+    async function enrollInCourse(courseId, courseTitle) {
+      if (!token) {
+        window.location.href = '/login';
+        return;
+      }
+      try {
+        const res = await fetch(`/api/courses/${courseId}/enroll`, {
+          method: 'POST',
+          headers: {
+            'Authorization': 'Bearer ' + token,
+            'Content-Type': 'application/json',
+          },
+        });
+        const json = await res.json();
+        if (res.ok && json.success) {
+          showToast(json.message || `Berhasil mendaftar kursus "${courseTitle}"!`, 'success');
+          const updatedIds = await loadStudentActivities(token);
+          await loadCoursesCatalog(updatedIds);
+        } else {
+          showToast(json.message || 'Gagal mendaftar kursus.', 'error');
+        }
+      } catch (e) {
+        showToast('Kesalahan jaringan saat mendaftar.', 'error');
+      }
+    }
+
+    function initStreakAndCheckin(userId) {
+      const today = new Date();
+      const dayIndex = (today.getDay() + 6) % 7; // Mon=0, Sun=6
+      const streakCircles = document.querySelectorAll('#streak-day-row-container .streak-day-item .streak-circle');
+      
+      const streakKey = `skillsphere_streak_${userId || 'current'}`;
+      let streakCount = parseInt(localStorage.getItem(streakKey) || '1', 10);
+
+      const navStreak = document.getElementById('nav-streak-count');
+      const sideStreak = document.getElementById('sidebar-streak-max');
+      if (navStreak) navStreak.textContent = streakCount;
+      if (sideStreak) sideStreak.textContent = `${streakCount} Hari`;
+
+      streakCircles.forEach((circle, idx) => {
+        if (idx <= dayIndex) {
+          circle.classList.add('active');
+        } else {
+          circle.classList.remove('active');
+        }
+      });
+
+      const todayKey = `skillsphere_checkin_${userId || 'current'}_` + (today.toISOString().split('T')[0]);
+      const hasCheckedIn = localStorage.getItem(todayKey);
+      const checkinBtn = document.getElementById('daily-checkin-btn');
+      if (hasCheckedIn && checkinBtn) {
+        checkinBtn.innerHTML = '<i class="fas fa-circle-check" style="margin-right:6px; color:var(--color-success);"></i> Sudah Check-in Hari Ini';
+        checkinBtn.disabled = true;
+      }
+    }
+
+    function handleDailyCheckin(btn) {
+      const today = new Date();
+      const userId = currentUser ? currentUser.id : 'current';
+      const todayKey = `skillsphere_checkin_${userId}_` + (today.toISOString().split('T')[0]);
+      const streakKey = `skillsphere_streak_${userId}`;
+      
+      let currentStreak = parseInt(localStorage.getItem(streakKey) || '1', 10);
+      currentStreak += 1;
+      localStorage.setItem(streakKey, currentStreak.toString());
+      localStorage.setItem(todayKey, 'true');
+
+      btn.innerHTML = '<i class="fas fa-circle-check" style="margin-right:6px; color:var(--color-success);"></i> Berhasil Check-in!';
+      btn.disabled = true;
+
+      const navStreak = document.getElementById('nav-streak-count');
+      const sideStreak = document.getElementById('sidebar-streak-max');
+      if (navStreak) navStreak.textContent = currentStreak;
+      if (sideStreak) sideStreak.textContent = `${currentStreak} Hari`;
+
+      const dayIndex = (today.getDay() + 6) % 7;
+      const streakCircles = document.querySelectorAll('#streak-day-row-container .streak-day-item .streak-circle');
+      if (streakCircles[dayIndex]) streakCircles[dayIndex].classList.add('active');
+
+      showToast(`Check-in harian berhasil! Streak belajar Anda bertambah menjadi ${currentStreak} hari berturut-turut.`, 'success');
+    }
+
+    function copyReferralCode(btn) {
+      const refDisplay = document.getElementById('referral-code-display');
+      const codeToCopy = refDisplay ? (refDisplay.getAttribute('data-code') || refDisplay.textContent.trim()) : 'SKILLSPHERE-2026';
+      navigator.clipboard.writeText(codeToCopy);
+      btn.innerHTML = '<i class="fas fa-check" style="margin-right:6px; color:var(--color-success);"></i> Kode Tersalin!';
+      showToast(`Kode referral "${codeToCopy}" berhasil disalin! Bagikan ke teman untuk diskon 20%.`, 'success');
+      setTimeout(() => {
+        btn.innerHTML = '<i class="fas fa-copy" style="margin-right:6px;"></i> Salin Kode Referral';
+      }, 2500);
+    }
+
+    function showToast(message, type = 'success') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.style.cssText = `
+        background: var(--bg-surface);
+        color: var(--text-primary);
+        padding: 12px 18px;
+        border-radius: var(--radius-md);
+        border: 1px solid ${type === 'error' ? 'var(--color-danger, #ef4444)' : 'var(--border-subtle)'};
+        box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        font-size: 13px;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        animation: slideIn 0.2s ease-out;
+      `;
+      const icon = type === 'error' ? '<i class="fas fa-circle-exclamation" style="color:var(--color-danger,#ef4444);"></i>' : '<i class="fas fa-circle-check" style="color:var(--color-success,#10b981);"></i>';
+      toast.innerHTML = `${icon} <span>${escapeHtml(message)}</span>`;
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transition = 'opacity 0.3s ease';
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    // 6. Logout Logic
+    document.getElementById('logout-btn').addEventListener('click', async () => {
+      const accessToken = localStorage.getItem('skillsphere_access_token');
+      try {
+        if (accessToken) {
+          await fetch('/api/auth/logout', {
+            method: 'POST',
+            headers: {
+              'Authorization': 'Bearer ' + accessToken,
+            },
+          });
+        }
+      } catch (e) {}
+
+      localStorage.removeItem('skillsphere_access_token');
+      localStorage.removeItem('skillsphere_refresh_token');
+      localStorage.removeItem('skillsphere_user');
+      window.location.href = '/login';
+    });
+
+    // =========================================================
+    // 7. INTERACTIVE EVENTS & AI QUIZ MODALS HANDLERS
+    // =========================================================
+    function openEventsModal() {
+      const modal = document.getElementById('events-modal');
+      if (modal) modal.style.display = 'flex';
+      initEventButtons();
+    }
+
+    function closeEventsModal() {
+      const modal = document.getElementById('events-modal');
+      if (modal) modal.style.display = 'none';
+    }
+
+    function initEventButtons() {
+      [1, 2, 3].forEach(id => {
+        const isReg = localStorage.getItem(`skillsphere_event_reg_${id}`);
+        const btn = document.getElementById(`event-reg-btn-${id}`);
+        if (isReg && btn) {
+          btn.innerHTML = '<i class="fas fa-circle-check"></i> Terdaftar';
+          btn.className = 'btn btn-outline';
+          btn.disabled = true;
+        }
+      });
+    }
+
+    function registerForEvent(eventId, title) {
+      localStorage.setItem(`skillsphere_event_reg_${eventId}`, 'true');
+      const btn = document.getElementById(`event-reg-btn-${eventId}`);
+      if (btn) {
+        btn.innerHTML = '<i class="fas fa-circle-check"></i> Terdaftar';
+        btn.className = 'btn btn-outline';
+        btn.disabled = true;
+      }
+      showToast(`Pendaftaran event "${title}" berhasil! Tiket & link streaming telah dikonfirmasi.`, 'success');
+    }
+
+    let currentAIQuizData = null;
+
+    function openQuizModal() {
+      const modal = document.getElementById('quiz-modal');
+      if (modal) modal.style.display = 'flex';
+      handleResetQuiz();
+    }
+
+    function closeQuizModal() {
+      const modal = document.getElementById('quiz-modal');
+      if (modal) modal.style.display = 'none';
+    }
+
+    function handleResetQuiz() {
+      document.getElementById('quiz-setup-pane').style.display = 'block';
+      document.getElementById('quiz-active-pane').style.display = 'none';
+      document.getElementById('quiz-result-pane').style.display = 'none';
+      currentAIQuizData = null;
+    }
+
+    async function handleGenerateAIQuiz() {
+      const topicSelect = document.getElementById('quiz-topic-select');
+      const difficultySelect = document.getElementById('quiz-difficulty-select');
+      const countSelect = document.getElementById('quiz-count-select');
+
+      const topic = topicSelect.value;
+      const difficulty = difficultySelect.value;
+      const numberOfQuestions = parseInt(countSelect.value, 10) || 3;
+
+      const startBtn = document.getElementById('btn-start-ai-quiz');
+      const originalText = startBtn.innerHTML;
+      startBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Merumuskan Soal AI...';
+      startBtn.disabled = true;
+
+      try {
+        const res = await fetch('/api/ai/quiz/generate', {
+          method: 'POST',
+          headers: {
+            'Authorization': 'Bearer ' + token,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            topic,
+            difficulty,
+            number_of_questions: numberOfQuestions,
+          }),
+        });
+
+        const json = await res.json();
+        if (res.ok && json.success && json.data && Array.isArray(json.data.questions)) {
+          currentAIQuizData = json.data;
+          renderActiveQuiz(json.data);
+        } else {
+          showToast(json.message || 'Gagal membuat soal kuis AI. Mencoba mode latihan cepat...', 'error');
+        }
+      } catch (err) {
+        showToast('Terjadi kesalahan jaringan saat membuat soal AI.', 'error');
+      } finally {
+        startBtn.innerHTML = originalText;
+        startBtn.disabled = false;
+      }
+    }
+
+    function renderActiveQuiz(quizData) {
+      document.getElementById('quiz-setup-pane').style.display = 'none';
+      document.getElementById('quiz-active-pane').style.display = 'block';
+      document.getElementById('quiz-result-pane').style.display = 'none';
+
+      const topicBadge = document.getElementById('quiz-active-topic-badge');
+      if (topicBadge) topicBadge.textContent = `${quizData.topic} • ${quizData.difficulty.toUpperCase()}`;
+
+      const container = document.getElementById('quiz-questions-container');
+      container.innerHTML = quizData.questions.map((q, qIdx) => {
+        const optionsHtml = q.options.map((opt, optIdx) => `
+          <label style="display:flex; align-items:center; gap:10px; padding:8px 12px; border:1px solid var(--border-subtle); border-radius:var(--radius-md); background:var(--bg-surface); cursor:pointer; font-size:13px; color:var(--text-primary); transition:background 0.15s ease;">
+            <input type="radio" name="quiz_q_${q.id || qIdx}" value="${optIdx}" style="accent-color:var(--accent-primary); cursor:pointer;" required>
+            <span>${escapeHtml(opt)}</span>
+          </label>
+        `).join('');
+
+        return `
+          <div style="background:var(--bg-surface-subtle); border:1px solid var(--border-subtle); border-radius:var(--radius-lg); padding:16px;">
+            <div style="font-size:11px; font-weight:700; color:var(--accent-primary); text-transform:uppercase; margin-bottom:6px;">
+              Pertanyaan ${qIdx + 1} dari ${quizData.questions.length}
+            </div>
+            <div style="font-size:14px; font-weight:600; color:var(--text-primary); margin-bottom:12px; line-height:1.45;">
+              ${escapeHtml(q.question)}
+            </div>
+            <div style="display:flex; flex-direction:column; gap:8px;">
+              ${optionsHtml}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function handleQuizSubmit() {
+      if (!currentAIQuizData || !Array.isArray(currentAIQuizData.questions)) return;
+
+      const questions = currentAIQuizData.questions;
+      let score = 0;
+      const userAnswers = [];
+
+      for (let i = 0; i < questions.length; i++) {
+        const q = questions[i];
+        const selected = document.querySelector(`input[name="quiz_q_${q.id || i}"]:checked`);
+        if (!selected) {
+          showToast(`Mohon jawab pertanyaan nomor ${i + 1} terlebih dahulu.`, 'error');
+          return;
+        }
+        const userAnsIndex = parseInt(selected.value, 10);
+        userAnswers.push(userAnsIndex);
+        if (userAnsIndex === q.answer_index) {
+          score += 1;
+        }
+      }
+
+      const total = questions.length;
+      const percentScore = Math.round((score / total) * 100);
+
+      // Render Result Pane
+      document.getElementById('quiz-setup-pane').style.display = 'none';
+      document.getElementById('quiz-active-pane').style.display = 'none';
+      document.getElementById('quiz-result-pane').style.display = 'block';
+
+      const scoreText = document.getElementById('quiz-result-score-text');
+      const scoreIcon = document.getElementById('quiz-result-icon');
+      const summaryText = document.getElementById('quiz-result-summary');
+
+      if (scoreText) scoreText.textContent = `Skor Anda: ${percentScore}/100 (${score} dari ${total} benar)`;
+      if (scoreIcon) scoreIcon.textContent = percentScore >= 70 ? '🎉' : '💡';
+      if (summaryText) {
+        summaryText.textContent = percentScore >= 70 
+          ? 'Selamat! Pemahaman Anda pada materi ini sudah sangat baik. Lanjutkan ke tantangan berikutnya.'
+          : 'Bagus! Anda telah menyelesaikan latihan. Pelajari kembali poin pembahasan di bawah untuk memperdalam pemahaman.';
+      }
+
+      const reviewContainer = document.getElementById('quiz-review-container');
+      reviewContainer.innerHTML = questions.map((q, idx) => {
+        const isCorrect = userAnswers[idx] === q.answer_index;
+        return `
+          <div style="background:var(--bg-surface-subtle); border:1px solid ${isCorrect ? 'var(--color-success)' : 'var(--border-subtle)'}; border-radius:var(--radius-md); padding:12px 14px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+              <span style="font-size:11px; font-weight:700; color:var(--text-secondary);">Soal ${idx + 1}</span>
+              <span style="font-size:11px; font-weight:700; color:${isCorrect ? 'var(--color-success)' : 'var(--color-danger)'};">
+                ${isCorrect ? '<i class="fas fa-circle-check"></i> Jawaban Benar' : '<i class="fas fa-circle-xmark"></i> Perlu Evaluasi'}
+              </span>
+            </div>
+            <div style="font-size:13px; font-weight:600; color:var(--text-primary); margin-bottom:6px;">${escapeHtml(q.question)}</div>
+            <div style="font-size:12px; color:var(--text-secondary); margin-bottom:4px;">
+              Jawaban Tepat: <strong style="color:var(--text-primary);">${escapeHtml(q.options[q.answer_index])}</strong>
+            </div>
+            ${q.explanation ? `<div style="font-size:11.5px; color:var(--text-tertiary); font-style:italic; line-height:1.4; margin-top:4px;">Penjelasan: ${escapeHtml(q.explanation)}</div>` : ''}
+          </div>
+        `;
+      }).join('');
+
+      showToast(`Kuis selesai! Anda memperoleh skor ${percentScore}/100.`, 'success');
+    }
+
+  </script>
+
+  <!-- PWA Service Worker & Install Prompt Banner -->
+  <script src="/javascripts/pwa-installer.js"></script>
+  <!-- Inclusive Accessibility, TTS, & Head Tracking Script -->
+  <script src="/javascripts/accessibility.js"></script>
+</body>
+</html>
