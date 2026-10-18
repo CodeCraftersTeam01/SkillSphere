@@ -26,6 +26,11 @@
   
   <!-- Claude Design System Stylesheet -->
   <link rel="stylesheet" href="/stylesheets/claude-theme.css?v=2.0">
+  <!-- Accessibility & Head Tracking Stylesheet -->
+  <link rel="stylesheet" href="/stylesheets/accessibility.css">
+  <!-- Custom Alert & Toast Stylesheet & Script -->
+  <link rel="stylesheet" href="/stylesheets/custom-alert.css">
+  <script src="/javascripts/custom-alert.js"></script>
 
   <style>
     .dashboard-layout {
@@ -41,8 +46,8 @@
       border-bottom: 1px solid var(--border-subtle);
       padding: 12px 32px;
       display: flex;
-      justify-content: space-between;
-      align-items: center;
+      flex-direction: column;
+      justify-content: center;
       position: sticky;
       top: 0;
       z-index: 100;
@@ -337,6 +342,66 @@
       align-items: center;
       gap: 10px;
       margin: 0;
+    }
+
+    /* AI Adaptive Recommendation Hub */
+    .ai-adaptive-banner {
+      background: var(--bg-surface-subtle);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 18px 20px;
+      margin-bottom: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      position: relative;
+    }
+
+    .ai-adaptive-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .ai-adaptive-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .ai-stage-pill {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: var(--radius-full);
+      background: var(--accent-primary);
+      color: var(--accent-text);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .ai-insight-quote {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.55;
+      padding-left: 12px;
+      border-left: 3px solid var(--accent-primary);
+      margin: 0;
+    }
+
+    .ai-next-steps-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--text-tertiary);
+      font-weight: 500;
     }
 
     /* Learning Activity Rows */
@@ -1300,11 +1365,11 @@
     }
 
     .desktop-only {
-      display: flex;
+      display: flex !important;
     }
 
     .mobile-only {
-      display: none;
+      display: none !important;
     }
 
     @media (max-width: 1024px) {
@@ -1546,7 +1611,7 @@
         <ul class="nav-links-menu desktop-only" id="desktop-nav-menu">
           <li><a href="/dashboard" class="nav-link-item active">Beranda</a></li>
           <li><a href="#courses-catalog-section" class="nav-link-item">Katalog Kursus</a></li>
-          <li><a href="/dashboard/onboarding" class="nav-link-item">Jalur Belajar AI</a></li>
+          <li><a href="/dashboard/roadmap" class="nav-link-item">Jalur Belajar AI</a></li>
           <li><a href="#activities-section" class="nav-link-item">Tantangan</a></li>
         </ul>
 
@@ -1584,7 +1649,7 @@
         <ul class="nav-links-menu mobile-scroll" id="mobile-nav-menu">
           <li><a href="/dashboard" class="nav-link-item active">Beranda</a></li>
           <li><a href="#courses-catalog-section" class="nav-link-item">Katalog Kursus</a></li>
-          <li><a href="/dashboard/onboarding" class="nav-link-item">Jalur Belajar AI</a></li>
+          <li><a href="/dashboard/roadmap" class="nav-link-item">Jalur Belajar AI</a></li>
           <li><a href="#activities-section" class="nav-link-item">Tantangan</a></li>
         </ul>
       </div>
@@ -1728,15 +1793,15 @@
           <!-- Kelengkapan Profil Card -->
           <div class="profile-hero-card">
             <div class="circular-progress-box" id="profile-percent-badge">
-              80%
+              0%
             </div>
             <div>
-              <h3 class="profile-card-title">Kelengkapan Profil Anda</h3>
-              <p class="profile-card-desc">
+              <h3 class="profile-card-title" id="profile-hero-card-title">Kelengkapan Profil Anda</h3>
+              <p class="profile-card-desc" id="profile-hero-card-desc">
                 Dengan melengkapi preferensi belajar, Anda dapat menikmati rekomendasi kurikulum adaptif AI secara maksimal.
               </p>
             </div>
-            <a href="/dashboard/onboarding" class="profile-card-cta">
+            <a href="/dashboard/onboarding" class="profile-card-cta" id="profile-hero-card-cta">
               Lengkapi / Ubah Preferensi <i class="fas fa-arrow-right" style="font-size:11px;"></i>
             </a>
           </div>
@@ -1747,15 +1812,15 @@
               <span style="font-size:14px; font-weight:600; color:var(--text-primary); display:flex; align-items:center; gap:8px;">
                 <i class="fas fa-calendar-check" style="color:var(--text-secondary);"></i> Runtutan Belajar
               </span>
-              <span style="font-size:12px; color:var(--text-secondary);">Streak Terlama: <strong>1</strong></span>
+              <span style="font-size:12px; color:var(--text-secondary);">Streak: <strong id="sidebar-streak-max">1 Hari</strong></span>
             </div>
             <p style="font-size:12px; color:var(--text-secondary); line-height:1.4; margin:0;">
               Bukan cuma angka, streak bantu Anda membangun kebiasaan belajar yang solid dan berkelanjutan.
             </p>
 
-            <div class="streak-day-row">
+            <div class="streak-day-row" id="streak-day-row-container">
               <div class="streak-day-item">
-                <div class="streak-circle active"><i class="fas fa-bolt"></i></div>
+                <div class="streak-circle"><i class="fas fa-bolt"></i></div>
                 <span>Sen</span>
               </div>
               <div class="streak-day-item">
@@ -1789,7 +1854,7 @@
               <p style="font-size:12px; color:var(--text-secondary); line-height:1.4; margin-bottom:10px;">
                 Check-in rutin menciptakan ritme belajar yang teratur sehingga membuat Anda lebih konsisten dan terarah.
               </p>
-              <button class="btn btn-outline" style="width:100%; font-size:12px; padding:7px 12px;" onclick="handleDailyCheckin(this)">
+              <button class="btn btn-outline" id="daily-checkin-btn" style="width:100%; font-size:12px; padding:7px 12px;" onclick="handleDailyCheckin(this)">
                 <i class="fas fa-check" style="margin-right:6px;"></i> Mulai isi check-in
               </button>
             </div>
@@ -1800,9 +1865,12 @@
             <div style="font-size:14px; font-weight:600; color:var(--text-primary); margin-bottom:6px; display:flex; align-items:center; gap:8px;">
               <i class="fas fa-gift" style="color:var(--text-secondary);"></i> Program Referral Belajar
             </div>
-            <p style="font-size:12px; color:var(--text-secondary); line-height:1.4; margin-bottom:14px;">
+            <p style="font-size:12px; color:var(--text-secondary); line-height:1.4; margin-bottom:10px;">
               Yuk, ajak rekan belajar Anda ke SkillSphere AI dan dapatkan voucher potongan langganan sebesar 20%!
             </p>
+            <div style="font-family:var(--font-mono); font-size:12px; font-weight:700; color:var(--text-primary); background:var(--bg-surface-subtle); border:1px dashed var(--border-subtle); border-radius:var(--radius-md); padding:6px 10px; margin-bottom:12px; text-align:center;" id="referral-code-display">
+              SKILL-REF-MEMBER
+            </div>
             <button class="btn btn-outline" style="width:100%; font-size:12px; padding:7px 12px;" onclick="copyReferralCode(this)">
               <i class="fas fa-copy" style="margin-right:6px;"></i> Salin Kode Referral
             </button>
@@ -1838,17 +1906,17 @@
             </div>
 
             <div class="sub-activities-grid">
-              <a href="#events" class="sub-activity-card">
+              <div class="sub-activity-card" onclick="openEventsModal()" style="cursor:pointer;" title="Buka Agenda Event & Webinar">
                 <div style="font-size:18px; color:var(--text-primary);"><i class="fas fa-calendar-days"></i></div>
                 <div class="sub-activity-title">Telusuri event dari SkillSphere</div>
                 <div class="sub-activity-desc">Ikuti webinar teknologi terkini dan sesi bedah kode bersama instruktur ahli.</div>
-              </a>
+              </div>
 
-              <a href="#challenges" class="sub-activity-card">
+              <div class="sub-activity-card" onclick="openQuizModal()" style="cursor:pointer;" title="Mulai Kuis & Tantangan AI">
                 <div style="font-size:18px; color:var(--text-primary);"><i class="fas fa-rocket"></i></div>
                 <div class="sub-activity-title">Telusuri tantangan & kuis AI</div>
                 <div class="sub-activity-desc">Uji pemahaman algoritma dan arsitektur sistem Anda dengan soal berbasis industri.</div>
-              </a>
+              </div>
             </div>
           </div>
 
@@ -1861,6 +1929,33 @@
               <a href="/courses" style="font-size:13px; font-weight:600; color:var(--text-primary); text-decoration:none;">
                 Lihat Semua <i class="fas fa-arrow-right" style="font-size:10px;"></i>
               </a>
+            </div>
+
+            <!-- AI Adaptive Learning Mentoring Banner -->
+            <div class="ai-adaptive-banner" id="ai-adaptive-banner">
+              <div class="ai-adaptive-header">
+                <div class="ai-adaptive-title">
+                  <i class="fas fa-wand-magic-sparkles" style="color:var(--accent-primary);"></i>
+                  <span>Rekomendasi Belajar Adaptif AI</span>
+                </div>
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <span class="ai-stage-pill" id="ai-stage-badge">
+                    <i class="fas fa-layer-group"></i> Menganalisis Personalisasi...
+                  </span>
+                  <button class="btn btn-outline" style="font-size:11px; padding:3px 8px;" onclick="refreshAIRecommendations()" title="Perbarui Analisis AI">
+                    <i class="fas fa-rotate" id="ai-refresh-icon"></i>
+                  </button>
+                </div>
+              </div>
+
+              <p class="ai-insight-quote" id="ai-recommendation-insight">
+                AI sedang mengevaluasi target karir, riwayat belajar, dan tingkat kemahiran Anda untuk menyusun kurikulum berjenjang...
+              </p>
+
+              <div class="ai-next-steps-row" id="ai-next-steps-row">
+                <i class="fas fa-route" style="color:var(--accent-primary);"></i>
+                <span id="ai-next-steps-hint">Memuat jalur rekomendasi selanjutnya...</span>
+              </div>
             </div>
 
             <div class="courses-catalog-grid" id="courses-container">
@@ -1933,9 +2028,193 @@
       </div>
     </div>
 
+    <!-- Modal 2: Agenda Event & Webinar Teknologi SkillSphere -->
+    <div class="modal-overlay" id="events-modal" style="display:none;" onclick="if(event.target === this) closeEventsModal()">
+      <div class="modal-card" style="max-width:620px; width:92%;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
+          <h3 style="font-family:var(--font-serif); font-size:20px; font-weight:500; color:var(--text-primary); margin:0;">
+            <i class="fas fa-calendar-check" style="margin-right:8px; color:var(--accent-primary);"></i> Event & Webinar Teknologi
+          </h3>
+          <button type="button" onclick="closeEventsModal()" style="background:none; border:none; color:var(--text-tertiary); font-size:18px; cursor:pointer;">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        
+        <p style="font-size:13px; color:var(--text-secondary); line-height:1.5; margin-bottom:16px;">
+          Tingkatkan kompetensi Anda melalui sesi langsung interaktif, bedah arsitektur kode, dan sesi tanya jawab bersama praktisi industri.
+        </p>
+
+        <div style="display:flex; flex-direction:column; gap:12px; max-height:55vh; overflow-y:auto; padding-right:4px;">
+          
+          <!-- Event 1 -->
+          <div style="background:var(--bg-surface-subtle); border:1px solid var(--border-subtle); border-radius:var(--radius-lg); padding:16px;">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
+              <span class="user-role-tag" style="font-size:9px; background:var(--bg-surface);">Webinar Eksklusif</span>
+              <span style="font-size:11px; font-weight:600; color:var(--accent-primary);"><i class="fas fa-clock"></i> Sabtu, 19:30 WIB</span>
+            </div>
+            <div style="font-size:14.5px; font-weight:700; color:var(--text-primary); margin-bottom:4px;">
+              Deep Dive HTML5 Semantics, Web Components & Core Web Vitals
+            </div>
+            <div style="font-size:12.5px; color:var(--text-secondary); margin-bottom:12px;">
+              Pemateri: <strong style="color:var(--text-primary);">Arjuna Lanang (Lead Tutor)</strong> • Live Coding & QnA Interaktif
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span style="font-size:12px; color:var(--color-success); font-weight:600;"><i class="fas fa-ticket"></i> Gratis untuk Siswa</span>
+              <button class="btn btn-primary" id="event-reg-btn-1" style="font-size:11.5px; padding:6px 14px;" onclick="registerForEvent(1, 'Deep Dive HTML5 Semantics')">
+                <i class="fas fa-check"></i> Daftar Event
+              </button>
+            </div>
+          </div>
+
+          <!-- Event 2 -->
+          <div style="background:var(--bg-surface-subtle); border:1px solid var(--border-subtle); border-radius:var(--radius-lg); padding:16px;">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
+              <span class="user-role-tag" style="font-size:9px; background:var(--bg-surface);">Live Workshop</span>
+              <span style="font-size:11px; font-weight:600; color:var(--accent-primary);"><i class="fas fa-clock"></i> Rabu Depan, 20:00 WIB</span>
+            </div>
+            <div style="font-size:14.5px; font-weight:700; color:var(--text-primary); margin-bottom:4px;">
+              Membangun Autonomous AI Agent & RAG dengan Gemini API
+            </div>
+            <div style="font-size:12.5px; color:var(--text-secondary); margin-bottom:12px;">
+              Pemateri: <strong style="color:var(--text-primary);">Tegar Mahardika (AI Engineer)</strong> • Bedah Arsitektur LLM
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span style="font-size:12px; color:var(--color-success); font-weight:600;"><i class="fas fa-ticket"></i> Gratis untuk Siswa</span>
+              <button class="btn btn-primary" id="event-reg-btn-2" style="font-size:11.5px; padding:6px 14px;" onclick="registerForEvent(2, 'Membangun Autonomous AI Agent')">
+                <i class="fas fa-check"></i> Daftar Event
+              </button>
+            </div>
+          </div>
+
+          <!-- Event 3 -->
+          <div style="background:var(--bg-surface-subtle); border:1px solid var(--border-subtle); border-radius:var(--radius-lg); padding:16px;">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
+              <span class="user-role-tag" style="font-size:9px; background:var(--bg-surface);">Masterclass Bedah Kode</span>
+              <span style="font-size:11px; font-weight:600; color:var(--accent-primary);"><i class="fas fa-clock"></i> Minggu Depan, 15:00 WIB</span>
+            </div>
+            <div style="font-size:14.5px; font-weight:700; color:var(--text-primary); margin-bottom:4px;">
+              Enterprise Microservices, Docker Containerization & Kubernetes
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span style="font-size:12px; color:var(--color-success); font-weight:600;"><i class="fas fa-ticket"></i> Kuota Terbatas</span>
+              <button class="btn btn-primary" id="event-reg-btn-3" style="font-size:11.5px; padding:6px 14px;" onclick="registerForEvent(3, 'Enterprise Microservices')">
+                <i class="fas fa-check"></i> Daftar Event
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+        <div style="display:flex; justify-content:flex-end; margin-top:18px;">
+          <button type="button" class="btn btn-outline" onclick="closeEventsModal()" style="font-size:12.5px; padding:7px 16px;">
+            Tutup
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal 3: Tantangan & Kuis Interaktif AI -->
+    <div class="modal-overlay" id="quiz-modal" style="display:none;" onclick="if(event.target === this) closeQuizModal()">
+      <div class="modal-card" style="max-width:640px; width:92%;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+          <h3 style="font-family:var(--font-serif); font-size:20px; font-weight:500; color:var(--text-primary); margin:0;">
+            <i class="fas fa-brain" style="margin-right:8px; color:var(--accent-primary);"></i> Tantangan & Kuis Adaptif AI
+          </h3>
+          <button type="button" onclick="closeQuizModal()" style="background:none; border:none; color:var(--text-tertiary); font-size:18px; cursor:pointer;">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+
+        <!-- Step 1: Quiz Configuration -->
+        <div id="quiz-setup-pane">
+          <p style="font-size:13px; color:var(--text-secondary); line-height:1.5; margin-bottom:16px;">
+            Uji pemahaman konsep dan kemampuan analisis kode Anda. AI akan merumuskan soal adaptif secara instan berbasis topik pilihan.
+          </p>
+
+          <div class="form-group-custom">
+            <label class="form-label-custom" for="quiz-topic-select">Pilih Topik Tantangan *</label>
+            <select id="quiz-topic-select" class="form-control-custom">
+              <option value="HTML5 Semantik & Aksesibilitas Web">HTML5 Semantik, Aksesibilitas Web & Struktur Modern</option>
+              <option value="JavaScript Modern & DOM Manipulation">JavaScript Modern (ES6+), Async/Await & DOM</option>
+              <option value="Backend Architecture & API Security">Backend Node.js, JWT Authentication & API Security</option>
+              <option value="AI Agent & Prompt Engineering">AI Agent Engineering, Gemini API & Prompting</option>
+              <option value="Database Relasional & SQL">Database Relasional, Sequelize ORM & SQL Integrity</option>
+            </select>
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px;">
+            <div class="form-group-custom">
+              <label class="form-label-custom" for="quiz-difficulty-select">Tingkat Kesulitan</label>
+              <select id="quiz-difficulty-select" class="form-control-custom">
+                <option value="easy">Dasar (Easy)</option>
+                <option value="medium" selected>Menengah (Medium)</option>
+                <option value="hard">Mahir (Hard)</option>
+              </select>
+            </div>
+            <div class="form-group-custom">
+              <label class="form-label-custom" for="quiz-count-select">Jumlah Soal</label>
+              <select id="quiz-count-select" class="form-control-custom">
+                <option value="3" selected>3 Soal Cepat</option>
+                <option value="5">5 Soal Lengkap</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
+            <button type="button" class="btn btn-outline" onclick="closeQuizModal()" style="font-size:12.5px; padding:7px 16px;">
+              Batal
+            </button>
+            <button type="button" id="btn-start-ai-quiz" class="btn btn-primary" style="font-size:12.5px; padding:7px 20px;" onclick="handleGenerateAIQuiz()">
+              <i class="fas fa-wand-magic-sparkles" style="margin-right:6px;"></i> Buat Soal AI & Mulai
+            </button>
+          </div>
+        </div>
+
+        <!-- Step 2: Live Quiz Rendering Pane -->
+        <div id="quiz-active-pane" style="display:none;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; padding-bottom:8px; border-bottom:1px solid var(--border-subtle);">
+            <span style="font-size:12px; font-weight:700; color:var(--accent-primary);" id="quiz-active-topic-badge">Topik Kuis</span>
+            <span style="font-size:12px; color:var(--text-secondary);" id="quiz-active-timer"><i class="fas fa-stopwatch"></i> Latihan Mandiri</span>
+          </div>
+
+          <div id="quiz-questions-container" style="display:flex; flex-direction:column; gap:18px; max-height:55vh; overflow-y:auto; padding-right:4px;"></div>
+
+          <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px; border-top:1px solid var(--border-subtle); padding-top:14px;">
+            <button type="button" class="btn btn-outline" onclick="handleResetQuiz()" style="font-size:12.5px; padding:7px 16px;">
+              Ganti Topik
+            </button>
+            <button type="button" id="btn-submit-ai-quiz" class="btn btn-primary" style="font-size:12.5px; padding:7px 20px;" onclick="handleQuizSubmit()">
+              <i class="fas fa-paper-plane" style="margin-right:6px;"></i> Kirim & Nilai Kuis
+            </button>
+          </div>
+        </div>
+
+        <!-- Step 3: Result & Explanations Pane -->
+        <div id="quiz-result-pane" style="display:none;">
+          <div style="text-align:center; padding:16px 8px 20px; border-bottom:1px solid var(--border-subtle); margin-bottom:16px;">
+            <div style="font-size:36px; margin-bottom:6px;" id="quiz-result-icon">🎉</div>
+            <h4 style="font-family:var(--font-serif); font-size:22px; font-weight:600; color:var(--text-primary); margin:0 0 6px;" id="quiz-result-score-text">Skor: 100/100</h4>
+            <p style="font-size:13px; color:var(--text-secondary); max-width:440px; margin:0 auto;" id="quiz-result-summary">
+              Luar biasa! Pemahaman Anda pada materi ini sangat solid.
+            </p>
+          </div>
+
+          <div id="quiz-review-container" style="display:flex; flex-direction:column; gap:12px; max-height:45vh; overflow-y:auto; padding-right:4px;"></div>
+
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-top:18px; border-top:1px solid var(--border-subtle); padding-top:14px;">
+            <span style="font-size:12px; color:var(--color-success); font-weight:600;"><i class="fas fa-bolt"></i> +1 Streak Latihan Bertambah</span>
+            <button type="button" class="btn btn-primary" onclick="handleResetQuiz()" style="font-size:12.5px; padding:7px 18px;">
+              <i class="fas fa-rotate-left"></i> Coba Topik Lain
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
     <!-- Footer -->
     <footer class="login-footer" style="padding-bottom: 24px; border-top:1px solid var(--border-subtle); padding-top:24px;">
-      <p>© 2026 SkillSphere AI — Platform Pembelajaran Cerdas & Kurikulum Adaptif.</p>
+      <p>© 2026 SkillSphere AI - Platform Pembelajaran Cerdas & Kurikulum Adaptif.</p>
     </footer>
   </div>
 
@@ -2038,16 +2317,46 @@
         document.getElementById('nav-user-role').textContent = roleDisplay;
 
         // Dynamic Profile Completeness calculation
-        let percent = 30; // base account
+        let percent = 20; // base account
+        if (user.name) percent += 10;
+        if (user.email) percent += 10;
         if (user.profile) {
           if (user.profile.bio) percent += 20;
-          if (user.profile.phone_number) percent += 15;
-          if (user.profile.career_goal) percent += 20;
-          if (user.profile.study_preferences) percent += 15;
+          if (user.profile.phone_number) percent += 10;
+          if (user.profile.career_goal) percent += 15;
+          if (user.profile.study_preferences && Object.keys(user.profile.study_preferences).length > 0) percent += 15;
         }
         percent = Math.min(percent, 100);
         const percentBadge = document.getElementById('profile-percent-badge');
         if (percentBadge) percentBadge.textContent = percent + '%';
+
+        const heroTitle = document.getElementById('profile-hero-card-title');
+        const heroDesc = document.getElementById('profile-hero-card-desc');
+        const heroCta = document.getElementById('profile-hero-card-cta');
+        if (percent >= 100) {
+          if (heroTitle) heroTitle.textContent = 'Profil Anda Sudah Lengkap';
+          if (heroDesc) heroDesc.textContent = 'Seluruh preferensi belajar Anda telah tersimpan. Nikmati rekomendasi kurikulum adaptif AI secara optimal.';
+          if (heroCta) {
+            heroCta.innerHTML = 'Lihat Jalur Belajar AI <i class="fas fa-arrow-right" style="font-size:11px;"></i>';
+            heroCta.href = '/dashboard/roadmap';
+          }
+        } else {
+          if (heroTitle) heroTitle.textContent = 'Kelengkapan Profil Anda';
+          if (heroDesc) heroDesc.textContent = 'Lengkapi preferensi dan tujuan karir Anda untuk memaksimalkan rekomendasi kurikulum adaptif AI.';
+          if (heroCta) {
+            heroCta.innerHTML = 'Lengkapi Preferensi <i class="fas fa-arrow-right" style="font-size:11px;"></i>';
+            heroCta.href = '/dashboard/onboarding';
+          }
+        }
+
+        // Dynamic Referral Code for Student
+        const refDisplay = document.getElementById('referral-code-display');
+        if (refDisplay) {
+          const rawName = (user.name || 'STUDENT').replace(/[^a-zA-Z]/g, '').substring(0, 4).toUpperCase();
+          const userRefCode = `SKILL-${user.id}-${rawName || '2026'}`;
+          refDisplay.textContent = userRefCode;
+          refDisplay.setAttribute('data-code', userRefCode);
+        }
 
         // Tutor verification bar logic
         const verifBar = document.getElementById('tutor-verification-bar');
@@ -2115,9 +2424,9 @@
           if (verifBar) verifBar.style.display = 'none';
 
           updateNavLinksForRole('student');
-          await loadStudentActivities(accessToken);
-          await loadCoursesCatalog();
-          initStreakAndCheckin();
+          const enrolledIds = await loadStudentActivities(accessToken);
+          await loadCoursesCatalog(enrolledIds);
+          initStreakAndCheckin(user.id);
         }
 
       } catch (err) {
@@ -2134,7 +2443,10 @@
       
       if (role === 'tutor' || role === 'admin') {
         // Hide horizontal navbar text links for tutor (per Google Classroom design)
-        if (desktopNav) desktopNav.style.display = 'none';
+        if (desktopNav) {
+          desktopNav.style.display = 'none';
+          desktopNav.classList.add('is-hidden');
+        }
         if (mobileNavRow) {
           mobileNavRow.style.display = 'none';
           mobileNavRow.classList.add('is-hidden');
@@ -2145,13 +2457,16 @@
         if (sidebarToggle) sidebarToggle.style.display = 'inline-flex';
       } else {
         // Show standard navigation links for students
-        if (desktopNav) desktopNav.style.display = 'flex';
+        if (desktopNav) {
+          desktopNav.style.display = '';
+          desktopNav.classList.remove('is-hidden');
+        }
         if (mobileNavRow) {
-          mobileNavRow.style.display = 'block';
+          mobileNavRow.style.display = '';
           mobileNavRow.classList.remove('is-hidden');
         }
         if (navbar) navbar.classList.remove('no-subnav');
-        if (streakBadge) streakBadge.style.display = 'inline-flex';
+        if (streakBadge) streakBadge.style.display = '';
         // Hide Classroom Drawer Hamburger button for students
         if (sidebarToggle) sidebarToggle.style.display = 'none';
         toggleClassroomSidebar(false);
@@ -2471,8 +2786,10 @@
     }
 
     // =========================================================
-    // 5. STUDENT ACTIVITIES & CATALOG LOADERS
+    // 5. STUDENT ACTIVITIES & DYNAMIC CATALOG LOADERS
     // =========================================================
+    let currentEnrolledCourseIds = new Set();
+
     async function loadStudentActivities(accessToken) {
       const container = document.getElementById('activities-container');
       const countLabel = document.getElementById('active-courses-count-label');
@@ -2484,6 +2801,8 @@
         });
         const json = await res.json();
         const enrollments = (json.success && Array.isArray(json.data)) ? json.data : [];
+
+        currentEnrolledCourseIds = new Set(enrollments.map(en => en.course_id || (en.course ? en.course.id : null)).filter(Boolean));
 
         if (countLabel) {
           countLabel.textContent = `${enrollments.length} Kursus Aktif`;
@@ -2502,11 +2821,11 @@
                 Pilih kursus unggulan dari instruktur ahli di katalog rekomendasi bawah untuk memulai pembelajaran adaptif Anda.
               </p>
               <a href="#courses-catalog-section" class="btn btn-primary" style="font-size:12px; padding:8px 18px; text-decoration:none; display:inline-flex; align-items:center; gap:8px;">
-                <i class="fas fa-compass"></i> Telusuri Katalog Kursus
+                <i class="fas fa-compass"></i> Telusuri Rekomendasi Kursus
               </a>
             </div>
           `;
-          return;
+          return currentEnrolledCourseIds;
         }
 
         container.innerHTML = enrollments.map(en => {
@@ -2515,18 +2834,21 @@
           const progress = Math.round(en.progress_percentage || 0);
 
           let totalMaterials = 0;
-          if (course.sections) {
+          if (course.sections && Array.isArray(course.sections)) {
             course.sections.forEach(s => {
-              if (s.materials) totalMaterials += s.materials.length;
+              if (s.materials && Array.isArray(s.materials)) totalMaterials += s.materials.length;
             });
           }
           const subtitle = totalMaterials > 0 ? `${totalMaterials} modul materi terstruktur` : (en.status === 'completed' ? 'Selesai 100%' : 'Sedang dipelajari');
+          const courseLink = `/courses/${course.slug || course.id}`;
 
           return `
             <div class="activity-course-item">
               <div class="activity-info">
                 <div class="activity-badge-text">Sedang dipelajari • ${escapeHtml(categoryName)}</div>
-                <div class="activity-title">${escapeHtml(course.title || 'Kursus')}</div>
+                <div class="activity-title">
+                  <a href="${courseLink}" style="color:inherit; text-decoration:none;">${escapeHtml(course.title || 'Kursus')}</a>
+                </div>
                 <div style="font-size:12px; color:var(--text-secondary); display:flex; justify-content:space-between; margin-bottom:6px;">
                   <span>${subtitle}</span>
                   <span style="font-weight:600;">${progress}%</span>
@@ -2535,12 +2857,14 @@
                   <div class="activity-progress-fill" style="width:${progress}%;"></div>
                 </div>
               </div>
-              <a href="/tutor/materials" class="btn-continue-learning">
-                Lanjutkan <i class="fas fa-arrow-right"></i>
+              <a href="${courseLink}" class="btn-continue-learning">
+                Lanjutkan Belajar <i class="fas fa-arrow-right"></i>
               </a>
             </div>
           `;
         }).join('');
+
+        return currentEnrolledCourseIds;
 
       } catch (e) {
         console.error('Failed to load student learning activities:', e);
@@ -2549,53 +2873,159 @@
             Gagal memuat aktivitas belajar. Silakan refresh halaman.
           </div>
         `;
+        return currentEnrolledCourseIds;
       }
     }
 
-    async function loadCoursesCatalog() {
+    async function loadCoursesCatalog(enrolledIds) {
       const container = document.getElementById('courses-container');
+      const enrolledSet = enrolledIds instanceof Set ? enrolledIds : currentEnrolledCourseIds;
+      
       try {
-        const res = await fetch('/api/courses?limit=6');
-        const json = await res.json();
+        // Fetch courses and AI recommendations in parallel
+        const [coursesRes, aiRes] = await Promise.all([
+          fetch('/api/courses?limit=12&status=published'),
+          fetch('/api/ai/recommendations', {
+            headers: {
+              'Authorization': 'Bearer ' + token,
+            },
+          }).catch(() => null),
+        ]);
+
+        const json = await coursesRes.json();
         const courses = (json.data && json.data.courses) ? json.data.courses : (Array.isArray(json.data) ? json.data : []);
+
+        let aiData = null;
+        if (aiRes && aiRes.ok) {
+          const aiJson = await aiRes.json();
+          if (aiJson.success && aiJson.data) {
+            aiData = aiJson.data;
+          }
+        }
+
+        // Render AI Recommendation Banner
+        const stageBadge = document.getElementById('ai-stage-badge');
+        const insightQuote = document.getElementById('ai-recommendation-insight');
+        const nextStepsHint = document.getElementById('ai-next-steps-hint');
+
+        if (aiData) {
+          if (stageBadge) stageBadge.innerHTML = `<i class="fas fa-layer-group"></i> ${escapeHtml(aiData.stage_badge || 'Tahap Adaptif')}`;
+          if (insightQuote) insightQuote.textContent = aiData.ai_insight || 'AI telah menyusun rekomendasi kursus terbaik berdasarkan target karir Anda.';
+          if (nextStepsHint) nextStepsHint.textContent = `Langkah Selanjutnya: ${aiData.next_steps_summary || 'Pelajari materi dasar dan raih sertifikasi digital.'}`;
+        } else {
+          if (stageBadge) stageBadge.innerHTML = `<i class="fas fa-graduation-cap"></i> Kurikulum Adaptif`;
+          if (insightQuote) insightQuote.textContent = 'Mulai dari kursus tingkat pemula untuk membangun fondasi yang kuat, lalu lanjutkan ke tingkat menengah dan arsitektur enterprise.';
+          if (nextStepsHint) nextStepsHint.textContent = 'Langkah Selanjutnya: Selesaikan modul dasar HTML5 dan Frontend.';
+        }
 
         if (!courses.length) {
           container.innerHTML = `
-            <div style="grid-column: 1 / -1; text-align: center; padding: 24px; color: var(--text-tertiary); font-size: 13px;">
+            <div style="grid-column: 1 / -1; text-align: center; padding: 32px; color: var(--text-tertiary); font-size: 13px;">
               Belum ada kursus publik yang tersedia saat ini.
             </div>
           `;
           return;
         }
 
-        container.innerHTML = courses.map(c => `
-          <div class="course-card-mini">
-            <div class="course-mini-thumb">
-              <i class="fas fa-graduation-cap"></i>
-            </div>
-            <div class="course-mini-body">
-              <span class="user-role-tag" style="align-self:flex-start; margin-bottom:6px; font-size:9px;">
-                ${c.category ? escapeHtml(c.category.name) : 'Teknologi'}
-              </span>
-              <div class="course-mini-title">${escapeHtml(c.title)}</div>
-              <div class="course-mini-tutor"><i class="fas fa-chalkboard-user" style="font-size:11px; margin-right:4px;"></i> ${c.tutor ? escapeHtml(c.tutor.name) : 'Instruktur'}</div>
-              <div class="course-mini-footer" style="margin-top:10px;">
-                <span class="course-mini-price">Rp ${(c.price || 0).toLocaleString('id-ID')}</span>
-                <div style="display:flex; gap:6px;">
-                  <button class="btn btn-outline" style="font-size:11px; padding:4px 8px;" onclick="enrollInCourse(${c.id}, '${escapeHtml(c.title)}')">
-                    <i class="fas fa-plus"></i> Ikuti
-                  </button>
-                  <a href="/tutor/materials" style="font-size:11px; font-weight:600; color:var(--text-primary); text-decoration:none; display:flex; align-items:center; gap:4px;">
-                    Materi <i class="fas fa-arrow-right" style="font-size:9px;"></i>
-                  </a>
+        // Filter strictly to AI Recommendations (2-3 focused courses for current stage)
+        const aiRecMap = {};
+        let displayCourses = [];
+
+        if (aiData && Array.isArray(aiData.recommendations) && aiData.recommendations.length > 0) {
+          aiData.recommendations.forEach((rec, idx) => {
+            aiRecMap[rec.course_id] = { ...rec, rank: idx + 1 };
+            const matched = courses.find(c => Number(c.id) === Number(rec.course_id));
+            if (matched) {
+              displayCourses.push({
+                ...matched,
+                aiRec: rec,
+              });
+            }
+          });
+        }
+
+        // Fallback if AI data has no direct course matches: filter only by student's current stage (beginner first, max 3)
+        if (!displayCourses.length) {
+          const targetLevel = (aiData && aiData.current_stage) ? aiData.current_stage : 'beginner';
+          const stageFiltered = courses.filter(c => c.level === targetLevel || (targetLevel === 'beginner' && (!c.level || c.level === 'beginner')));
+          
+          const fallbackPool = stageFiltered.length > 0 ? stageFiltered : courses;
+          displayCourses = fallbackPool.slice(0, 3).map((c, idx) => ({
+            ...c,
+            aiRec: {
+              priority: idx === 0 ? 'current_focus' : 'next_stage',
+              reason: idx === 0
+                ? 'Fondasi penting tingkat pemula untuk membangun keahlian dasar sebelum melangkah ke tingkat lanjutan.'
+                : 'Pondasi lanjutan untuk melengkapi alur belajar Anda.',
+              badge: idx === 0 ? 'Fokus Utama (Pemula)' : 'Fondasi (Pemula)',
+            }
+          }));
+        }
+
+        container.innerHTML = displayCourses.map(c => {
+          const isEnrolled = enrolledSet.has(c.id);
+          const courseLink = `/courses/${c.slug || c.id}`;
+          const formattedPrice = (c.price && c.price > 0) ? `Rp ${(c.price).toLocaleString('id-ID')}` : 'Gratis';
+          const thumbHtml = c.thumbnail_url ? `<img src="${c.thumbnail_url}" alt="${escapeHtml(c.title)}" style="width:100%; height:100%; object-fit:cover;" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">` : '';
+          const aiRec = c.aiRec || aiRecMap[c.id];
+
+          let aiTagHtml = '';
+          if (aiRec) {
+            aiTagHtml = `<span style="font-size:9px; font-weight:700; color:var(--accent-text); background:var(--accent-primary); padding:2px 7px; border-radius:var(--radius-full); display:inline-flex; align-items:center; gap:4px;"><i class="fas fa-sparkles"></i> ${escapeHtml(aiRec.badge || 'Saran AI')}</span>`;
+          }
+
+          return `
+            <div class="course-card-mini" style="${aiRec && aiRec.priority === 'current_focus' ? 'border-color: var(--accent-primary); box-shadow: var(--shadow-md);' : ''}">
+              <div class="course-mini-thumb" onclick="window.location.href='${courseLink}'" style="cursor:pointer; overflow:hidden; display:flex; align-items:center; justify-content:center;">
+                ${thumbHtml}
+                <i class="fas fa-graduation-cap" style="${c.thumbnail_url ? 'display:none;' : ''}"></i>
+              </div>
+              <div class="course-mini-body">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                  <span class="user-role-tag" style="font-size:9px;">
+                    ${c.category ? escapeHtml(c.category.name) : 'Teknologi'}
+                  </span>
+                  ${aiTagHtml}
+                </div>
+                <div class="course-mini-title" onclick="window.location.href='${courseLink}'" style="cursor:pointer;">
+                  ${escapeHtml(c.title)}
+                </div>
+                <div class="course-mini-tutor">
+                  <i class="fas fa-chalkboard-user" style="font-size:11px; margin-right:4px;"></i> ${c.tutor ? escapeHtml(c.tutor.name) : 'Instruktur Ahli'}
+                </div>
+                ${aiRec && aiRec.reason ? `<div style="font-size:11.5px; color:var(--text-secondary); line-height:1.4; margin:6px 0; font-style:italic;">"${escapeHtml(aiRec.reason)}"</div>` : ''}
+                <div class="course-mini-footer" style="margin-top:10px;">
+                  <span class="course-mini-price">${formattedPrice}</span>
+                  <div style="display:flex; align-items:center; gap:6px;">
+                    ${isEnrolled ? `
+                      <span style="font-size:11px; color:var(--color-success); font-weight:600; display:inline-flex; align-items:center; gap:4px;">
+                        <i class="fas fa-circle-check"></i> Terdaftar
+                      </span>
+                    ` : `
+                      <button class="btn btn-outline" style="font-size:11px; padding:4px 8px;" onclick="enrollInCourse(${c.id}, '${escapeHtml(c.title)}')">
+                        <i class="fas fa-plus"></i> Ikuti
+                      </button>
+                    `}
+                    <a href="${courseLink}" style="font-size:11px; font-weight:600; color:var(--text-primary); text-decoration:none; display:flex; align-items:center; gap:4px;">
+                      Materi <i class="fas fa-arrow-right" style="font-size:9px;"></i>
+                    </a>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        `).join('');
+          `;
+        }).join('');
       } catch (e) {
         console.error('Failed to load courses catalog:', e);
       }
+    }
+
+    async function refreshAIRecommendations() {
+      const icon = document.getElementById('ai-refresh-icon');
+      if (icon) icon.classList.add('fa-spin');
+      showToast('Memperbarui analisis rekomendasi kurikulum adaptif AI...', 'success');
+      await loadCoursesCatalog(currentEnrolledCourseIds);
+      if (icon) icon.classList.remove('fa-spin');
     }
 
     async function enrollInCourse(courseId, courseTitle) {
@@ -2614,7 +3044,8 @@
         const json = await res.json();
         if (res.ok && json.success) {
           showToast(json.message || `Berhasil mendaftar kursus "${courseTitle}"!`, 'success');
-          loadStudentActivities(token);
+          const updatedIds = await loadStudentActivities(token);
+          await loadCoursesCatalog(updatedIds);
         } else {
           showToast(json.message || 'Gagal mendaftar kursus.', 'error');
         }
@@ -2623,11 +3054,19 @@
       }
     }
 
-    function initStreakAndCheckin() {
+    function initStreakAndCheckin(userId) {
       const today = new Date();
       const dayIndex = (today.getDay() + 6) % 7; // Mon=0, Sun=6
-      const streakCircles = document.querySelectorAll('.streak-day-row .streak-day-item .streak-circle');
+      const streakCircles = document.querySelectorAll('#streak-day-row-container .streak-day-item .streak-circle');
       
+      const streakKey = `skillsphere_streak_${userId || 'current'}`;
+      let streakCount = parseInt(localStorage.getItem(streakKey) || '1', 10);
+
+      const navStreak = document.getElementById('nav-streak-count');
+      const sideStreak = document.getElementById('sidebar-streak-max');
+      if (navStreak) navStreak.textContent = streakCount;
+      if (sideStreak) sideStreak.textContent = `${streakCount} Hari`;
+
       streakCircles.forEach((circle, idx) => {
         if (idx <= dayIndex) {
           circle.classList.add('active');
@@ -2636,9 +3075,9 @@
         }
       });
 
-      const todayKey = 'skillsphere_checkin_' + (today.toISOString().split('T')[0]);
+      const todayKey = `skillsphere_checkin_${userId || 'current'}_` + (today.toISOString().split('T')[0]);
       const hasCheckedIn = localStorage.getItem(todayKey);
-      const checkinBtn = document.querySelector('button[onclick*="handleDailyCheckin"]');
+      const checkinBtn = document.getElementById('daily-checkin-btn');
       if (hasCheckedIn && checkinBtn) {
         checkinBtn.innerHTML = '<i class="fas fa-circle-check" style="margin-right:6px; color:var(--color-success);"></i> Sudah Check-in Hari Ini';
         checkinBtn.disabled = true;
@@ -2647,20 +3086,39 @@
 
     function handleDailyCheckin(btn) {
       const today = new Date();
-      const todayKey = 'skillsphere_checkin_' + (today.toISOString().split('T')[0]);
+      const userId = currentUser ? currentUser.id : 'current';
+      const todayKey = `skillsphere_checkin_${userId}_` + (today.toISOString().split('T')[0]);
+      const streakKey = `skillsphere_streak_${userId}`;
+      
+      let currentStreak = parseInt(localStorage.getItem(streakKey) || '1', 10);
+      currentStreak += 1;
+      localStorage.setItem(streakKey, currentStreak.toString());
       localStorage.setItem(todayKey, 'true');
+
       btn.innerHTML = '<i class="fas fa-circle-check" style="margin-right:6px; color:var(--color-success);"></i> Berhasil Check-in!';
       btn.disabled = true;
-      showToast('Check-in harian berhasil! Streak belajar Anda bertambah +1.', 'success');
+
+      const navStreak = document.getElementById('nav-streak-count');
+      const sideStreak = document.getElementById('sidebar-streak-max');
+      if (navStreak) navStreak.textContent = currentStreak;
+      if (sideStreak) sideStreak.textContent = `${currentStreak} Hari`;
+
+      const dayIndex = (today.getDay() + 6) % 7;
+      const streakCircles = document.querySelectorAll('#streak-day-row-container .streak-day-item .streak-circle');
+      if (streakCircles[dayIndex]) streakCircles[dayIndex].classList.add('active');
+
+      showToast(`Check-in harian berhasil! Streak belajar Anda bertambah menjadi ${currentStreak} hari berturut-turut.`, 'success');
     }
 
     function copyReferralCode(btn) {
-      navigator.clipboard.writeText('SKILLSPHERE-BELAJAR-2026');
+      const refDisplay = document.getElementById('referral-code-display');
+      const codeToCopy = refDisplay ? (refDisplay.getAttribute('data-code') || refDisplay.textContent.trim()) : 'SKILLSPHERE-2026';
+      navigator.clipboard.writeText(codeToCopy);
       btn.innerHTML = '<i class="fas fa-check" style="margin-right:6px; color:var(--color-success);"></i> Kode Tersalin!';
-      showToast('Kode referral berhasil disalin ke papan klip!', 'success');
+      showToast(`Kode referral "${codeToCopy}" berhasil disalin! Bagikan ke teman untuk diskon 20%.`, 'success');
       setTimeout(() => {
         btn.innerHTML = '<i class="fas fa-copy" style="margin-right:6px;"></i> Salin Kode Referral';
-      }, 2000);
+      }, 2500);
     }
 
     function showToast(message, type = 'success') {
@@ -2720,9 +3178,208 @@
       window.location.href = '/login';
     });
 
+    // =========================================================
+    // 7. INTERACTIVE EVENTS & AI QUIZ MODALS HANDLERS
+    // =========================================================
+    function openEventsModal() {
+      const modal = document.getElementById('events-modal');
+      if (modal) modal.style.display = 'flex';
+      initEventButtons();
+    }
+
+    function closeEventsModal() {
+      const modal = document.getElementById('events-modal');
+      if (modal) modal.style.display = 'none';
+    }
+
+    function initEventButtons() {
+      [1, 2, 3].forEach(id => {
+        const isReg = localStorage.getItem(`skillsphere_event_reg_${id}`);
+        const btn = document.getElementById(`event-reg-btn-${id}`);
+        if (isReg && btn) {
+          btn.innerHTML = '<i class="fas fa-circle-check"></i> Terdaftar';
+          btn.className = 'btn btn-outline';
+          btn.disabled = true;
+        }
+      });
+    }
+
+    function registerForEvent(eventId, title) {
+      localStorage.setItem(`skillsphere_event_reg_${eventId}`, 'true');
+      const btn = document.getElementById(`event-reg-btn-${eventId}`);
+      if (btn) {
+        btn.innerHTML = '<i class="fas fa-circle-check"></i> Terdaftar';
+        btn.className = 'btn btn-outline';
+        btn.disabled = true;
+      }
+      showToast(`Pendaftaran event "${title}" berhasil! Tiket & link streaming telah dikonfirmasi.`, 'success');
+    }
+
+    let currentAIQuizData = null;
+
+    function openQuizModal() {
+      const modal = document.getElementById('quiz-modal');
+      if (modal) modal.style.display = 'flex';
+      handleResetQuiz();
+    }
+
+    function closeQuizModal() {
+      const modal = document.getElementById('quiz-modal');
+      if (modal) modal.style.display = 'none';
+    }
+
+    function handleResetQuiz() {
+      document.getElementById('quiz-setup-pane').style.display = 'block';
+      document.getElementById('quiz-active-pane').style.display = 'none';
+      document.getElementById('quiz-result-pane').style.display = 'none';
+      currentAIQuizData = null;
+    }
+
+    async function handleGenerateAIQuiz() {
+      const topicSelect = document.getElementById('quiz-topic-select');
+      const difficultySelect = document.getElementById('quiz-difficulty-select');
+      const countSelect = document.getElementById('quiz-count-select');
+
+      const topic = topicSelect.value;
+      const difficulty = difficultySelect.value;
+      const numberOfQuestions = parseInt(countSelect.value, 10) || 3;
+
+      const startBtn = document.getElementById('btn-start-ai-quiz');
+      const originalText = startBtn.innerHTML;
+      startBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Merumuskan Soal AI...';
+      startBtn.disabled = true;
+
+      try {
+        const res = await fetch('/api/ai/quiz/generate', {
+          method: 'POST',
+          headers: {
+            'Authorization': 'Bearer ' + token,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            topic,
+            difficulty,
+            number_of_questions: numberOfQuestions,
+          }),
+        });
+
+        const json = await res.json();
+        if (res.ok && json.success && json.data && Array.isArray(json.data.questions)) {
+          currentAIQuizData = json.data;
+          renderActiveQuiz(json.data);
+        } else {
+          showToast(json.message || 'Gagal membuat soal kuis AI. Mencoba mode latihan cepat...', 'error');
+        }
+      } catch (err) {
+        showToast('Terjadi kesalahan jaringan saat membuat soal AI.', 'error');
+      } finally {
+        startBtn.innerHTML = originalText;
+        startBtn.disabled = false;
+      }
+    }
+
+    function renderActiveQuiz(quizData) {
+      document.getElementById('quiz-setup-pane').style.display = 'none';
+      document.getElementById('quiz-active-pane').style.display = 'block';
+      document.getElementById('quiz-result-pane').style.display = 'none';
+
+      const topicBadge = document.getElementById('quiz-active-topic-badge');
+      if (topicBadge) topicBadge.textContent = `${quizData.topic} • ${quizData.difficulty.toUpperCase()}`;
+
+      const container = document.getElementById('quiz-questions-container');
+      container.innerHTML = quizData.questions.map((q, qIdx) => {
+        const optionsHtml = q.options.map((opt, optIdx) => `
+          <label style="display:flex; align-items:center; gap:10px; padding:8px 12px; border:1px solid var(--border-subtle); border-radius:var(--radius-md); background:var(--bg-surface); cursor:pointer; font-size:13px; color:var(--text-primary); transition:background 0.15s ease;">
+            <input type="radio" name="quiz_q_${q.id || qIdx}" value="${optIdx}" style="accent-color:var(--accent-primary); cursor:pointer;" required>
+            <span>${escapeHtml(opt)}</span>
+          </label>
+        `).join('');
+
+        return `
+          <div style="background:var(--bg-surface-subtle); border:1px solid var(--border-subtle); border-radius:var(--radius-lg); padding:16px;">
+            <div style="font-size:11px; font-weight:700; color:var(--accent-primary); text-transform:uppercase; margin-bottom:6px;">
+              Pertanyaan ${qIdx + 1} dari ${quizData.questions.length}
+            </div>
+            <div style="font-size:14px; font-weight:600; color:var(--text-primary); margin-bottom:12px; line-height:1.45;">
+              ${escapeHtml(q.question)}
+            </div>
+            <div style="display:flex; flex-direction:column; gap:8px;">
+              ${optionsHtml}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function handleQuizSubmit() {
+      if (!currentAIQuizData || !Array.isArray(currentAIQuizData.questions)) return;
+
+      const questions = currentAIQuizData.questions;
+      let score = 0;
+      const userAnswers = [];
+
+      for (let i = 0; i < questions.length; i++) {
+        const q = questions[i];
+        const selected = document.querySelector(`input[name="quiz_q_${q.id || i}"]:checked`);
+        if (!selected) {
+          showToast(`Mohon jawab pertanyaan nomor ${i + 1} terlebih dahulu.`, 'error');
+          return;
+        }
+        const userAnsIndex = parseInt(selected.value, 10);
+        userAnswers.push(userAnsIndex);
+        if (userAnsIndex === q.answer_index) {
+          score += 1;
+        }
+      }
+
+      const total = questions.length;
+      const percentScore = Math.round((score / total) * 100);
+
+      // Render Result Pane
+      document.getElementById('quiz-setup-pane').style.display = 'none';
+      document.getElementById('quiz-active-pane').style.display = 'none';
+      document.getElementById('quiz-result-pane').style.display = 'block';
+
+      const scoreText = document.getElementById('quiz-result-score-text');
+      const scoreIcon = document.getElementById('quiz-result-icon');
+      const summaryText = document.getElementById('quiz-result-summary');
+
+      if (scoreText) scoreText.textContent = `Skor Anda: ${percentScore}/100 (${score} dari ${total} benar)`;
+      if (scoreIcon) scoreIcon.textContent = percentScore >= 70 ? '🎉' : '💡';
+      if (summaryText) {
+        summaryText.textContent = percentScore >= 70 
+          ? 'Selamat! Pemahaman Anda pada materi ini sudah sangat baik. Lanjutkan ke tantangan berikutnya.'
+          : 'Bagus! Anda telah menyelesaikan latihan. Pelajari kembali poin pembahasan di bawah untuk memperdalam pemahaman.';
+      }
+
+      const reviewContainer = document.getElementById('quiz-review-container');
+      reviewContainer.innerHTML = questions.map((q, idx) => {
+        const isCorrect = userAnswers[idx] === q.answer_index;
+        return `
+          <div style="background:var(--bg-surface-subtle); border:1px solid ${isCorrect ? 'var(--color-success)' : 'var(--border-subtle)'}; border-radius:var(--radius-md); padding:12px 14px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+              <span style="font-size:11px; font-weight:700; color:var(--text-secondary);">Soal ${idx + 1}</span>
+              <span style="font-size:11px; font-weight:700; color:${isCorrect ? 'var(--color-success)' : 'var(--color-danger)'};">
+                ${isCorrect ? '<i class="fas fa-circle-check"></i> Jawaban Benar' : '<i class="fas fa-circle-xmark"></i> Perlu Evaluasi'}
+              </span>
+            </div>
+            <div style="font-size:13px; font-weight:600; color:var(--text-primary); margin-bottom:6px;">${escapeHtml(q.question)}</div>
+            <div style="font-size:12px; color:var(--text-secondary); margin-bottom:4px;">
+              Jawaban Tepat: <strong style="color:var(--text-primary);">${escapeHtml(q.options[q.answer_index])}</strong>
+            </div>
+            ${q.explanation ? `<div style="font-size:11.5px; color:var(--text-tertiary); font-style:italic; line-height:1.4; margin-top:4px;">Penjelasan: ${escapeHtml(q.explanation)}</div>` : ''}
+          </div>
+        `;
+      }).join('');
+
+      showToast(`Kuis selesai! Anda memperoleh skor ${percentScore}/100.`, 'success');
+    }
+
   </script>
 
   <!-- PWA Service Worker & Install Prompt Banner -->
   <script src="/javascripts/pwa-installer.js"></script>
+  <!-- Inclusive Accessibility, TTS, & Head Tracking Script -->
+  <script src="/javascripts/accessibility.js"></script>
 </body>
 </html>

@@ -16,6 +16,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <!-- Accessibility & Head Tracking Stylesheet -->
+  <link rel="stylesheet" href="/stylesheets/accessibility.css">
 
   <style>
     * {
@@ -588,23 +590,55 @@
     // BÜRO 3D HYPERSPACE CANVAS & HIGH-PERFORMANCE ARCADE ENGINE
     // ============================================================
     const canvas = document.getElementById('hyperspace-canvas');
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext('2d', { alpha: false, desynchronized: true }) || canvas.getContext('2d');
 
     let width = 0;
     let height = 0;
     let cx = 0;
     let cy = 0;
+    let isTabHidden = false;
+    let animFrameId = null;
 
     function resize() {
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
       width = canvas.width = window.innerWidth;
       height = canvas.height = window.innerHeight;
       cx = width / 2;
       cy = height / 2;
     }
-    window.addEventListener('resize', resize);
+
+    let resizePending = false;
+    function onResize() {
+      if (!resizePending) {
+        resizePending = true;
+        requestAnimationFrame(() => {
+          resize();
+          resizePending = false;
+        });
+      }
+    }
+    window.addEventListener('resize', onResize, { passive: true });
     resize();
 
-    const STAR_COUNT = 280;
+    // Zero-CPU background tab throttle & pause
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        isTabHidden = true;
+        stopShooting();
+        if (animFrameId) {
+          cancelAnimationFrame(animFrameId);
+          animFrameId = null;
+        }
+      } else {
+        isTabHidden = false;
+        if (!animFrameId) {
+          animFrameId = requestAnimationFrame(render);
+        }
+      }
+    });
+
+    const isMobile = window.innerWidth < 768;
+    const STAR_COUNT = isMobile ? 160 : 280;
     const MAX_DEPTH = 1400;
     let targetSpeed = 7.5;
     let currentSpeed = 7.5;
@@ -1546,9 +1580,13 @@
 
       ctx.restore(); // Restore shake transform
 
-      requestAnimationFrame(render);
+      if (!isTabHidden) {
+        animFrameId = requestAnimationFrame(render);
+      }
     }
-    render();
+    animFrameId = requestAnimationFrame(render);
   </script>
+  <!-- Accessibility & Head Tracking Script -->
+  <script src="/javascripts/accessibility.js"></script>
 </body>
 </html>

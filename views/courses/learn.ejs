@@ -1,0 +1,3949 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title || 'Ruang Belajar Interaktif | SkillSphere AI' %></title>
+  <meta name="description" content="Ruang belajar interaktif kurikulum adaptif SkillSphere AI. Pelajari materi teks, video streaming, presentasi slide PPTX, dan kuis per bab.">
+
+  <!-- PWA Manifest & App Icons -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#1F1E1B">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="SkillSphere">
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="shortcut icon" href="/favicon.svg">
+
+  <!-- Google Fonts: Newsreader & Plus Jakarta Sans & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome 6 Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- Claude Design System Stylesheet -->
+  <link rel="stylesheet" href="/stylesheets/claude-theme.css?v=2.0">
+  <!-- Accessibility & Head Tracking Stylesheet -->
+  <link rel="stylesheet" href="/stylesheets/accessibility.css">
+  <!-- Custom Alert & Toast Stylesheet & Script -->
+  <link rel="stylesheet" href="/stylesheets/custom-alert.css">
+  <script src="/javascripts/custom-alert.js"></script>
+
+  <style>
+    :root {
+      --sidebar-width: 320px;
+      --topbar-height: 58px;
+      --ai-panel-width: 420px;
+    }
+
+    body {
+      background-color: var(--bg-app);
+      color: var(--text-primary);
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+      font-family: var(--font-sans);
+    }
+
+    .classroom-layout {
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Left Sidebar: Curriculum tree per bab */
+    .classroom-sidebar {
+      width: var(--sidebar-width);
+      height: 100%;
+      background: var(--bg-surface);
+      border-right: 1px solid var(--border-subtle);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), width 0.25s ease;
+      z-index: 50;
+    }
+
+    .classroom-sidebar.collapsed {
+      transform: translateX(-100%);
+      position: absolute;
+    }
+
+    .sidebar-header {
+      padding: 16px;
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .back-corridor-btn {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: color 0.15s ease;
+    }
+
+    .back-corridor-btn:hover {
+      color: var(--text-primary);
+    }
+
+    .course-info-card {
+      padding: 16px;
+      margin: 14px 16px 8px 16px;
+      background: var(--bg-surface-subtle);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+    }
+
+    .active-class-tag {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--accent-primary);
+      margin-bottom: 4px;
+    }
+
+    .active-course-title {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--text-primary);
+      line-height: 1.35;
+      margin: 0 0 10px 0;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .progress-track-mini {
+      height: 6px;
+      background: var(--border-subtle);
+      border-radius: var(--radius-full);
+      overflow: hidden;
+      margin-top: 6px;
+    }
+
+    .progress-fill-mini {
+      height: 100%;
+      background: var(--color-success);
+      width: 0%;
+      transition: width 0.4s ease;
+    }
+
+    .sidebar-tabs-nav {
+      display: flex;
+      padding: 0 16px 8px 16px;
+      gap: 6px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .sidebar-tab-btn {
+      flex: 1;
+      padding: 7px 10px;
+      font-size: 12px;
+      font-weight: 600;
+      border-radius: var(--radius-sm);
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--text-secondary);
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.15s ease;
+    }
+
+    .sidebar-tab-btn.active {
+      background: var(--bg-surface);
+      color: var(--text-primary);
+      border-color: var(--border-subtle);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .curriculum-tree-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px 12px 24px 12px;
+    }
+
+    /* Chapter (Bab) Accordion in Sidebar */
+    .chapter-group {
+      margin-bottom: 12px;
+    }
+
+    .chapter-header {
+      padding: 8px 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      border-radius: var(--radius-sm);
+      user-select: none;
+    }
+
+    .chapter-header:hover {
+      background: var(--bg-surface-subtle);
+    }
+
+    .chapter-title-text {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-tertiary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .chapter-meta-count {
+      font-size: 10.5px;
+      font-family: var(--font-mono);
+      color: var(--text-tertiary);
+    }
+
+    .module-item-btn {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      padding: 9px 12px;
+      border-radius: var(--radius-md);
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--text-secondary);
+      text-align: left;
+      cursor: pointer;
+      font-size: 12.5px;
+      line-height: 1.4;
+      margin-bottom: 3px;
+      transition: all 0.15s ease;
+      gap: 10px;
+    }
+
+    .module-item-btn:hover {
+      background: var(--bg-surface-subtle);
+      color: var(--text-primary);
+    }
+
+    .module-item-btn.active {
+      background: var(--accent-subtle, rgba(200, 150, 100, 0.15));
+      color: var(--accent-text-primary, var(--text-primary));
+      border-color: var(--accent-primary);
+      font-weight: 600;
+    }
+
+    .module-status-icon {
+      font-size: 13px;
+      flex-shrink: 0;
+    }
+
+    .module-status-icon.completed {
+      color: var(--color-success);
+    }
+
+    .module-status-icon.pending {
+      color: var(--text-tertiary);
+      opacity: 0.6;
+    }
+
+    .module-status-icon.active {
+      color: var(--accent-primary);
+    }
+
+    .module-title-truncate {
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .module-format-badge {
+      font-size: 9.5px;
+      padding: 2px 6px;
+      border-radius: var(--radius-sm);
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    /* Right Main Content Area */
+    .classroom-main {
+      flex: 1;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background: var(--bg-app);
+      position: relative;
+    }
+
+    .classroom-topbar {
+      height: var(--topbar-height);
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      flex-shrink: 0;
+      gap: 16px;
+      z-index: 30;
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .sidebar-toggle-trigger {
+      background: none;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      padding: 6px 10px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      font-size: 13px;
+      flex-shrink: 0;
+    }
+
+    .sidebar-toggle-trigger:hover {
+      color: var(--text-primary);
+      border-color: var(--border-medium);
+    }
+
+    .topbar-breadcrumb {
+      font-size: 13px;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+
+    .btn-ai-header-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12.5px;
+      font-weight: 600;
+      padding: 6px 14px;
+      border-radius: var(--radius-full);
+      border: 1px solid var(--accent-primary);
+      background: var(--accent-subtle, rgba(200, 150, 100, 0.12));
+      color: var(--text-primary);
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .btn-ai-header-toggle:hover {
+      background: var(--accent-primary);
+      color: var(--accent-text);
+      transform: translateY(-1px);
+    }
+
+    .btn-ai-header-toggle.active {
+      background: var(--accent-primary);
+      color: var(--accent-text);
+      box-shadow: 0 0 0 2px rgba(200, 150, 100, 0.3);
+    }
+
+    /* Tanya AI Star Absorption & Radiant Shine Effect */
+    .btn-ai-header-toggle.tanya-ai-shine {
+      animation: tanyaAiShinePulse 1.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      position: relative;
+      z-index: 100;
+    }
+
+    @keyframes tanyaAiShinePulse {
+      0% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.95), 0 0 20px rgba(147, 197, 253, 0.85);
+      }
+      30% {
+        transform: scale(1.18);
+        box-shadow: 0 0 0 12px rgba(59, 130, 246, 0.35), 0 0 40px rgba(147, 197, 253, 1), 0 0 65px rgba(59, 130, 246, 0.85);
+        border-color: #60A5FA;
+        background: #2563EB;
+        color: #FFFFFF;
+      }
+      65% {
+        transform: scale(1.04);
+        box-shadow: 0 0 0 20px rgba(59, 130, 246, 0), 0 0 24px rgba(147, 197, 253, 0.45);
+      }
+      100% {
+        transform: scale(1);
+        box-shadow: none;
+      }
+    }
+
+    /* Split Workspace Container (Side-by-Side) */
+    .classroom-split-workspace {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+      position: relative;
+      height: calc(100vh - var(--topbar-height) - 64px);
+    }
+
+    /* Workspace Content Reader */
+    .classroom-reader-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 36px 48px 60px 48px;
+      max-width: 900px;
+      margin: 0 auto;
+      width: 100%;
+      box-sizing: border-box;
+      transition: padding 0.25s ease;
+    }
+
+    .classroom-split-workspace.ai-open .classroom-reader-body {
+      max-width: 100%;
+      padding: 32px 36px 60px 36px;
+    }
+
+    .reader-article-header {
+      margin-bottom: 24px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .reader-chapter-pill {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-tertiary);
+      margin-bottom: 8px;
+      display: inline-block;
+    }
+
+    .reader-title {
+      font-family: var(--font-serif);
+      font-size: 30px;
+      font-weight: 500;
+      color: var(--text-primary);
+      line-height: 1.25;
+      letter-spacing: -0.02em;
+      margin: 0 0 12px 0;
+    }
+
+    .reader-meta-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-size: 12.5px;
+      color: var(--text-secondary);
+      flex-wrap: wrap;
+    }
+
+    /* Side-by-Side Realtime AI Split Panel */
+    .ai-split-panel {
+      width: var(--ai-panel-width);
+      height: 100%;
+      background: var(--bg-surface);
+      border-left: 1px solid var(--border-subtle);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      transform: translateX(100%);
+      margin-right: calc(-1 * var(--ai-panel-width));
+      transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), margin-right 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 35;
+      box-shadow: -4px 0 20px rgba(0,0,0,0.06);
+    }
+
+    .classroom-split-workspace.ai-open .ai-split-panel {
+      transform: translateX(0);
+      margin-right: 0;
+    }
+
+    .ai-panel-header {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--bg-surface-subtle);
+    }
+
+    .ai-panel-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .ai-panel-badge-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: var(--radius-full);
+      background: var(--accent-primary);
+      color: var(--accent-text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+    }
+
+    .ai-panel-title {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--text-primary);
+      line-height: 1.2;
+    }
+
+    .ai-panel-subtitle {
+      font-size: 11px;
+      color: var(--text-secondary);
+    }
+
+    .ai-panel-close-btn {
+      background: none;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-full);
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .ai-panel-close-btn:hover {
+      color: var(--text-primary);
+      border-color: var(--border-medium);
+      background: var(--bg-surface);
+    }
+
+    .ai-panel-suggestions {
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      white-space: nowrap;
+      background: var(--bg-app);
+      scrollbar-width: none;
+    }
+
+    .ai-panel-suggestions::-webkit-scrollbar {
+      display: none;
+    }
+
+    .ai-chip-prompt {
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: var(--radius-full);
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      flex-shrink: 0;
+    }
+
+    .ai-chip-prompt:hover {
+      border-color: var(--accent-primary);
+      color: var(--text-primary);
+      background: var(--accent-subtle);
+    }
+
+    .ai-panel-chat-stream {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .ai-chat-bubble {
+      display: flex;
+      flex-direction: column;
+      max-width: 92%;
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .ai-chat-bubble.user {
+      align-self: flex-end;
+      background: var(--accent-primary);
+      color: var(--accent-text);
+      padding: 10px 14px;
+      border-radius: 14px 14px 2px 14px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .ai-chat-bubble.assistant {
+      align-self: flex-start;
+      background: var(--bg-surface-subtle);
+      color: var(--text-primary);
+      border: 1px solid var(--border-subtle);
+      padding: 12px 16px;
+      border-radius: 14px 14px 14px 2px;
+    }
+
+    .ai-bubble-sender {
+      font-size: 10.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--accent-primary);
+    }
+
+    .ai-panel-footer {
+      padding: 12px 16px;
+      border-top: 1px solid var(--border-subtle);
+      background: var(--bg-surface);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .ai-panel-input-box {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--bg-surface-subtle);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-full);
+      padding: 4px 6px 4px 14px;
+      transition: border-color 0.15s ease;
+    }
+
+    .ai-panel-input-box:focus-within {
+      border-color: var(--accent-primary);
+      box-shadow: 0 0 0 2px rgba(200, 150, 100, 0.15);
+    }
+
+    .ai-panel-input {
+      flex: 1;
+      border: none;
+      background: transparent;
+      color: var(--text-primary);
+      font-size: 13px;
+      outline: none;
+      font-family: var(--font-sans);
+    }
+
+    .ai-panel-send-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius-full);
+      background: var(--accent-primary);
+      color: var(--accent-text);
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      transition: transform 0.15s ease;
+    }
+
+    .ai-panel-send-btn:hover {
+      transform: scale(1.05);
+    }
+
+    /* Rich Prose Content & Supporting Media Components */
+    .prose-content {
+      font-size: 15.5px;
+      line-height: 1.75;
+      color: var(--text-primary);
+    }
+
+    .prose-content h2 {
+      font-family: var(--font-serif);
+      font-size: 22px;
+      font-weight: 500;
+      margin: 32px 0 14px 0;
+      letter-spacing: -0.01em;
+      color: var(--text-primary);
+    }
+
+    .prose-content h3 {
+      font-family: var(--font-sans);
+      font-size: 16.5px;
+      font-weight: 700;
+      margin: 24px 0 10px 0;
+      color: var(--text-primary);
+    }
+
+    .prose-content p {
+      margin: 0 0 16px 0;
+      color: var(--text-primary);
+    }
+
+    .prose-content ul, .prose-content ol {
+      margin: 0 0 18px 0;
+      padding-left: 22px;
+    }
+
+    .prose-content li {
+      margin-bottom: 6px;
+    }
+
+    /* Diagram & Visual Asset Containers */
+    .diagram-visual-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      margin: 24px 0;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .diagram-visual-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .diagram-visual-title {
+      font-size: 12.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--accent-primary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .diagram-svg-wrapper {
+      background: var(--bg-surface-subtle);
+      border: 1px dashed var(--border-medium);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow-x: auto;
+    }
+
+    .diagram-svg-wrapper svg {
+      max-width: 100%;
+      height: auto;
+    }
+
+    /* Downloadable & Supporting Resource Banner */
+    .resource-download-banner {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 16px 20px;
+      margin: 24px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 14px;
+    }
+
+    .resource-download-info {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .resource-icon-badge {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-md);
+      background: rgba(239, 68, 68, 0.1);
+      color: var(--color-danger);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+
+    .code-editor-box {
+      background: #141413;
+      border: 1px solid #2A2926;
+      border-radius: var(--radius-md);
+      margin: 22px 0;
+      overflow: hidden;
+    }
+
+    .code-editor-header {
+      background: #1F1E1B;
+      border-bottom: 1px solid #2A2926;
+      padding: 8px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      color: #A8A29A;
+    }
+
+    .code-copy-btn {
+      background: transparent;
+      border: 1px solid #3A3834;
+      border-radius: var(--radius-sm);
+      color: #FAF9F5;
+      font-size: 11px;
+      padding: 3px 8px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .code-copy-btn:hover {
+      background: #2A2926;
+    }
+
+    .code-editor-body {
+      padding: 16px;
+      margin: 0;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: #FAF9F5;
+      line-height: 1.55;
+      overflow-x: auto;
+    }
+
+    .callout-box {
+      background: var(--bg-surface-subtle);
+      border-left: 4px solid var(--accent-primary);
+      border-radius: 0 var(--radius-md) var(--radius-md) 0;
+      padding: 16px 18px;
+      margin: 22px 0;
+      font-size: 13.5px;
+      line-height: 1.6;
+    }
+
+    .callout-box.tip {
+      border-left-color: var(--color-success);
+      background: rgba(16, 185, 129, 0.08);
+    }
+
+    /* Bottom Navigator Bar */
+    .classroom-bottom-bar {
+      height: 64px;
+      background: var(--bg-surface);
+      border-top: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 32px;
+      flex-shrink: 0;
+      z-index: 30;
+      position: relative;
+    }
+
+    /* Keep Accessibility FAB cleanly positioned without overlapping bottom bar or AI panel */
+    .a11y-fab-launcher {
+      bottom: 80px !important;
+      right: 24px !important;
+      z-index: 9999980 !important;
+      transition: right 0.28s cubic-bezier(0.16, 1, 0.3, 1), left 0.28s cubic-bezier(0.16, 1, 0.3, 1), transform 0.2s ease, bottom 0.28s ease !important;
+    }
+
+    .a11y-panel {
+      bottom: 140px !important;
+      right: 24px !important;
+      z-index: 9999990 !important;
+      transition: right 0.28s cubic-bezier(0.16, 1, 0.3, 1), left 0.28s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease, visibility 0.25s ease !important;
+    }
+
+    #a11y-webcam-pip {
+      bottom: 140px !important;
+      right: 24px !important;
+      z-index: 9999990 !important;
+      transition: right 0.28s cubic-bezier(0.16, 1, 0.3, 1), left 0.28s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    }
+
+    /* Shift Accessibility elements smoothly when AI Split Panel is open */
+    body.ai-panel-open .a11y-fab-launcher {
+      right: calc(var(--ai-panel-width, 420px) + 20px) !important;
+    }
+
+    body.ai-panel-open .a11y-panel {
+      right: calc(var(--ai-panel-width, 420px) + 20px) !important;
+    }
+
+    body.ai-panel-open #a11y-webcam-pip {
+      right: calc(var(--ai-panel-width, 420px) + 20px) !important;
+    }
+
+    @media (max-width: 900px) {
+      body.ai-panel-open .a11y-fab-launcher {
+        left: 20px !important;
+        right: auto !important;
+      }
+      body.ai-panel-open .a11y-panel {
+        left: 20px !important;
+        right: auto !important;
+      }
+      body.ai-panel-open #a11y-webcam-pip {
+        left: 20px !important;
+        right: auto !important;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .classroom-bottom-bar {
+        padding: 0 16px;
+        gap: 10px;
+      }
+      .a11y-fab-launcher {
+        bottom: 76px !important;
+        right: 16px !important;
+        width: 42px !important;
+        height: 42px !important;
+        font-size: 18px !important;
+      }
+      .a11y-panel {
+        bottom: 126px !important;
+        right: 12px !important;
+      }
+    }
+
+
+
+    /* ========================================================
+       AURORA SPHERE FULLSCREEN OVERLAY (ORION AI SPHERE ONLY)
+       ======================================================== */
+    .aurora-orb-overlay {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      z-index: 999950;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 1;
+      visibility: visible;
+      transition: opacity 0.55s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.55s ease, transform 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+      cursor: default;
+      user-select: none;
+      pointer-events: auto;
+    }
+
+    .aurora-orb-overlay.dismissed {
+      opacity: 0;
+      visibility: hidden;
+      display: none !important;
+      transform: scale(1.05);
+      pointer-events: none !important;
+    }
+
+    .aurora-orb-overlay.fading-backdrop {
+      background: rgba(0, 0, 0, 0) !important;
+      backdrop-filter: blur(0px) !important;
+      -webkit-backdrop-filter: blur(0px) !important;
+      pointer-events: none !important;
+      transition: background 0.75s ease, backdrop-filter 0.75s ease, -webkit-backdrop-filter 0.75s ease;
+    }
+
+    .aurora-orb-center {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+      animation: orbAppear 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      pointer-events: auto;
+      max-width: 90vw;
+    }
+
+    /* Choice Prompt Card Under Sphere (Matching SkillSphere Design System) */
+    .aurora-choice-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-xl, 20px);
+      padding: 22px 28px;
+      max-width: 440px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45), 0 0 1px rgba(255, 255, 255, 0.1);
+      opacity: 0;
+      transform: translateY(18px) scale(0.96);
+      pointer-events: none;
+      transition: opacity 0.45s ease, transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .aurora-choice-card.visible {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      pointer-events: auto;
+    }
+
+    .aurora-choice-question {
+      font-family: var(--font-sans);
+      font-size: 14.5px;
+      font-weight: 600;
+      color: var(--text-primary);
+      line-height: 1.55;
+      margin-bottom: 20px;
+    }
+
+    .aurora-choice-buttons {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    .aurora-btn-choice {
+      flex: 1;
+      padding: 10px 22px;
+      border-radius: var(--radius-full, 9999px);
+      font-family: var(--font-sans);
+      font-size: 13.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      outline: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .aurora-btn-no {
+      background: var(--bg-surface-subtle);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .aurora-btn-no:hover {
+      background: var(--bg-surface);
+      color: var(--text-primary);
+      border-color: var(--border-strong);
+      transform: translateY(-1px);
+    }
+
+    .aurora-btn-yes {
+      background: var(--accent-primary);
+      color: var(--accent-text);
+      border: 1px solid var(--accent-primary);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+    }
+
+    .aurora-btn-yes:hover {
+      background: var(--accent-primary-hover);
+      transform: translateY(-1px);
+    }
+
+    .aurora-btn-choice:active {
+      transform: translateY(0);
+    }
+
+    /* Orion Next Module Prompt Card (Anchored above Docked Mini Orb) */
+    .orion-next-choice-card {
+      position: fixed;
+      bottom: 138px;
+      right: 88px;
+      width: 295px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-medium);
+      border-radius: var(--radius-lg, 14px);
+      padding: 14px 16px;
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.28), 0 0 16px rgba(59, 130, 246, 0.22);
+      z-index: 999975;
+      opacity: 0;
+      transform: translateY(12px) scale(0.95);
+      pointer-events: none;
+      transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1), transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), right 0.28s ease;
+    }
+
+    .orion-next-choice-card.visible {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      pointer-events: auto;
+    }
+
+    body.ai-panel-open .orion-next-choice-card {
+      right: calc(var(--ai-panel-width, 420px) + 84px);
+    }
+
+    @media (max-width: 900px) {
+      body.ai-panel-open .orion-next-choice-card {
+        left: 72px;
+        right: auto;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .orion-next-choice-card {
+        right: 76px;
+        bottom: 130px;
+        width: 265px;
+      }
+    }
+
+    .orion-next-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .orion-next-tag {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--accent-primary);
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .orion-next-close-btn {
+      background: none;
+      border: none;
+      color: var(--text-tertiary);
+      font-size: 12px;
+      cursor: pointer;
+      padding: 2px 5px;
+      border-radius: 4px;
+    }
+    .orion-next-close-btn:hover {
+      color: var(--text-primary);
+    }
+
+    .orion-next-card-text {
+      font-size: 12.5px;
+      line-height: 1.45;
+      color: var(--text-primary);
+      margin-bottom: 12px;
+      font-family: var(--font-sans);
+    }
+
+    .orion-next-card-actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
+    @keyframes orbAppear {
+      0% {
+        opacity: 0;
+        transform: scale(0.82);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    .aurora-sphere-wrapper {
+      position: relative;
+      width: 270px;
+      height: 270px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: orbFloat 5s ease-in-out infinite alternate;
+      transition: transform 0.5s ease;
+    }
+
+    .aurora-sphere-wrapper.flying-to-target {
+      animation: none !important;
+      will-change: transform, opacity;
+      pointer-events: none;
+    }
+
+    /* Docked Mini AI Companion Orb (When user clicks 'Ya') */
+    .aurora-orb-overlay.docked-mode {
+      background: transparent !important;
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+      pointer-events: none !important;
+      display: none !important;
+      transition: background 0.6s ease, backdrop-filter 0.6s ease;
+    }
+
+    .aurora-sphere-wrapper.docked-corner {
+      position: fixed !important;
+      bottom: 76px !important;
+      right: 88px !important;
+      left: auto !important;
+      top: auto !important;
+      width: 52px !important;
+      height: 52px !important;
+      transform: none;
+      pointer-events: auto !important;
+      cursor: pointer !important;
+      animation: none !important;
+      z-index: 999980 !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      transition: right 0.28s cubic-bezier(0.16, 1, 0.3, 1), bottom 0.28s ease, transform 0.15s ease !important;
+    }
+
+    .aurora-sphere-wrapper.docked-corner:hover {
+      transform: scale(1.08) !important;
+    }
+
+    .aurora-sphere-wrapper.docked-corner .aurora-sphere {
+      width: 52px !important;
+      height: 52px !important;
+      box-shadow: 0 4px 18px rgba(37, 99, 235, 0.55), 0 0 12px rgba(96, 165, 250, 0.7) !important;
+    }
+
+    .aurora-sphere-wrapper.docked-corner .aurora-equalizer-container {
+      position: absolute !important;
+      top: 50% !important;
+      left: 50% !important;
+      transform: translate(-50%, -50%) !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      width: auto !important;
+      height: 18px !important;
+      gap: 1.2px !important;
+      padding: 0 !important;
+      margin: 0 !important;
+    }
+
+    .aurora-sphere-wrapper.docked-corner .aurora-eq-bar {
+      width: 1.2px !important;
+      border-radius: 1px !important;
+      min-height: 2px !important;
+    }
+
+    .aurora-sphere-wrapper.docked-corner .aurora-outer-glow {
+      display: none !important;
+      pointer-events: none !important;
+    }
+
+    /* Shift Docked Mini Orb smoothly when AI Split Panel opens */
+    body.ai-panel-open .aurora-sphere-wrapper.docked-corner {
+      right: calc(var(--ai-panel-width, 420px) + 84px) !important;
+    }
+
+    @media (max-width: 900px) {
+      body.ai-panel-open .aurora-sphere-wrapper.docked-corner {
+        left: 72px !important;
+        right: auto !important;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .aurora-sphere-wrapper.docked-corner {
+        bottom: 72px !important;
+        right: 76px !important;
+        width: 48px !important;
+        height: 48px !important;
+      }
+      .aurora-sphere-wrapper.docked-corner .aurora-sphere {
+        width: 48px !important;
+        height: 48px !important;
+      }
+      body.ai-panel-open .aurora-sphere-wrapper.docked-corner {
+        left: 70px !important;
+        right: auto !important;
+      }
+    }
+
+    .aurora-sphere-wrapper.loading {
+      animation: loadingBounce 0.75s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite alternate;
+    }
+
+    /* ========================================================
+       AI ORION LIVE TEXT HIGHLIGHTER & FOCUS SCROLL
+       ======================================================== */
+    mark.ai-live-text-mark {
+      background: rgba(37, 99, 235, 0.28) !important;
+      color: inherit !important;
+      border-radius: 4px !important;
+      box-shadow: 0 0 16px rgba(59, 130, 246, 0.45), inset 0 0 0 1.5px rgba(59, 130, 246, 0.4) !important;
+      padding: 2px 6px !important;
+      margin: 0 -1px !important;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+      animation: liveMarkerGlow 2.2s ease-in-out infinite alternate !important;
+      display: inline !important;
+    }
+
+    [data-theme="dark"] mark.ai-live-text-mark {
+      background: rgba(96, 165, 250, 0.35) !important;
+      box-shadow: 0 0 18px rgba(96, 165, 250, 0.55), inset 0 0 0 1.5px rgba(96, 165, 250, 0.5) !important;
+    }
+
+    .ai-block-focus-highlight {
+      position: relative !important;
+      background: rgba(59, 130, 246, 0.08) !important;
+      border-left: 3.5px solid var(--accent-primary) !important;
+      border-radius: 6px !important;
+      padding: 8px 14px !important;
+      margin-left: -14px !important;
+      margin-right: -14px !important;
+      box-shadow: 0 0 18px rgba(59, 130, 246, 0.14) !important;
+      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    }
+
+    [data-theme="dark"] .ai-block-focus-highlight {
+      background: rgba(59, 130, 246, 0.14) !important;
+      box-shadow: 0 0 22px rgba(59, 130, 246, 0.22) !important;
+    }
+
+    .diagram-visual-card.ai-card-glow-focus,
+    .code-editor-box.ai-card-glow-focus,
+    .ai-card-glow-focus {
+      position: relative !important;
+      border-color: var(--accent-primary) !important;
+      box-shadow: 0 0 0 2.5px var(--accent-primary), 0 8px 32px rgba(59, 130, 246, 0.28) !important;
+      transition: all 0.45s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    }
+
+    @keyframes liveMarkerGlow {
+      0% {
+        background: rgba(37, 99, 235, 0.18);
+        box-shadow: 0 0 8px rgba(59, 130, 246, 0.28), inset 0 0 0 1px rgba(59, 130, 246, 0.28);
+      }
+      100% {
+        background: rgba(37, 99, 235, 0.34);
+        box-shadow: 0 0 20px rgba(59, 130, 246, 0.6), inset 0 0 0 2px rgba(59, 130, 246, 0.5);
+      }
+    }
+
+    @keyframes loadingBounce {
+      0% {
+        transform: translateY(22px);
+      }
+      100% {
+        transform: translateY(-24px);
+      }
+    }
+
+    @keyframes orbFloat {
+      0% {
+        transform: translateY(0px);
+      }
+      50% {
+        transform: translateY(-10px);
+      }
+      100% {
+        transform: translateY(0px);
+      }
+    }
+
+    /* The Main Circular Aurora Orb */
+    .aurora-sphere {
+      width: 270px;
+      height: 270px;
+      border-radius: 50%;
+      position: relative;
+      overflow: hidden;
+      background: radial-gradient(circle at 50% 25%, #4C82FB 0%, #2563EB 40%, #1D4ED8 70%, #0F2D7A 100%);
+      box-shadow: 
+        0 0 60px rgba(59, 130, 246, 0.65),
+        0 0 120px rgba(37, 99, 235, 0.4);
+      transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease;
+      will-change: transform, box-shadow;
+    }
+
+    .aurora-sphere.loading {
+      transform: scale(0.45);
+      box-shadow: 
+        0 0 35px rgba(59, 130, 246, 0.75),
+        0 0 70px rgba(37, 99, 235, 0.45);
+    }
+
+    .aurora-sphere.speaking {
+      box-shadow: 
+        0 0 85px rgba(96, 165, 250, 0.85),
+        0 0 160px rgba(59, 130, 246, 0.6);
+      transition: transform 0.08s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.12s ease;
+    }
+
+    /* Atmosphere Ambient Radial Gradient */
+    .aurora-atmosphere {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background: radial-gradient(circle at 50% 30%, rgba(96, 165, 250, 0.45) 0%, rgba(30, 64, 175, 0) 70%);
+      mix-blend-mode: screen;
+      pointer-events: none;
+    }
+
+    /* Animated White Aurora Cloud / Mist Layers */
+    .aurora-mist-layer {
+      position: absolute;
+      border-radius: 50%;
+      pointer-events: none;
+      transition: filter 0.4s ease, opacity 0.4s ease;
+    }
+
+    .aurora-sphere.speaking .aurora-mist-layer {
+      filter: blur(10px) brightness(1.25);
+    }
+
+    /* Mist Layer 1: Undulating Horizontal Wave */
+    .aurora-mist-1 {
+      width: 360px;
+      height: 200px;
+      left: -45px;
+      top: 45px;
+      background: radial-gradient(ellipse at 50% 50%, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.72) 40%, rgba(191, 219, 254, 0.25) 70%, transparent 85%);
+      filter: blur(14px);
+      opacity: 0.9;
+      animation: auroraWave1 6.5s ease-in-out infinite alternate;
+    }
+
+    .aurora-sphere.speaking .aurora-mist-1 {
+      animation: auroraWave1 2.8s ease-in-out infinite alternate;
+    }
+
+    /* Mist Layer 2: Swirling Upward Wisps */
+    .aurora-mist-2 {
+      width: 310px;
+      height: 180px;
+      left: -20px;
+      top: 75px;
+      background: radial-gradient(ellipse at 55% 45%, rgba(255, 255, 255, 0.9) 0%, rgba(224, 242, 254, 0.6) 45%, transparent 75%);
+      filter: blur(16px);
+      opacity: 0.85;
+      animation: auroraWave2 8s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate;
+    }
+
+    .aurora-sphere.speaking .aurora-mist-2 {
+      animation: auroraWave2 3.2s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate;
+    }
+
+    /* Mist Layer 3: Lower Luminous Base Cloud */
+    .aurora-mist-3 {
+      width: 290px;
+      height: 160px;
+      left: -10px;
+      bottom: -10px;
+      background: radial-gradient(ellipse at 50% 70%, rgba(200, 225, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 35%, rgba(147, 197, 253, 0.3) 70%, transparent 90%);
+      filter: blur(12px);
+      opacity: 0.92;
+      animation: auroraWave3 5.5s ease-in-out infinite alternate;
+    }
+
+    .aurora-sphere.speaking .aurora-mist-3 {
+      animation: auroraWave3 2.2s ease-in-out infinite alternate;
+    }
+
+    /* Mist Layer 4: Ambient Floating Wisps */
+    .aurora-mist-4 {
+      width: 250px;
+      height: 140px;
+      left: 10px;
+      top: 90px;
+      background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.4) 50%, transparent 80%);
+      filter: blur(10px);
+      opacity: 0.75;
+      animation: auroraDrift 10s ease-in-out infinite alternate;
+    }
+
+    /* Keyframes for the dynamic aurora mist motion */
+    @keyframes auroraWave1 {
+      0% {
+        transform: translate(0px, 0px) scale(1) rotate(0deg);
+      }
+      50% {
+        transform: translate(20px, -14px) scale(1.08, 0.92) rotate(4deg);
+      }
+      100% {
+        transform: translate(-18px, 10px) scale(0.95, 1.06) rotate(-3deg);
+      }
+    }
+
+    @keyframes auroraWave2 {
+      0% {
+        transform: translate(-12px, 6px) scale(0.96) rotate(-2deg);
+      }
+      50% {
+        transform: translate(16px, -18px) scale(1.05) rotate(5deg);
+      }
+      100% {
+        transform: translate(8px, 12px) scale(1.02) rotate(-4deg);
+      }
+    }
+
+    @keyframes auroraWave3 {
+      0% {
+        transform: translateY(0px) scale(1);
+        opacity: 0.85;
+      }
+      50% {
+        transform: translateY(-10px) scale(1.06);
+        opacity: 0.98;
+      }
+      100% {
+        transform: translateY(5px) scale(0.96);
+        opacity: 0.88;
+      }
+    }
+
+    @keyframes auroraDrift {
+      0% {
+        transform: translate(-14px, -8px) scale(0.95);
+      }
+      50% {
+        transform: translate(18px, 10px) scale(1.1);
+      }
+      100% {
+        transform: translate(-10px, 14px) scale(1.02);
+      }
+    }
+
+    /* ========================================================
+       AURORA AUDIO EQUALIZER VISUALIZER (INSIDE SPHERE)
+       ======================================================== */
+    .aurora-equalizer-container {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5.5px;
+      z-index: 6;
+      pointer-events: none;
+      padding: 0;
+      margin: 0;
+      transition: opacity 0.35s ease;
+    }
+
+    .aurora-sphere.loading .aurora-equalizer-container {
+      opacity: 0;
+    }
+
+    .aurora-eq-bar {
+      width: 4px;
+      min-height: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: linear-gradient(to top, rgba(255, 255, 255, 1) 0%, rgba(224, 242, 254, 0.95) 60%, rgba(147, 197, 253, 0.75) 100%);
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.9), 0 0 18px rgba(147, 197, 253, 0.7);
+      transition: height 0.05s ease-out, opacity 0.12s ease-out;
+      opacity: 0.6;
+      transform-origin: center;
+    }
+
+    .aurora-sphere.speaking .aurora-eq-bar {
+      opacity: 0.95;
+    }
+
+    /* 3D Rim Glare & Specular Reflection */
+    .aurora-sphere-glare {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      box-shadow: 
+        inset 0 4px 10px rgba(255, 255, 255, 0.7),
+        inset 0 -4px 12px rgba(255, 255, 255, 0.2);
+      pointer-events: none;
+      z-index: 7;
+    }
+
+    /* Outer Ambient Ring Glow */
+    .aurora-outer-glow {
+      position: absolute;
+      width: 320px;
+      height: 320px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(59, 130, 246, 0.35) 0%, rgba(37, 99, 235, 0.12) 55%, transparent 75%);
+      filter: blur(24px);
+      z-index: -1;
+      pointer-events: none !important;
+      animation: glowPulse 4s ease-in-out infinite alternate;
+    }
+
+    @keyframes glowPulse {
+      0% {
+        transform: scale(0.92);
+        opacity: 0.6;
+      }
+      100% {
+        transform: scale(1.14);
+        opacity: 0.95;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ==================== AURORA SPHERE OVERLAY (Z-INDEX TERTINGGI, 70% BLACK, HANYA BOLA SAJA) ==================== -->
+  <div id="aurora-orb-overlay" class="aurora-orb-overlay">
+    <div class="aurora-orb-center">
+      <!-- Animated Blue Sphere with White Aurora Mist & Equalizer Waves -->
+      <div class="aurora-sphere-wrapper loading" id="aurora-sphere-wrapper">
+        <div class="aurora-sphere loading" id="aurora-sphere-elem">
+          <div class="aurora-atmosphere"></div>
+          <div class="aurora-mist-layer aurora-mist-1"></div>
+          <div class="aurora-mist-layer aurora-mist-2"></div>
+          <div class="aurora-mist-layer aurora-mist-3"></div>
+          <div class="aurora-mist-layer aurora-mist-4"></div>
+
+          <!-- Dynamic White Aurora Equalizer Waves inside Sphere (12 Bands) -->
+          <div class="aurora-equalizer-container" id="aurora-eq-container">
+            <div class="aurora-eq-bar"></div>
+            <div class="aurora-eq-bar"></div>
+            <div class="aurora-eq-bar"></div>
+            <div class="aurora-eq-bar"></div>
+            <div class="aurora-eq-bar"></div>
+            <div class="aurora-eq-bar"></div>
+            <div class="aurora-eq-bar"></div>
+            <div class="aurora-eq-bar"></div>
+            <div class="aurora-eq-bar"></div>
+            <div class="aurora-eq-bar"></div>
+            <div class="aurora-eq-bar"></div>
+            <div class="aurora-eq-bar"></div>
+          </div>
+
+          <div class="aurora-sphere-glare"></div>
+        </div>
+        <div class="aurora-outer-glow"></div>
+      </div>
+
+      <!-- Interactive Choice Prompt Card Under Aurora Sphere -->
+      <div class="aurora-choice-card" id="aurora-choice-card">
+        <div class="aurora-choice-question">
+          Sebelum memulai, apakah Anda ingin saya bantu jelaskan tentang materi ini?
+        </div>
+        <div class="aurora-choice-buttons">
+          <button type="button" class="aurora-btn-choice aurora-btn-no" id="aurora-btn-no" onclick="handleChoiceNo()">
+            Tidak
+          </button>
+          <button type="button" class="aurora-btn-choice aurora-btn-yes" id="aurora-btn-yes" onclick="handleChoiceYes()">
+            Ya
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Orion Next Module Prompt Card (Anchored above docked mini orb) -->
+  <div class="orion-next-choice-card" id="orion-next-choice-card">
+    <div class="orion-next-card-header">
+      <span class="orion-next-tag"><i class="fas fa-sparkles"></i> Selesai Dibahas</span>
+      <button type="button" class="orion-next-close-btn" onclick="dismissNextChoiceCard()" title="Tutup">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="orion-next-card-text">
+      Modul ini telah selesai! Apakah Anda ingin lanjut ke materi berikutnya dan dijelaskan lagi oleh Orion?
+    </div>
+    <div class="orion-next-card-actions">
+      <button type="button" class="aurora-btn-choice aurora-btn-no" style="font-size:12px; padding:6px 14px;" onclick="dismissNextChoiceCard()">
+        Tidak
+      </button>
+      <button type="button" class="aurora-btn-choice aurora-btn-yes" style="font-size:12px; padding:6px 16px;" onclick="proceedToNextModuleAndExplain()">
+        <span>Iya, Lanjut</span> <i class="fas fa-arrow-right" style="font-size:10px;"></i>
+      </button>
+    </div>
+  </div>
+
+  <div class="classroom-layout">
+    <!-- Left Sidebar: Chapters & Modules Tree -->
+    <aside class="classroom-sidebar" id="classroom-sidebar">
+      <div class="sidebar-header">
+        <a href="/dashboard" class="back-corridor-btn" id="btn-back-corridor">
+          <i class="fas fa-arrow-left"></i> Kembali ke Dashboard
+        </a>
+        <button class="sidebar-toggle-trigger" onclick="toggleSidebar(false)" title="Sembunyikan Sidebar">
+          <i class="fas fa-angles-left"></i>
+        </button>
+      </div>
+
+      <div class="course-info-card">
+        <div class="active-class-tag">Kelas Aktif</div>
+        <h2 class="active-course-title" id="sidebar-course-title">Memuat Kursus...</h2>
+        <div style="display:flex; justify-content:space-between; align-items:center; font-size:11.5px; color:var(--text-secondary);">
+          <span id="sidebar-progress-label">0 / 0 modul</span>
+          <span style="font-weight:700; font-family:var(--font-mono);" id="sidebar-progress-percent">0%</span>
+        </div>
+        <div class="progress-track-mini">
+          <div class="progress-fill-mini" id="sidebar-progress-fill"></div>
+        </div>
+      </div>
+
+      <div class="sidebar-tabs-nav">
+        <button class="sidebar-tab-btn active" id="tab-btn-modules" onclick="switchSidebarTab('modules')">
+          <i class="fas fa-list-check" style="margin-right:4px;"></i> Silabus Bab
+        </button>
+        <button class="sidebar-tab-btn" id="tab-btn-notes" onclick="switchSidebarTab('notes')">
+          <i class="fas fa-wand-magic-sparkles" style="margin-right:4px;"></i> Intuisi AI
+        </button>
+      </div>
+
+      <div class="curriculum-tree-scroll" id="curriculum-tree-container">
+        <div style="text-align:center; padding:24px; font-size:12.5px; color:var(--text-secondary);">
+          <i class="fas fa-spinner fa-spin"></i> Memuat silabus per bab...
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Learning Workspace -->
+    <main class="classroom-main">
+      <!-- Topbar -->
+      <header class="classroom-topbar">
+        <div class="topbar-left">
+          <button class="sidebar-toggle-trigger" id="sidebar-toggle-btn" onclick="toggleSidebar()" title="Toggle Silabus">
+            <i class="fas fa-bars"></i>
+          </button>
+          <div class="topbar-breadcrumb" id="topbar-breadcrumb">
+            <span>Kurikulum</span>
+            <i class="fas fa-chevron-right" style="font-size:9px; color:var(--text-tertiary);"></i>
+            <span id="topbar-chapter-title" style="color:var(--text-primary); font-weight:600;">Memuat Bab...</span>
+          </div>
+        </div>
+
+        <div class="topbar-actions">
+          <button class="theme-toggle-btn" id="theme-toggle-btn" type="button" aria-label="Toggle Mode">
+            <i class="fas fa-sun" id="theme-icon-sun" style="display:none;"></i>
+            <i class="fas fa-moon" id="theme-icon-moon"></i>
+            <span id="theme-text">Mode Gelap</span>
+          </button>
+          <button class="btn-ai-header-toggle" id="btn-ai-header-toggle" onclick="toggleAISplitPanel()" title="Akses AI Study Assistant secara split-screen">
+            <i class="fas fa-sparkles" style="color:var(--accent-primary);"></i>
+            <span>Tanya AI</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Side-by-Side Split Workspace -->
+      <div class="classroom-split-workspace" id="classroom-split-workspace">
+        <!-- Dynamic Reader Body (Left Side) -->
+        <div class="classroom-reader-body" id="classroom-reader-body">
+          <div class="reader-article-header">
+            <span class="reader-chapter-pill" id="reader-chapter-badge">BAB 1 • MODUL 1</span>
+            <h1 class="reader-title" id="reader-material-title">Memuat Materi...</h1>
+            <div class="reader-meta-row">
+              <span><i class="fas fa-clock" style="margin-right:4px;"></i> <span id="reader-duration">15 Menit</span></span>
+              <span><i class="fas fa-book-open" style="margin-right:4px;"></i> <span id="reader-format">Materi Teks & Diagram</span></span>
+              <span id="reader-status-tag" style="color:var(--color-success); font-weight:600;"><i class="fas fa-circle-check"></i> Siap Dipelajari</span>
+            </div>
+          </div>
+
+          <!-- Dynamic Multi-Format Content Block -->
+          <div id="material-dynamic-content-area">
+            <div style="text-align:center; padding:48px; color:var(--text-secondary);">
+              <i class="fas fa-spinner fa-spin" style="font-size:24px; margin-bottom:12px;"></i>
+              <p>Memuat isi materi pembelajaran...</p>
+            </div>
+          </div>
+
+          <!-- Concept Analogy & Key Takeaways AI Card -->
+          <div class="callout-box tip" id="ai-concept-box" style="margin-top:36px;">
+            <div style="display:flex; align-items:center; gap:8px; font-weight:700; color:var(--color-success); margin-bottom:8px;">
+              <i class="fas fa-wand-magic-sparkles"></i> Poin Kunci & Intuisi Konsep
+            </div>
+            <p id="ai-concept-summary" style="margin-bottom:8px;">
+              Penguasaan konsep pada bab ini membentuk fondasi arsitektur web modern berstandar industri.
+            </p>
+            <div style="font-size:12.5px; color:var(--text-secondary); font-style:italic;" id="ai-concept-analogy">
+              "Gunakan tombol Tanya AI di header kapan saja jika Anda ingin mengeksplorasi analogi atau contoh kode tambahan secara berdampingan."
+            </div>
+          </div>
+        </div>
+
+        <!-- Realtime Side-by-Side AI Split Panel (Right Side) -->
+        <aside class="ai-split-panel" id="ai-split-panel">
+          <div class="ai-panel-header">
+            <div class="ai-panel-title-wrap">
+              <div class="ai-panel-badge-icon">
+                <i class="fas fa-sparkles"></i>
+              </div>
+              <div>
+                <div class="ai-panel-title" style="display:flex; align-items:center; gap:6px;">
+                  Orion <span style="font-size:10px; font-weight:700; padding:1px 6px; background:var(--bg-surface-subtle); border-radius:var(--radius-full); border:1px solid var(--border-subtle); color:var(--accent-primary);">AI PARTNER</span>
+                </div>
+                <div class="ai-panel-subtitle" id="ai-panel-active-topic">Topik: HTML5 Dokumen</div>
+              </div>
+            </div>
+            <button class="ai-panel-close-btn" onclick="toggleAISplitPanel(false)" title="Tutup Panel Orion AI">
+              <i class="fas fa-xmark"></i>
+            </button>
+          </div>
+
+          <div class="ai-panel-suggestions">
+            <button class="ai-chip-prompt" onclick="quickAskAI('Beri saya analogi sederhana untuk memahami konsep modul ini secara bertahap.')">
+              💡 Analogi Konsep
+            </button>
+            <button class="ai-chip-prompt" onclick="quickAskAI('Berikan 1 petunjuk kode langkah awal untuk topik ini, jangan langsung semua kodenya.')">
+              🧩 Petunjuk Kode Awal
+            </button>
+            <button class="ai-chip-prompt" onclick="quickAskAI('Beri saya 1 pertanyaan pemantik untuk menguji apakah saya sudah paham modul ini.')">
+              ❓ Pertanyaan Pemantik
+            </button>
+            <button class="ai-chip-prompt" onclick="quickAskAI('Konsep awal sudah saya pahami, mari lanjut ke langkah atau elaborasi berikutnya.')">
+              🚀 Langkah Lanjutan
+            </button>
+          </div>
+
+          <div class="ai-panel-chat-stream" id="ai-chat-history">
+            <div class="ai-chat-bubble assistant">
+              <div class="ai-bubble-sender">
+                <i class="fas fa-sparkles" style="color:var(--accent-primary);"></i> Orion • AI Learning Partner
+              </div>
+              <div>
+                Halo! Saya <strong>Orion</strong>, partner belajar AI Anda. Saya akan menemani dan membimbing Anda memahami materi ini secara bertahap. Tanyakan konsep, minta petunjuk awal, atau uji pemahaman Anda kapan saja!
+              </div>
+            </div>
+          </div>
+
+          <div class="ai-panel-footer">
+            <div class="ai-panel-input-box">
+              <input type="text" id="ai-chat-input" class="ai-panel-input" placeholder="Tanyakan apa saja kepada Orion..." onkeypress="if(event.key==='Enter') sendAIChatMessage()">
+              <button class="ai-panel-send-btn" onclick="sendAIChatMessage()" title="Kirim Pesan ke Orion">
+                <i class="fas fa-paper-plane"></i>
+              </button>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; font-size:10.5px; color:var(--text-tertiary); padding:0 4px;">
+              <span>Orion Socratic Learning Partner</span>
+              <span>Tekan Enter untuk mengirim</span>
+            </div>
+          </div>
+        </aside>
+      </div>
+
+      <!-- Bottom Navigation Footer -->
+      <footer class="classroom-bottom-bar">
+        <button class="btn btn-outline" id="btn-prev-module" onclick="goToPrevModule()" style="font-size:13px; padding:8px 18px;">
+          <i class="fas fa-arrow-left"></i> Materi Sebelumnya
+        </button>
+
+        <div style="font-size:12.5px; color:var(--text-secondary); font-family:var(--font-mono);" id="bottom-module-counter">
+          Modul 1 dari 20
+        </div>
+
+        <button class="btn btn-primary" id="btn-next-module" onclick="completeAndNextModule()" style="font-size:13px; padding:8px 20px;">
+          <span>Tandai Selesai & Lanjut</span> <i class="fas fa-arrow-right"></i>
+        </button>
+      </footer>
+    </main>
+  </div>
+
+  <!-- JavaScript Logic -->
+  <script>
+    const token = localStorage.getItem('skillsphere_access_token') || localStorage.getItem('access_token');
+    const pathSegments = window.location.pathname.split('/').filter(Boolean);
+    const serverCourseId = '<%= (typeof courseId !== "undefined" ? courseId : "") %>';
+    const courseIdParam = serverCourseId || pathSegments[1] || 'mastering-modern-html5-expert';
+
+    let courseData = null;
+    let flatMaterials = [];
+    let currentMaterialIndex = 0;
+    let completedMaterialIds = new Set();
+    let isAIPanelOpen = false;
+    let activePlaybackSessionId = 0;
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    // Theme Management
+    const themeBtn = document.getElementById('theme-toggle-btn');
+    const sunIcon = document.getElementById('theme-icon-sun');
+    const moonIcon = document.getElementById('theme-icon-moon');
+    const themeText = document.getElementById('theme-text');
+
+    function updateThemeUI(theme) {
+      if (theme === 'dark') {
+        if (sunIcon) sunIcon.style.display = 'inline-block';
+        if (moonIcon) moonIcon.style.display = 'none';
+        if (themeText) themeText.textContent = 'Mode Terang';
+      } else {
+        if (sunIcon) sunIcon.style.display = 'none';
+        if (moonIcon) moonIcon.style.display = 'inline-block';
+        if (themeText) themeText.textContent = 'Mode Gelap';
+      }
+    }
+
+    const savedTheme = localStorage.getItem('skillsphere_theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    updateThemeUI(savedTheme);
+
+    if (themeBtn) {
+      themeBtn.addEventListener('click', () => {
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        const nextTheme = isDark ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', nextTheme);
+        localStorage.setItem('skillsphere_theme', nextTheme);
+        updateThemeUI(nextTheme);
+      });
+    }
+
+    function toggleSidebar(force) {
+      const sidebar = document.getElementById('classroom-sidebar');
+      if (typeof force === 'boolean') {
+        if (force) sidebar.classList.remove('collapsed');
+        else sidebar.classList.add('collapsed');
+      } else {
+        sidebar.classList.toggle('collapsed');
+      }
+    }
+
+    // Split AI Panel Toggle
+    function toggleAISplitPanel(force) {
+      const workspace = document.getElementById('classroom-split-workspace');
+      const headerBtn = document.getElementById('btn-ai-header-toggle');
+      
+      if (typeof force === 'boolean') {
+        isAIPanelOpen = force;
+      } else {
+        isAIPanelOpen = !isAIPanelOpen;
+      }
+
+      if (isAIPanelOpen) {
+        workspace.classList.add('ai-open');
+        document.body.classList.add('ai-panel-open');
+        headerBtn.classList.add('active');
+        setTimeout(() => {
+          const input = document.getElementById('ai-chat-input');
+          if (input) input.focus();
+        }, 150);
+      } else {
+        workspace.classList.remove('ai-open');
+        document.body.classList.remove('ai-panel-open');
+        headerBtn.classList.remove('active');
+      }
+    }
+
+    // Load Course & Curriculum Structure
+    async function loadClassroom() {
+      if (!token) {
+        showCustomAlert({
+          title: 'Perlu Masuk Akun',
+          message: 'Silakan masuk (login) terlebih dahulu untuk mengakses ruang belajar.',
+          type: 'warning',
+          buttonText: 'Masuk Sekarang'
+        }).then(() => {
+          window.location.href = `/login?redirect=${encodeURIComponent(window.location.pathname)}`;
+        });
+        return;
+      }
+
+      try {
+        const res = await fetch(`/api/courses/${courseIdParam}`, {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        const json = await res.json();
+
+        if (!json.success || !json.data) {
+          showCustomAlert({
+            title: 'Kelas Tidak Ditemukan',
+            message: 'Kursus tidak ditemukan atau belum dipublikasikan.',
+            type: 'error',
+            buttonText: 'Kembali'
+          }).then(() => {
+            window.location.href = '/dashboard';
+          });
+          return;
+        }
+
+        courseData = json.data;
+        document.getElementById('sidebar-course-title').textContent = courseData.title;
+
+        // Build flat material array
+        flatMaterials = [];
+        const sections = courseData.sections || [];
+        sections.forEach((sec, sIdx) => {
+          (sec.materials || []).forEach((mat, mIdx) => {
+            flatMaterials.push({
+              ...mat,
+              section_title: sec.title,
+              section_index: sIdx + 1,
+              material_index: mIdx + 1,
+            });
+          });
+        });
+
+        // Load saved local completed materials
+        const localKey = `skillsphere_completed_${courseData.id}`;
+        try {
+          const saved = JSON.parse(localStorage.getItem(localKey) || '[]');
+          saved.forEach(id => completedMaterialIds.add(id));
+        } catch (e) {}
+
+        renderCurriculumTree();
+        updateProgressUI();
+
+        if (flatMaterials.length > 0) {
+          // Dynamic initial material resolution on page load / reload:
+          // 1. URL search params (?m=index or ?material_id=id)
+          const urlParams = new URLSearchParams(window.location.search);
+          const qMatId = urlParams.get('material_id') || urlParams.get('m_id');
+          const qIndex = urlParams.get('m') !== null ? parseInt(urlParams.get('m'), 10) : null;
+
+          let initialIdx = -1;
+
+          if (qMatId) {
+            const foundById = flatMaterials.findIndex(m => String(m.id) === String(qMatId));
+            if (foundById !== -1) initialIdx = foundById;
+          }
+
+          if (initialIdx === -1 && qIndex !== null && !isNaN(qIndex) && qIndex >= 0 && qIndex < flatMaterials.length) {
+            initialIdx = qIndex;
+          }
+
+          // 2. Saved last active material in localStorage
+          if (initialIdx === -1) {
+            const lastSaved = localStorage.getItem(`skillsphere_last_material_${courseData.id}`);
+            if (lastSaved !== null) {
+              const parsedIdx = parseInt(lastSaved, 10);
+              if (!isNaN(parsedIdx) && parsedIdx >= 0 && parsedIdx < flatMaterials.length) {
+                initialIdx = parsedIdx;
+              }
+            }
+          }
+
+          // 3. First unfinished module in course progression
+          if (initialIdx === -1) {
+            const firstUnfinished = flatMaterials.findIndex(m => !completedMaterialIds.has(m.id));
+            if (firstUnfinished !== -1) {
+              initialIdx = firstUnfinished;
+            } else {
+              initialIdx = 0;
+            }
+          }
+
+          selectMaterial(Math.max(0, initialIdx));
+
+          // Trigger instant speech and equalizer animation now that courseData is verified and loaded
+          playOrionWelcomeSpeech();
+        } else {
+          document.getElementById('material-dynamic-content-area').innerHTML = `
+            <div style="text-align:center; padding:48px; color:var(--text-secondary);">
+              <p>Materi kelas ini sedang disiapkan oleh instruktur.</p>
+            </div>
+          `;
+        }
+      } catch (err) {
+        console.error('Error loading classroom:', err);
+        showToast('Terjadi kesalahan jaringan saat memuat kelas.', 'error');
+      }
+    }
+
+    function renderCurriculumTree() {
+      const container = document.getElementById('curriculum-tree-container');
+      if (!courseData || !courseData.sections || courseData.sections.length === 0) {
+        container.innerHTML = '<div style="padding:16px; color:var(--text-secondary); text-align:center;">Belum ada bab.</div>';
+        return;
+      }
+
+      let globalIdx = 0;
+      container.innerHTML = courseData.sections.map((sec, sIdx) => {
+        const materials = sec.materials || [];
+        const completedInSec = materials.filter(m => completedMaterialIds.has(m.id)).length;
+
+        const itemsHtml = materials.map((mat) => {
+          const thisIndex = globalIdx++;
+          const isCompleted = completedMaterialIds.has(mat.id);
+          const isActive = thisIndex === currentMaterialIndex;
+
+          let statusIcon = `<i class="fas fa-circle-check module-status-icon completed"></i>`;
+          if (!isCompleted) {
+            statusIcon = isActive 
+              ? `<i class="fas fa-circle-play module-status-icon active"></i>`
+              : `<i class="far fa-circle module-status-icon pending"></i>`;
+          }
+
+          const badgeText = 'TEKS';
+
+          return `
+            <button class="module-item-btn ${isActive ? 'active' : ''}" onclick="selectMaterial(${thisIndex})">
+              <div style="display:flex; align-items:center; gap:8px; overflow:hidden;">
+                ${statusIcon}
+                <span class="module-title-truncate">${escapeHtml(mat.title)}</span>
+              </div>
+              <span class="module-format-badge">${badgeText}</span>
+            </button>
+          `;
+        }).join('');
+
+        return `
+          <div class="chapter-group">
+            <div class="chapter-header" onclick="toggleChapterAccordion(this)">
+              <div class="chapter-title-text">
+                <i class="fas fa-folder-open" style="font-size:10px;"></i>
+                <span>Bab ${sIdx + 1}: ${escapeHtml(sec.title.replace(/^Bab\s*\d+\s*:\s*/i, ''))}</span>
+              </div>
+              <span class="chapter-meta-count">${completedInSec}/${materials.length}</span>
+            </div>
+            <div class="chapter-body" style="padding-left:4px; margin-top:2px;">
+              ${itemsHtml}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function toggleChapterAccordion(el) {
+      const body = el.nextElementSibling;
+      if (body) {
+        body.style.display = body.style.display === 'none' ? 'block' : 'none';
+      }
+    }
+
+    function selectMaterial(index) {
+      if (index < 0 || index >= flatMaterials.length) return;
+      currentMaterialIndex = index;
+      const mat = flatMaterials[index];
+
+      // Save last active material to localStorage & update URL state
+      if (courseData) {
+        localStorage.setItem(`skillsphere_last_material_${courseData.id}`, index);
+        try {
+          const currentUrl = new URL(window.location.href);
+          currentUrl.searchParams.set('m', index);
+          if (mat.id) currentUrl.searchParams.set('material_id', mat.id);
+          window.history.replaceState({ materialIndex: index }, '', currentUrl.toString());
+        } catch (e) {}
+      }
+
+      // Update Topbar and Header
+      document.getElementById('topbar-chapter-title').textContent = mat.section_title || 'Materi Belajar';
+      document.getElementById('reader-chapter-badge').textContent = `BAB ${mat.section_index} • MODUL ${index + 1} DARI ${flatMaterials.length}`;
+      document.getElementById('reader-material-title').textContent = mat.title;
+      document.getElementById('reader-duration').textContent = `${mat.duration_minutes || 15} Menit`;
+      document.getElementById('reader-format').textContent = mat.diagram_svg ? 'Materi Teks & Diagram' : (mat.content_type === 'ppt' ? 'Slide Presentasi' : 'Materi Bacaan');
+      document.getElementById('ai-panel-active-topic').textContent = `Topik: ${mat.title}`;
+
+      // Update Status tag
+      const isCompleted = completedMaterialIds.has(mat.id);
+      const statusTag = document.getElementById('reader-status-tag');
+      if (isCompleted) {
+        statusTag.innerHTML = `<i class="fas fa-circle-check" style="color:var(--color-success);"></i> Selesai Dipelajari`;
+      } else {
+        statusTag.innerHTML = `<i class="fas fa-book-open-reader"></i> Sedang Dipelajari`;
+      }
+
+      // Render Dedicated Rich Text Content & Supporting Media per Bab
+      renderChapterSpecificArticle(mat);
+
+      // Bottom bar updates
+      document.getElementById('bottom-module-counter').textContent = `Modul ${index + 1} dari ${flatMaterials.length}`;
+      document.getElementById('btn-prev-module').disabled = index === 0;
+      
+      const nextBtn = document.getElementById('btn-next-module');
+      if (index === flatMaterials.length - 1) {
+        nextBtn.innerHTML = `<span>Tuntaskan Kursus</span> <i class="fas fa-trophy"></i>`;
+      } else {
+        nextBtn.innerHTML = `<span>Tandai Selesai & Lanjut</span> <i class="fas fa-arrow-right"></i>`;
+      }
+
+      // Refresh sidebar active highlight
+      renderCurriculumTree();
+
+      // Scroll reader to top smoothly
+      document.getElementById('classroom-reader-body').scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Helper Markdown-to-HTML parser for Dynamic Database Text Content
+    function parseMarkdownArticle(md) {
+      if (!md) return '';
+      let text = md.trim();
+
+      // 1. Extract and preserve multiline code blocks
+      const codeBlocks = [];
+      text = text.replace(/```([a-zA-Z0-9_-]*)\n([\s\S]*?)```/g, (match, lang, code) => {
+        const placeholder = `___CODE_BLOCK_${codeBlocks.length}___`;
+        codeBlocks.push({
+          lang: lang || 'html',
+          code: code.trim()
+        });
+        return placeholder;
+      });
+
+      // 2. Extract and preserve inline code snippets (e.g. `<ul>`, `<ol>`, `<code>`)
+      const inlineCodes = [];
+      text = text.replace(/`([^`\n]+)`/g, (match, code) => {
+        const placeholder = `___INLINE_CODE_${inlineCodes.length}___`;
+        inlineCodes.push(code);
+        return placeholder;
+      });
+
+      // 3. Headings
+      text = text.replace(/^### (.*$)/gim, '<h3>$1</h3>');
+      text = text.replace(/^## (.*$)/gim, '<h2>$1</h2>');
+      text = text.replace(/^# (.*$)/gim, '<h1>$1</h1>');
+
+      // 4. Blockquotes / Callouts
+      text = text.replace(/^\> (.*$)/gim, '<div class="callout-box"><p>$1</p></div>');
+
+      // 5. Bold & Italic
+      text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+      text = text.replace(/\*(.*?)\*/g, '<em>$1</em>');
+
+      // 6. Lists (Unordered and Ordered)
+      // Ordered lists (1. 2. 3.)
+      text = text.replace(/^\s*\d+\.\s+(.*)$/gim, '<oli>$1</oli>');
+      text = text.replace(/(<oli>.*<\/oli>(\n|(?=<oli>))*)/gim, '<ol>$1</ol>');
+      text = text.replace(/<oli>/g, '<li>').replace(/<\/oli>/g, '</li>');
+
+      // Unordered lists (- or *)
+      text = text.replace(/^\s*[\-\*]\s+(.*)$/gim, '<li>$1</li>');
+      text = text.replace(/(<li>.*<\/li>(\n|(?=<li>))*)/gim, '<ul>$1</ul>');
+
+      // 7. Paragraphs
+      const sections = text.split(/\n\n+/);
+      text = sections.map(sec => {
+        sec = sec.trim();
+        if (!sec) return '';
+        if (sec.startsWith('<h') || sec.startsWith('<ul') || sec.startsWith('<ol') || sec.startsWith('<div') || sec.startsWith('<table') || sec.startsWith('___CODE_BLOCK_')) {
+          return sec;
+        }
+        return `<p>${sec.replace(/\n/g, '<br>')}</p>`;
+      }).join('\n');
+
+      // 8. Restore Inline Code Snippets safely
+      inlineCodes.forEach((code, idx) => {
+        const placeholder = `___INLINE_CODE_${idx}___`;
+        text = text.split(placeholder).join(`<code>${escapeHtml(code)}</code>`);
+      });
+
+      // 9. Restore Code Blocks
+      codeBlocks.forEach((block, idx) => {
+        const placeholder = `___CODE_BLOCK_${idx}___`;
+        const escapedCode = escapeHtml(block.code);
+        const htmlBlock = `
+          <div class="code-editor-box">
+            <div class="code-editor-header">
+              <span>${escapeHtml(block.lang)}.example</span>
+              <button class="code-copy-btn" onclick="copySnippetCode(this)">Salin Kode</button>
+            </div>
+            <pre class="code-editor-body"><code>${escapedCode}</code></pre>
+          </div>
+        `;
+        text = text.split(placeholder).join(htmlBlock);
+      });
+
+      return text;
+    }
+
+    // Dynamic Database-Driven Material Content Renderer
+    function renderChapterSpecificArticle(mat) {
+      const container = document.getElementById('material-dynamic-content-area');
+      const title = mat.title;
+      const sIdx = mat.section_index || 1;
+
+      let html = '';
+
+      const courseTitleLower = ((courseData && courseData.title) || '').toLowerCase();
+      const courseSlugLower = ((courseData && courseData.slug) || '').toLowerCase();
+      const isDbCourse = courseTitleLower.includes('basis data') || courseTitleLower.includes('database') || courseTitleLower.includes('normalisasi') || courseSlugLower.includes('data');
+
+      // Render diagram only if explicitly provided in material data
+      if (mat.diagram_svg) {
+        html += `
+          <div class="diagram-visual-card">
+            <div class="diagram-visual-header">
+              <span class="diagram-visual-title"><i class="fas fa-diagram-project"></i> ${escapeHtml(mat.diagram_title || 'Diagram Visual')}</span>
+            </div>
+            <div class="diagram-svg-wrapper">
+              ${mat.diagram_svg}
+            </div>
+          </div>
+        `;
+      }
+
+      // Dynamic text content from Database Record
+      const rawText = mat.content_text || `## ${escapeHtml(title)}\n\nMateri ini memuat konsep standar industri. Tanyakan kepada Asisten AI jika ingin meminta elaborasi tambahan.`;
+      const parsedArticleHtml = parseMarkdownArticle(rawText);
+
+      html += `
+        <article class="prose-content">
+          ${parsedArticleHtml}
+        </article>
+      `;
+
+      // Dynamic Practice Quiz adapted to Course Content
+      let quizQuestion = `Pertanyaan: Berdasarkan materi pada <strong>${escapeHtml(title)}</strong>, manakah praktik terbaik yang direkomendasikan di standar industri?`;
+      let optA = 'Menggunakan elemen semantik yang tepat, atribut eksplisit (seperti lang &amp; alt), serta mengoptimalkan kinerja CRP';
+      let optB = 'Membungkus semua struktur dalam &lt;div&gt; tanpa atribut semantik sama sekali';
+      let optC = 'Menghilangkan tag &lt;!DOCTYPE html&gt; agar browser masuk ke Quirks Mode';
+
+      if (isDbCourse) {
+        quizQuestion = `Pertanyaan: Berdasarkan materi pada <strong>${escapeHtml(title)}</strong>, manakah prinsip normalisasi relasional yang tepat?`;
+        optA = 'Memastikan nilai atomik (1NF), mengeliminasi ketergantungan parsial (2NF), dan menghilangkan ketergantungan transitif (3NF) guna mencegah anomali data';
+        optB = 'Menyimpan seluruh data entitas dalam satu tabel raksasa universal tanpa primary key';
+        optC = 'Membiarkan data terduplikasi di banyak baris agar pencarian data tidak memerlukan relasi JOIN';
+      }
+
+      html += `
+        <div class="practice-quiz-container" data-no-ai-focus="true" style="background:var(--bg-surface); border:1px solid var(--border-subtle); border-radius:var(--radius-lg); padding:22px; margin:28px 0; box-shadow:var(--shadow-sm);">
+          <div style="display:flex; align-items:center; gap:8px; font-weight:700; font-size:14px; margin-bottom:12px; color:var(--text-primary);">
+            <i class="fas fa-circle-question" style="color:var(--accent-primary);"></i> Kuis Evaluasi Pemahaman Modul
+          </div>
+          <p style="font-size:13.5px; margin-bottom:14px; color:var(--text-primary);">
+            ${quizQuestion}
+          </p>
+          <div style="display:flex; flex-direction:column; gap:10px;">
+            <label style="font-size:13px; display:flex; align-items:center; gap:10px; cursor:pointer; padding:8px 12px; background:var(--bg-surface-subtle); border-radius:var(--radius-md); border:1px solid var(--border-subtle);">
+              <input type="radio" name="practice_quiz" value="a"> ${optA}
+            </label>
+            <label style="font-size:13px; display:flex; align-items:center; gap:10px; cursor:pointer; padding:8px 12px; background:var(--bg-surface-subtle); border-radius:var(--radius-md); border:1px solid var(--border-subtle);">
+              <input type="radio" name="practice_quiz" value="b"> ${optB}
+            </label>
+            <label style="font-size:13px; display:flex; align-items:center; gap:10px; cursor:pointer; padding:8px 12px; background:var(--bg-surface-subtle); border-radius:var(--radius-md); border:1px solid var(--border-subtle);">
+              <input type="radio" name="practice_quiz" value="c"> ${optC}
+            </label>
+          </div>
+          <div style="display:flex; align-items:center; gap:12px; margin-top:16px;">
+            <button class="btn btn-outline" style="font-size:12px; padding:6px 16px;" onclick="checkPracticeQuiz()">
+              Periksa Jawaban
+            </button>
+            <button class="btn btn-outline" style="font-size:12px; padding:6px 14px;" onclick="quickAskAI('Jelaskan jawaban yang benar dan pembahasan detail dari kuis modul ini.')">
+              <i class="fas fa-sparkles" style="color:var(--accent-primary);"></i> Bahas Bersama AI
+            </button>
+          </div>
+          <div id="quiz-feedback" style="margin-top:12px; font-size:13px; display:none; padding:10px 14px; border-radius:var(--radius-md);"></div>
+        </div>
+      `;
+
+      container.innerHTML = html;
+    }
+
+    function checkPracticeQuiz() {
+      const selected = document.querySelector('input[name="practice_quiz"]:checked');
+      const feedback = document.getElementById('quiz-feedback');
+      if (!selected) {
+        showToast('Pilih salah satu opsi jawaban terlebih dahulu.', 'warning');
+        return;
+      }
+      const courseTitleLower = ((courseData && courseData.title) || '').toLowerCase();
+      const isDb = courseTitleLower.includes('basis data') || courseTitleLower.includes('database') || courseTitleLower.includes('normalisasi');
+      
+      feedback.style.display = 'block';
+      if (selected.value === 'a') {
+        feedback.style.background = 'rgba(16, 185, 129, 0.12)';
+        feedback.style.border = '1px solid var(--color-success)';
+        const correctMsg = isDb 
+          ? 'Praktik ini menjamin integritas relasional, pencegahan anomali (insert/update/delete), dan efisiensi penyimpanan database.'
+          : 'Praktik ini menjamin aksesibilitas universal, performa tinggi, dan indeks SEO optimal.';
+        feedback.innerHTML = `<span style="color:var(--color-success); font-weight:700;"><i class="fas fa-circle-check"></i> Jawaban Anda Tepat!</span> ${correctMsg}`;
+      } else {
+        feedback.style.background = 'rgba(239, 68, 68, 0.12)';
+        feedback.style.border = '1px solid var(--color-danger)';
+        feedback.innerHTML = `<span style="color:var(--color-danger); font-weight:700;"><i class="fas fa-circle-xmark"></i> Kurang Tepat.</span> Opsi A adalah jawaban standar industri. Anda dapat mengecek penjelasan lengkap melalui panel AI.`;
+      }
+    }
+
+    function copySnippetCode(btn) {
+      const code = btn.closest('.code-editor-box').querySelector('code').innerText;
+      navigator.clipboard.writeText(code);
+      btn.textContent = 'Tersalin!';
+      setTimeout(() => btn.textContent = 'Salin Kode', 2000);
+      showToast('Kode berhasil disalin ke clipboard!', 'success');
+    }
+
+    function goToPrevModule() {
+      if (currentMaterialIndex > 0) {
+        selectMaterial(currentMaterialIndex - 1);
+      }
+    }
+
+    async function completeAndNextModule() {
+      if (flatMaterials.length === 0) return;
+      const currentMat = flatMaterials[currentMaterialIndex];
+
+      // Stop any ongoing speech and highlights immediately
+      stopAllAudioPlayback();
+      clearAIFocusHighlight();
+      dismissNextChoiceCard();
+
+      // Mark current material completed
+      completedMaterialIds.add(currentMat.id);
+
+      // Save locally
+      if (courseData) {
+        localStorage.setItem(`skillsphere_completed_${courseData.id}`, JSON.stringify(Array.from(completedMaterialIds)));
+      }
+
+      // Sync progress with backend
+      updateProgressUI();
+      const progressPercent = Math.round((completedMaterialIds.size / flatMaterials.length) * 100);
+
+      try {
+        fetch(`/api/courses/${courseData.id}/progress`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+          body: JSON.stringify({
+            progress_percentage: progressPercent,
+            status: progressPercent >= 100 ? 'completed' : 'active'
+          })
+        }).catch(e => console.warn('Progress sync warning:', e));
+      } catch (e) {}
+
+      showToast(`Modul "${currentMat.title}" selesai dipelajari!`, 'success');
+
+      // Advance to next module or finish
+      if (currentMaterialIndex < flatMaterials.length - 1) {
+        selectMaterial(currentMaterialIndex + 1);
+
+        // In docked mini orb mode in the bottom-right, ask if student wants Orion to explain this new module
+        dockAuroraToCorner();
+        setTimeout(() => {
+          showNextModuleChoiceCard('on_module_change');
+        }, 400);
+      } else {
+        showCustomAlert({
+          title: 'Selamat! Anda Telah Menuntaskan Seluruh Modul',
+          message: 'Seluruh bab dan materi telah berhasil Anda kuasai. Sertifikat kelulusan digital Anda siap diakses di dashboard.',
+          type: 'success',
+          buttonText: 'Kembali ke Dashboard'
+        }).then(() => {
+          window.location.href = '/dashboard';
+        });
+      }
+    }
+
+    function updateProgressUI() {
+      if (flatMaterials.length === 0) return;
+      const count = completedMaterialIds.size;
+      const total = flatMaterials.length;
+      const percent = Math.min(100, Math.round((count / total) * 100));
+
+      const labelEl = document.getElementById('sidebar-progress-label');
+      const percentEl = document.getElementById('sidebar-progress-percent');
+      const fillEl = document.getElementById('sidebar-progress-fill');
+
+      if (labelEl) labelEl.textContent = `${count} / ${total} modul`;
+      if (percentEl) percentEl.textContent = `${percent}%`;
+      if (fillEl) fillEl.style.width = `${percent}%`;
+    }
+
+    function switchSidebarTab(tab) {
+      const btnModules = document.getElementById('tab-btn-modules');
+      const btnNotes = document.getElementById('tab-btn-notes');
+      const container = document.getElementById('curriculum-tree-container');
+
+      if (tab === 'modules') {
+        btnModules.classList.add('active');
+        btnNotes.classList.remove('active');
+        renderCurriculumTree();
+      } else {
+        btnNotes.classList.add('active');
+        btnModules.classList.remove('active');
+        container.innerHTML = `
+          <div style="padding:16px; font-size:13px; color:var(--text-secondary); line-height:1.5;">
+            <div style="font-weight:700; color:var(--text-primary); margin-bottom:8px;">
+              <i class="fas fa-brain" style="color:var(--accent-primary);"></i> Catatan & Ringkasan AI
+            </div>
+            <p>Setiap modul dirancang berbasis teks interaktif dengan diagram visual per bab dan dukungan tanya jawab realtime bersama AI.</p>
+            <div class="callout-box" style="margin:12px 0; font-size:12px;">
+              <strong>Split-Screen AI:</strong> Klik tombol <em>Tanya AI</em> di bagian header atas untuk membuka panel diskusi secara berdampingan.
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    // Realtime Multi-Turn Conversation History for Orion AI
+    let aiConversationHistory = [];
+
+    // Helper to format Orion's markdown replies nicely inside chat bubbles
+    function formatAIChatMarkdown(md) {
+      if (!md) return '';
+      let text = escapeHtml(md);
+
+      // Code blocks
+      text = text.replace(/```([a-zA-Z0-9_-]*)\n([\s\S]*?)```/g, (match, lang, code) => {
+        return `<pre class="code-editor-body" style="margin:8px 0; padding:10px; font-size:12px; border-radius:6px; background:#181816; color:#ECEBE8; overflow-x:auto;"><code>${code}</code></pre>`;
+      });
+
+      // Bold & Italic & Inline code
+      text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+      text = text.replace(/\*(.*?)\*/g, '<em>$1</em>');
+      text = text.replace(/`([^`]+)`/g, '<code style="background:var(--bg-surface-subtle); padding:2px 5px; border-radius:4px; font-family:var(--font-mono); font-size:12px;">$1</code>');
+
+      // Unordered lists
+      text = text.replace(/^\s*[\-\*]\s+(.*)$/gim, '<li style="margin-left:14px;">$1</li>');
+
+      // Line breaks
+      text = text.replace(/\n\n+/g, '<br><br>');
+      text = text.replace(/\n/g, '<br>');
+
+      return text;
+    }
+
+    // Quick AI prompt trigger
+    function quickAskAI(promptText) {
+      toggleAISplitPanel(true);
+      const input = document.getElementById('ai-chat-input');
+      if (input) {
+        input.value = promptText;
+        sendAIChatMessage();
+      }
+    }
+
+    // Realtime Side-by-Side Orion AI Learning Partner
+    async function sendAIChatMessage() {
+      const input = document.getElementById('ai-chat-input');
+      const text = input.value.trim();
+      if (!text) return;
+
+      const history = document.getElementById('ai-chat-history');
+      
+      // Append user bubble
+      history.innerHTML += `
+        <div class="ai-chat-bubble user">
+          ${escapeHtml(text)}
+        </div>
+      `;
+      input.value = '';
+      history.scrollTop = history.scrollHeight;
+
+      // Add to conversation history
+      aiConversationHistory.push({ role: 'user', content: text });
+      if (aiConversationHistory.length > 10) {
+        aiConversationHistory = aiConversationHistory.slice(-10);
+      }
+
+      // Append loading bubble
+      const loadingMsgId = 'ai-loading-' + Date.now();
+      history.innerHTML += `
+        <div class="ai-chat-bubble assistant" id="${loadingMsgId}">
+          <div class="ai-bubble-sender">
+            <i class="fas fa-sparkles" style="color:var(--accent-primary);"></i> Orion • AI Partner
+          </div>
+          <div style="color:var(--text-secondary); font-size:12px; display:flex; align-items:center; gap:8px;">
+            <i class="fas fa-spinner fa-spin"></i> Orion sedang menyusun panduan belajar untuk Anda...
+          </div>
+        </div>
+      `;
+      history.scrollTop = history.scrollHeight;
+
+      const currentMat = flatMaterials[currentMaterialIndex] || {};
+
+      try {
+        const res = await fetch('/api/ai/study-assistant/chat', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+          body: JSON.stringify({
+            message: text,
+            conversation_history: aiConversationHistory,
+            course_id: courseData ? courseData.id : null,
+            current_topic: currentMat.title || 'Materi Belajar HTML5'
+          })
+        });
+        const json = await res.json();
+
+        const loadingEl = document.getElementById(loadingMsgId);
+        if (loadingEl) loadingEl.remove();
+
+        let replyText = '';
+        if (json.data) {
+          replyText = json.data.reply || json.data.message || json.data.response || '';
+        }
+        if (!replyText && json.message && !json.message.includes('berhasil dibuat')) {
+          replyText = json.message;
+        }
+        if (!replyText) {
+          replyText = 'Halo! Saya Orion. Ada bagian dari konsep ini yang ingin kita bedah bersama langkah demi langkah?';
+        }
+
+        // Add assistant response to conversation history
+        aiConversationHistory.push({ role: 'assistant', content: replyText });
+        if (aiConversationHistory.length > 10) {
+          aiConversationHistory = aiConversationHistory.slice(-10);
+        }
+
+        const formattedReply = formatAIChatMarkdown(replyText);
+
+        history.innerHTML += `
+          <div class="ai-chat-bubble assistant">
+            <div class="ai-bubble-sender">
+              <i class="fas fa-sparkles" style="color:var(--accent-primary);"></i> Orion • AI Learning Partner
+            </div>
+            <div style="line-height:1.6; font-size:13px;">${formattedReply}</div>
+          </div>
+        `;
+        history.scrollTop = history.scrollHeight;
+      } catch (e) {
+        const loadingEl = document.getElementById(loadingMsgId);
+        if (loadingEl) loadingEl.remove();
+        history.innerHTML += `
+          <div class="ai-chat-bubble assistant" style="border-color:var(--color-danger);">
+            <div class="ai-bubble-sender" style="color:var(--color-danger);">
+              <i class="fas fa-triangle-exclamation"></i> Gagal Terhubung
+            </div>
+            <div style="font-size:12.5px; color:var(--text-secondary);">
+              Gagal menghubungi Orion AI. Silakan periksa koneksi internet Anda atau coba beberapa saat lagi.
+            </div>
+          </div>
+        `;
+        history.scrollTop = history.scrollHeight;
+      }
+    }
+
+    // ========================================================
+    // ORION AI VOICE GREETING & DYNAMIC EQUALIZER CONTROLLER
+    // ========================================================
+    let orionAudioContext = null;
+    let orionAnalyser = null;
+    let orionBufferSource = null;
+    let orionAudioElement = null;
+    let orionAnimationId = null;
+    let isOrionSpeaking = false;
+    let visualizerCurrentScale = 1.0;
+    let hasAttemptedAutoplay = false;
+
+    // Detect language from course title and content
+    function detectLanguage(title) {
+      if (!title) return 'id';
+      const lower = title.toLowerCase();
+      const idKeywords = ['dari nol', 'hingga', 'standar industri', 'belajar', 'dasar', 'pemrograman', 'panduan', 'anatomi', 'modul', 'bab'];
+      for (const k of idKeywords) {
+        if (lower.includes(k)) return 'id';
+      }
+      return 'id'; // default Indonesian
+    }
+
+    // Read selected voice preference from Accessibility settings with natural language safety
+    function getA11ySelectedVoice(lang = 'id') {
+      let chosen = 'id-male';
+      try {
+        const saved = localStorage.getItem('skillsphere_a11y_prefs');
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (parsed && parsed.voice) {
+            chosen = parsed.voice;
+          }
+        }
+      } catch (e) {}
+
+      // Language Accent Harmonizer: Ensure Indonesian text is voiced with Indonesian Edge-TTS voice
+      if (lang === 'id') {
+        if (chosen.startsWith('en-')) {
+          chosen = chosen.includes('female') ? 'id-female' : 'id-male';
+        }
+      } else if (lang === 'en') {
+        if (chosen.startsWith('id-')) {
+          chosen = chosen.includes('female') ? 'en-female' : 'en-male';
+        }
+      }
+      return chosen;
+    }
+
+    function ensureAudioContext() {
+      if (!orionAudioContext) {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (AudioContextClass) {
+          orionAudioContext = new AudioContextClass();
+        }
+      }
+      if (orionAudioContext && orionAudioContext.state === 'suspended') {
+        orionAudioContext.resume().catch(() => {});
+      }
+      return orionAudioContext;
+    }
+
+    // Auto-unlock AudioContext on first page interaction
+    ['pointerdown', 'keydown', 'touchstart', 'mousedown'].forEach(evt => {
+      window.addEventListener(evt, () => {
+        if (orionAudioContext && orionAudioContext.state === 'suspended') {
+          orionAudioContext.resume();
+        }
+      }, { capture: true, passive: true });
+    });
+
+    let preloadedQuestionAudioBuffer = null;
+    let preloadedQuestionBlob = null;
+
+    async function playOrionWelcomeSpeech() {
+      if (hasAttemptedAutoplay) return;
+      hasAttemptedAutoplay = true;
+
+      const sphereElem = document.getElementById('aurora-sphere-elem');
+      const sphereWrapper = document.getElementById('aurora-sphere-wrapper');
+      const courseTitle = (courseData && courseData.title)
+        ? courseData.title
+        : ((document.getElementById('sidebar-course-title') && document.getElementById('sidebar-course-title').textContent)
+           ? document.getElementById('sidebar-course-title').textContent
+           : 'Kursus Pembelajaran');
+      const lang = detectLanguage(courseTitle);
+      const chosenVoice = getA11ySelectedVoice(lang);
+
+      // Natural, warm, pedagogical phrasing
+      let welcomeText = '';
+      let questionSpeechText = '';
+      if (lang === 'en' || chosenVoice.startsWith('en-')) {
+        welcomeText = `Hello! Welcome to ${courseTitle}. I am Orion, your AI learning partner. Let's start our lesson together!`;
+        questionSpeechText = 'Before we begin, would you like me to help explain this lesson?';
+      } else {
+        welcomeText = `Halo! Selamat datang di modul pembelajaran ${courseTitle}. Saya Orion, asisten AI personal Anda. Mari kita mulai belajar bersama!`;
+        questionSpeechText = 'Sebelum memulai, apakah Anda ingin saya bantu jelaskan tentang materi ini?';
+      }
+
+      const audioCtx = ensureAudioContext();
+
+      try {
+        // Fetch welcome speech audio binary
+        const res = await fetch('/api/tts/speak', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            input: welcomeText,
+            voice: chosenVoice,
+            speed: 0
+          })
+        });
+
+        if (!res.ok) {
+          throw new Error('TTS API HTTP ' + res.status);
+        }
+
+        const arrayBuffer = await res.arrayBuffer();
+
+        if (audioCtx) {
+          // Decode MP3 audio into PCM AudioBuffer
+          const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+
+          // Preload question speech in background while welcome speech is prepared/playing
+          fetch('/api/tts/speak', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ input: questionSpeechText, voice: chosenVoice, speed: 0 })
+          }).then(async qRes => {
+            if (qRes.ok) {
+              const qBuf = await qRes.arrayBuffer();
+              if (audioCtx) {
+                preloadedQuestionAudioBuffer = await audioCtx.decodeAudioData(qBuf);
+              }
+            }
+          }).catch(e => console.warn('Preload question speech warn:', e));
+
+          const startAudioPlayback = () => {
+            if (isOrionSpeaking) return;
+            try {
+              orionBufferSource = audioCtx.createBufferSource();
+              orionBufferSource.buffer = audioBuffer;
+
+              orionAnalyser = audioCtx.createAnalyser();
+              orionAnalyser.fftSize = 128; // 64 frequency bins
+              orionAnalyser.smoothingTimeConstant = 0.55; // Fast response to vocal transients
+
+              orionBufferSource.connect(orionAnalyser);
+              orionAnalyser.connect(audioCtx.destination);
+
+              isOrionSpeaking = true;
+              if (sphereWrapper) {
+                sphereWrapper.classList.remove('loading');
+              }
+              if (sphereElem) {
+                sphereElem.classList.remove('loading');
+                sphereElem.classList.add('speaking');
+              }
+
+              orionBufferSource.onended = () => {
+                stopOrionEqualizer();
+                // Delay 500ms before starting question phase and showing choice card
+                setTimeout(() => {
+                  triggerQuestionPhase(questionSpeechText, lang, chosenVoice);
+                }, 500);
+              };
+
+              orionBufferSource.start(0);
+              startAudioVisualizerLoop();
+            } catch (playErr) {
+              console.warn('Audio playback error:', playErr);
+            }
+          };
+
+          // Check if AudioContext is running or suspended by browser policy
+          if (audioCtx.state === 'running') {
+            startAudioPlayback();
+          } else {
+            // Attempt immediate resume
+            audioCtx.resume().then(() => {
+              if (audioCtx.state === 'running') {
+                startAudioPlayback();
+              }
+            }).catch(() => {});
+
+            // One-touch instant unlock on any first user activity
+            const unlockAndPlay = async () => {
+              ['pointerdown', 'click', 'keydown', 'touchstart', 'scroll', 'mousemove'].forEach(evt => {
+                window.removeEventListener(evt, unlockAndPlay, { capture: true });
+              });
+              if (audioCtx.state === 'suspended') {
+                await audioCtx.resume().catch(() => {});
+              }
+              if (!isOrionSpeaking) {
+                startAudioPlayback();
+              }
+            };
+
+            ['pointerdown', 'click', 'keydown', 'touchstart', 'scroll', 'mousemove'].forEach(evt => {
+              window.addEventListener(evt, unlockAndPlay, { capture: true, once: true, passive: true });
+            });
+          }
+        } else {
+          // Fallback to HTML5 Audio if Web Audio API not supported
+          const blob = new Blob([arrayBuffer], { type: 'audio/mp3' });
+          const audioUrl = URL.createObjectURL(blob);
+          orionAudioElement = new Audio(audioUrl);
+          
+          // Preload question blob
+          fetch('/api/tts/speak', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ input: questionSpeechText, voice: chosenVoice, speed: 0 })
+          }).then(async qRes => {
+            if (qRes.ok) {
+              const qBuf = await qRes.arrayBuffer();
+              preloadedQuestionBlob = new Blob([qBuf], { type: 'audio/mp3' });
+            }
+          }).catch(() => {});
+
+          orionAudioElement.onplay = () => {
+            isOrionSpeaking = true;
+            if (sphereWrapper) {
+              sphereWrapper.classList.remove('loading');
+            }
+            if (sphereElem) {
+              sphereElem.classList.remove('loading');
+              sphereElem.classList.add('speaking');
+            }
+            runSimulatedSpeechVisualizer();
+          };
+          orionAudioElement.onended = () => {
+            stopOrionEqualizer();
+            setTimeout(() => {
+              triggerQuestionPhase(questionSpeechText, lang, chosenVoice);
+            }, 500);
+          };
+          orionAudioElement.play().catch(() => {
+            fallbackSpeechSynthesis(welcomeText, lang, chosenVoice, false);
+          });
+        }
+      } catch (err) {
+        console.warn('Orion Edge-TTS fallback to Web Speech API:', err);
+        fallbackSpeechSynthesis(welcomeText, lang, chosenVoice, false);
+      }
+    }
+
+    async function triggerQuestionPhase(questionSpeechText, lang, chosenVoice) {
+      const card = document.getElementById('aurora-choice-card');
+      const sphereElem = document.getElementById('aurora-sphere-elem');
+      const sphereWrapper = document.getElementById('aurora-sphere-wrapper');
+      const audioCtx = ensureAudioContext();
+
+      if (audioCtx && preloadedQuestionAudioBuffer) {
+        // Instantly play preloaded audio buffer with zero latency
+        orionBufferSource = audioCtx.createBufferSource();
+        orionBufferSource.buffer = preloadedQuestionAudioBuffer;
+        orionAnalyser = audioCtx.createAnalyser();
+        orionAnalyser.fftSize = 128;
+        orionAnalyser.smoothingTimeConstant = 0.55;
+        orionBufferSource.connect(orionAnalyser);
+        orionAnalyser.connect(audioCtx.destination);
+
+        isOrionSpeaking = true;
+        // Show choice card simultaneously with voice start
+        if (card) {
+          card.classList.add('visible');
+        }
+        if (sphereWrapper) {
+          sphereWrapper.classList.remove('loading');
+        }
+        if (sphereElem) {
+          sphereElem.classList.remove('loading');
+          sphereElem.classList.add('speaking');
+        }
+
+        orionBufferSource.onended = () => {
+          stopOrionEqualizer();
+        };
+
+        orionBufferSource.start(0);
+        startAudioVisualizerLoop();
+      } else if (!audioCtx && preloadedQuestionBlob) {
+        const audioUrl = URL.createObjectURL(preloadedQuestionBlob);
+        orionAudioElement = new Audio(audioUrl);
+        orionAudioElement.onplay = () => {
+          isOrionSpeaking = true;
+          if (card) {
+            card.classList.add('visible');
+          }
+          if (sphereWrapper) {
+            sphereWrapper.classList.remove('loading');
+          }
+          if (sphereElem) {
+            sphereElem.classList.remove('loading');
+            sphereElem.classList.add('speaking');
+          }
+          runSimulatedSpeechVisualizer();
+        };
+        orionAudioElement.onended = () => {
+          stopOrionEqualizer();
+        };
+        orionAudioElement.play().catch(() => {
+          fallbackSpeechSynthesis(questionSpeechText, lang, chosenVoice, false);
+        });
+      } else {
+        // If preload not finished yet, fetch and play directly
+        if (card) {
+          card.classList.add('visible');
+        }
+        await playOrionSpeechText(questionSpeechText, lang, chosenVoice, false);
+      }
+    }
+
+    function handleChoiceNo() {
+      const card = document.getElementById('aurora-choice-card');
+      if (card) {
+        card.classList.remove('visible');
+      }
+      dismissAuroraOverlay();
+    }
+
+    function dockAuroraToCorner() {
+      const overlay = document.getElementById('aurora-orb-overlay');
+      const sphereWrapper = document.getElementById('aurora-sphere-wrapper');
+      const choiceCard = document.getElementById('aurora-choice-card');
+
+      if (choiceCard) {
+        choiceCard.classList.remove('visible');
+      }
+      if (overlay) {
+        overlay.classList.add('fading-backdrop');
+        setTimeout(() => {
+          if (overlay.parentElement) overlay.remove();
+        }, 600);
+      }
+
+      if (sphereWrapper) {
+        const isSmallScreen = window.innerWidth <= 768;
+        const targetRight = isSmallScreen ? 76 : 88;
+        const targetBottom = isSmallScreen ? 72 : 76;
+        const targetSize = isSmallScreen ? 48 : 52;
+
+        // Calculate center of current sphere and target docked center
+        const sphereRect = sphereWrapper.getBoundingClientRect();
+        const currentCenterX = sphereRect.left + sphereRect.width / 2;
+        const currentCenterY = sphereRect.top + sphereRect.height / 2;
+
+        const targetCenterX = window.innerWidth - targetRight - (targetSize / 2);
+        const targetCenterY = window.innerHeight - targetBottom - (targetSize / 2);
+
+        const deltaX = Math.round(targetCenterX - currentCenterX);
+        const deltaY = Math.round(targetCenterY - currentCenterY);
+        const scaleRatio = (targetSize / 270).toFixed(4);
+
+        sphereWrapper.classList.remove('loading');
+        sphereWrapper.style.animation = 'none';
+        void sphereWrapper.offsetWidth;
+
+        // Animate with clean uniform transform scale + translate (zero aspect ratio distortion!)
+        sphereWrapper.style.transformOrigin = 'center center';
+        sphereWrapper.style.transition = 'transform 0.75s cubic-bezier(0.2, 0.9, 0.3, 1)';
+        sphereWrapper.style.transform = `translate3d(${deltaX}px, ${deltaY}px, 0) scale(${scaleRatio})`;
+
+        setTimeout(() => {
+          if (sphereWrapper.parentElement !== document.body) {
+            document.body.appendChild(sphereWrapper);
+          }
+          sphereWrapper.style.transition = '';
+          sphereWrapper.style.transform = '';
+          sphereWrapper.style.transformOrigin = '';
+          sphereWrapper.style.left = '';
+          sphereWrapper.style.top = '';
+          sphereWrapper.style.width = '';
+          sphereWrapper.style.height = '';
+          sphereWrapper.style.margin = '';
+          sphereWrapper.classList.add('docked-corner');
+          sphereWrapper.title = 'Buka Tanya AI Orion';
+          sphereWrapper.onclick = () => {
+            toggleAISplitPanel(true);
+          };
+        }, 760);
+      }
+    }
+
+    function stopAllAudioPlayback() {
+      activePlaybackSessionId++; // Invalidate and immediately kill any running speech loop / pipeline!
+
+      if (window.speechSynthesis) {
+        try { window.speechSynthesis.cancel(); } catch(e) {}
+      }
+      if (window.sharedAudio) {
+        try {
+          window.sharedAudio.pause();
+          window.sharedAudio.currentTime = 0;
+        } catch(e) {}
+      }
+      if (orionBufferSource) {
+        try {
+          orionBufferSource.onended = null; // Unbind onended to prevent ghost triggers
+          orionBufferSource.stop();
+          orionBufferSource.disconnect();
+        } catch(e) {}
+        orionBufferSource = null;
+      }
+      if (orionAudioElement) {
+        try {
+          orionAudioElement.onended = null;
+          orionAudioElement.pause();
+          orionAudioElement.currentTime = 0;
+        } catch(e) {}
+        orionAudioElement = null;
+      }
+      isOrionSpeaking = false;
+      stopOrionEqualizer();
+    }
+
+    async function handleChoiceYes() {
+      const card = document.getElementById('aurora-choice-card');
+      if (card) {
+        card.classList.remove('visible');
+      }
+
+      // Immediately stop any welcome or question speech so voices never overlap!
+      stopAllAudioPlayback();
+
+      // Smoothly dock mini orb to bottom-right corner
+      dockAuroraToCorner();
+
+      const sessionId = activePlaybackSessionId;
+
+      // Gather current material content & DOM details
+      const currentMat = (flatMaterials && flatMaterials[currentMaterialIndex]) ? flatMaterials[currentMaterialIndex] : null;
+      const courseTitle = (courseData && courseData.title) ? courseData.title : 'materi ini';
+      const matTitle = (currentMat && currentMat.title) ? currentMat.title : courseTitle;
+      
+      const dynamicArea = document.getElementById('material-dynamic-content-area');
+      const articleText = (currentMat && currentMat.content_text) || (dynamicArea ? dynamicArea.innerText : '') || (currentMat && currentMat.description) || '';
+
+      const lang = detectLanguage(courseTitle);
+      const chosenVoice = getA11ySelectedVoice(lang);
+
+      // Fetch deep AI narrative in background
+      let segments = [];
+      try {
+        const narrativeRes = await fetch('/api/ai/material/narrative', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            material_id: currentMat ? currentMat.id : null,
+            material_title: matTitle,
+            material_content: articleText,
+            context_details: dynamicArea ? dynamicArea.innerText : '',
+            target_level: 'beginner'
+          })
+        }).then(r => r.json());
+
+        if (sessionId !== activePlaybackSessionId) return;
+
+        if (narrativeRes && narrativeRes.success && narrativeRes.data && Array.isArray(narrativeRes.data.segments) && narrativeRes.data.segments.length > 0) {
+          segments = narrativeRes.data.segments;
+        }
+      } catch (err) {
+        console.warn('Failed to load narrative from AI:', err);
+      }
+
+      if (sessionId !== activePlaybackSessionId) return;
+
+      // Dynamic fallback if AI narrative is unavailable
+      if (!segments || segments.length === 0) {
+        const clientTransitions = [
+          'Nah, coba Anda perhatikan logika penting di bagian ini:',
+          'Kebayang kan mengapa hal ini sangat krusial dalam perancangan sistem?',
+          'Logika di baliknya cukup sederhana namun punya dampak besar:',
+          'Di sinilah letak kunci efisiensinya:',
+          'Biar semakin terbayang di implementasi nyata sehari-hari:',
+          'Coba perhatikan bagaimana prinsip ini saling melengkapi:'
+        ];
+        const paras = articleText.split(/\n\n+/).map(s => s.trim()).filter(s => s.length > 20 && !s.startsWith('---'));
+        segments = paras.map((p, idx) => {
+          const cleanP = p.replace(/^[#\s*\->]+/, '').replace(/[*_`]/g, '').trim();
+          const openWords = cleanP.split(' ').slice(0, 8).join(' ');
+          const transition = clientTransitions[idx % clientTransitions.length];
+          return {
+            step: idx + 1,
+            topic: `Konsep Inti ${idx + 1}`,
+            target_text: openWords,
+            text: idx === 0 
+              ? `Halo teman belajar! Senang sekali bisa mendampingi Anda di materi ${matTitle}. Yuk, kita pelajari bersama langkah demi langkah agar pemahaman Anda benar-benar matang! ${cleanP.slice(0, 180)}.`
+              : `${transition} ${cleanP.slice(0, 210)}.`
+          };
+        });
+      }
+
+      // Play segments sequentially with continuous background pipelining using accessibility voice!
+      await playPipelinedSegments(segments, lang, chosenVoice, sessionId);
+    }
+
+    async function fetchAndDecodeTTS(text, voice) {
+      const audioCtx = ensureAudioContext();
+      const res = await fetch('/api/tts/speak', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ input: text, voice: voice, speed: 0 })
+      });
+      if (!res.ok) throw new Error('TTS HTTP ' + res.status);
+      const arrayBuffer = await res.arrayBuffer();
+      if (audioCtx) {
+        return await audioCtx.decodeAudioData(arrayBuffer);
+      }
+      return arrayBuffer;
+    }
+
+    async function playPipelinedSegments(segments, lang, chosenVoice, sessionId = activePlaybackSessionId) {
+      if (!segments || segments.length === 0) return;
+
+      const preloadedBuffers = new Array(segments.length);
+
+      const preloadPromise = (idx) => {
+        if (idx < segments.length && !preloadedBuffers[idx]) {
+          preloadedBuffers[idx] = fetchAndDecodeTTS(segments[idx].text, chosenVoice).catch(err => {
+            console.warn(`Preload segment ${idx} failed:`, err);
+            return null;
+          });
+        }
+      };
+
+      // Kick off preload for segment 0 and 1
+      preloadPromise(0);
+      if (segments.length > 1) preloadPromise(1);
+
+      for (let i = 0; i < segments.length; i++) {
+        // Abort immediately if session was invalidated or user skipped
+        if (sessionId !== activePlaybackSessionId) {
+          return;
+        }
+
+        // 🎯 Fokus Mode: Highlight exact words / phrases & smooth auto-scroll in sync with Orion speech
+        highlightAndScrollToSection(i, segments.length, segments[i].topic, segments[i].text, segments[i].target_text);
+
+        // Preload next upcoming segment
+        if (i + 1 < segments.length) {
+          preloadPromise(i + 1);
+        }
+
+        let audioBuffer = null;
+        try {
+          audioBuffer = await preloadedBuffers[i];
+        } catch (e) {
+          audioBuffer = null;
+        }
+
+        if (sessionId !== activePlaybackSessionId) {
+          return;
+        }
+
+        if (audioBuffer && audioBuffer instanceof AudioBuffer) {
+          await playDecodedBuffer(audioBuffer, sessionId);
+        } else {
+          // Fallback direct speech text
+          await playOrionSpeechText(segments[i].text, lang, chosenVoice, false, sessionId);
+        }
+
+        if (sessionId !== activePlaybackSessionId) {
+          return;
+        }
+
+        // Natural breath pause between segments (280ms)
+        if (i < segments.length - 1) {
+          await new Promise(r => setTimeout(r, 280));
+          if (sessionId !== activePlaybackSessionId) return;
+        }
+      }
+
+      if (sessionId !== activePlaybackSessionId) return;
+
+      // Finished all segments cleanly
+      stopOrionEqualizer();
+      setTimeout(() => {
+        if (sessionId === activePlaybackSessionId) {
+          clearAIFocusHighlight();
+        }
+      }, 1600);
+
+      // Display Next Lesson Prompt Card if more modules are available
+      if (currentMaterialIndex < flatMaterials.length - 1) {
+        setTimeout(() => {
+          if (sessionId === activePlaybackSessionId) {
+            showNextModuleChoiceCard('finished_lesson', lang, chosenVoice);
+          }
+        }, 1200);
+      }
+    }
+
+    async function showNextModuleChoiceCard(promptMode = 'on_module_change', lang = 'id', chosenVoice = null) {
+      const card = document.getElementById('orion-next-choice-card');
+      if (!card) return;
+
+      if (!chosenVoice) {
+        const courseTitle = (courseData && courseData.title) ? courseData.title : '';
+        lang = detectLanguage(courseTitle);
+        chosenVoice = getA11ySelectedVoice(lang);
+      }
+
+      const currentMat = (flatMaterials && flatMaterials[currentMaterialIndex]) ? flatMaterials[currentMaterialIndex] : null;
+      const matTitle = currentMat ? currentMat.title : 'materi ini';
+
+      const tagEl = card.querySelector('.orion-next-tag');
+      const textEl = card.querySelector('.orion-next-card-text');
+      const yesBtn = card.querySelector('.aurora-btn-yes');
+
+      if (promptMode === 'on_module_change' || promptMode === 'mid_explanation_next') {
+        if (tagEl) tagEl.innerHTML = `<i class="fas fa-sparkles"></i> Orion Mentor AI`;
+        if (textEl) textEl.textContent = `Apakah materi "${matTitle}" ini mau dijelaskan?`;
+        if (yesBtn) {
+          yesBtn.innerHTML = `<span>Iya, Jelaskan</span> <i class="fas fa-play" style="font-size:10px;"></i>`;
+          yesBtn.onclick = () => {
+            dismissNextChoiceCard();
+            handleChoiceYes();
+          };
+        }
+      } else {
+        // finished_lesson mode
+        if (tagEl) tagEl.innerHTML = `<i class="fas fa-circle-check"></i> Selesai Dibahas`;
+        if (textEl) textEl.textContent = `Modul ini telah selesai! Ingin lanjut ke materi berikutnya dan saya bantu jelaskan lagi?`;
+        if (yesBtn) {
+          yesBtn.innerHTML = `<span>Iya, Lanjut</span> <i class="fas fa-arrow-right" style="font-size:10px;"></i>`;
+          yesBtn.onclick = () => {
+            proceedToNextModuleAndExplain();
+          };
+        }
+      }
+
+      // Ensure mini orb is docked in bottom-right corner
+      dockAuroraToCorner();
+      card.classList.add('visible');
+
+      const nextQuestionSpeech = (promptMode === 'on_module_change' || promptMode === 'mid_explanation_next')
+        ? ((lang === 'en' || chosenVoice.startsWith('en-')) ? 'Would you like me to explain this module?' : 'Apakah materi ini mau dijelaskan?')
+        : ((lang === 'en' || chosenVoice.startsWith('en-')) ? 'This module is complete! Would you like to proceed to the next lesson?' : 'Modul ini telah selesai. Apakah Anda ingin lanjut ke materi berikutnya dan saya bantu jelaskan lagi?');
+
+      await playOrionSpeechText(nextQuestionSpeech, lang, chosenVoice, false);
+    }
+
+    async function proceedToNextModuleAndExplain() {
+      dismissNextChoiceCard();
+      
+      if (currentMaterialIndex < flatMaterials.length - 1) {
+        // Mark current material completed
+        const currentMat = flatMaterials[currentMaterialIndex];
+        if (currentMat) {
+          completedMaterialIds.add(currentMat.id);
+          if (courseData) {
+            localStorage.setItem(`skillsphere_completed_${courseData.id}`, JSON.stringify(Array.from(completedMaterialIds)));
+          }
+          updateProgressUI();
+        }
+
+        // Advance to next module
+        selectMaterial(currentMaterialIndex + 1);
+
+        // Automatically start Orion explanation on the next lesson
+        setTimeout(() => {
+          handleChoiceYes();
+        }, 450);
+      } else {
+        completeAndNextModule();
+      }
+    }
+
+    function dismissNextChoiceCard() {
+      const card = document.getElementById('orion-next-choice-card');
+      if (card) {
+        card.classList.remove('visible');
+      }
+      stopAllAudioPlayback();
+    }
+
+    let lastHighlightedBlockIdx = -1;
+
+    function highlightAndScrollToSection(stepIndex, totalSteps = 1, topicText = '', segmentText = '', targetText = '') {
+      clearAIFocusHighlight();
+
+      const container = document.getElementById('material-dynamic-content-area');
+      if (!container) return;
+
+      const lowerTopic = (topicText || '').toLowerCase();
+      const searchRoot = container.querySelector('.prose-content') || container;
+      const readerBody = document.getElementById('classroom-reader-body');
+
+      // 1. Initial Opening Step (Step 0): strictly anchor and highlight at the top of the lesson
+      if (stepIndex === 0 || lowerTopic.includes('salam pembuka') || lowerTopic.includes('orientasi') || lowerTopic.includes('pengenalan') || lowerTopic.includes('selamat datang')) {
+        lastHighlightedBlockIdx = 0;
+        if (readerBody) {
+          readerBody.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        const topEl = (searchRoot ? searchRoot.querySelector('h1, h2, h3, p') : null) || document.getElementById('reader-material-title');
+        if (topEl) {
+          topEl.classList.add('ai-block-focus-highlight');
+        }
+        return;
+      }
+
+      // 2. Collect all readable content blocks strictly in order
+      const rawBlocks = Array.from(searchRoot.querySelectorAll('h1, h2, h3, h4, h5, h6, p, li, blockquote, pre'))
+        .filter(el => !el.closest('[data-no-ai-focus="true"]') && !el.closest('.practice-quiz-container'));
+
+      // If a blockquote contains child <p> elements, let the child <p> elements be the discrete focusable blocks
+      const blocks = rawBlocks.filter(el => !(el.tagName === 'BLOCKQUOTE' && el.querySelector('p')));
+
+      if (blocks.length === 0) return;
+
+      const cleanTarget = (targetText || '').replace(/^[#\s*\->]+/, '').replace(/[*_`]/g, '').trim().toLowerCase();
+      
+      let bestBlock = null;
+      let bestBlockIdx = -1;
+      let bestScore = -1;
+      let bestMatchIdx = -1;
+      let bestMatchLen = 0;
+
+      // Find the block that best matches cleanTarget
+      blocks.forEach((block, bIdx) => {
+        const bText = (block.textContent || '').replace(/\s+/g, ' ').trim().toLowerCase();
+        if (!bText || bText.length < 5) return;
+
+        let score = 0;
+        let matchIdx = -1;
+        let matchLen = 0;
+
+        if (cleanTarget && cleanTarget.length >= 4) {
+          // Exact prefix match is king (e.g. "ketika seorang mahasiswa...")
+          if (bText.startsWith(cleanTarget)) {
+            score += 6000;
+            matchIdx = 0;
+            matchLen = cleanTarget.length;
+          } else {
+            const foundIdx = bText.indexOf(cleanTarget);
+            if (foundIdx !== -1) {
+              score += 4000;
+              matchIdx = foundIdx;
+              matchLen = cleanTarget.length;
+            } else {
+              // Check first 5 words of cleanTarget
+              const targetWords = cleanTarget.split(' ').slice(0, 5).join(' ');
+              if (targetWords.length >= 6) {
+                if (bText.startsWith(targetWords)) {
+                  score += 5000;
+                  matchIdx = 0;
+                  matchLen = targetWords.length;
+                } else {
+                  const wordIdx = bText.indexOf(targetWords);
+                  if (wordIdx !== -1) {
+                    score += 3000;
+                    matchIdx = wordIdx;
+                    matchLen = targetWords.length;
+                  }
+                }
+              }
+            }
+          }
+        }
+
+        // Sequential progression bonus:
+        // Prioritize moving forward from lastHighlightedBlockIdx
+        if (lastHighlightedBlockIdx !== -1) {
+          if (bIdx >= lastHighlightedBlockIdx) {
+            score += 500;
+          } else {
+            score -= 1200; // Strong penalty for jumping backwards to an already read paragraph
+          }
+        }
+        const expectedBlockIdx = Math.min(blocks.length - 1, Math.max(0, stepIndex));
+        const distance = Math.abs(bIdx - expectedBlockIdx);
+        score += Math.max(0, 200 - (distance * 20));
+
+        if (score > bestScore) {
+          bestScore = score;
+          bestBlock = block;
+          bestBlockIdx = bIdx;
+          bestMatchIdx = matchIdx;
+          bestMatchLen = matchLen;
+        }
+      });
+
+      // If no confident text match found, smoothly advance to the next sequential block
+      if (!bestBlock || bestScore < 200) {
+        const fallbackIdx = lastHighlightedBlockIdx !== -1 
+          ? Math.min(blocks.length - 1, lastHighlightedBlockIdx + 1)
+          : Math.min(blocks.length - 1, Math.max(0, stepIndex));
+        bestBlock = blocks[fallbackIdx];
+        bestBlockIdx = fallbackIdx;
+      }
+
+      if (!bestBlock) return;
+
+      lastHighlightedBlockIdx = bestBlockIdx;
+
+      // Highlight the entire active paragraph/block with soft glow outline
+      bestBlock.classList.add('ai-block-focus-highlight');
+
+      // If a specific phrase was found within the block, mark the text node
+      if (bestMatchIdx !== -1 && bestMatchLen >= 4 && !/^H[1-6]$/i.test(bestBlock.tagName)) {
+        try {
+          const walker = document.createTreeWalker(bestBlock, NodeFilter.SHOW_TEXT, null, false);
+          let textNode;
+          const blockFullText = (bestBlock.textContent || '').replace(/\s+/g, ' ').toLowerCase();
+          const subTarget = blockFullText.substr(bestMatchIdx, bestMatchLen);
+
+          while ((textNode = walker.nextNode())) {
+            const tnVal = textNode.nodeValue || '';
+            const tnLower = tnVal.toLowerCase();
+            const nodeMatchIdx = tnLower.indexOf(subTarget);
+
+            if (nodeMatchIdx !== -1) {
+              const range = document.createRange();
+              range.setStart(textNode, nodeMatchIdx);
+              range.setEnd(textNode, nodeMatchIdx + subTarget.length);
+
+              const mark = document.createElement('mark');
+              mark.className = 'ai-live-text-mark';
+              range.surroundContents(mark);
+              break;
+            }
+          }
+        } catch (e) {}
+      }
+
+      // Smoothly scroll the centered active block into viewport
+      bestBlock.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+        inline: 'nearest'
+      });
+    }
+
+    function clearAIFocusHighlight() {
+      const container = document.getElementById('material-dynamic-content-area') || document;
+      
+      // 1. Remove glowing cards and block focus
+      const activeGlows = document.querySelectorAll('.ai-card-glow-focus, .ai-focus-highlight, .ai-diagram-glow, .ai-block-focus-highlight');
+      activeGlows.forEach(el => el.classList.remove('ai-card-glow-focus', 'ai-focus-highlight', 'ai-diagram-glow', 'ai-block-focus-highlight'));
+
+      // 2. Unwrap all marks cleanly
+      const marks = document.querySelectorAll('mark.ai-live-text-mark');
+      marks.forEach(mark => {
+        const parent = mark.parentNode;
+        if (parent) {
+          while (mark.firstChild) {
+            parent.insertBefore(mark.firstChild, mark);
+          }
+          parent.removeChild(mark);
+          parent.normalize();
+        }
+      });
+    }
+
+    function playDecodedBuffer(audioBuffer, expectedSessionId = null) {
+      return new Promise((resolve) => {
+        if (expectedSessionId !== null && expectedSessionId !== activePlaybackSessionId) {
+          resolve();
+          return;
+        }
+
+        const audioCtx = ensureAudioContext();
+        if (!audioCtx) {
+          resolve();
+          return;
+        }
+
+        const sphereElem = document.getElementById('aurora-sphere-elem');
+        const sphereWrapper = document.getElementById('aurora-sphere-wrapper');
+
+        try {
+          if (orionBufferSource) {
+            try {
+              orionBufferSource.onended = null;
+              orionBufferSource.stop();
+              orionBufferSource.disconnect();
+            } catch(e) {}
+            orionBufferSource = null;
+          }
+
+          orionBufferSource = audioCtx.createBufferSource();
+          orionBufferSource.buffer = audioBuffer;
+          orionAnalyser = audioCtx.createAnalyser();
+          orionAnalyser.fftSize = 128;
+          orionAnalyser.smoothingTimeConstant = 0.55;
+          orionBufferSource.connect(orionAnalyser);
+          orionAnalyser.connect(audioCtx.destination);
+
+          isOrionSpeaking = true;
+          if (sphereWrapper) {
+            sphereWrapper.classList.remove('loading');
+            sphereWrapper.classList.add('speaking');
+          }
+          if (sphereElem) {
+            sphereElem.classList.remove('loading');
+            sphereElem.classList.add('speaking');
+          }
+
+          orionBufferSource.onended = () => {
+            orionBufferSource = null;
+            resolve();
+          };
+
+          orionBufferSource.start(0);
+          startAudioVisualizerLoop();
+        } catch (err) {
+          console.warn('Audio play error:', err);
+          resolve();
+        }
+      });
+    }
+
+    async function playOrionSpeechText(text, lang = 'id', chosenVoice = 'id-male', autoDismiss = true, expectedSessionId = null) {
+      if (expectedSessionId !== null && expectedSessionId !== activePlaybackSessionId) return;
+
+      const sphereElem = document.getElementById('aurora-sphere-elem');
+      const sphereWrapper = document.getElementById('aurora-sphere-wrapper');
+      const audioCtx = ensureAudioContext();
+
+      try {
+        const res = await fetch('/api/tts/speak', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ input: text, voice: chosenVoice, speed: 0 })
+        });
+        if (!res.ok) throw new Error('TTS HTTP ' + res.status);
+        const arrayBuffer = await res.arrayBuffer();
+
+        if (expectedSessionId !== null && expectedSessionId !== activePlaybackSessionId) return;
+
+        if (audioCtx) {
+          const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+          if (expectedSessionId !== null && expectedSessionId !== activePlaybackSessionId) return;
+
+          if (orionBufferSource) {
+            try {
+              orionBufferSource.onended = null;
+              orionBufferSource.stop();
+              orionBufferSource.disconnect();
+            } catch(e) {}
+            orionBufferSource = null;
+          }
+
+          orionBufferSource = audioCtx.createBufferSource();
+          orionBufferSource.buffer = audioBuffer;
+          orionAnalyser = audioCtx.createAnalyser();
+          orionAnalyser.fftSize = 128;
+          orionAnalyser.smoothingTimeConstant = 0.55;
+          orionBufferSource.connect(orionAnalyser);
+          orionAnalyser.connect(audioCtx.destination);
+
+          isOrionSpeaking = true;
+          if (sphereWrapper) sphereWrapper.classList.remove('loading');
+          if (sphereElem) {
+            sphereElem.classList.remove('loading');
+            sphereElem.classList.add('speaking');
+          }
+
+          return new Promise((resolve) => {
+            orionBufferSource.onended = () => {
+              orionBufferSource = null;
+              stopOrionEqualizer();
+              if (autoDismiss) {
+                dismissAuroraOverlay();
+              }
+              resolve();
+            };
+            orionBufferSource.start(0);
+            startAudioVisualizerLoop();
+          });
+        } else {
+          const blob = new Blob([arrayBuffer], { type: 'audio/mp3' });
+          const audioUrl = URL.createObjectURL(blob);
+          orionAudioElement = new Audio(audioUrl);
+          return new Promise((resolve) => {
+            orionAudioElement.onplay = () => {
+              isOrionSpeaking = true;
+              if (sphereWrapper) sphereWrapper.classList.remove('loading');
+              if (sphereElem) {
+                sphereElem.classList.remove('loading');
+                sphereElem.classList.add('speaking');
+              }
+              runSimulatedSpeechVisualizer();
+            };
+            orionAudioElement.onended = () => {
+              orionAudioElement = null;
+              stopOrionEqualizer();
+              if (autoDismiss) {
+                dismissAuroraOverlay();
+              }
+              resolve();
+            };
+            orionAudioElement.onerror = () => {
+              orionAudioElement = null;
+              resolve();
+            };
+            orionAudioElement.play().catch(() => {
+              fallbackSpeechSynthesis(text, lang, chosenVoice, autoDismiss);
+              resolve();
+            });
+          });
+        }
+      } catch (err) {
+        fallbackSpeechSynthesis(text, lang, chosenVoice, autoDismiss);
+      }
+    }
+
+    function startAudioVisualizerLoop() {
+      const sphereElem = document.getElementById('aurora-sphere-elem');
+      const sphereWrapper = document.getElementById('aurora-sphere-wrapper');
+      const eqBars = document.querySelectorAll('.aurora-eq-bar');
+      if (!orionAnalyser) return;
+
+      const bufferLength = orionAnalyser.frequencyBinCount;
+      const dataArray = new Uint8Array(bufferLength);
+      const numBars = eqBars.length;
+
+      function renderEqualizer() {
+        if (!isOrionSpeaking) return;
+        orionAnimationId = requestAnimationFrame(renderEqualizer);
+
+        orionAnalyser.getByteFrequencyData(dataArray);
+
+        const isDocked = sphereWrapper && (sphereWrapper.classList.contains('docked-corner') || sphereWrapper.parentElement === document.body);
+
+        // Vocal bass resonance frequencies (bins 1 to 5: ~70Hz to 350Hz)
+        const bassVal = ((dataArray[1] || 0) * 1.3 + (dataArray[2] || 0) * 1.4 + (dataArray[3] || 0) * 1.1 + (dataArray[4] || 0) * 0.9) / 4;
+        const bassEnergy = Math.min(1.0, bassVal / 220);
+
+        // Overall voice speech energy across the 12 equalizer bars
+        let totalEnergy = 0;
+        eqBars.forEach((bar, index) => {
+          const freqBin = Math.min(bufferLength - 1, Math.floor(1 + index * 1.8));
+          const rawVal = dataArray[freqBin] || 0;
+          const boost = (freqBin <= 4) ? 1.4 : (freqBin <= 10 ? 1.2 : 0.9);
+          const val = Math.min(255, rawVal * boost);
+          totalEnergy += val;
+
+          const percent = val / 255;
+          if (isDocked) {
+            // Mini equalizer bar height (2px to 14px)
+            const targetHeight = Math.max(2, Math.min(14, Math.round(2 + percent * 12)));
+            bar.style.height = `${targetHeight}px`;
+          } else {
+            // Full-size equalizer bar height (6px to 74px)
+            const targetHeight = Math.max(6, Math.min(74, Math.round(6 + percent * 68)));
+            bar.style.height = `${targetHeight}px`;
+          }
+          bar.style.opacity = (0.5 + percent * 0.5).toFixed(2);
+        });
+
+        const avgEnergy = Math.min(1.0, totalEnergy / (numBars * 180));
+
+        // Dynamic Bass Scale & Glow Pulsing
+        if (isDocked && sphereWrapper) {
+          // Dynamic scale pulse on the mini floating orb while speaking
+          const targetScale = 1.0 + (bassEnergy * 0.15) + (avgEnergy * 0.08);
+          visualizerCurrentScale += (targetScale - visualizerCurrentScale) * 0.5;
+          sphereWrapper.style.transform = `scale(${visualizerCurrentScale.toFixed(3)})`;
+
+          if (sphereElem) {
+            const glowSpread = Math.round(14 + bassEnergy * 16);
+            const glowOpacity = (0.55 + bassEnergy * 0.4).toFixed(2);
+            sphereElem.style.boxShadow = `0 4px 20px rgba(37, 99, 235, 0.7), 0 0 ${glowSpread}px rgba(147, 197, 253, ${glowOpacity})`;
+          }
+        } else if (sphereElem) {
+          const targetScale = 1.0 + (bassEnergy * 0.085) + (avgEnergy * 0.04);
+          visualizerCurrentScale += (targetScale - visualizerCurrentScale) * 0.45;
+          sphereElem.style.transform = `scale(${visualizerCurrentScale.toFixed(3)})`;
+
+          const glowSpread = Math.round(45 + bassEnergy * 40);
+          const glowOpacity = (0.35 + bassEnergy * 0.25).toFixed(2);
+          sphereElem.style.boxShadow = `0 12px 45px rgba(59, 130, 246, 0.35), 0 0 ${glowSpread}px rgba(147, 197, 253, ${glowOpacity})`;
+        }
+      }
+
+      renderEqualizer();
+    }
+
+    function stopOrionEqualizer() {
+      isOrionSpeaking = false;
+      visualizerCurrentScale = 1.0;
+      const sphereElem = document.getElementById('aurora-sphere-elem');
+      const sphereWrapper = document.getElementById('aurora-sphere-wrapper');
+      if (sphereElem) {
+        sphereElem.classList.remove('speaking');
+        sphereElem.style.transform = 'scale(1)';
+        sphereElem.style.boxShadow = '';
+      }
+      if (sphereWrapper) {
+        sphereWrapper.classList.remove('speaking');
+        if (sphereWrapper.classList.contains('docked-corner')) {
+          sphereWrapper.style.transform = 'scale(1)';
+        }
+      }
+      if (orionAnimationId) {
+        cancelAnimationFrame(orionAnimationId);
+        orionAnimationId = null;
+      }
+      const isDocked = sphereWrapper && sphereWrapper.classList.contains('docked-corner');
+      const eqBars = document.querySelectorAll('.aurora-eq-bar');
+      eqBars.forEach((bar) => {
+        bar.style.height = isDocked ? '3px' : '6px';
+        bar.style.opacity = '0.55';
+      });
+    }
+
+    function runSimulatedSpeechVisualizer() {
+      const sphereElem = document.getElementById('aurora-sphere-elem');
+      const sphereWrapper = document.getElementById('aurora-sphere-wrapper');
+      const eqBars = document.querySelectorAll('.aurora-eq-bar');
+      let simTime = 0;
+
+      function renderSimulation() {
+        if (!isOrionSpeaking) return;
+        orionAnimationId = requestAnimationFrame(renderSimulation);
+        simTime += 0.09;
+
+        const isDocked = sphereWrapper && (sphereWrapper.classList.contains('docked-corner') || sphereWrapper.parentElement === document.body);
+
+        // Simulated vocal cadence with bass transients
+        const bassBeat = Math.max(0, Math.sin(simTime * 3.2) * 0.7 + Math.sin(simTime * 6.5) * 0.35);
+        const speechLoudness = Math.min(1.0, bassBeat);
+
+        eqBars.forEach((bar, index) => {
+          const centerDist = Math.abs(index - (eqBars.length - 1) / 2);
+          const barOsc = Math.sin(simTime * 4.8 + index * 0.7) * 0.35 + 0.65;
+          const barEnergy = Math.min(1.0, speechLoudness * barOsc * (1.15 - centerDist * 0.08));
+          if (isDocked) {
+            const targetHeight = Math.max(2, Math.min(14, Math.round(2 + barEnergy * 12)));
+            bar.style.height = `${targetHeight}px`;
+          } else {
+            const targetHeight = Math.max(6, Math.min(82, Math.round(6 + barEnergy * 76)));
+            bar.style.height = `${targetHeight}px`;
+          }
+          bar.style.opacity = (0.55 + barEnergy * 0.45).toFixed(2);
+        });
+
+        if (isDocked && sphereWrapper) {
+          const targetScale = 1.0 + (speechLoudness * 0.15);
+          visualizerCurrentScale += (targetScale - visualizerCurrentScale) * 0.35;
+          sphereWrapper.style.transform = `scale(${visualizerCurrentScale.toFixed(3)})`;
+
+          if (sphereElem) {
+            const glowSpread = Math.round(14 + speechLoudness * 16);
+            sphereElem.style.boxShadow = `0 4px 20px rgba(37, 99, 235, 0.7), 0 0 ${glowSpread}px rgba(147, 197, 253, ${(0.55 + speechLoudness * 0.35).toFixed(2)})`;
+          }
+        } else if (sphereElem) {
+          const targetScale = 1.0 + (speechLoudness * 0.095);
+          visualizerCurrentScale += (targetScale - visualizerCurrentScale) * 0.35;
+          sphereElem.style.transform = `scale(${visualizerCurrentScale.toFixed(3)})`;
+
+          const glowSpread = Math.round(45 + speechLoudness * 35);
+          sphereElem.style.boxShadow = `0 12px 45px rgba(59, 130, 246, 0.35), 0 0 ${glowSpread}px rgba(147, 197, 253, ${(0.35 + speechLoudness * 0.25).toFixed(2)})`;
+        }
+      }
+
+      renderSimulation();
+    }
+
+    function fallbackSpeechSynthesis(text, lang = 'id', voiceId = 'id-male', shouldDismiss = false) {
+      if (!('speechSynthesis' in window)) {
+        if (shouldDismiss) {
+          setTimeout(dismissAuroraOverlay, 2800);
+        } else {
+          setTimeout(showAuroraChoiceCard, 500);
+        }
+        return;
+      }
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = lang === 'en' ? 'en-US' : 'id-ID';
+      utterance.rate = 1.0;
+      utterance.pitch = voiceId.includes('female') ? 1.05 : 0.95;
+
+      const voices = window.speechSynthesis.getVoices();
+      if (voices && voices.length > 0) {
+        const isMale = voiceId.includes('male');
+        const targetLang = lang === 'en' ? 'en' : 'id';
+        const matched = voices.find(v => v.lang.toLowerCase().includes(targetLang) && (isMale ? (v.name.toLowerCase().includes('male') || v.name.toLowerCase().includes('david') || v.name.toLowerCase().includes('pria')) : true));
+        if (matched) utterance.voice = matched;
+      }
+
+      const sphereElem = document.getElementById('aurora-sphere-elem');
+
+      utterance.onstart = () => {
+        isOrionSpeaking = true;
+        const sphereWrapper = document.getElementById('aurora-sphere-wrapper');
+        if (sphereWrapper) {
+          sphereWrapper.classList.remove('loading');
+        }
+        if (sphereElem) {
+          sphereElem.classList.remove('loading');
+          sphereElem.classList.add('speaking');
+        }
+        runSimulatedSpeechVisualizer();
+      };
+      utterance.onend = () => {
+        stopOrionEqualizer();
+        if (shouldDismiss) {
+          dismissAuroraOverlay();
+        } else {
+          setTimeout(showAuroraChoiceCard, 500);
+        }
+      };
+      utterance.onerror = () => {
+        stopOrionEqualizer();
+        if (shouldDismiss) {
+          dismissAuroraOverlay();
+        } else {
+          setTimeout(showAuroraChoiceCard, 500);
+        }
+      };
+
+      window.speechSynthesis.speak(utterance);
+    }
+
+    function handleAuroraOverlayClick() {
+      // Prologue cannot be skipped by click - must finish naturally
+    }
+
+    let isDismissingAurora = false;
+
+    function dismissAuroraOverlay() {
+      if (isDismissingAurora) return;
+      isDismissingAurora = true;
+
+      if (orionBufferSource) {
+        try { orionBufferSource.stop(); } catch(e) {}
+      }
+      if (orionAudioElement) {
+        orionAudioElement.pause();
+      }
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
+      stopOrionEqualizer();
+
+      const overlay = document.getElementById('aurora-orb-overlay');
+      const sphereWrapper = document.getElementById('aurora-sphere-wrapper');
+      const sphereElem = document.getElementById('aurora-sphere-elem');
+      const choiceCard = document.getElementById('aurora-choice-card');
+      const targetBtn = document.getElementById('btn-ai-header-toggle');
+
+      if (choiceCard) {
+        choiceCard.classList.remove('visible');
+      }
+
+      if (overlay) {
+        overlay.classList.add('fading-backdrop');
+      }
+
+      if (sphereWrapper && targetBtn && overlay) {
+        // Disable keyframe floating & bouncing animations
+        sphereWrapper.classList.remove('loading');
+        sphereWrapper.classList.add('flying-to-target');
+        sphereWrapper.style.animation = 'none';
+        if (sphereElem) {
+          sphereElem.classList.remove('loading', 'speaking');
+          sphereElem.style.animation = 'none';
+        }
+        const outerGlow = sphereWrapper.querySelector('.aurora-outer-glow');
+        if (outerGlow) {
+          outerGlow.style.opacity = '0';
+        }
+
+        // Compute delta position to the exact center of "Tanya AI" header button
+        const sphereRect = sphereWrapper.getBoundingClientRect();
+        const targetRect = targetBtn.getBoundingClientRect();
+
+        const sphereCenterX = sphereRect.left + sphereRect.width / 2;
+        const sphereCenterY = sphereRect.top + sphereRect.height / 2;
+        const targetCenterX = targetRect.left + targetRect.width / 2;
+        const targetCenterY = targetRect.top + targetRect.height / 2;
+
+        const deltaX = Math.round(targetCenterX - sphereCenterX);
+        const deltaY = Math.round(targetCenterY - sphereCenterY);
+
+        // Force browser layout reflow to register starting point
+        void sphereWrapper.offsetWidth;
+
+        // Transform into brilliant glowing star & fly smoothly across screen to Tanya AI button
+        sphereWrapper.style.transition = 'transform 0.9s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.85s cubic-bezier(0.22, 1, 0.36, 1)';
+        sphereWrapper.style.transform = `translate(${deltaX}px, ${deltaY}px) scale(0.06)`;
+
+        if (sphereElem) {
+          sphereElem.style.transition = 'box-shadow 0.45s ease, filter 0.45s ease';
+          sphereElem.style.boxShadow = '0 0 35px #60A5FA, 0 0 70px #93C5FD, 0 0 100px #FFFFFF';
+          sphereElem.style.filter = 'brightness(2.5)';
+        }
+
+        // When star reaches Tanya AI button
+        setTimeout(() => {
+          sphereWrapper.style.opacity = '0';
+
+          // Trigger brilliant radiant shine on Tanya AI button
+          targetBtn.classList.add('tanya-ai-shine');
+          setTimeout(() => {
+            targetBtn.classList.remove('tanya-ai-shine');
+          }, 1400);
+
+          // Completely teardown overlay
+          setTimeout(() => {
+            overlay.classList.add('dismissed');
+            overlay.style.display = 'none';
+          }, 300);
+        }, 900);
+      } else if (overlay) {
+        overlay.classList.add('dismissed');
+        setTimeout(() => {
+          overlay.style.display = 'none';
+        }, 400);
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadClassroom();
+    });
+  </script>
+
+  <!-- Accessibility Studio & Head Tracking Controller -->
+  <script src="/javascripts/accessibility.js"></script>
+</body>
+</html>

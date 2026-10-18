@@ -1,38 +1,107 @@
 const https = require('https');
 const http = require('http');
 
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY || '';
+const AI_API_BASE_URL = process.env.AI_API_BASE_URL || 'https://pi.leopard-gila.ts.net/v1';
+const AI_API_KEY = process.env.AI_API_KEY || process.env.GEMINI_API_KEY || '';
 const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-1.5-flash';
 
 /**
- * Low-level caller to Google Gemini REST API using native Node.js HTTP/HTTPS
+ * Universal LLM caller: Supports OpenAI-compatible API endpoints (Orion/Gemini proxy)
+ * and Google Generative Language endpoints.
  */
 async function callGeminiAPI(prompt, systemInstruction = null, temperature = 0.7) {
-  if (!GEMINI_API_KEY || GEMINI_API_KEY.includes('your_gemini') || GEMINI_API_KEY.trim() === '') {
+  if (!AI_API_KEY || AI_API_KEY.includes('your_gemini') || AI_API_KEY.trim() === '') {
     return null; // Signals fallback mode
   }
 
+  // 1. Check if using OpenAI-compatible proxy (e.g., https://pi.leopard-gila.ts.net/v1)
+  if (AI_API_BASE_URL.includes('/v1') || AI_API_BASE_URL.includes('http')) {
+    try {
+      const endpoint = AI_API_BASE_URL.endsWith('/chat/completions') 
+        ? AI_API_BASE_URL 
+        : `${AI_API_BASE_URL.replace(/\/+$/, '')}/chat/completions`;
+
+      const messages = [];
+      if (systemInstruction) {
+        messages.push({ role: 'system', content: systemInstruction });
+      }
+      messages.push({ role: 'user', content: prompt });
+
+      const payload = JSON.stringify({
+        model: GEMINI_MODEL,
+        messages,
+        temperature,
+        max_tokens: 2048,
+      });
+
+      return await new Promise((resolve) => {
+        const url = new URL(endpoint);
+        const isHttps = url.protocol === 'https:';
+        const client = isHttps ? https : http;
+
+        const options = {
+          method: 'POST',
+          hostname: url.hostname,
+          port: url.port || (isHttps ? 443 : 80),
+          path: url.pathname + url.search,
+          headers: {
+            'Authorization': `Bearer ${AI_API_KEY}`,
+            'Content-Type': 'application/json',
+            'Content-Length': Buffer.byteLength(payload),
+          },
+          timeout: 15000,
+        };
+
+        const req = client.request(options, (res) => {
+          let data = '';
+          res.on('data', (chunk) => { data += chunk; });
+          res.on('end', () => {
+            try {
+              if (res.statusCode >= 200 && res.statusCode < 300) {
+                const parsed = JSON.parse(data);
+                const content = parsed?.choices?.[0]?.message?.content;
+                resolve(content || null);
+              } else {
+                console.warn(`[AI API] HTTP ${res.statusCode}:`, data);
+                resolve(null);
+              }
+            } catch (err) {
+              console.warn('[AI API] Parse error:', err.message);
+              resolve(null);
+            }
+          });
+        });
+
+        req.on('error', (err) => {
+          console.warn('[AI API] Request error:', err.message);
+          resolve(null);
+        });
+
+        req.on('timeout', () => {
+          req.destroy();
+          console.warn('[AI API] Request timed out.');
+          resolve(null);
+        });
+
+        req.write(payload);
+        req.end();
+      });
+    } catch (e) {
+      console.warn('[AI API] Client error:', e.message);
+    }
+  }
+
+  // 2. Google Direct Generative Language Fallback
   const model = GEMINI_MODEL;
-  const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(GEMINI_API_KEY)}`;
+  const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(AI_API_KEY)}`;
 
   const requestBody = {
-    contents: [
-      {
-        parts: [
-          { text: prompt },
-        ],
-      },
-    ],
-    generationConfig: {
-      temperature,
-      maxOutputTokens: 2048,
-    },
+    contents: [{ parts: [{ text: prompt }] }],
+    generationConfig: { temperature, maxOutputTokens: 2048 },
   };
 
   if (systemInstruction) {
-    requestBody.systemInstruction = {
-      parts: [{ text: systemInstruction }],
-    };
+    requestBody.systemInstruction = { parts: [{ text: systemInstruction }] };
   }
 
   const payload = JSON.stringify(requestBody);
@@ -53,9 +122,7 @@ async function callGeminiAPI(prompt, systemInstruction = null, temperature = 0.7
 
     const req = https.request(options, (res) => {
       let data = '';
-      res.on('data', (chunk) => {
-        data += chunk;
-      });
+      res.on('data', (chunk) => { data += chunk; });
       res.on('end', () => {
         try {
           if (res.statusCode >= 200 && res.statusCode < 300) {
@@ -187,40 +254,63 @@ Format JSON yang wajib dihasilkan:
 }
 
 /**
- * 2. AI Study Assistant Chat (Sprint 2 - Tegar)
+ * 2. AI Study Assistant Chat - Orion (AI Learning Partner with Socratic Scaffolding)
  */
 async function chatStudyAssistant({ message, conversationHistory = [], courseContext = null, studentName = 'Pelajar' }) {
-  const systemPrompt = `Anda adalah "SkillSphere AI Study Assistant", mentor belajar pribadi yang ramah, cerdas, dan pedagogis.
-Panduan Menjawab:
-- Jelaskan konsep dengan analogi sederhana terlebih dahulu, diikuti penjelasan teknis dan contoh kode jika relevan.
-- Berikan respon dalam Bahasa Indonesia yang lugas dan terstruktur.
-- Jangan gunakan em dash (—), gunakan tanda hubung (-) atau titik dua (:).
-- Bersikap suportif dan berikan tips belajar praktis.
-${courseContext ? `\nKonteks Kursus yang Sedang Dipelajari:\nJudul: ${courseContext.title || 'Kursus'}\nDeskripsi: ${courseContext.description || '-'}\nBab/Materi: ${courseContext.currentSection || '-'}` : ''}`;
+  const currentTopic = (courseContext && (courseContext.currentTopic || courseContext.currentSection)) || 'Materi Belajar';
+  const systemPrompt = `Anda adalah "Orion", partner belajar AI (AI Learning Partner & Socratic Study Companion) di platform SkillSphere AI.
+
+Peran & Karakteristik Orion:
+- Nama Anda adalah Orion. Bersikaplah seperti partner belajar dan mentor yang bersahabat, cerdas, suportif, dan interaktif.
+- Tujuan Anda adalah membantu siswa benar-benar memahami konsep secara mendalam, bukan sekadar memberikan contekan instan.
+
+Aturan Utama Bimbingan Bertahap (Scaffolding & Socratic Method):
+1. JANGAN LANGSUNG MEMBERIKAN SEMUA JAWABAN LENGKAP ATAU DUMP KODE SECARA SEKALIGUS.
+2. Berikan penjelasan secara bertahap (step-by-step):
+   - Mulai dengan intuisi atau konsep dasar 1 langkah pertama secara ringkas dan mudah dipahami.
+   - Berikan 1 potongan petunjuk (clue) atau contoh analogi awal.
+   - Akhiri selalu dengan pertanyaan pemantik atau ajakan reflektif, misalnya: "Bagaimana menurutmu tentang bagian ini?", "Sudah siap kita lanjut ke langkah berikutnya?", atau "Coba kamu tebak apa fungsi dari atribut tersebut sebelum saya jelaskan?"
+3. Jika siswa menyapa (seperti "hello", "halo", "hai", "pagi"):
+   - Balas dengan hangat dan ramah sebagai Orion.
+   - Sebutkan materi/topik yang sedang dibuka ("${currentTopic}").
+   - Tanyakan apa hal pertama yang ingin kita bedah bersama.
+4. Gaya Bahasa:
+   - Gunakan Bahasa Indonesia yang natural, mengalir, dan memotivasi.
+   - Dilarang menggunakan tanda em dash (—), gunakan tanda hubung biasa (-) atau titik dua (:).
+${courseContext ? `\nKonteks Kursus Aktif:\nJudul Kursus: ${courseContext.title || 'Kursus'}\nDeskripsi: ${courseContext.description || '-'}\nModul/Topik Saat Ini: ${currentTopic}` : ''}`;
 
   let prompt = '';
   if (Array.isArray(conversationHistory) && conversationHistory.length > 0) {
     prompt += 'Riwayat Diskusi:\n';
-    conversationHistory.slice(-6).forEach((h) => {
-      prompt += `${h.role === 'user' ? studentName : 'AI Assistant'}: ${h.content}\n`;
+    conversationHistory.slice(-8).forEach((h) => {
+      const sender = h.role === 'user' ? studentName : 'Orion';
+      prompt += `${sender}: ${h.content}\n`;
     });
     prompt += '\n';
   }
-  prompt += `${studentName}: ${message}\nAI Assistant:`;
+  prompt += `${studentName}: ${message}\nOrion:`;
 
   const aiResponse = await callGeminiAPI(prompt, systemPrompt, 0.7);
 
   if (aiResponse) {
+    const cleanReply = aiResponse.trim().replace(/—/g, '-');
     return {
-      message: aiResponse.trim().replace(/—/g, '-'),
+      message: cleanReply,
+      reply: cleanReply,
+      response: cleanReply,
+      partner_name: 'Orion',
       source: 'gemini_ai',
       timestamp: new Date().toISOString(),
     };
   }
 
-  // Resilient Intelligent Fallback Assistant
+  // Resilient Intelligent Fallback Assistant with Orion Persona
+  const fallbackReply = generateStudyAssistantFallback(message, courseContext);
   return {
-    message: generateStudyAssistantFallback(message, courseContext),
+    message: fallbackReply,
+    reply: fallbackReply,
+    response: fallbackReply,
+    partner_name: 'Orion',
     source: 'study_assistant_fallback',
     timestamp: new Date().toISOString(),
   };
@@ -315,6 +405,211 @@ Level: ${targetLevel}`;
       `Bagaimana Anda akan mengimplementasikan ${materialTitle} pada proyek nyata?`,
       'Apa saja tantangan utama dan solusi mitigasi saat menggunakan teknik ini?',
     ],
+  };
+}
+
+/**
+ * Extract clean, distinct readable paragraphs from course material content
+ */
+function extractContentParagraphs(text) {
+  if (!text) return [];
+  const rawParagraphs = text
+    .split(/\n\n+/)
+    .map(p => p.trim())
+    .filter(p => p.length > 20 && !p.startsWith('---'));
+
+  const paragraphs = [];
+  rawParagraphs.forEach(para => {
+    const cleanPara = para
+      .replace(/^[#\s*\->]+/, '')
+      .replace(/[*_`]/g, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+    if (cleanPara.length > 20) {
+      // 6 to 9 words verbatim from the start of this specific paragraph
+      const words = cleanPara.split(' ').slice(0, 8).join(' ');
+      paragraphs.push({
+        raw: para,
+        clean: cleanPara,
+        firstWords: words
+      });
+    }
+  });
+  return paragraphs;
+}
+
+/**
+ * 4b. Generate Interactive Multi-Segment Speech Narrative for Orion Tutor (100% Dynamic & Realtime Context-Aware)
+ */
+async function generateMaterialNarrative({ materialTitle, materialContent = '', contextDetails = '', targetLevel = 'beginner' }) {
+  const structuredParagraphs = extractContentParagraphs(materialContent || contextDetails || '');
+
+  const paragraphsPromptList = structuredParagraphs.map((p, idx) => 
+    `[Bagian ${idx + 1}]
+Kutipan Awal (target_text): "${p.firstWords}"
+Konten Materi: ${p.clean}`
+  ).join('\n\n');
+
+  const systemPrompt = `Anda adalah Orion, asisten AI mentor belajar ramah, hangat, komunikatif, dan penuh empati di platform edukasi SkillSphere AI.
+Gaya bicara Anda: Bersikaplah seperti mentor ahli yang duduk santai di samping siswa, membimbing dengan sabar dan memastikan siswa benar-benar memahami esensi dan logika di balik materi, bukan sekadar membaca ulang teks.
+
+PENDEKATAN MENTOR KE SISWA:
+1. Dekatkan diri ke siswa dengan bahasa percakapan yang hidup dan hangat ("kamu" atau "Anda" secara personal).
+2. Bangun pemahaman dari akar masalah: jelaskan mengapa konsep ini ada, analogikan dengan kehidupan nyata, dan jelaskan apa bahayanya jika tidak diterapkan.
+3. Ajak siswa berpikir reflektif (misal: "Coba bayangkan kalau kamu...", "Pernah nggak kamu kepikiran kenapa...", "Nah, di sinilah letak solusinya...").
+4. DILARANG KERAS MENGGUNAKAN FRASA ROBOTIK / KLISE:
+   - SANGAT DILARANG menggunakan kata "Mari kita cermati", "Mari kita simak", "Mari kita telaah", "Perhatikan bagian ini", atau "Berikut adalah penjelasannya".
+   - Gantilah dengan bahasa percakapan mentor sejati yang mengalir alami dan bersahabat.
+5. Dilarang menggunakan tanda em dash (—). Gunakan tanda hubung biasa (-) atau titik dua (:).
+6. Jangan sertakan format Markdown seperti bintang (*, **), pagar (#), atau blok kode di naskah 'text' karena teks ini akan disuarakan langsung oleh Text-to-Speech (TTS).
+
+ATURAN SEGMEN DAN PENYELARASAN LAYAR (SCREEN SYNC):
+1. Buat segmen berurutan untuk setiap [Bagian N] yang ada pada daftar materi di bawah. JANGAN menggabungkan atau melompati bagian.
+2. 'target_text' WAJIB disalin PERSIS (verbatim) dari "Kutipan Awal (target_text)" milik [Bagian N] tersebut!
+   SANGAT PENTING: JANGAN PERNAH mengambil teks dari bagian lain, karena antarmuka web menyorot (highlight) teks tersebut di layar pengguna saat Anda berbicara! Jika Anda sedang membahas Bagian 2, 'target_text' WAJIB persis milik Bagian 2!
+3. 'text': Naskah tuturan suara penjelasan Anda untuk bagian tersebut. Jelaskan inti permasalahan, logika sebab-akibat, dan analogi yang membantu murid paham.
+
+Format output WAJIB JSON:
+{
+  "title": "${materialTitle}",
+  "intro": "Halo! Saya Orion, mentor belajar AI Anda. Senang sekali bisa mendampingi Anda mendalami materi ${materialTitle} ini.",
+  "segments": [
+    {
+      "step": 1,
+      "topic": "Pengantar & Skenario Awal",
+      "target_text": "Kutipan Awal dari Bagian 1",
+      "text": "Naskah penjelasan mentor untuk Bagian 1..."
+    }
+  ]
+}`;
+
+  const userPrompt = `Analisis daftar bagian materi berikut dan buatkan narasi penjelasan bersegmen yang hangat, ramah, dan mendalam:
+Judul Materi: "${materialTitle}"
+Tingkat / Level: ${targetLevel}
+
+Daftar Bagian Materi Siswa:
+${paragraphsPromptList || materialTitle}`;
+
+  const rawResponse = await callGeminiAPI(userPrompt, systemPrompt, 0.4);
+
+  if (rawResponse) {
+    try {
+      const cleanJson = rawResponse.replace(/```json/gi, '').replace(/```/g, '').trim();
+      const parsed = JSON.parse(cleanJson);
+      if (parsed && Array.isArray(parsed.segments) && parsed.segments.length > 0) {
+        return parsed;
+      }
+    } catch (e) {
+      console.warn('[Gemini Service] Material narrative JSON parse error:', e.message);
+    }
+  }
+
+  // Dynamic Context-Aware Variable-Step Fallback based on real text content
+  return buildMaterialNarrativeFallback(materialTitle, materialContent, contextDetails);
+}
+
+function buildMaterialNarrativeFallback(materialTitle, materialContent = '', contextDetails = '') {
+  const fullText = (materialContent || contextDetails || '').trim();
+  const contentChunks = extractContentParagraphs(fullText);
+
+  // If no content parsed, provide a warm default
+  if (contentChunks.length === 0) {
+    return {
+      title: materialTitle,
+      intro: `Halo! Saya Orion, mentor belajar AI Anda. Senang sekali bisa mendampingi Anda di materi ${materialTitle}.`,
+      segments: [
+        {
+          step: 1,
+          topic: 'Orientasi Modul',
+          target_text: materialTitle,
+          text: `Halo teman belajar! Senang sekali bisa mendampingi Anda di materi ${materialTitle}. Yuk, kita pelajari bersama konsep penting ini agar wawasan teknis Anda semakin kuat dan siap diterapkan di dunia profesional.`
+        }
+      ]
+    };
+  }
+
+  // Empathetic, engaging pedagogical mentor transitions
+  const mentorOpeners = [
+    'Nah, coba Anda perhatikan logika penting di bagian ini:',
+    'Kebayang kan mengapa hal ini sangat krusial dalam perancangan sistem?',
+    'Logika di baliknya cukup sederhana namun punya dampak besar:',
+    'Di sinilah letak kunci efisiensinya:',
+    'Biar semakin terbayang di implementasi nyata sehari-hari:',
+    'Coba perhatikan bagaimana prinsip ini saling melengkapi:',
+    'Dari skenario ini, kita bisa melihat solusi elegan yang ditawarkan:'
+  ];
+
+  const segments = [];
+
+  contentChunks.forEach((item, idx) => {
+    const chunk = item.clean;
+    const lower = chunk.toLowerCase();
+    const openingWords = item.firstWords;
+
+    let topicName = `Konsep Inti ${idx + 1}`;
+    let explanationText = '';
+
+    if (lower.includes('bayangkan') || lower.includes('catatan besar')) {
+      topicName = 'Analogi Nyata: Buku Catatan Manual';
+      explanationText = `Halo teman belajar! Senang sekali bisa mendampingi Anda di materi ${materialTitle}. Coba Anda bayangkan situasi nyata ini: kamu punya sebuah buku catatan besar, dan setiap kali ada mahasiswa mengambil mata kuliah, kamu menulis ulang seluruh data dirinya dari awal di setiap baris. Kebayang kan betapa melelahkannya cara manual seperti ini?`;
+    } else if (lower.includes('ketika seorang mahasiswa') || lower.includes('pindah rumah') || lower.includes('5 baris')) {
+      topicName = 'Dampak Redundansi Data & Inkonsistensi';
+      explanationText = `Nah, masalah yang lebih fatal muncul saat data itu berubah: bayangkan kalau mahasiswa tadi mengambil lima mata kuliah sekaligus, lalu dia pindah rumah. Kamu terpaksa mencari dan mengubah lima baris data sekaligus. Kalau ada satu baris saja yang terlewat, alamatnya jadi tidak konsisten dan datanya bertolak belakang. Inilah masalah klasik yang dipecahkan oleh normalisasi basis data.`;
+    } else if (lower.includes('dr. e. f. codd') || lower.includes('definisi & konsep') || lower.includes('logical design')) {
+      topicName = 'Definisi & Teori Dr. E. F. Codd';
+      explanationText = `Untuk mengatasi masalah redundansi tersebut, Dr. Edgar F. Codd merumuskan konsep normalisasi. Logika dasarnya sangat elegan: kita pisahkan data ke dalam tabel-tabel terfokus dengan batas entitas yang jelas. Hasilnya, database kita jadi ramping, efisien, dan bebas dari kerangkapan data yang tidak perlu.`;
+    } else if (lower.includes('tujuan fundamental') || lower.includes('menghilangkan kerangkapan')) {
+      topicName = 'Tiga Tujuan Pokok Normalisasi';
+      explanationText = `Ada tiga tujuan besar yang ingin kita capai dengan teknik ini: pertama, membuang data duplikat yang boros ruang simpan. Kedua, menyederhanakan hubungan antar-tabel agar mudah dikelola. Dan yang paling penting: mencegah tiga anomali fatal saat sistem kita melakukan penambahan, perubahan, atau penghapusan data.`;
+    } else if (lower.includes('anomali penyisipan') || lower.includes('insertion anomaly')) {
+      topicName = 'Bahaya Anomali Penyisipan (Insert)';
+      explanationText = `Pertama, ada anomali penyisipan. Pernah nggak kamu mau input data baru, misalnya mata kuliah baru, tapi sistem menolak hanya karena belum ada mahasiswa yang mendaftar? Itu terjadi kalau kamu memaksakan dua entitas berbeda digabung dalam satu tabel.`;
+    } else if (lower.includes('anomali pembaruan') || lower.includes('update anomaly')) {
+      topicName = 'Bahaya Anomali Pembaruan (Update)';
+      explanationText = `Kedua, anomali pembaruan. Seperti contoh mahasiswa bernama Welli tadi, kalau satu orang punya data alamat di banyak baris, mengeditnya setengah-setengah akan menimbulkan inkonsistensi. Komputer kamu jadi bingung mana data yang valid.`;
+    } else if (lower.includes('anomali penghapusan') || lower.includes('deletion anomaly')) {
+      topicName = 'Bahaya Anomali Penghapusan (Delete)';
+      explanationText = `Dan ketiga, anomali penghapusan. Ini sangat bahaya kalau kamu cuma ingin menghapus satu transaksi mahasiswa yang batal kuliah, tapi gara-gara desain tabelnya salah, data mata kuliah dan dosennya ikut terhapus lenyap dari sistem.`;
+    } else if (lower.includes('syarat basis data normal') || lower.includes('lossless-join') || lower.includes('tiga syarat')) {
+      topicName = 'Syarat Dekomposisi Normal yang Ideal';
+      explanationText = `Nah, supaya pemecahan tabel kamu benar-benar sukses, pastikan memenuhi syarat Lossless-Join Decomposition. Artinya, ketika tabel-tabel pecahan itu digabungkan kembali lewat relasi Foreign Key, informasinya harus utuh persis seperti semula tanpa ada baris data palsu yang tercipta.`;
+    } else if (lower.includes('functional dependency') || lower.includes('ketergantungan')) {
+      topicName = 'Ketergantungan Fungsional (FD)';
+      explanationText = `Kunci utama memahami normalisasi adalah ketergantungan fungsional. Bayangkan ini seperti hubungan nomor induk mahasiswa dengan nama lengkapnya: jika NIM diketahui, maka nama pemiliknya pasti tunggal dan jelas.`;
+    } else if (lower.includes('1nf') || lower.includes('atomik')) {
+      topicName = 'Bentuk Normal Pertama (1NF)';
+      explanationText = `Pada bentuk normal pertama, prinsipnya sangat tegas: setiap kolom wajib bernilai atomik atau tunggal, dan tidak boleh ada perulangan kelompok data dalam satu baris.`;
+    } else if (lower.includes('2nf') || lower.includes('parsial')) {
+      topicName = 'Bentuk Normal Kedua (2NF)';
+      explanationText = `Melangkah ke bentuk normal kedua: seluruh atribut non-kunci wajib bergantung secara penuh pada kunci utama. Kita singkirkan ketergantungan parsial yang membuat tabel rancu.`;
+    } else if (lower.includes('3nf') || lower.includes('transitif')) {
+      topicName = 'Bentuk Normal Ketiga (3NF)';
+      explanationText = `Di tahap bentuk normal ketiga: kita pastikan tidak ada ketergantungan transitif, yaitu kondisi di mana atribut non-kunci malah bergantung pada atribut non-kunci lainnya.`;
+    } else {
+      const opener = mentorOpeners[idx % mentorOpeners.length];
+      explanationText = `${opener} ${chunk.slice(0, 220)}.`;
+    }
+
+    segments.push({
+      step: segments.length + 1,
+      topic: topicName,
+      target_text: openingWords,
+      text: explanationText
+    });
+  });
+
+  // Warm, motivating, encouraging mentor conclusion
+  segments.push({
+    step: segments.length + 1,
+    topic: 'Refleksi & Apresiasi Belajar',
+    target_text: contentChunks[contentChunks.length - 1]?.firstWords || materialTitle,
+    text: `Hebat sekali! Anda telah menuntaskan pembahasan modul ${materialTitle} ini dengan sangat tekun. Memahami konsep rancangan ini adalah bekal berharga untuk menjadi software engineer yang handal. Coba uji pemahaman Anda di kuis latihan di bawah, dan tanyakan kepada saya kapan saja jika ada hal yang ingin didiskusikan lebih lanjut ya. Tetap semangat!`
+  });
+
+  return {
+    title: materialTitle,
+    intro: `Halo! Saya Orion, mentor belajar AI Anda. Senang sekali bisa mendampingi Anda di materi ${materialTitle} ini.`,
+    segments
   };
 }
 
@@ -466,21 +761,64 @@ function buildAdaptiveRoadmapFallback(targetRole, currentSkills) {
 }
 
 function generateStudyAssistantFallback(message, courseContext) {
-  const msgLower = (message || '').toLowerCase();
+  const msgLower = (message || '').toLowerCase().trim();
+  const currentTopic = (courseContext && (courseContext.currentTopic || courseContext.currentSection)) || 'HTML5 & Modern Web Development';
 
+  // Greeting handling
+  if (msgLower === 'hello' || msgLower === 'halo' || msgLower === 'hai' || msgLower === 'pagi' || msgLower === 'siang' || msgLower === 'sore' || msgLower === 'malam' || msgLower === 'hi') {
+    return `Halo! Saya **Orion**, partner belajar AI Anda. 
+
+Saat ini kita sedang membuka modul: **${currentTopic}**. 
+
+Saya di sini untuk menemani dan memandu proses pemahaman Anda langkah demi langkah. Bagian mana yang ingin kita pelajari atau diskusikan bersama terlebih dahulu?`;
+  }
+
+  // HTML / DOM / Tag Questions (Scaffolded Step 1)
+  if (msgLower.includes('html') || msgLower.includes('dom') || msgLower.includes('tag') || msgLower.includes('struktur')) {
+    return `Pertanyaan yang bagus tentang **${currentTopic}**! Mari kita bedah konsepnya secara bertahap:
+
+**Langkah 1: Intuisi Dasar**
+Bayangkan HTML seperti kerangka tulang sebuah bangunan. Sebelum kita memberi cat (CSS) atau memasang instalasi listrik interaktif (JavaScript), kita butuh pondasi struktur yang kokoh terlebih dahulu.
+
+Elemen paling dasar yang wajib ada di setiap dokumen HTML5 adalah deklarasi \`<!DOCTYPE html>\` dan tag induk \`<html>\`.
+
+*Petunjuk Pemantik:*
+Kira-kira apa yang terjadi jika kita tidak menyertakan \`<!DOCTYPE html>\` di awal dokumen? Coba tebak, atau ketik *"lanjut"* jika ingin kita bahas bersama langkah berikutnya!`;
+  }
+
+  // JWT / Auth Questions
   if (msgLower.includes('jwt') || msgLower.includes('token') || msgLower.includes('auth')) {
-    return 'JSON Web Token (JWT) terdiri dari 3 bagian: Header (algoritma), Payload (klaim data seperti user id & role), dan Signature (kunci verifikasi). Di platform SkillSphere, kami menggunakan arsitektur Token Ganda: Access Token (masa aktif 24 jam) untuk otentikasi request cepat, dan Refresh Token (masa aktif 7 hari) untuk memperbarui sesi tanpa memaksa pengguna login ulang.';
+    return `Topik otentikasi sangat penting. Mari kita pahami dari intinya terlebih dahulu:
+
+**Tahap 1: Konsep Dasar Token**
+JSON Web Token (JWT) ibarat kartu akses digital dengan tanda tangan resmi yang tidak bisa dipalsukan. Kartu ini memuat informasi identitas pengguna (*payload*) dan masa berlaku.
+
+Di SkillSphere, kami memisahkan token menjadi 2:
+1. **Access Token**: Masa aktif singkat (24 jam) untuk mengakses data aman.
+2. **Refresh Token**: Masa aktif panjang (7 hari) untuk memperbarui sesi.
+
+Apakah peran Access Token ini sudah cukup jelas, atau ingin kita simulasikan bagaimana aliran datanya saat pengguna mengakses endpoint rahasia?`;
   }
 
+  // Split Revenue / Business Rules
   if (msgLower.includes('split') || msgLower.includes('revenue') || msgLower.includes('20%') || msgLower.includes('80%')) {
-    return 'Di SkillSphere, setiap transaksi kursus dibagi secara transparan: 20% dialokasikan untuk biaya platform (server, AI API, operasional) dan 80% masuk langsung ke dompet virtual Tutor (TutorWallet). Dana akan berada dalam masa holding selama 7 hari sebelum siap dicairkan (minimal penarikan Rp 100.000).';
+    return `Tentang pembagian hasil kursus di platform:
+
+**Skema Transparan 20% / 80%:**
+- **20% Biaya Platform**: Digunakan untuk pemeliharaan server, integrasi LLM AI Orion, dan operasional.
+- **80% Pendapatan Bersih**: Langsung dialokasikan ke Virtual Wallet Tutor (\`TutorWallet\`).
+
+Terdapat masa holding selama 7 hari sebelum saldo siap dicairkan (minimal penarikan Rp 100.000). Apakah Anda ingin mengetahui alur penarikan dananya secara lebih detail?`;
   }
 
-  if (msgLower.includes('milestone') || msgLower.includes('diskon') || msgLower.includes('voucher')) {
-    return 'Sistem Gamifikasi Milestone di SkillSphere memberikan penghargaan kepada pelajar yang disiplin. Jika Anda menyelesaikan sebuah bab/section dalam target waktu yang ditentukan (misalnya dalam 3 hari), sistem akan secara otomatis menerbitkan voucher diskon reward (misal 15%) untuk pembelian kursus berikutnya!';
-  }
+  // General Socratic / Scaffolding Response
+  return `Saya menangkap pertanyaan Anda mengenai **"${message}"** pada modul **${currentTopic}**.
 
-  return `Halo! Saya adalah Asisten Belajar AI SkillSphere. Pertanyaan Anda mengenai "${message}" sangat menarik. Anda dapat menanyakan konsep pemrograman, arsitektur database relasional, logika bisnis payment gateway, integrasi Gemini AI, atau meminta tips belajar dan ringkasan materi kursus kapan saja. Ada hal spesifik yang ingin kita bahas lebih dalam?`;
+Mari kita mulai dengan satu konsep kunci terlebih dahulu:
+1. Setiap fitur atau konsep pemrograman selalu berangkat dari masalah nyata yang ingin dipecahkan.
+2. Coba kita refleksikan: menurut pemahaman Anda saat ini, tujuan utama dari konsep tersebut apa?
+
+Berikan jawaban atau dugaan awal Anda, dan saya (Orion) akan memandu Anda menyempurnakannya langkah demi langkah!`;
 }
 
 function buildQuizFallback(topic, numberOfQuestions, difficulty) {
@@ -516,10 +854,166 @@ function buildQuizFallback(topic, numberOfQuestions, difficulty) {
   };
 }
 
+/**
+ * 5. Generate AI Adaptive Course Recommendations with Stage-based Progression
+ */
+async function generateAdaptiveCourseRecommendations({ user = {}, userProfile = {}, enrollments = [], availableCourses = [] }) {
+  const careerGoal = (userProfile && userProfile.career_goal) || 'Fullstack & AI Engineer';
+  const studyPreferences = (userProfile && userProfile.study_preferences) || {};
+  const topics = Array.isArray(studyPreferences.topics) ? studyPreferences.topics : ['Web Development', 'AI', 'Backend'];
+  
+  const completedCourseIds = new Set();
+  const inProgressCourseIds = new Set();
+  
+  enrollments.forEach(en => {
+    const isCompleted = en.status === 'completed' || (en.progress_percentage && en.progress_percentage >= 95);
+    const courseId = en.course_id || (en.course && en.course.id);
+    if (courseId) {
+      if (isCompleted) completedCourseIds.add(courseId);
+      else inProgressCourseIds.add(courseId);
+    }
+  });
+
+  const availableCatalog = availableCourses.map(c => ({
+    id: c.id,
+    title: c.title,
+    level: c.level || 'beginner',
+    category: c.category ? c.category.name : 'Teknologi',
+    description: c.description || '',
+    price: c.price || 0,
+    is_completed: completedCourseIds.has(c.id),
+    is_enrolled: inProgressCourseIds.has(c.id),
+  }));
+
+  const systemPrompt = `Anda adalah AI Adaptive Curriculum Mentor di platform edukasi SkillSphere AI.
+Tugas Anda adalah menganalisis personalisasi siswa dan kurikulum kursus yang tersedia, lalu merekomendasikan alur belajar berjenjang yang adaptif dan terfokus.
+Prinsip Alur Belajar Berjenjang:
+1. Tahap 1 (Pemula / Beginner): Jika siswa belum menyelesaikan kursus tingkat pemula, WAJIB HANYA merekomendasikan 2-3 kursus berlevel 'beginner' untuk membangun pondasi logika dasar. JANGAN merekomendasikan kursus intermediate atau advanced pada tahap ini.
+2. Tahap 2 (Menengah / Intermediate): Jika kursus pemula sudah diselesaikan (100%), rekomendasikan 2-3 kursus tingkat menengah untuk pendalaman arsitektur dan implementasi.
+3. Tahap 3 (Mahir / Expert / Advanced): Jika tingkat menengah sudah dikuasai, rekomendasikan 2-3 kursus tingkat lanjut, arsitektur enterprise, AI Agent, atau cloud native.
+
+ATURAN PEMBATASAN (LIMIT):
+- HANYA pilih MAKSIMAL 2-3 kursus terbaik yang sesuai dengan level tahapan siswa saat ini.
+- JANGAN mengembalikan semua kursus katalog sekaligus.
+- Gunakan Bahasa Indonesia ramah, profesional, dan memotivasi.
+- Dilarang menggunakan tanda em dash (—), gunakan tanda hubung (-) atau titik dua (:).
+- Output HANYA berupa JSON valid tanpa blok markdown.`;
+
+  const userPrompt = `Analisis data siswa dan berikan rekomendasi kursus adaptif (MAKSIMAL 2-3 KURSUS):
+Siswa: ${user.name || 'Siswa'}
+Target Karir: ${careerGoal}
+Minat / Topik: ${topics.join(', ')}
+Total Kursus Terdaftar: ${enrollments.length}
+Kursus Selesai (ID): ${Array.from(completedCourseIds).join(', ') || 'Belum ada'}
+
+Daftar Kursus Tersedia di SkillSphere:
+${JSON.stringify(availableCatalog, null, 2)}
+
+Format JSON yang WAJIB dihasilkan:
+{
+  "current_stage": "beginner",
+  "stage_badge": "Tahap 1: Pondasi Dasar (Pemula)",
+  "ai_insight": "Insight mentoring personalisasi 2-3 kalimat yang menjelaskan mengapa kursus pemula ini direkomendasikan saat ini.",
+  "primary_recommended_course_id": 2,
+  "next_steps_summary": "Langkah selanjutnya setelah menyelesaikan tahap pemula ini...",
+  "recommendations": [
+    {
+      "course_id": 2,
+      "priority": "current_focus",
+      "reason": "Alasan spesifik mengapa kursus pemula ini tepat untuk membangun fondasi...",
+      "badge": "Fokus Utama (Pemula)"
+    }
+  ]
+}`;
+
+  let rawResponse = await callGeminiAPI(userPrompt, systemPrompt, 0.3);
+  if (rawResponse) {
+    try {
+      const cleanJson = rawResponse.replace(/```json/gi, '').replace(/```/g, '').trim();
+      const parsed = JSON.parse(cleanJson);
+      if (parsed && parsed.current_stage && Array.isArray(parsed.recommendations)) {
+        // Enforce maximum 3 recommendations
+        parsed.recommendations = parsed.recommendations.slice(0, 3);
+        return parsed;
+      }
+    } catch (e) {
+      console.warn('[Gemini AI] Recommendation JSON parse error, falling back to heuristic engine.');
+    }
+  }
+
+  // Heuristic Fallback Engine
+  return buildAdaptiveRecommendationsFallback({
+    user,
+    careerGoal,
+    topics,
+    completedCourseIds,
+    inProgressCourseIds,
+    availableCourses,
+  });
+}
+
+function buildAdaptiveRecommendationsFallback({ user, careerGoal, topics, completedCourseIds, inProgressCourseIds, availableCourses }) {
+  // Determine Stage
+  const beginnerCourses = availableCourses.filter(c => c.level === 'beginner');
+  const intermediateCourses = availableCourses.filter(c => c.level === 'intermediate');
+  const advancedCourses = availableCourses.filter(c => c.level === 'advanced');
+
+  const completedBeginnerCount = beginnerCourses.filter(c => completedCourseIds.has(c.id)).length;
+  const completedIntermediateCount = intermediateCourses.filter(c => completedCourseIds.has(c.id)).length;
+
+  let currentStage = 'beginner';
+  let stageBadge = 'Tahap 1: Pondasi Dasar (Pemula)';
+  let aiInsight = `Berdasarkan target karir Anda sebagai "${careerGoal}", AI merekomendasikan untuk menguasai pondasi dasar dan semantik web terlebih dahulu sebelum melangkah ke konsep arsitektur tingkat lanjut.`;
+  let targetPool = beginnerCourses.length > 0 ? beginnerCourses : availableCourses;
+
+  if (completedBeginnerCount >= 1 && beginnerCourses.length > 0) {
+    if (completedIntermediateCount >= 1 && intermediateCourses.length > 0) {
+      currentStage = 'advanced';
+      stageBadge = 'Tahap 3: Tingkat Mahir & Expert';
+      aiInsight = `Luar biasa! Anda telah menyelesaikan pondasi dasar dan tingkat menengah. AI sekarang merekomendasikan kursus spesialisasi tingkat lanjut untuk menguasai standar industri dan arsitektur enterprise.`;
+      targetPool = advancedCourses.length > 0 ? advancedCourses : intermediateCourses;
+    } else {
+      currentStage = 'intermediate';
+      stageBadge = 'Tahap 2: Tingkat Menengah & Implementasi';
+      aiInsight = `Selamat atas kelulusan tahap pemula! AI sekarang merekomendasikan kursus tingkat menengah untuk memperdalam arsitektur sistem, keamanan, dan integrasi API industri.`;
+      targetPool = intermediateCourses.length > 0 ? intermediateCourses : advancedCourses;
+    }
+  }
+
+  const recommendations = [];
+  targetPool.slice(0, 3).forEach((c, idx) => {
+    if (!completedCourseIds.has(c.id)) {
+      recommendations.push({
+        course_id: c.id,
+        priority: idx === 0 ? 'current_focus' : 'next_stage',
+        reason: idx === 0 
+          ? `Materi utama yang sangat direkomendasikan untuk memperkuat kompetensi Anda di bidang ${c.category ? c.category.name : 'Teknologi'}.`
+          : `Langkah lanjutan untuk melengkapi pemahaman konsep dan keterampilan teknis Anda.`,
+        badge: idx === 0 ? `Fokus Utama (${c.level || 'beginner'})` : `Pondasi (${c.level || 'beginner'})`,
+      });
+    }
+  });
+
+  const primaryCourseId = recommendations.length > 0 ? recommendations[0].course_id : (targetPool[0] ? targetPool[0].id : null);
+
+  return {
+    current_stage: currentStage,
+    stage_badge: stageBadge,
+    ai_insight: aiInsight,
+    primary_recommended_course_id: primaryCourseId,
+    next_steps_summary: currentStage === 'beginner' 
+      ? 'Selesaikan modul HTML5 dan fundamental web untuk membuka kurikulum Backend dan AI tingkat menengah.'
+      : (currentStage === 'intermediate' ? 'Selesaikan proyek arsitektur backend untuk membuka kurikulum AI Agent dan Cloud Native.' : 'Raih sertifikasi resmi dan capstone portofolio industri.'),
+    recommendations: recommendations.slice(0, 3),
+  };
+}
+
 module.exports = {
   callGeminiAPI,
   generateCareerRoadmap,
   chatStudyAssistant,
   generatePracticeQuiz,
   explainCourseMaterial,
+  generateMaterialNarrative,
+  generateAdaptiveCourseRecommendations,
 };

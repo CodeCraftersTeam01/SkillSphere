@@ -23,6 +23,10 @@ const CourseMaterial = sequelize.define('CourseMaterial', {
     type: DataTypes.STRING(255),
     allowNull: false,
   },
+  content_text: {
+    type: DataTypes.TEXT('long'),
+    allowNull: true,
+  },
   duration_minutes: {
     type: DataTypes.INTEGER,
     defaultValue: 0,

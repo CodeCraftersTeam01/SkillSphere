@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title || 'Jalur Belajar AI & Karir | SkillSphere AI' %></title>
+  <meta name="description" content="Jalur belajar karir adaptif berbasis AI dari SkillSphere AI. Pantau milestone pembelajaran, proyek industri, dan progres penguasaan keahlian teknologi.">
+
+  <!-- PWA Manifest & App Icons -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#1F1E1B">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="SkillSphere">
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="shortcut icon" href="/favicon.svg">
+
+  <!-- Google Fonts: Newsreader & Plus Jakarta Sans & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome 6 Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- Claude Design System Stylesheet -->
+  <link rel="stylesheet" href="/stylesheets/claude-theme.css?v=2.0">
+  <!-- Accessibility & Head Tracking Stylesheet -->
+  <link rel="stylesheet" href="/stylesheets/accessibility.css">
+  <!-- Custom Alert & Toast Stylesheet & Script -->
+  <link rel="stylesheet" href="/stylesheets/custom-alert.css">
+  <script src="/javascripts/custom-alert.js"></script>
+
+  <style>
+    .roadmap-page {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 32px 24px 80px 24px;
+    }
+
+    .roadmap-hero {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 32px;
+      margin-bottom: 32px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .roadmap-hero::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 260px;
+      height: 100%;
+      background: radial-gradient(circle at top right, var(--accent-subtle) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .roadmap-header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+
+    .roadmap-title-area h1 {
+      font-family: var(--font-serif);
+      font-size: 28px;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin: 8px 0 6px 0;
+      letter-spacing: -0.02em;
+    }
+
+    .roadmap-title-area p {
+      font-size: 14px;
+      color: var(--text-secondary);
+      max-width: 620px;
+      line-height: 1.5;
+      margin: 0;
+    }
+
+    .roadmap-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .roadmap-meta-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-top: 24px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .meta-stat-box {
+      background: var(--bg-surface-subtle);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 14px 18px;
+    }
+
+    .meta-stat-label {
+      font-size: 11.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-tertiary);
+      font-weight: 600;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .meta-stat-value {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .skills-pills-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .skill-chip {
+      font-size: 12px;
+      font-weight: 600;
+      padding: 5px 12px;
+      border-radius: var(--radius-full);
+      background: var(--bg-surface-subtle);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .roadmap-progress-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 20px 24px;
+      margin-bottom: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .progress-bar-container {
+      flex: 1;
+      min-width: 240px;
+    }
+
+    .progress-bar-track {
+      height: 10px;
+      background: var(--bg-surface-subtle);
+      border-radius: var(--radius-full);
+      overflow: hidden;
+      border: 1px solid var(--border-subtle);
+      margin-top: 8px;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: var(--color-success);
+      width: 0%;
+      transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* Timeline Milestones */
+    .timeline-container {
+      position: relative;
+      padding-left: 36px;
+    }
+
+    .timeline-container::before {
+      content: '';
+      position: absolute;
+      top: 14px;
+      bottom: 20px;
+      left: 15px;
+      width: 2px;
+      background: var(--border-subtle);
+    }
+
+    .milestone-card {
+      position: relative;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      margin-bottom: 24px;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .milestone-card:hover {
+      border-color: var(--border-medium);
+      box-shadow: var(--shadow-md);
+    }
+
+    .milestone-card.status-completed {
+      border-left: 4px solid var(--color-success);
+    }
+
+    .milestone-card.status-in_progress {
+      border-left: 4px solid var(--accent-primary);
+    }
+
+    .milestone-card.status-pending {
+      border-left: 4px solid var(--border-medium);
+    }
+
+    .timeline-node {
+      position: absolute;
+      left: -36px;
+      top: 24px;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--bg-surface);
+      border: 2px solid var(--border-medium);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      z-index: 2;
+    }
+
+    .milestone-card.status-completed .timeline-node {
+      background: var(--color-success);
+      border-color: var(--color-success);
+      color: #FFFFFF;
+    }
+
+    .milestone-card.status-in_progress .timeline-node {
+      background: var(--accent-primary);
+      border-color: var(--accent-primary);
+      color: var(--accent-text);
+    }
+
+    .milestone-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+
+    .milestone-step-badge {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-tertiary);
+      margin-bottom: 4px;
+    }
+
+    .milestone-title {
+      font-family: var(--font-serif);
+      font-size: 20px;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin: 0;
+    }
+
+    .status-badge {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: var(--radius-full);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .status-badge.completed {
+      background: rgba(16, 185, 129, 0.12);
+      color: var(--color-success);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .status-badge.in_progress {
+      background: rgba(59, 130, 246, 0.12);
+      color: #3B82F6;
+      border: 1px solid rgba(59, 130, 246, 0.3);
+    }
+
+    .status-badge.pending {
+      background: var(--bg-surface-subtle);
+      color: var(--text-tertiary);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .milestone-desc {
+      font-size: 13.5px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      margin-bottom: 16px;
+    }
+
+    .milestone-topics-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 18px;
+    }
+
+    .topic-pill {
+      font-size: 11.5px;
+      background: var(--bg-surface-subtle);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      padding: 3px 10px;
+      border-radius: var(--radius-sm);
+    }
+
+    .assignment-box {
+      background: var(--bg-surface-subtle);
+      border: 1px dashed var(--border-medium);
+      border-radius: var(--radius-md);
+      padding: 14px 18px;
+      margin-bottom: 18px;
+    }
+
+    .assignment-header {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--accent-primary);
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .assignment-text {
+      font-size: 13px;
+      color: var(--text-primary);
+      margin: 0;
+      font-weight: 500;
+    }
+
+    .milestone-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+      padding-top: 14px;
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .milestone-duration {
+      font-size: 12px;
+      color: var(--text-tertiary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .milestone-controls {
+      display: flex;
+      gap: 8px;
+    }
+
+    .toast-popup {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      padding: 12px 20px;
+      border-radius: var(--radius-md);
+      font-size: 13px;
+      font-weight: 600;
+      z-index: 1000;
+      box-shadow: var(--shadow-lg);
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .toast-popup.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .toast-success {
+      background: var(--color-success);
+      color: #FFFFFF;
+    }
+
+    .toast-error {
+      background: var(--color-danger);
+      color: #FFFFFF;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="dashboard-layout">
+    <!-- Navigation Bar -->
+    <header class="navbar">
+      <div class="nav-main-row">
+        <div class="nav-brand-group">
+          <a href="/dashboard" class="brand-logo" style="text-decoration:none;">
+            <div class="brand-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path opacity="0.38" d="M12 7.6L17.3 4.7L14.4 10L17.3 15.3L12 12.4L6.7 15.3L9.6 10L6.7 4.7Z" />
+                <path d="M12 0L13.8 8.2L22 10L13.8 11.8L12 20L10.2 11.8L2 10L10.2 8.2L12 0Z" />
+              </svg>
+            </div>
+            <span>SkillSphere AI</span>
+          </a>
+        </div>
+
+        <ul class="nav-links-menu desktop-only">
+          <li><a href="/dashboard" class="nav-link-item">Beranda</a></li>
+          <li><a href="/courses" class="nav-link-item">Katalog Kursus</a></li>
+          <li><a href="/dashboard/roadmap" class="nav-link-item active">Jalur Belajar AI</a></li>
+          <li><a href="/dashboard#activities-section" class="nav-link-item">Tantangan</a></li>
+        </ul>
+
+        <div class="nav-actions">
+          <!-- Theme Toggle -->
+          <button class="theme-toggle-btn" id="theme-toggle-btn" type="button" aria-label="Toggle dark/light mode">
+            <i class="fas fa-sun" id="theme-icon-sun" style="display:none;"></i>
+            <i class="fas fa-moon" id="theme-icon-moon"></i>
+            <span id="theme-text">Mode Gelap</span>
+          </button>
+
+          <!-- User Profile Pill -->
+          <div class="user-profile-badge" onclick="window.location.href='/profile'" style="cursor:pointer;" title="Buka Pengaturan Profil Saya">
+            <div class="user-avatar-sm" id="nav-avatar">U</div>
+            <span class="user-name-label" id="nav-user-name">Memuat...</span>
+            <span class="user-role-tag" id="nav-user-role">Siswa</span>
+          </div>
+
+          <!-- Logout Button -->
+          <button class="logout-btn" id="logout-btn" type="button" title="Keluar">
+            <i class="fas fa-arrow-right-from-bracket"></i>
+            <span>Keluar</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Mobile Scrollable Subnav Menu -->
+      <div class="nav-mobile-row mobile-only">
+        <ul class="nav-links-menu mobile-scroll">
+          <li><a href="/dashboard" class="nav-link-item">Beranda</a></li>
+          <li><a href="/courses" class="nav-link-item">Katalog Kursus</a></li>
+          <li><a href="/dashboard/roadmap" class="nav-link-item active">Jalur Belajar AI</a></li>
+          <li><a href="/dashboard#activities-section" class="nav-link-item">Tantangan</a></li>
+        </ul>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="roadmap-page">
+      <div style="margin-bottom: 16px;">
+        <a href="/dashboard" style="font-size: 13px; color: var(--text-secondary); text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+          <i class="fas fa-arrow-left" style="font-size: 11px;"></i> Kembali ke Dashboard
+        </a>
+      </div>
+
+      <!-- Hero Header -->
+      <section class="roadmap-hero">
+        <div class="roadmap-header-top">
+          <div class="roadmap-title-area">
+            <span class="ai-stage-pill" style="margin-bottom: 8px;">
+              <i class="fas fa-wand-magic-sparkles"></i> AI Adaptive Career Roadmap
+            </span>
+            <h1 id="hero-target-role">Jalur Karir Cerdas</h1>
+            <p id="hero-summary">
+              Kurikulum bertahap yang dipersonalisasi secara otomatis oleh AI berdasarkan target karir, keahlian, dan preferensi belajar Anda.
+            </p>
+          </div>
+
+          <div class="roadmap-actions">
+            <button class="btn btn-outline" id="btn-regenerate-roadmap" onclick="handleRegenerateRoadmap()" style="font-size: 12px; padding: 7px 14px;">
+              <i class="fas fa-rotate" id="refresh-icon"></i> Perbarui Analisis AI
+            </button>
+            <a href="/profile" class="btn btn-outline" style="font-size: 12px; padding: 7px 14px; text-decoration: none;">
+              <i class="fas fa-sliders"></i> Ubah Target Karir
+            </a>
+          </div>
+        </div>
+
+        <div class="roadmap-meta-grid">
+          <div class="meta-stat-box">
+            <div class="meta-stat-label"><i class="fas fa-crosshairs"></i> Target Profesi</div>
+            <div class="meta-stat-value" id="stat-target-role">Memuat...</div>
+          </div>
+          <div class="meta-stat-box">
+            <div class="meta-stat-label"><i class="fas fa-list-check"></i> Total Milestone</div>
+            <div class="meta-stat-value" id="stat-total-steps">0 Tahap</div>
+          </div>
+          <div class="meta-stat-box">
+            <div class="meta-stat-label"><i class="fas fa-clock"></i> Estimasi Waktu</div>
+            <div class="meta-stat-value" id="stat-total-weeks">0 Minggu</div>
+          </div>
+        </div>
+
+        <div style="margin-top: 20px;">
+          <span style="font-size: 12px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.04em;">
+            Keahlian Rekomendasi AI:
+          </span>
+          <div class="skills-pills-wrap" id="recommended-skills-container">
+            <!-- Populated via JS -->
+            <span class="skill-chip"><i class="fas fa-spinner fa-spin"></i> Memuat keahlian...</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Progress Bar Card -->
+      <section class="roadmap-progress-card">
+        <div class="progress-bar-container">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 13.5px; font-weight: 600; color: var(--text-primary);">
+              Progres Penyelesaian Jalur Karir
+            </span>
+            <span style="font-size: 13px; font-weight: 700; color: var(--color-success); font-family: var(--font-mono);" id="progress-percent-label">
+              0% Selesai
+            </span>
+          </div>
+          <div class="progress-bar-track">
+            <div class="progress-bar-fill" id="progress-bar-fill"></div>
+          </div>
+        </div>
+        <div style="font-size: 12.5px; color: var(--text-secondary);" id="progress-status-summary">
+          0 dari 0 milestone selesai
+        </div>
+      </section>
+
+      <!-- Milestone Timeline List -->
+      <section>
+        <div style="margin-bottom: 20px;">
+          <h2 style="font-family: var(--font-serif); font-size: 22px; font-weight: 500; color: var(--text-primary); margin-bottom: 4px;">
+            Daftar Milestone Pembelajaran
+          </h2>
+          <p style="font-size: 13px; color: var(--text-secondary); margin: 0;">
+            Tandai setiap milestone saat Anda menguasai materinya untuk menjaga akurasi pelacakan AI.
+          </p>
+        </div>
+
+        <div class="timeline-container" id="milestones-container">
+          <div style="text-align: center; padding: 48px; color: var(--text-secondary); font-size: 13.5px;">
+            <i class="fas fa-spinner fa-spin" style="margin-right: 8px;"></i> Memuat alur milestone AI...
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer style="border-top: 1px solid var(--border-subtle); padding: 32px 24px; text-align: center; font-size: 12.5px; color: var(--text-tertiary);">
+      &copy; 2026 SkillSphere AI. Platform Pembelajaran Cerdas & Kurikulum Adaptif.
+    </footer>
+  </div>
+
+  <div id="toast" class="toast-popup"></div>
+
+  <!-- JavaScript -->
+  <script>
+    const token = localStorage.getItem('skillsphere_access_token') || localStorage.getItem('access_token');
+    let currentRoadmap = null;
+
+    function showToast(message, type = 'success') {
+      const toast = document.getElementById('toast');
+      if (!toast) return;
+      toast.textContent = message;
+      toast.className = `toast-popup show toast-${type}`;
+      setTimeout(() => {
+        toast.className = 'toast-popup';
+      }, 3500);
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    // Theme Management
+    const themeBtn = document.getElementById('theme-toggle-btn');
+    const sunIcon = document.getElementById('theme-icon-sun');
+    const moonIcon = document.getElementById('theme-icon-moon');
+    const themeText = document.getElementById('theme-text');
+
+    function updateThemeUI(theme) {
+      if (theme === 'dark') {
+        if (sunIcon) sunIcon.style.display = 'inline-block';
+        if (moonIcon) moonIcon.style.display = 'none';
+        if (themeText) themeText.textContent = 'Mode Terang';
+      } else {
+        if (sunIcon) sunIcon.style.display = 'none';
+        if (moonIcon) moonIcon.style.display = 'inline-block';
+        if (themeText) themeText.textContent = 'Mode Gelap';
+      }
+    }
+
+    const savedTheme = localStorage.getItem('skillsphere_theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    updateThemeUI(savedTheme);
+
+    if (themeBtn) {
+      themeBtn.addEventListener('click', () => {
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        const nextTheme = isDark ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', nextTheme);
+        localStorage.setItem('skillsphere_theme', nextTheme);
+        updateThemeUI(nextTheme);
+      });
+    }
+
+    // Logout Handler
+    const logoutBtn = document.getElementById('logout-btn');
+    if (logoutBtn) {
+      logoutBtn.addEventListener('click', () => {
+        localStorage.removeItem('skillsphere_access_token');
+        localStorage.removeItem('skillsphere_refresh_token');
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('refresh_token');
+        window.location.href = '/login';
+      });
+    }
+
+    // Fetch User Profile for Nav
+    async function loadUserProfile() {
+      if (!token) {
+        window.location.href = '/login';
+        return;
+      }
+      try {
+        const res = await fetch('/api/auth/me', {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        const json = await res.json();
+        if (json.success && json.data) {
+          const user = json.data;
+          const navAvatar = document.getElementById('nav-avatar');
+          const navUserName = document.getElementById('nav-user-name');
+          const navUserRole = document.getElementById('nav-user-role');
+          if (navAvatar) navAvatar.textContent = (user.name || 'U').charAt(0).toUpperCase();
+          if (navUserName) navUserName.textContent = user.name || 'Siswa';
+          if (navUserRole) navUserRole.textContent = (user.role || 'student').toUpperCase();
+        }
+      } catch (e) {
+        console.warn('Failed to fetch auth profile:', e);
+      }
+    }
+
+    // Load AI Career Roadmap
+    async function loadRoadmap() {
+      if (!token) {
+        window.location.href = '/login';
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/ai/career-roadmap/my-roadmap', {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        const json = await res.json();
+
+        if (!json.success || !json.data) {
+          showToast('Gagal memuat jalur belajar AI.', 'error');
+          return;
+        }
+
+        currentRoadmap = json.data;
+        renderRoadmap(currentRoadmap);
+      } catch (err) {
+        console.error('Error in loadRoadmap:', err);
+        showToast('Terjadi kesalahan jaringan.', 'error');
+      }
+    }
+
+    function renderRoadmap(roadmap) {
+      const targetRole = roadmap.target_role || 'Fullstack AI Engineer';
+      document.getElementById('hero-target-role').textContent = `Jalur Menuju ${targetRole}`;
+      document.getElementById('stat-target-role').textContent = targetRole;
+
+      let roadmapData = roadmap.roadmap_data;
+      if (typeof roadmapData === 'string') {
+        try { roadmapData = JSON.parse(roadmapData); } catch (e) { roadmapData = {}; }
+      }
+
+      const milestones = Array.isArray(roadmapData.milestones) ? roadmapData.milestones : [];
+      document.getElementById('stat-total-steps').textContent = `${milestones.length} Tahap`;
+
+      // Calculate Total Weeks
+      let totalWeeks = 0;
+      milestones.forEach(m => {
+        totalWeeks += (m.estimated_weeks || 3);
+      });
+      document.getElementById('stat-total-weeks').textContent = `${totalWeeks} Minggu`;
+
+      // Recommended Skills
+      const skillsContainer = document.getElementById('recommended-skills-container');
+      let skills = roadmap.recommended_skills || [];
+      if (typeof skills === 'string') {
+        try { skills = JSON.parse(skills); } catch (e) { skills = []; }
+      }
+      if (!Array.isArray(skills) || skills.length === 0) {
+        skills = ['Problem Solving', 'Modern Architecture', 'REST API', 'Security'];
+      }
+
+      skillsContainer.innerHTML = skills.map(s => `
+        <span class="skill-chip">
+          <i class="fas fa-check-circle" style="color:var(--accent-primary); font-size:11px;"></i> ${escapeHtml(s)}
+        </span>
+      `).join('');
+
+      // Progress Calculation
+      const completedCount = milestones.filter(m => m.status === 'completed').length;
+      const progressPercent = milestones.length > 0 ? Math.round((completedCount / milestones.length) * 100) : 0;
+      
+      const progressBar = document.getElementById('progress-bar-fill');
+      const progressLabel = document.getElementById('progress-percent-label');
+      const progressSummary = document.getElementById('progress-status-summary');
+
+      if (progressBar) progressBar.style.width = `${progressPercent}%`;
+      if (progressLabel) progressLabel.textContent = `${progressPercent}% Selesai`;
+      if (progressSummary) progressSummary.textContent = `${completedCount} dari ${milestones.length} milestone terselesaikan`;
+
+      // Render Milestones
+      const container = document.getElementById('milestones-container');
+      if (milestones.length === 0) {
+        container.innerHTML = `
+          <div style="text-align:center; padding:32px; color:var(--text-secondary); font-size:13px;">
+            Belum ada milestone yang dibuat. Silakan klik tombol "Perbarui Analisis AI".
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = milestones.map(m => {
+        const step = m.step;
+        const status = m.status || 'pending';
+        let statusBadgeHtml = '';
+        let nodeIcon = step;
+
+        if (status === 'completed') {
+          statusBadgeHtml = `<span class="status-badge completed"><i class="fas fa-circle-check"></i> Selesai</span>`;
+          nodeIcon = `<i class="fas fa-check"></i>`;
+        } else if (status === 'in_progress') {
+          statusBadgeHtml = `<span class="status-badge in_progress"><i class="fas fa-spinner fa-spin"></i> Sedang Berjalan</span>`;
+          nodeIcon = `<i class="fas fa-play" style="font-size:10px;"></i>`;
+        } else {
+          statusBadgeHtml = `<span class="status-badge pending"><i class="fas fa-hourglass-start"></i> Belum Dimulai</span>`;
+        }
+
+        const topics = Array.isArray(m.topics) ? m.topics : [];
+
+        return `
+          <div class="milestone-card status-${status}">
+            <div class="timeline-node">${nodeIcon}</div>
+            
+            <div class="milestone-header">
+              <div>
+                <div class="milestone-step-badge">Milestone #${step}</div>
+                <h3 class="milestone-title">${escapeHtml(m.title)}</h3>
+              </div>
+              <div>
+                ${statusBadgeHtml}
+              </div>
+            </div>
+
+            <p class="milestone-desc">${escapeHtml(m.description)}</p>
+
+            ${topics.length > 0 ? `
+              <div class="milestone-topics-list">
+                ${topics.map(t => `<span class="topic-pill"><i class="fas fa-code" style="font-size:9px; margin-right:4px;"></i>${escapeHtml(t)}</span>`).join('')}
+              </div>
+            ` : ''}
+
+            ${m.project_assignment ? `
+              <div class="assignment-box">
+                <div class="assignment-header">
+                  <i class="fas fa-laptop-code"></i> Proyek Capstone Praktik
+                </div>
+                <p class="assignment-text">${escapeHtml(m.project_assignment)}</p>
+              </div>
+            ` : ''}
+
+            <div class="milestone-footer">
+              <div class="milestone-duration">
+                <i class="fas fa-calendar-days"></i> Estimasi: ${m.estimated_weeks || 3} Minggu
+              </div>
+
+              <div class="milestone-controls">
+                ${status !== 'completed' ? `
+                  <button class="btn btn-outline" style="font-size:11.5px; padding:4px 10px;" onclick="updateMilestone(${step}, 'completed')">
+                    <i class="fas fa-circle-check" style="color:var(--color-success);"></i> Tandai Selesai
+                  </button>
+                ` : `
+                  <button class="btn btn-outline" style="font-size:11.5px; padding:4px 10px;" onclick="updateMilestone(${step}, 'in_progress')">
+                    <i class="fas fa-rotate-left"></i> Buka Kembali
+                  </button>
+                `}
+                ${status === 'pending' ? `
+                  <button class="btn btn-primary" style="font-size:11.5px; padding:4px 10px;" onclick="updateMilestone(${step}, 'in_progress')">
+                    <i class="fas fa-play"></i> Mulai Tahap Ini
+                  </button>
+                ` : ''}
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function updateMilestone(step, newStatus) {
+      if (!token) return;
+      try {
+        const res = await fetch(`/api/ai/career-roadmap/milestone/${step}`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+          body: JSON.stringify({ status: newStatus })
+        });
+        const json = await res.json();
+        if (json.success) {
+          showToast(`Milestone #${step} berhasil diperbarui!`, 'success');
+          loadRoadmap();
+        } else {
+          showToast(json.message || 'Gagal memperbarui milestone.', 'error');
+        }
+      } catch (e) {
+        showToast('Terjadi kesalahan jaringan.', 'error');
+      }
+    }
+
+    async function handleRegenerateRoadmap() {
+      if (!token) return;
+      const icon = document.getElementById('refresh-icon');
+      if (icon) icon.classList.add('fa-spin');
+      showToast('AI sedang menyusun ulang roadmap karir Anda...', 'success');
+
+      try {
+        const res = await fetch('/api/ai/career-roadmap/generate', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+          body: JSON.stringify({ force_refresh: true })
+        });
+        const json = await res.json();
+        if (json.success) {
+          showToast('Roadmap karir baru berhasil dibuat oleh AI!', 'success');
+          loadRoadmap();
+        } else {
+          showToast(json.message || 'Gagal meregenerasi roadmap.', 'error');
+        }
+      } catch (e) {
+        showToast('Terjadi kesalahan jaringan.', 'error');
+      } finally {
+        if (icon) icon.classList.remove('fa-spin');
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadUserProfile();
+      loadRoadmap();
+    });
+  </script>
+</body>
+</html>

@@ -22,6 +22,7 @@ const {
   WalletTransaction,
   WithdrawalRequest,
 } = require('../models');
+const html5Articles = require('./html5ArticlesData');
 
 async function seedDatabase() {
   try {
@@ -294,34 +295,256 @@ async function seedDatabase() {
       order_index: 2,
     });
 
-    // Course 2: Dasar Pemrograman Web Modern (Beginner / Free)
+    // Course 2: Mastering Modern HTML5 (Beginner to Expert)
     const course2 = await Course.create({
       tutor_id: tutor.id,
       category_id: catFrontend.id,
-      title: 'Dasar Pemrograman Web Modern: HTML5, CSS3 & JavaScript ES6+',
-      slug: 'dasar-pemrograman-web-modern',
-      description: 'Mulai perjalanan karir Anda sebagai web developer dari pondasi dasar sintaks, semantik HTML5, CSS Grid/Flexbox, dan JavaScript modern.',
+      title: 'Mastering Modern HTML5: Dari Nol Hingga Standar Industri & Web Expert',
+      slug: 'mastering-modern-html5-expert',
+      description: 'Panduan kurikulum komprehensif HTML5 dari pondasi sintaks dasar, formulir interaktif, semantik modern, aksesibilitas WCAG, optimasi Core Web Vitals, hingga Web Components tingkat lanjut.',
       thumbnail_url: null,
       price: 0.00,
       level: 'beginner',
-      rating_avg: 4.8,
-      rating_count: 94,
+      rating_avg: 4.95,
+      rating_count: 142,
       status: 'published',
     });
+
+    // Bab 1: Pondasi Dasar & Struktur Dokumen (Level Pemula)
     const c2Sec1 = await CourseSection.create({
       course_id: course2.id,
-      title: 'Bab 1: Struktur Web & Semantik Modern',
+      title: 'Bab 1: Pondasi Dasar & Struktur Dokumen (Level Pemula)',
       order_index: 1,
     });
-    await CourseMaterial.create({
-      section_id: c2Sec1.id,
-      title: '1.1 Pengantar HTML5 Semantik & Aksesibilitas Web',
-      content_type: 'video',
-      file_url: 'https://storage.skillsphere.id/materials/html5_intro.mp4',
-      duration_minutes: 20,
-      is_preview: true,
-      order_index: 1,
+    await CourseMaterial.bulkCreate([
+      {
+        section_id: c2Sec1.id,
+        title: '1.1 Anatomi Dokumen HTML5 & Konfigurasi Lingkungan Belajar',
+        content_type: 'book',
+        file_url: null,
+        duration_minutes: 15,
+        content_text: (html5Articles['1.1 Anatomi Dokumen HTML5 & Konfigurasi Lingkungan Belajar'] || '').trim(),
+        is_preview: true,
+        order_index: 1,
+      },
+      {
+        section_id: c2Sec1.id,
+        title: '1.2 Hirarki Teks, Tipografi & Format Konten',
+        content_type: 'book',
+        file_url: null,
+        duration_minutes: 12,
+        content_text: (html5Articles['1.2 Hirarki Teks, Tipografi & Format Konten'] || '').trim(),
+        is_preview: false,
+        order_index: 2,
+      },
+      {
+        section_id: c2Sec1.id,
+        title: '1.3 Tautan Hiperteks, Navigasi & Anchor Positioning',
+        content_type: 'book',
+        file_url: null,
+        duration_minutes: 18,
+        content_text: (html5Articles['1.3 Tautan Hiperteks, Navigasi & Anchor Positioning'] || '').trim(),
+        is_preview: false,
+        order_index: 3,
+      },
+      {
+        section_id: c2Sec1.id,
+        title: '1.4 Penyusunan Daftar (List) & Struktur Informasi Bersarang',
+        content_type: 'book',
+        file_url: null,
+        duration_minutes: 10,
+        content_text: (html5Articles['1.4 Penyusunan Daftar (List) & Struktur Informasi Bersarang'] || '').trim(),
+        is_preview: false,
+        order_index: 4,
+      },
+      {
+        section_id: c2Sec1.id,
+        title: '1.5 Integrasi Media Dasar: Gambar, Audio, dan Video',
+        content_type: 'book',
+        file_url: null,
+        duration_minutes: 20,
+        content_text: (html5Articles['1.5 Integrasi Media Dasar: Gambar, Audio, dan Video'] || '').trim(),
+        is_preview: false,
+        order_index: 5,
+      },
+    ]);
+
+    // Bab 2: Semantik Web, Formulir Interaktif & Validasi (Level Menengah)
+    const c2Sec2 = await CourseSection.create({
+      course_id: course2.id,
+      title: 'Bab 2: Semantik Web, Formulir Interaktif & Validasi (Level Menengah)',
+      order_index: 2,
     });
+    await CourseMaterial.bulkCreate([
+      {
+        section_id: c2Sec2.id,
+        title: '2.1 Struktur Semantik Modern: Layout Tanpa div Soup',
+        content_type: 'book',
+        file_url: null,
+        duration_minutes: 22,
+        content_text: (html5Articles['2.1 Struktur Semantik Modern: Layout Tanpa div Soup'] || '').trim(),
+        is_preview: false,
+        order_index: 1,
+      },
+      {
+        section_id: c2Sec2.id,
+        title: '2.2 Formulir Interaktif & Variasi Input Modern',
+        content_type: 'book',
+        file_url: null,
+        duration_minutes: 25,
+        content_text: (html5Articles['2.2 Formulir Interaktif & Variasi Input Modern'] || '').trim(),
+        is_preview: false,
+        order_index: 2,
+      },
+      {
+        section_id: c2Sec2.id,
+        title: '2.3 Kontrol Pilihan: Select, Datalist, Radio, dan Checkbox',
+        content_type: 'book',
+        file_url: null,
+        duration_minutes: 15,
+        content_text: (html5Articles['2.3 Kontrol Pilihan: Select, Datalist, Radio, dan Checkbox'] || '').trim(),
+        is_preview: false,
+        order_index: 3,
+      },
+      {
+        section_id: c2Sec2.id,
+        title: '2.4 Validasi Formulir Native & Aksesibilitas Form',
+        content_type: 'book',
+        file_url: null,
+        duration_minutes: 18,
+        content_text: (html5Articles['2.4 Validasi Formulir Native & Aksesibilitas Form'] || '').trim(),
+        is_preview: false,
+        order_index: 4,
+      },
+      {
+        section_id: c2Sec2.id,
+        title: '2.5 Tabel Data Terstruktur & Responsif',
+        content_type: 'book',
+        file_url: null,
+        duration_minutes: 14,
+        content_text: (html5Articles['2.5 Tabel Data Terstruktur & Responsif'] || '').trim(),
+        is_preview: false,
+        order_index: 5,
+      },
+    ]);
+
+    // Bab 3: Aksesibilitas (a11y), Grafis Modern & Media Adaptif (Level Mahir)
+    const c2Sec3 = await CourseSection.create({
+      course_id: course2.id,
+      title: 'Bab 3: Aksesibilitas (a11y), Grafis Modern & Media Adaptif (Level Mahir)',
+      order_index: 3,
+    });
+    await CourseMaterial.bulkCreate([
+      {
+        section_id: c2Sec3.id,
+        title: '3.1 Prinsip Aksesibilitas Web (WCAG 2.2) & WAI-ARIA',
+        content_type: 'book',
+        file_url: null,
+        duration_minutes: 28,
+        content_text: (html5Articles['3.1 Prinsip Aksesibilitas Web (WCAG 2.2) & WAI-ARIA'] || '').trim(),
+        is_preview: false,
+        order_index: 1,
+      },
+      {
+        section_id: c2Sec3.id,
+        title: '3.2 Media Adaptif & Responsive Images (picture & srcset)',
+        content_type: 'book',
+        file_url: null,
+        duration_minutes: 20,
+        content_text: (html5Articles['3.2 Media Adaptif & Responsive Images (picture & srcset)'] || '').trim(),
+        is_preview: false,
+        order_index: 2,
+      },
+      {
+        section_id: c2Sec3.id,
+        title: '3.3 Grafik Vektor Interaktif (SVG) Inline & Manipulasi DOM',
+        content_type: 'book',
+        file_url: null,
+        duration_minutes: 16,
+        content_text: (html5Articles['3.3 Grafik Vektor Interaktif (SVG) Inline & Manipulasi DOM'] || '').trim(),
+        is_preview: false,
+        order_index: 3,
+      },
+      {
+        section_id: c2Sec3.id,
+        title: '3.4 Dasar HTML5 Canvas untuk Render Grafis 2D',
+        content_type: 'book',
+        file_url: null,
+        duration_minutes: 24,
+        content_text: (html5Articles['3.4 Dasar HTML5 Canvas untuk Render Grafis 2D'] || '').trim(),
+        is_preview: false,
+        order_index: 4,
+      },
+      {
+        section_id: c2Sec3.id,
+        title: '3.5 Elemen Interaktif Modern: dialog, details, dan summary',
+        content_type: 'book',
+        file_url: null,
+        duration_minutes: 15,
+        content_text: (html5Articles['3.5 Elemen Interaktif Modern: dialog, details, dan summary'] || '').trim(),
+        is_preview: false,
+        order_index: 5,
+      },
+    ]);
+
+    // Bab 4: Arsitektur Expert, SEO Teknis, Keamanan & Web Standards (Level Expert)
+    const c2Sec4 = await CourseSection.create({
+      course_id: course2.id,
+      title: 'Bab 4: Arsitektur Expert, SEO Teknis, Keamanan & Web Standards (Level Expert)',
+      order_index: 4,
+    });
+    await CourseMaterial.bulkCreate([
+      {
+        section_id: c2Sec4.id,
+        title: '4.1 SEO Teknis, Open Graph & Structured Data (JSON-LD / Schema.org)',
+        content_type: 'book',
+        file_url: null,
+        duration_minutes: 25,
+        content_text: (html5Articles['4.1 SEO Teknis, Open Graph & Structured Data (JSON-LD / Schema.org)'] || '').trim(),
+        is_preview: false,
+        order_index: 1,
+      },
+      {
+        section_id: c2Sec4.id,
+        title: '4.2 Optimasi Performa & Core Web Vitals (LCP, INP, CLS)',
+        content_type: 'book',
+        file_url: null,
+        duration_minutes: 30,
+        content_text: (html5Articles['4.2 Optimasi Performa & Core Web Vitals (LCP, INP, CLS)'] || '').trim(),
+        is_preview: false,
+        order_index: 2,
+      },
+      {
+        section_id: c2Sec4.id,
+        title: '4.3 Keamanan Header & Proteksi Konten HTML (CSP, SRI, CORS, Iframe Sandbox)',
+        content_type: 'book',
+        file_url: null,
+        duration_minutes: 22,
+        content_text: (html5Articles['4.3 Keamanan Header & Proteksi Konten HTML (CSP, SRI, CORS, Iframe Sandbox)'] || '').trim(),
+        is_preview: false,
+        order_index: 3,
+      },
+      {
+        section_id: c2Sec4.id,
+        title: '4.4 Web Components: Custom Elements, Shadow DOM & template',
+        content_type: 'book',
+        file_url: null,
+        duration_minutes: 32,
+        content_text: (html5Articles['4.4 Web Components: Custom Elements, Shadow DOM & template'] || '').trim(),
+        is_preview: false,
+        order_index: 4,
+      },
+      {
+        section_id: c2Sec4.id,
+        title: '4.5 Fondasi Progressive Web Apps (PWA): Web App Manifest & Offline Strategy',
+        content_type: 'book',
+        file_url: null,
+        duration_minutes: 26,
+        content_text: (html5Articles['4.5 Fondasi Progressive Web Apps (PWA): Web App Manifest & Offline Strategy'] || '').trim(),
+        is_preview: false,
+        order_index: 5,
+      },
+    ]);
 
     // Course 3: Mastering Large Language Models & AI Agent Engineering (Advanced)
     const course3 = await Course.create({

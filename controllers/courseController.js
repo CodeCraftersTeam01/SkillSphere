@@ -67,7 +67,11 @@ exports.getMyCourses = async (req, res) => {
 exports.getCourseById = async (req, res) => {
   try {
     const { id } = req.params;
-    const course = await Course.findByPk(id, {
+    const isNumeric = /^\d+$/.test(id);
+    const whereClause = isNumeric ? { id: parseInt(id, 10) } : { slug: id };
+
+    const course = await Course.findOne({
+      where: whereClause,
       include: [
         {
           model: Category,
@@ -593,9 +597,11 @@ exports.getMyLearning = async (req, res) => {
 exports.enrollCourse = async (req, res) => {
   try {
     const studentId = req.user.id;
-    const courseId = req.params.id;
+    const { id } = req.params;
+    const isNumeric = /^\d+$/.test(id);
+    const whereClause = isNumeric ? { id: parseInt(id, 10) } : { slug: id };
 
-    const course = await Course.findByPk(courseId);
+    const course = await Course.findOne({ where: whereClause });
     if (!course) {
       return res.status(404).json({
         success: false,
@@ -604,7 +610,7 @@ exports.enrollCourse = async (req, res) => {
     }
 
     const [enrollment, created] = await Enrollment.findOrCreate({
-      where: { user_id: studentId, course_id: courseId },
+      where: { user_id: studentId, course_id: course.id },
       defaults: {
         progress_percentage: 0.0,
         status: 'active',
@@ -623,6 +629,59 @@ exports.enrollCourse = async (req, res) => {
       success: false,
       message: 'Gagal mendaftar ke kursus.',
       error: err.message,
+    });
+  }
+};
+
+/**
+ * Update student learning progress for a course
+ */
+exports.updateLearningProgress = async (req, res) => {
+  try {
+    const studentId = req.user.id;
+    const { id } = req.params;
+    const { progress_percentage, status } = req.body;
+
+    const isNumeric = /^\d+$/.test(id);
+    const whereClause = isNumeric ? { id: parseInt(id, 10) } : { slug: id };
+
+    const course = await Course.findOne({ where: whereClause });
+    if (!course) {
+      return res.status(404).json({ success: false, message: 'Kursus tidak ditemukan.' });
+    }
+
+    const enrollment = await Enrollment.findOne({
+      where: { user_id: studentId, course_id: course.id }
+    });
+
+    if (!enrollment) {
+      return res.status(404).json({ success: false, message: 'Data pendaftaran kursus tidak ditemukan.' });
+    }
+
+    if (progress_percentage !== undefined) {
+      enrollment.progress_percentage = Math.min(100, Math.max(0, parseFloat(progress_percentage)));
+    }
+
+    if (enrollment.progress_percentage >= 100 || status === 'completed') {
+      enrollment.status = 'completed';
+      if (!enrollment.completed_at) enrollment.completed_at = new Date();
+    } else if (status) {
+      enrollment.status = status;
+    }
+
+    await enrollment.save();
+
+    return res.status(200).json({
+      success: true,
+      message: 'Progres belajar berhasil diperbarui.',
+      data: enrollment
+    });
+  } catch (err) {
+    console.error('Error in updateLearningProgress:', err);
+    return res.status(500).json({
+      success: false,
+      message: 'Gagal memperbarui progres belajar.',
+      error: err.message
     });
   }
 };

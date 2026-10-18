@@ -17,8 +17,9 @@ router.get('/tutor/my-courses', authenticateJWT, authorizeRoles('tutor', 'admin'
 // Student learning activities list
 router.get('/student/my-learning', authenticateJWT, courseController.getMyLearning);
 
-// Course enrollment
+// Course enrollment & learning progress
 router.post('/:id/enroll', authenticateJWT, invalidateCacheMiddleware(['cache:/api/courses*', 'cache:/api/admin*']), courseController.enrollCourse);
+router.patch('/:id/progress', authenticateJWT, invalidateCacheMiddleware(['cache:/api/courses*']), courseController.updateLearningProgress);
 
 // Course details
 router.get('/:id', optionalAuth, courseController.getCourseById);

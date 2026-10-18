@@ -26,6 +26,11 @@
   
   <!-- Claude Design System Stylesheet -->
   <link rel="stylesheet" href="/stylesheets/claude-theme.css?v=2.0">
+  <!-- Accessibility & Head Tracking Stylesheet -->
+  <link rel="stylesheet" href="/stylesheets/accessibility.css">
+  <!-- Custom Alert & Toast Stylesheet & Script -->
+  <link rel="stylesheet" href="/stylesheets/custom-alert.css">
+  <script src="/javascripts/custom-alert.js"></script>
 
   <style>
     :root {
@@ -1179,7 +1184,12 @@
         const json = await res.json();
 
         if (!json.success || !json.data) {
-          alert('Kursus tidak ditemukan atau belum dipublikasikan.');
+          await showCustomAlert({
+            title: 'Kursus Tidak Ditemukan',
+            message: 'Kursus tidak ditemukan atau belum dipublikasikan.',
+            type: 'error',
+            buttonText: 'Kembali ke Katalog'
+          });
           window.location.href = '/courses';
           return;
         }
@@ -1225,9 +1235,10 @@
               </a>
             `;
           } else if (course.is_enrolled) {
+            const learnLink = `/courses/${course.slug || course.id}/learn`;
             enrollBtn.outerHTML = `
-              <a href="/dashboard" class="btn-enroll-action" style="background:var(--color-success); color:#FFFFFF; text-decoration:none; display:flex; align-items:center; justify-content:center; gap:8px;">
-                <i class="fas fa-graduation-cap"></i> Terdaftar: Lanjutkan Belajar
+              <a href="${learnLink}" class="btn-enroll-action" style="background:var(--color-success); color:#FFFFFF; text-decoration:none; display:flex; align-items:center; justify-content:center; gap:8px;">
+                <i class="fas fa-graduation-cap"></i> Terdaftar: Lanjutkan Belajar &rarr;
               </a>
             `;
           }
@@ -1387,7 +1398,12 @@
     async function handleEnrollCourse() {
       const activeToken = localStorage.getItem('skillsphere_access_token') || localStorage.getItem('access_token');
       if (!activeToken) {
-        alert('Silakan masuk (login) terlebih dahulu untuk mendaftar kelas ini.');
+        await showCustomAlert({
+          title: 'Perlu Masuk Akun',
+          message: 'Silakan masuk (login) terlebih dahulu untuk mendaftar kelas ini.',
+          type: 'warning',
+          buttonText: 'Masuk Sekarang'
+        });
         window.location.href = `/login?redirect=${encodeURIComponent(window.location.pathname)}`;
         return;
       }
@@ -1411,13 +1427,25 @@
 
         const json = await res.json();
         if (json.success) {
-          alert(json.message || 'Pendaftaran kelas berhasil! Anda akan diarahkan ke ruang belajar.');
-          window.location.href = '/dashboard';
+          showToast(json.message || 'Pendaftaran kelas berhasil!', 'success');
+          setTimeout(() => {
+            window.location.href = '/dashboard';
+          }, 800);
         } else {
-          alert(json.message || 'Pendaftaran tidak dapat diproses.');
+          showCustomAlert({
+            title: 'Pendaftaran Kelas',
+            message: json.message || 'Pendaftaran tidak dapat diproses.',
+            type: 'error',
+            buttonText: 'Tutup'
+          });
         }
       } catch (err) {
-        alert('Terjadi kesalahan jaringan saat mendaftar kelas.');
+        showCustomAlert({
+          title: 'Gangguan Jaringan',
+          message: 'Terjadi kesalahan jaringan saat mendaftar kelas. Silakan coba lagi.',
+          type: 'error',
+          buttonText: 'Tutup'
+        });
       } finally {
         if (btn) {
           btn.disabled = false;
@@ -1428,12 +1456,14 @@
 
     function copyCourseShareLink() {
       navigator.clipboard.writeText(window.location.href);
-      alert('Tautan kursus berhasil disalin ke clipboard!');
+      showToast('Tautan kursus berhasil disalin ke clipboard!', 'success');
     }
 
     document.addEventListener('DOMContentLoaded', () => {
       loadCourseDetail();
     });
   </script>
+  <!-- Inclusive Accessibility, TTS, & Head Tracking Script -->
+  <script src="/javascripts/accessibility.js"></script>
 </body>
 </html>
