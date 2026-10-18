@@ -16,5 +16,10 @@ router.post('/quiz/generate', authenticateJWT, aiController.generateQuiz);
 
 // 4. AI Material Explainer & Summarizer (Sprint 2 - Tegar)
 router.post('/material/explain', authenticateJWT, aiController.explainMaterial);
+router.post('/material/narrative', optionalAuth, aiController.generateMaterialNarrative);
+
+// 5. AI Adaptive Learning & Course Recommendations (Stage-based Progression)
+router.get('/recommendations', authenticateJWT, aiController.getAdaptiveCourseRecommendations);
 
 module.exports = router;
+
