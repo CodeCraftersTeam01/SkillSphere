@@ -187,6 +187,7 @@ async function createMaterial(req, res) {
       title: title.trim(),
       content_type,
       file_url,
+      content_text: req.body.content_text || null,
       duration_minutes: duration_minutes ? parseInt(duration_minutes, 10) : 0,
       is_preview: is_preview === 'true' || is_preview === true || is_preview === 1,
       order_index: order_index ? parseInt(order_index, 10) : highestOrder + 1,
@@ -236,6 +237,7 @@ async function updateMaterial(req, res) {
     const updateData = {};
     if (req.body.title !== undefined) updateData.title = req.body.title.trim();
     if (req.body.content_type !== undefined) updateData.content_type = req.body.content_type;
+    if (req.body.content_text !== undefined) updateData.content_text = req.body.content_text;
     if (req.body.duration_minutes !== undefined) updateData.duration_minutes = parseInt(req.body.duration_minutes, 10);
     if (req.body.is_preview !== undefined) {
       updateData.is_preview = req.body.is_preview === 'true' || req.body.is_preview === true || req.body.is_preview === 1;
