@@ -787,5 +787,794 @@
       color: var(--color-danger);
       display: flex;
       align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
 
-<!-- Skeleton loaded -->
+    .code-editor-box {
+      background: #141413;
+      border: 1px solid #2A2926;
+      border-radius: var(--radius-md);
+      margin: 22px 0;
+      overflow: hidden;
+    }
+
+    .code-editor-header {
+      background: #1F1E1B;
+      border-bottom: 1px solid #2A2926;
+      padding: 8px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      color: #A8A29A;
+    }
+
+    .code-copy-btn {
+      background: transparent;
+      border: 1px solid #3A3834;
+      border-radius: var(--radius-sm);
+      color: #FAF9F5;
+      font-size: 11px;
+      padding: 3px 8px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .code-copy-btn:hover {
+      background: #2A2926;
+    }
+
+    .code-editor-body {
+      padding: 16px;
+      margin: 0;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: #FAF9F5;
+      line-height: 1.55;
+      overflow-x: auto;
+    }
+
+    .callout-box {
+      background: var(--bg-surface-subtle);
+      border-left: 4px solid var(--accent-primary);
+      border-radius: 0 var(--radius-md) var(--radius-md) 0;
+      padding: 16px 18px;
+      margin: 22px 0;
+      font-size: 13.5px;
+      line-height: 1.6;
+    }
+
+    .callout-box.tip {
+      border-left-color: var(--color-success);
+      background: rgba(16, 185, 129, 0.08);
+    }
+
+    /* Bottom Navigator Bar */
+    .classroom-bottom-bar {
+      height: 64px;
+      background: var(--bg-surface);
+      border-top: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 32px;
+      flex-shrink: 0;
+      z-index: 30;
+      position: relative;
+    }
+
+    /* Keep Accessibility FAB cleanly positioned without overlapping bottom bar or AI panel */
+    .a11y-fab-launcher {
+      bottom: 80px !important;
+      right: 24px !important;
+      z-index: 9999980 !important;
+      transition: right 0.28s cubic-bezier(0.16, 1, 0.3, 1), left 0.28s cubic-bezier(0.16, 1, 0.3, 1), transform 0.2s ease, bottom 0.28s ease !important;
+    }
+
+    .a11y-panel {
+      bottom: 140px !important;
+      right: 24px !important;
+      z-index: 9999990 !important;
+      transition: right 0.28s cubic-bezier(0.16, 1, 0.3, 1), left 0.28s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease, visibility 0.25s ease !important;
+    }
+
+    #a11y-webcam-pip {
+      bottom: 140px !important;
+      right: 24px !important;
+      z-index: 9999990 !important;
+      transition: right 0.28s cubic-bezier(0.16, 1, 0.3, 1), left 0.28s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    }
+
+    /* Shift Accessibility elements smoothly when AI Split Panel is open */
+    body.ai-panel-open .a11y-fab-launcher {
+      right: calc(var(--ai-panel-width, 420px) + 20px) !important;
+    }
+
+    body.ai-panel-open .a11y-panel {
+      right: calc(var(--ai-panel-width, 420px) + 20px) !important;
+    }
+
+    body.ai-panel-open #a11y-webcam-pip {
+      right: calc(var(--ai-panel-width, 420px) + 20px) !important;
+    }
+
+    @media (max-width: 900px) {
+      body.ai-panel-open .a11y-fab-launcher {
+        left: 20px !important;
+        right: auto !important;
+      }
+      body.ai-panel-open .a11y-panel {
+        left: 20px !important;
+        right: auto !important;
+      }
+      body.ai-panel-open #a11y-webcam-pip {
+        left: 20px !important;
+        right: auto !important;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .classroom-bottom-bar {
+        padding: 0 16px;
+        gap: 10px;
+      }
+      .a11y-fab-launcher {
+        bottom: 76px !important;
+        right: 16px !important;
+        width: 42px !important;
+        height: 42px !important;
+        font-size: 18px !important;
+      }
+      .a11y-panel {
+        bottom: 126px !important;
+        right: 12px !important;
+      }
+    }
+
+
+
+    /* ========================================================
+       AURORA SPHERE FULLSCREEN OVERLAY (ORION AI SPHERE ONLY)
+       ======================================================== */
+    .aurora-orb-overlay {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      z-index: 999950;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 1;
+      visibility: visible;
+      transition: opacity 0.55s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.55s ease, transform 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+      cursor: default;
+      user-select: none;
+      pointer-events: auto;
+    }
+
+    .aurora-orb-overlay.dismissed {
+      opacity: 0;
+      visibility: hidden;
+      display: none !important;
+      transform: scale(1.05);
+      pointer-events: none !important;
+    }
+
+    .aurora-orb-overlay.fading-backdrop {
+      background: rgba(0, 0, 0, 0) !important;
+      backdrop-filter: blur(0px) !important;
+      -webkit-backdrop-filter: blur(0px) !important;
+      pointer-events: none !important;
+      transition: background 0.75s ease, backdrop-filter 0.75s ease, -webkit-backdrop-filter 0.75s ease;
+    }
+
+    .aurora-orb-center {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+      animation: orbAppear 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      pointer-events: auto;
+      max-width: 90vw;
+    }
+
+    /* Choice Prompt Card Under Sphere (Matching SkillSphere Design System) */
+    .aurora-choice-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-xl, 20px);
+      padding: 22px 28px;
+      max-width: 440px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45), 0 0 1px rgba(255, 255, 255, 0.1);
+      opacity: 0;
+      transform: translateY(18px) scale(0.96);
+      pointer-events: none;
+      transition: opacity 0.45s ease, transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .aurora-choice-card.visible {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      pointer-events: auto;
+    }
+
+    .aurora-choice-question {
+      font-family: var(--font-sans);
+      font-size: 14.5px;
+      font-weight: 600;
+      color: var(--text-primary);
+      line-height: 1.55;
+      margin-bottom: 20px;
+    }
+
+    .aurora-choice-buttons {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    .aurora-btn-choice {
+      flex: 1;
+      padding: 10px 22px;
+      border-radius: var(--radius-full, 9999px);
+      font-family: var(--font-sans);
+      font-size: 13.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      outline: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .aurora-btn-no {
+      background: var(--bg-surface-subtle);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .aurora-btn-no:hover {
+      background: var(--bg-surface);
+      color: var(--text-primary);
+      border-color: var(--border-strong);
+      transform: translateY(-1px);
+    }
+
+    .aurora-btn-yes {
+      background: var(--accent-primary);
+      color: var(--accent-text);
+      border: 1px solid var(--accent-primary);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+    }
+
+    .aurora-btn-yes:hover {
+      background: var(--accent-primary-hover);
+      transform: translateY(-1px);
+    }
+
+    .aurora-btn-choice:active {
+      transform: translateY(0);
+    }
+
+    /* Orion Next Module Prompt Card (Anchored above Docked Mini Orb) */
+    .orion-next-choice-card {
+      position: fixed;
+      bottom: 138px;
+      right: 88px;
+      width: 295px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-medium);
+      border-radius: var(--radius-lg, 14px);
+      padding: 14px 16px;
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.28), 0 0 16px rgba(59, 130, 246, 0.22);
+      z-index: 999975;
+      opacity: 0;
+      transform: translateY(12px) scale(0.95);
+      pointer-events: none;
+      transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1), transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), right 0.28s ease;
+    }
+
+    .orion-next-choice-card.visible {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      pointer-events: auto;
+    }
+
+    body.ai-panel-open .orion-next-choice-card {
+      right: calc(var(--ai-panel-width, 420px) + 84px);
+    }
+
+    @media (max-width: 900px) {
+      body.ai-panel-open .orion-next-choice-card {
+        left: 72px;
+        right: auto;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .orion-next-choice-card {
+        right: 76px;
+        bottom: 130px;
+        width: 265px;
+      }
+    }
+
+    .orion-next-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .orion-next-tag {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--accent-primary);
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .orion-next-close-btn {
+      background: none;
+      border: none;
+      color: var(--text-tertiary);
+      font-size: 12px;
+      cursor: pointer;
+      padding: 2px 5px;
+      border-radius: 4px;
+    }
+    .orion-next-close-btn:hover {
+      color: var(--text-primary);
+    }
+
+    .orion-next-card-text {
+      font-size: 12.5px;
+      line-height: 1.45;
+      color: var(--text-primary);
+      margin-bottom: 12px;
+      font-family: var(--font-sans);
+    }
+
+    .orion-next-card-actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
+    @keyframes orbAppear {
+      0% {
+        opacity: 0;
+        transform: scale(0.82);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    .aurora-sphere-wrapper {
+      position: relative;
+      width: 270px;
+      height: 270px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: orbFloat 5s ease-in-out infinite alternate;
+      transition: transform 0.5s ease;
+    }
+
+    .aurora-sphere-wrapper.flying-to-target {
+      animation: none !important;
+      will-change: transform, opacity;
+      pointer-events: none;
+    }
+
+    /* Docked Mini AI Companion Orb (When user clicks 'Ya') */
+    .aurora-orb-overlay.docked-mode {
+      background: transparent !important;
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+      pointer-events: none !important;
+      display: none !important;
+      transition: background 0.6s ease, backdrop-filter 0.6s ease;
+    }
+
+    .aurora-sphere-wrapper.docked-corner {
+      position: fixed !important;
+      bottom: 76px !important;
+      right: 88px !important;
+      left: auto !important;
+      top: auto !important;
+      width: 52px !important;
+      height: 52px !important;
+      transform: none;
+      pointer-events: auto !important;
+      cursor: pointer !important;
+      animation: none !important;
+      z-index: 999980 !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      transition: right 0.28s cubic-bezier(0.16, 1, 0.3, 1), bottom 0.28s ease, transform 0.15s ease !important;
+    }
+
+    .aurora-sphere-wrapper.docked-corner:hover {
+      transform: scale(1.08) !important;
+    }
+
+    .aurora-sphere-wrapper.docked-corner .aurora-sphere {
+      width: 52px !important;
+      height: 52px !important;
+      box-shadow: 0 4px 18px rgba(37, 99, 235, 0.55), 0 0 12px rgba(96, 165, 250, 0.7) !important;
+    }
+
+    .aurora-sphere-wrapper.docked-corner .aurora-equalizer-container {
+      position: absolute !important;
+      top: 50% !important;
+      left: 50% !important;
+      transform: translate(-50%, -50%) !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      width: auto !important;
+      height: 18px !important;
+      gap: 1.2px !important;
+      padding: 0 !important;
+      margin: 0 !important;
+    }
+
+    .aurora-sphere-wrapper.docked-corner .aurora-eq-bar {
+      width: 1.2px !important;
+      border-radius: 1px !important;
+      min-height: 2px !important;
+    }
+
+    .aurora-sphere-wrapper.docked-corner .aurora-outer-glow {
+      display: none !important;
+      pointer-events: none !important;
+    }
+
+    /* Shift Docked Mini Orb smoothly when AI Split Panel opens */
+    body.ai-panel-open .aurora-sphere-wrapper.docked-corner {
+      right: calc(var(--ai-panel-width, 420px) + 84px) !important;
+    }
+
+    @media (max-width: 900px) {
+      body.ai-panel-open .aurora-sphere-wrapper.docked-corner {
+        left: 72px !important;
+        right: auto !important;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .aurora-sphere-wrapper.docked-corner {
+        bottom: 72px !important;
+        right: 76px !important;
+        width: 48px !important;
+        height: 48px !important;
+      }
+      .aurora-sphere-wrapper.docked-corner .aurora-sphere {
+        width: 48px !important;
+        height: 48px !important;
+      }
+      body.ai-panel-open .aurora-sphere-wrapper.docked-corner {
+        left: 70px !important;
+        right: auto !important;
+      }
+    }
+
+    .aurora-sphere-wrapper.loading {
+      animation: loadingBounce 0.75s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite alternate;
+    }
+
+    /* ========================================================
+       AI ORION LIVE TEXT HIGHLIGHTER & FOCUS SCROLL
+       ======================================================== */
+    mark.ai-live-text-mark {
+      background: rgba(37, 99, 235, 0.28) !important;
+      color: inherit !important;
+      border-radius: 4px !important;
+      box-shadow: 0 0 16px rgba(59, 130, 246, 0.45), inset 0 0 0 1.5px rgba(59, 130, 246, 0.4) !important;
+      padding: 2px 6px !important;
+      margin: 0 -1px !important;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+      animation: liveMarkerGlow 2.2s ease-in-out infinite alternate !important;
+      display: inline !important;
+    }
+
+    [data-theme="dark"] mark.ai-live-text-mark {
+      background: rgba(96, 165, 250, 0.35) !important;
+      box-shadow: 0 0 18px rgba(96, 165, 250, 0.55), inset 0 0 0 1.5px rgba(96, 165, 250, 0.5) !important;
+    }
+
+    .ai-block-focus-highlight {
+      position: relative !important;
+      background: rgba(59, 130, 246, 0.08) !important;
+      border-left: 3.5px solid var(--accent-primary) !important;
+      border-radius: 6px !important;
+      padding: 8px 14px !important;
+      margin-left: -14px !important;
+      margin-right: -14px !important;
+      box-shadow: 0 0 18px rgba(59, 130, 246, 0.14) !important;
+      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    }
+
+    [data-theme="dark"] .ai-block-focus-highlight {
+      background: rgba(59, 130, 246, 0.14) !important;
+      box-shadow: 0 0 22px rgba(59, 130, 246, 0.22) !important;
+    }
+
+    .diagram-visual-card.ai-card-glow-focus,
+    .code-editor-box.ai-card-glow-focus,
+    .ai-card-glow-focus {
+      position: relative !important;
+      border-color: var(--accent-primary) !important;
+      box-shadow: 0 0 0 2.5px var(--accent-primary), 0 8px 32px rgba(59, 130, 246, 0.28) !important;
+      transition: all 0.45s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    }
+
+    @keyframes liveMarkerGlow {
+      0% {
+        background: rgba(37, 99, 235, 0.18);
+        box-shadow: 0 0 8px rgba(59, 130, 246, 0.28), inset 0 0 0 1px rgba(59, 130, 246, 0.28);
+      }
+      100% {
+        background: rgba(37, 99, 235, 0.34);
+        box-shadow: 0 0 20px rgba(59, 130, 246, 0.6), inset 0 0 0 2px rgba(59, 130, 246, 0.5);
+      }
+    }
+
+    @keyframes loadingBounce {
+      0% {
+        transform: translateY(22px);
+      }
+      100% {
+        transform: translateY(-24px);
+      }
+    }
+
+    @keyframes orbFloat {
+      0% {
+        transform: translateY(0px);
+      }
+      50% {
+        transform: translateY(-10px);
+      }
+      100% {
+        transform: translateY(0px);
+      }
+    }
+
+    /* The Main Circular Aurora Orb */
+    .aurora-sphere {
+      width: 270px;
+      height: 270px;
+      border-radius: 50%;
+      position: relative;
+      overflow: hidden;
+      background: radial-gradient(circle at 50% 25%, #4C82FB 0%, #2563EB 40%, #1D4ED8 70%, #0F2D7A 100%);
+      box-shadow: 
+        0 0 60px rgba(59, 130, 246, 0.65),
+        0 0 120px rgba(37, 99, 235, 0.4);
+      transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease;
+      will-change: transform, box-shadow;
+    }
+
+    .aurora-sphere.loading {
+      transform: scale(0.45);
+      box-shadow: 
+        0 0 35px rgba(59, 130, 246, 0.75),
+        0 0 70px rgba(37, 99, 235, 0.45);
+    }
+
+    .aurora-sphere.speaking {
+      box-shadow: 
+        0 0 85px rgba(96, 165, 250, 0.85),
+        0 0 160px rgba(59, 130, 246, 0.6);
+      transition: transform 0.08s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.12s ease;
+    }
+
+    /* Atmosphere Ambient Radial Gradient */
+    .aurora-atmosphere {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background: radial-gradient(circle at 50% 30%, rgba(96, 165, 250, 0.45) 0%, rgba(30, 64, 175, 0) 70%);
+      mix-blend-mode: screen;
+      pointer-events: none;
+    }
+
+    /* Animated White Aurora Cloud / Mist Layers */
+    .aurora-mist-layer {
+      position: absolute;
+      border-radius: 50%;
+      pointer-events: none;
+      transition: filter 0.4s ease, opacity 0.4s ease;
+    }
+
+    .aurora-sphere.speaking .aurora-mist-layer {
+      filter: blur(10px) brightness(1.25);
+    }
+
+    /* Mist Layer 1: Undulating Horizontal Wave */
+    .aurora-mist-1 {
+      width: 360px;
+      height: 200px;
+      left: -45px;
+      top: 45px;
+      background: radial-gradient(ellipse at 50% 50%, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.72) 40%, rgba(191, 219, 254, 0.25) 70%, transparent 85%);
+      filter: blur(14px);
+      opacity: 0.9;
+      animation: auroraWave1 6.5s ease-in-out infinite alternate;
+    }
+
+    .aurora-sphere.speaking .aurora-mist-1 {
+      animation: auroraWave1 2.8s ease-in-out infinite alternate;
+    }
+
+    /* Mist Layer 2: Swirling Upward Wisps */
+    .aurora-mist-2 {
+      width: 310px;
+      height: 180px;
+      left: -20px;
+      top: 75px;
+      background: radial-gradient(ellipse at 55% 45%, rgba(255, 255, 255, 0.9) 0%, rgba(224, 242, 254, 0.6) 45%, transparent 75%);
+      filter: blur(16px);
+      opacity: 0.85;
+      animation: auroraWave2 8s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate;
+    }
+
+    .aurora-sphere.speaking .aurora-mist-2 {
+      animation: auroraWave2 3.2s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate;
+    }
+
+    /* Mist Layer 3: Lower Luminous Base Cloud */
+    .aurora-mist-3 {
+      width: 290px;
+      height: 160px;
+      left: -10px;
+      bottom: -10px;
+      background: radial-gradient(ellipse at 50% 70%, rgba(200, 225, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 35%, rgba(147, 197, 253, 0.3) 70%, transparent 90%);
+      filter: blur(12px);
+      opacity: 0.92;
+      animation: auroraWave3 5.5s ease-in-out infinite alternate;
+    }
+
+    .aurora-sphere.speaking .aurora-mist-3 {
+      animation: auroraWave3 2.2s ease-in-out infinite alternate;
+    }
+
+    /* Mist Layer 4: Ambient Floating Wisps */
+    .aurora-mist-4 {
+      width: 250px;
+      height: 140px;
+      left: 10px;
+      top: 90px;
+      background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.4) 50%, transparent 80%);
+      filter: blur(10px);
+      opacity: 0.75;
+      animation: auroraDrift 10s ease-in-out infinite alternate;
+    }
+
+    /* Keyframes for the dynamic aurora mist motion */
+    @keyframes auroraWave1 {
+      0% {
+        transform: translate(0px, 0px) scale(1) rotate(0deg);
+      }
+      50% {
+        transform: translate(20px, -14px) scale(1.08, 0.92) rotate(4deg);
+      }
+      100% {
+        transform: translate(-18px, 10px) scale(0.95, 1.06) rotate(-3deg);
+      }
+    }
+
+    @keyframes auroraWave2 {
+      0% {
+        transform: translate(-12px, 6px) scale(0.96) rotate(-2deg);
+      }
+      50% {
+        transform: translate(16px, -18px) scale(1.05) rotate(5deg);
+      }
+      100% {
+        transform: translate(8px, 12px) scale(1.02) rotate(-4deg);
+      }
+    }
+
+    @keyframes auroraWave3 {
+      0% {
+        transform: translateY(0px) scale(1);
+        opacity: 0.85;
+      }
+      50% {
+        transform: translateY(-10px) scale(1.06);
+        opacity: 0.98;
+      }
+      100% {
+        transform: translateY(5px) scale(0.96);
+        opacity: 0.88;
+      }
+    }
+
+    @keyframes auroraDrift {
+      0% {
+        transform: translate(-14px, -8px) scale(0.95);
+      }
+      50% {
+        transform: translate(18px, 10px) scale(1.1);
+      }
+      100% {
+        transform: translate(-10px, 14px) scale(1.02);
+      }
+    }
+
+    /* ========================================================
+       AURORA AUDIO EQUALIZER VISUALIZER (INSIDE SPHERE)
+       ======================================================== */
+    .aurora-equalizer-container {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5.5px;
+      z-index: 6;
+      pointer-events: none;
+      padding: 0;
+      margin: 0;
+      transition: opacity 0.35s ease;
+    }
+
+    .aurora-sphere.loading .aurora-equalizer-container {
+      opacity: 0;
+    }
+
+    .aurora-eq-bar {
+      width: 4px;
+      min-height: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: linear-gradient(to top, rgba(255, 255, 255, 1) 0%, rgba(224, 242, 254, 0.95) 60%, rgba(147, 197, 253, 0.75) 100%);
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.9), 0 0 18px rgba(147, 197, 253, 0.7);
+      transition: height 0.05s ease-out, opacity 0.12s ease-out;
+      opacity: 0.6;
+      transform-origin: center;
+    }
+
+    .aurora-sphere.speaking .aurora-eq-bar {
+      opacity: 0.95;
+    }
+
+    /* 3D Rim Glare & Specular Reflection */
+    .aurora-sphere-glare {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      box-shadow: 
+        inset 0 4px 10px rgba(255, 255, 255, 0.7),
+        inset 0 -4px 12px rgba(255, 255, 255, 0.2);
+      pointer-events: none;
+      z-index: 7;
+    }
+
+    /* Outer Ambient Ring Glow */
+    .aurora-outer-glow {
+
+<!-- Curriculum sidebar loaded -->
