@@ -121,8 +121,11 @@ async function runTtsAccessibilityTests() {
   }
 }
 
-runTtsAccessibilityTests().catch((err) => {
-  console.error('❌ TTS Accessibility Test Suite Failed:', err);
-  if (server) server.close();
-  process.exit(1);
-});
+runTtsAccessibilityTests()
+  .then(() => process.exit(0))
+  .catch((err) => {
+    console.error('❌ TTS Accessibility Test Suite Failed:', err);
+    if (server) server.close();
+    process.exit(1);
+  });
+
