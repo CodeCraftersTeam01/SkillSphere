@@ -31,6 +31,11 @@ router.get('/dashboard', function(req, res, next) {
   res.render('dashboard', { title: 'Dashboard | SkillSphere AI' });
 });
 
+/* GET Student AI Career Roadmap / Jalur Belajar Page (Sprint 2 - Tegar) */
+router.get(['/roadmap', '/dashboard/roadmap', '/jalur-belajar'], function(req, res, next) {
+  res.render('roadmap', { title: 'Jalur Belajar AI & Karir | SkillSphere AI' });
+});
+
 /* GET Student Profile & Settings Page (Sprint 1 - Fadiyah) */
 router.get(['/profile', '/dashboard/profile'], function(req, res, next) {
   res.render('profile', { title: 'Profil & Pengaturan Akun | SkillSphere AI' });
@@ -44,6 +49,11 @@ router.get(['/courses', '/catalog', '/katalog'], function(req, res, next) {
 /* GET Course Detail & Syllabus Page (Sprint 2 - Fadiyah) */
 router.get('/courses/:id', function(req, res, next) {
   res.render('courses/detail', { title: 'Detail Kursus | SkillSphere AI', courseId: req.params.id });
+});
+
+/* GET Interactive Classroom Learning Space (Sprint 2 - Dicoding & Claude Style) */
+router.get(['/courses/:id/learn', '/courses/:id/ruang-belajar'], function(req, res, next) {
+  res.render('courses/learn', { title: 'Ruang Belajar Interaktif | SkillSphere AI', courseId: req.params.id });
 });
 
 /* GET cinematic warp transition page */
