@@ -275,7 +275,7 @@ body.a11y-reduce-motion *::after {
   bottom: 24px;
   right: 24px;
   left: auto;
-  z-index: 999980;
+  z-index: 9999980;
   width: 48px;
   height: 48px;
   border-radius: 50%;
@@ -306,7 +306,7 @@ body.a11y-reduce-motion *::after {
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.4);
-  z-index: 999988;
+  z-index: 9999985;
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.25s ease, visibility 0.25s ease;
@@ -330,7 +330,7 @@ body.a11y-reduce-motion *::after {
   border: 1px solid var(--border-subtle, #E8E2D9);
   border-radius: 16px;
   box-shadow: 0 16px 36px rgba(0, 0, 0, 0.16);
-  z-index: 999989;
+  z-index: 9999990;
   opacity: 0;
   transform: translateY(12px) scale(0.97);
   visibility: hidden;
