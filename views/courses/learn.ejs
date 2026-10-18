@@ -2365,5 +2365,794 @@
       }
     }
 
+    function copySnippetCode(btn) {
+      const code = btn.closest('.code-editor-box').querySelector('code').innerText;
+      navigator.clipboard.writeText(code);
+      btn.textContent = 'Tersalin!';
+      setTimeout(() => btn.textContent = 'Salin Kode', 2000);
+      showToast('Kode berhasil disalin ke clipboard!', 'success');
+    }
 
-<!-- Audio Toolbar loaded -->
+    function goToPrevModule() {
+      if (currentMaterialIndex > 0) {
+        selectMaterial(currentMaterialIndex - 1);
+      }
+    }
+
+    async function completeAndNextModule() {
+      if (flatMaterials.length === 0) return;
+      const currentMat = flatMaterials[currentMaterialIndex];
+
+      // Stop any ongoing speech and highlights immediately
+      stopAllAudioPlayback();
+      clearAIFocusHighlight();
+      dismissNextChoiceCard();
+
+      // Mark current material completed
+      completedMaterialIds.add(currentMat.id);
+
+      // Save locally
+      if (courseData) {
+        localStorage.setItem(`skillsphere_completed_${courseData.id}`, JSON.stringify(Array.from(completedMaterialIds)));
+      }
+
+      // Sync progress with backend
+      updateProgressUI();
+      const progressPercent = Math.round((completedMaterialIds.size / flatMaterials.length) * 100);
+
+      try {
+        fetch(`/api/courses/${courseData.id}/progress`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+          body: JSON.stringify({
+            progress_percentage: progressPercent,
+            status: progressPercent >= 100 ? 'completed' : 'active'
+          })
+        }).catch(e => console.warn('Progress sync warning:', e));
+      } catch (e) {}
+
+      showToast(`Modul "${currentMat.title}" selesai dipelajari!`, 'success');
+
+      // Advance to next module or finish
+      if (currentMaterialIndex < flatMaterials.length - 1) {
+        selectMaterial(currentMaterialIndex + 1);
+
+        // In docked mini orb mode in the bottom-right, ask if student wants Orion to explain this new module
+        dockAuroraToCorner();
+        setTimeout(() => {
+          showNextModuleChoiceCard('on_module_change');
+        }, 400);
+      } else {
+        showCustomAlert({
+          title: 'Selamat! Anda Telah Menuntaskan Seluruh Modul',
+          message: 'Seluruh bab dan materi telah berhasil Anda kuasai. Sertifikat kelulusan digital Anda siap diakses di dashboard.',
+          type: 'success',
+          buttonText: 'Kembali ke Dashboard'
+        }).then(() => {
+          window.location.href = '/dashboard';
+        });
+      }
+    }
+
+    function updateProgressUI() {
+      if (flatMaterials.length === 0) return;
+      const count = completedMaterialIds.size;
+      const total = flatMaterials.length;
+      const percent = Math.min(100, Math.round((count / total) * 100));
+
+      const labelEl = document.getElementById('sidebar-progress-label');
+      const percentEl = document.getElementById('sidebar-progress-percent');
+      const fillEl = document.getElementById('sidebar-progress-fill');
+
+      if (labelEl) labelEl.textContent = `${count} / ${total} modul`;
+      if (percentEl) percentEl.textContent = `${percent}%`;
+      if (fillEl) fillEl.style.width = `${percent}%`;
+    }
+
+    function switchSidebarTab(tab) {
+      const btnModules = document.getElementById('tab-btn-modules');
+      const btnNotes = document.getElementById('tab-btn-notes');
+      const container = document.getElementById('curriculum-tree-container');
+
+      if (tab === 'modules') {
+        btnModules.classList.add('active');
+        btnNotes.classList.remove('active');
+        renderCurriculumTree();
+      } else {
+        btnNotes.classList.add('active');
+        btnModules.classList.remove('active');
+        container.innerHTML = `
+          <div style="padding:16px; font-size:13px; color:var(--text-secondary); line-height:1.5;">
+            <div style="font-weight:700; color:var(--text-primary); margin-bottom:8px;">
+              <i class="fas fa-brain" style="color:var(--accent-primary);"></i> Catatan & Ringkasan AI
+            </div>
+            <p>Setiap modul dirancang berbasis teks interaktif dengan diagram visual per bab dan dukungan tanya jawab realtime bersama AI.</p>
+            <div class="callout-box" style="margin:12px 0; font-size:12px;">
+              <strong>Split-Screen AI:</strong> Klik tombol <em>Tanya AI</em> di bagian header atas untuk membuka panel diskusi secara berdampingan.
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    // Realtime Multi-Turn Conversation History for Orion AI
+    let aiConversationHistory = [];
+
+    // Helper to format Orion's markdown replies nicely inside chat bubbles
+    function formatAIChatMarkdown(md) {
+      if (!md) return '';
+      let text = escapeHtml(md);
+
+      // Code blocks
+      text = text.replace(/```([a-zA-Z0-9_-]*)\n([\s\S]*?)```/g, (match, lang, code) => {
+        return `<pre class="code-editor-body" style="margin:8px 0; padding:10px; font-size:12px; border-radius:6px; background:#181816; color:#ECEBE8; overflow-x:auto;"><code>${code}</code></pre>`;
+      });
+
+      // Bold & Italic & Inline code
+      text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+      text = text.replace(/\*(.*?)\*/g, '<em>$1</em>');
+      text = text.replace(/`([^`]+)`/g, '<code style="background:var(--bg-surface-subtle); padding:2px 5px; border-radius:4px; font-family:var(--font-mono); font-size:12px;">$1</code>');
+
+      // Unordered lists
+      text = text.replace(/^\s*[\-\*]\s+(.*)$/gim, '<li style="margin-left:14px;">$1</li>');
+
+      // Line breaks
+      text = text.replace(/\n\n+/g, '<br><br>');
+      text = text.replace(/\n/g, '<br>');
+
+      return text;
+    }
+
+    // Quick AI prompt trigger
+    function quickAskAI(promptText) {
+      toggleAISplitPanel(true);
+      const input = document.getElementById('ai-chat-input');
+      if (input) {
+        input.value = promptText;
+        sendAIChatMessage();
+      }
+    }
+
+    // Realtime Side-by-Side Orion AI Learning Partner
+    async function sendAIChatMessage() {
+      const input = document.getElementById('ai-chat-input');
+      const text = input.value.trim();
+      if (!text) return;
+
+      const history = document.getElementById('ai-chat-history');
+      
+      // Append user bubble
+      history.innerHTML += `
+        <div class="ai-chat-bubble user">
+          ${escapeHtml(text)}
+        </div>
+      `;
+      input.value = '';
+      history.scrollTop = history.scrollHeight;
+
+      // Add to conversation history
+      aiConversationHistory.push({ role: 'user', content: text });
+      if (aiConversationHistory.length > 10) {
+        aiConversationHistory = aiConversationHistory.slice(-10);
+      }
+
+      // Append loading bubble
+      const loadingMsgId = 'ai-loading-' + Date.now();
+      history.innerHTML += `
+        <div class="ai-chat-bubble assistant" id="${loadingMsgId}">
+          <div class="ai-bubble-sender">
+            <i class="fas fa-sparkles" style="color:var(--accent-primary);"></i> Orion • AI Partner
+          </div>
+          <div style="color:var(--text-secondary); font-size:12px; display:flex; align-items:center; gap:8px;">
+            <i class="fas fa-spinner fa-spin"></i> Orion sedang menyusun panduan belajar untuk Anda...
+          </div>
+        </div>
+      `;
+      history.scrollTop = history.scrollHeight;
+
+      const currentMat = flatMaterials[currentMaterialIndex] || {};
+
+      try {
+        const res = await fetch('/api/ai/study-assistant/chat', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+          body: JSON.stringify({
+            message: text,
+            conversation_history: aiConversationHistory,
+            course_id: courseData ? courseData.id : null,
+            current_topic: currentMat.title || 'Materi Belajar HTML5'
+          })
+        });
+        const json = await res.json();
+
+        const loadingEl = document.getElementById(loadingMsgId);
+        if (loadingEl) loadingEl.remove();
+
+        let replyText = '';
+        if (json.data) {
+          replyText = json.data.reply || json.data.message || json.data.response || '';
+        }
+        if (!replyText && json.message && !json.message.includes('berhasil dibuat')) {
+          replyText = json.message;
+        }
+        if (!replyText) {
+          replyText = 'Halo! Saya Orion. Ada bagian dari konsep ini yang ingin kita bedah bersama langkah demi langkah?';
+        }
+
+        // Add assistant response to conversation history
+        aiConversationHistory.push({ role: 'assistant', content: replyText });
+        if (aiConversationHistory.length > 10) {
+          aiConversationHistory = aiConversationHistory.slice(-10);
+        }
+
+        const formattedReply = formatAIChatMarkdown(replyText);
+
+        history.innerHTML += `
+          <div class="ai-chat-bubble assistant">
+            <div class="ai-bubble-sender">
+              <i class="fas fa-sparkles" style="color:var(--accent-primary);"></i> Orion • AI Learning Partner
+            </div>
+            <div style="line-height:1.6; font-size:13px;">${formattedReply}</div>
+          </div>
+        `;
+        history.scrollTop = history.scrollHeight;
+      } catch (e) {
+        const loadingEl = document.getElementById(loadingMsgId);
+        if (loadingEl) loadingEl.remove();
+        history.innerHTML += `
+          <div class="ai-chat-bubble assistant" style="border-color:var(--color-danger);">
+            <div class="ai-bubble-sender" style="color:var(--color-danger);">
+              <i class="fas fa-triangle-exclamation"></i> Gagal Terhubung
+            </div>
+            <div style="font-size:12.5px; color:var(--text-secondary);">
+              Gagal menghubungi Orion AI. Silakan periksa koneksi internet Anda atau coba beberapa saat lagi.
+            </div>
+          </div>
+        `;
+        history.scrollTop = history.scrollHeight;
+      }
+    }
+
+    // ========================================================
+    // ORION AI VOICE GREETING & DYNAMIC EQUALIZER CONTROLLER
+    // ========================================================
+    let orionAudioContext = null;
+    let orionAnalyser = null;
+    let orionBufferSource = null;
+    let orionAudioElement = null;
+    let orionAnimationId = null;
+    let isOrionSpeaking = false;
+    let visualizerCurrentScale = 1.0;
+    let hasAttemptedAutoplay = false;
+
+    // Detect language from course title and content
+    function detectLanguage(title) {
+      if (!title) return 'id';
+      const lower = title.toLowerCase();
+      const idKeywords = ['dari nol', 'hingga', 'standar industri', 'belajar', 'dasar', 'pemrograman', 'panduan', 'anatomi', 'modul', 'bab'];
+      for (const k of idKeywords) {
+        if (lower.includes(k)) return 'id';
+      }
+      return 'id'; // default Indonesian
+    }
+
+    // Read selected voice preference from Accessibility settings with natural language safety
+    function getA11ySelectedVoice(lang = 'id') {
+      let chosen = 'id-male';
+      try {
+        const saved = localStorage.getItem('skillsphere_a11y_prefs');
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (parsed && parsed.voice) {
+            chosen = parsed.voice;
+          }
+        }
+      } catch (e) {}
+
+      // Language Accent Harmonizer: Ensure Indonesian text is voiced with Indonesian Edge-TTS voice
+      if (lang === 'id') {
+        if (chosen.startsWith('en-')) {
+          chosen = chosen.includes('female') ? 'id-female' : 'id-male';
+        }
+      } else if (lang === 'en') {
+        if (chosen.startsWith('id-')) {
+          chosen = chosen.includes('female') ? 'en-female' : 'en-male';
+        }
+      }
+      return chosen;
+    }
+
+    function ensureAudioContext() {
+      if (!orionAudioContext) {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (AudioContextClass) {
+          orionAudioContext = new AudioContextClass();
+        }
+      }
+      if (orionAudioContext && orionAudioContext.state === 'suspended') {
+        orionAudioContext.resume().catch(() => {});
+      }
+      return orionAudioContext;
+    }
+
+    // Auto-unlock AudioContext on first page interaction
+    ['pointerdown', 'keydown', 'touchstart', 'mousedown'].forEach(evt => {
+      window.addEventListener(evt, () => {
+        if (orionAudioContext && orionAudioContext.state === 'suspended') {
+          orionAudioContext.resume();
+        }
+      }, { capture: true, passive: true });
+    });
+
+    let preloadedQuestionAudioBuffer = null;
+    let preloadedQuestionBlob = null;
+
+    async function playOrionWelcomeSpeech() {
+      if (hasAttemptedAutoplay) return;
+      hasAttemptedAutoplay = true;
+
+      const sphereElem = document.getElementById('aurora-sphere-elem');
+      const sphereWrapper = document.getElementById('aurora-sphere-wrapper');
+      const courseTitle = (courseData && courseData.title)
+        ? courseData.title
+        : ((document.getElementById('sidebar-course-title') && document.getElementById('sidebar-course-title').textContent)
+           ? document.getElementById('sidebar-course-title').textContent
+           : 'Kursus Pembelajaran');
+      const lang = detectLanguage(courseTitle);
+      const chosenVoice = getA11ySelectedVoice(lang);
+
+      // Natural, warm, pedagogical phrasing
+      let welcomeText = '';
+      let questionSpeechText = '';
+      if (lang === 'en' || chosenVoice.startsWith('en-')) {
+        welcomeText = `Hello! Welcome to ${courseTitle}. I am Orion, your AI learning partner. Let's start our lesson together!`;
+        questionSpeechText = 'Before we begin, would you like me to help explain this lesson?';
+      } else {
+        welcomeText = `Halo! Selamat datang di modul pembelajaran ${courseTitle}. Saya Orion, asisten AI personal Anda. Mari kita mulai belajar bersama!`;
+        questionSpeechText = 'Sebelum memulai, apakah Anda ingin saya bantu jelaskan tentang materi ini?';
+      }
+
+      const audioCtx = ensureAudioContext();
+
+      try {
+        // Fetch welcome speech audio binary
+        const res = await fetch('/api/tts/speak', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            input: welcomeText,
+            voice: chosenVoice,
+            speed: 0
+          })
+        });
+
+        if (!res.ok) {
+          throw new Error('TTS API HTTP ' + res.status);
+        }
+
+        const arrayBuffer = await res.arrayBuffer();
+
+        if (audioCtx) {
+          // Decode MP3 audio into PCM AudioBuffer
+          const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+
+          // Preload question speech in background while welcome speech is prepared/playing
+          fetch('/api/tts/speak', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ input: questionSpeechText, voice: chosenVoice, speed: 0 })
+          }).then(async qRes => {
+            if (qRes.ok) {
+              const qBuf = await qRes.arrayBuffer();
+              if (audioCtx) {
+                preloadedQuestionAudioBuffer = await audioCtx.decodeAudioData(qBuf);
+              }
+            }
+          }).catch(e => console.warn('Preload question speech warn:', e));
+
+          const startAudioPlayback = () => {
+            if (isOrionSpeaking) return;
+            try {
+              orionBufferSource = audioCtx.createBufferSource();
+              orionBufferSource.buffer = audioBuffer;
+
+              orionAnalyser = audioCtx.createAnalyser();
+              orionAnalyser.fftSize = 128; // 64 frequency bins
+              orionAnalyser.smoothingTimeConstant = 0.55; // Fast response to vocal transients
+
+              orionBufferSource.connect(orionAnalyser);
+              orionAnalyser.connect(audioCtx.destination);
+
+              isOrionSpeaking = true;
+              if (sphereWrapper) {
+                sphereWrapper.classList.remove('loading');
+              }
+              if (sphereElem) {
+                sphereElem.classList.remove('loading');
+                sphereElem.classList.add('speaking');
+              }
+
+              orionBufferSource.onended = () => {
+                stopOrionEqualizer();
+                // Delay 500ms before starting question phase and showing choice card
+                setTimeout(() => {
+                  triggerQuestionPhase(questionSpeechText, lang, chosenVoice);
+                }, 500);
+              };
+
+              orionBufferSource.start(0);
+              startAudioVisualizerLoop();
+            } catch (playErr) {
+              console.warn('Audio playback error:', playErr);
+            }
+          };
+
+          // Check if AudioContext is running or suspended by browser policy
+          if (audioCtx.state === 'running') {
+            startAudioPlayback();
+          } else {
+            // Attempt immediate resume
+            audioCtx.resume().then(() => {
+              if (audioCtx.state === 'running') {
+                startAudioPlayback();
+              }
+            }).catch(() => {});
+
+            // One-touch instant unlock on any first user activity
+            const unlockAndPlay = async () => {
+              ['pointerdown', 'click', 'keydown', 'touchstart', 'scroll', 'mousemove'].forEach(evt => {
+                window.removeEventListener(evt, unlockAndPlay, { capture: true });
+              });
+              if (audioCtx.state === 'suspended') {
+                await audioCtx.resume().catch(() => {});
+              }
+              if (!isOrionSpeaking) {
+                startAudioPlayback();
+              }
+            };
+
+            ['pointerdown', 'click', 'keydown', 'touchstart', 'scroll', 'mousemove'].forEach(evt => {
+              window.addEventListener(evt, unlockAndPlay, { capture: true, once: true, passive: true });
+            });
+          }
+        } else {
+          // Fallback to HTML5 Audio if Web Audio API not supported
+          const blob = new Blob([arrayBuffer], { type: 'audio/mp3' });
+          const audioUrl = URL.createObjectURL(blob);
+          orionAudioElement = new Audio(audioUrl);
+          
+          // Preload question blob
+          fetch('/api/tts/speak', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ input: questionSpeechText, voice: chosenVoice, speed: 0 })
+          }).then(async qRes => {
+            if (qRes.ok) {
+              const qBuf = await qRes.arrayBuffer();
+              preloadedQuestionBlob = new Blob([qBuf], { type: 'audio/mp3' });
+            }
+          }).catch(() => {});
+
+          orionAudioElement.onplay = () => {
+            isOrionSpeaking = true;
+            if (sphereWrapper) {
+              sphereWrapper.classList.remove('loading');
+            }
+            if (sphereElem) {
+              sphereElem.classList.remove('loading');
+              sphereElem.classList.add('speaking');
+            }
+            runSimulatedSpeechVisualizer();
+          };
+          orionAudioElement.onended = () => {
+            stopOrionEqualizer();
+            setTimeout(() => {
+              triggerQuestionPhase(questionSpeechText, lang, chosenVoice);
+            }, 500);
+          };
+          orionAudioElement.play().catch(() => {
+            fallbackSpeechSynthesis(welcomeText, lang, chosenVoice, false);
+          });
+        }
+      } catch (err) {
+        console.warn('Orion Edge-TTS fallback to Web Speech API:', err);
+        fallbackSpeechSynthesis(welcomeText, lang, chosenVoice, false);
+      }
+    }
+
+    async function triggerQuestionPhase(questionSpeechText, lang, chosenVoice) {
+      const card = document.getElementById('aurora-choice-card');
+      const sphereElem = document.getElementById('aurora-sphere-elem');
+      const sphereWrapper = document.getElementById('aurora-sphere-wrapper');
+      const audioCtx = ensureAudioContext();
+
+      if (audioCtx && preloadedQuestionAudioBuffer) {
+        // Instantly play preloaded audio buffer with zero latency
+        orionBufferSource = audioCtx.createBufferSource();
+        orionBufferSource.buffer = preloadedQuestionAudioBuffer;
+        orionAnalyser = audioCtx.createAnalyser();
+        orionAnalyser.fftSize = 128;
+        orionAnalyser.smoothingTimeConstant = 0.55;
+        orionBufferSource.connect(orionAnalyser);
+        orionAnalyser.connect(audioCtx.destination);
+
+        isOrionSpeaking = true;
+        // Show choice card simultaneously with voice start
+        if (card) {
+          card.classList.add('visible');
+        }
+        if (sphereWrapper) {
+          sphereWrapper.classList.remove('loading');
+        }
+        if (sphereElem) {
+          sphereElem.classList.remove('loading');
+          sphereElem.classList.add('speaking');
+        }
+
+        orionBufferSource.onended = () => {
+          stopOrionEqualizer();
+        };
+
+        orionBufferSource.start(0);
+        startAudioVisualizerLoop();
+      } else if (!audioCtx && preloadedQuestionBlob) {
+        const audioUrl = URL.createObjectURL(preloadedQuestionBlob);
+        orionAudioElement = new Audio(audioUrl);
+        orionAudioElement.onplay = () => {
+          isOrionSpeaking = true;
+          if (card) {
+            card.classList.add('visible');
+          }
+          if (sphereWrapper) {
+            sphereWrapper.classList.remove('loading');
+          }
+          if (sphereElem) {
+            sphereElem.classList.remove('loading');
+            sphereElem.classList.add('speaking');
+          }
+          runSimulatedSpeechVisualizer();
+        };
+        orionAudioElement.onended = () => {
+          stopOrionEqualizer();
+        };
+        orionAudioElement.play().catch(() => {
+          fallbackSpeechSynthesis(questionSpeechText, lang, chosenVoice, false);
+        });
+      } else {
+        // If preload not finished yet, fetch and play directly
+        if (card) {
+          card.classList.add('visible');
+        }
+        await playOrionSpeechText(questionSpeechText, lang, chosenVoice, false);
+      }
+    }
+
+    function handleChoiceNo() {
+      const card = document.getElementById('aurora-choice-card');
+      if (card) {
+        card.classList.remove('visible');
+      }
+      dismissAuroraOverlay();
+    }
+
+    function dockAuroraToCorner() {
+      const overlay = document.getElementById('aurora-orb-overlay');
+      const sphereWrapper = document.getElementById('aurora-sphere-wrapper');
+      const choiceCard = document.getElementById('aurora-choice-card');
+
+      if (choiceCard) {
+        choiceCard.classList.remove('visible');
+      }
+      if (overlay) {
+        overlay.classList.add('fading-backdrop');
+        setTimeout(() => {
+          if (overlay.parentElement) overlay.remove();
+        }, 600);
+      }
+
+      if (sphereWrapper) {
+        const isSmallScreen = window.innerWidth <= 768;
+        const targetRight = isSmallScreen ? 76 : 88;
+        const targetBottom = isSmallScreen ? 72 : 76;
+        const targetSize = isSmallScreen ? 48 : 52;
+
+        // Calculate center of current sphere and target docked center
+        const sphereRect = sphereWrapper.getBoundingClientRect();
+        const currentCenterX = sphereRect.left + sphereRect.width / 2;
+        const currentCenterY = sphereRect.top + sphereRect.height / 2;
+
+        const targetCenterX = window.innerWidth - targetRight - (targetSize / 2);
+        const targetCenterY = window.innerHeight - targetBottom - (targetSize / 2);
+
+        const deltaX = Math.round(targetCenterX - currentCenterX);
+        const deltaY = Math.round(targetCenterY - currentCenterY);
+        const scaleRatio = (targetSize / 270).toFixed(4);
+
+        sphereWrapper.classList.remove('loading');
+        sphereWrapper.style.animation = 'none';
+        void sphereWrapper.offsetWidth;
+
+        // Animate with clean uniform transform scale + translate (zero aspect ratio distortion!)
+        sphereWrapper.style.transformOrigin = 'center center';
+        sphereWrapper.style.transition = 'transform 0.75s cubic-bezier(0.2, 0.9, 0.3, 1)';
+        sphereWrapper.style.transform = `translate3d(${deltaX}px, ${deltaY}px, 0) scale(${scaleRatio})`;
+
+        setTimeout(() => {
+          if (sphereWrapper.parentElement !== document.body) {
+            document.body.appendChild(sphereWrapper);
+          }
+          sphereWrapper.style.transition = '';
+          sphereWrapper.style.transform = '';
+          sphereWrapper.style.transformOrigin = '';
+          sphereWrapper.style.left = '';
+          sphereWrapper.style.top = '';
+          sphereWrapper.style.width = '';
+          sphereWrapper.style.height = '';
+          sphereWrapper.style.margin = '';
+          sphereWrapper.classList.add('docked-corner');
+          sphereWrapper.title = 'Buka Tanya AI Orion';
+          sphereWrapper.onclick = () => {
+            toggleAISplitPanel(true);
+          };
+        }, 760);
+      }
+    }
+
+    function stopAllAudioPlayback() {
+      activePlaybackSessionId++; // Invalidate and immediately kill any running speech loop / pipeline!
+
+      if (window.speechSynthesis) {
+        try { window.speechSynthesis.cancel(); } catch(e) {}
+      }
+      if (window.sharedAudio) {
+        try {
+          window.sharedAudio.pause();
+          window.sharedAudio.currentTime = 0;
+        } catch(e) {}
+      }
+      if (orionBufferSource) {
+        try {
+          orionBufferSource.onended = null; // Unbind onended to prevent ghost triggers
+          orionBufferSource.stop();
+          orionBufferSource.disconnect();
+        } catch(e) {}
+        orionBufferSource = null;
+      }
+      if (orionAudioElement) {
+        try {
+          orionAudioElement.onended = null;
+          orionAudioElement.pause();
+          orionAudioElement.currentTime = 0;
+        } catch(e) {}
+        orionAudioElement = null;
+      }
+      isOrionSpeaking = false;
+      stopOrionEqualizer();
+    }
+
+    async function handleChoiceYes() {
+      const card = document.getElementById('aurora-choice-card');
+      if (card) {
+        card.classList.remove('visible');
+      }
+
+      // Immediately stop any welcome or question speech so voices never overlap!
+      stopAllAudioPlayback();
+
+      // Smoothly dock mini orb to bottom-right corner
+      dockAuroraToCorner();
+
+      const sessionId = activePlaybackSessionId;
+
+      // Gather current material content & DOM details
+      const currentMat = (flatMaterials && flatMaterials[currentMaterialIndex]) ? flatMaterials[currentMaterialIndex] : null;
+      const courseTitle = (courseData && courseData.title) ? courseData.title : 'materi ini';
+      const matTitle = (currentMat && currentMat.title) ? currentMat.title : courseTitle;
+      
+      const dynamicArea = document.getElementById('material-dynamic-content-area');
+      const articleText = (currentMat && currentMat.content_text) || (dynamicArea ? dynamicArea.innerText : '') || (currentMat && currentMat.description) || '';
+
+      const lang = detectLanguage(courseTitle);
+      const chosenVoice = getA11ySelectedVoice(lang);
+
+      // Fetch deep AI narrative in background
+      let segments = [];
+      try {
+        const narrativeRes = await fetch('/api/ai/material/narrative', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            material_id: currentMat ? currentMat.id : null,
+            material_title: matTitle,
+            material_content: articleText,
+            context_details: dynamicArea ? dynamicArea.innerText : '',
+            target_level: 'beginner'
+          })
+        }).then(r => r.json());
+
+        if (sessionId !== activePlaybackSessionId) return;
+
+        if (narrativeRes && narrativeRes.success && narrativeRes.data && Array.isArray(narrativeRes.data.segments) && narrativeRes.data.segments.length > 0) {
+          segments = narrativeRes.data.segments;
+        }
+      } catch (err) {
+        console.warn('Failed to load narrative from AI:', err);
+      }
+
+      if (sessionId !== activePlaybackSessionId) return;
+
+      // Dynamic fallback if AI narrative is unavailable
+      if (!segments || segments.length === 0) {
+        const clientTransitions = [
+          'Nah, coba Anda perhatikan logika penting di bagian ini:',
+          'Kebayang kan mengapa hal ini sangat krusial dalam perancangan sistem?',
+          'Logika di baliknya cukup sederhana namun punya dampak besar:',
+          'Di sinilah letak kunci efisiensinya:',
+          'Biar semakin terbayang di implementasi nyata sehari-hari:',
+          'Coba perhatikan bagaimana prinsip ini saling melengkapi:'
+        ];
+        const paras = articleText.split(/\n\n+/).map(s => s.trim()).filter(s => s.length > 20 && !s.startsWith('---'));
+        segments = paras.map((p, idx) => {
+          const cleanP = p.replace(/^[#\s*\->]+/, '').replace(/[*_`]/g, '').trim();
+          const openWords = cleanP.split(' ').slice(0, 8).join(' ');
+          const transition = clientTransitions[idx % clientTransitions.length];
+          return {
+            step: idx + 1,
+            topic: `Konsep Inti ${idx + 1}`,
+            target_text: openWords,
+            text: idx === 0 
+              ? `Halo teman belajar! Senang sekali bisa mendampingi Anda di materi ${matTitle}. Yuk, kita pelajari bersama langkah demi langkah agar pemahaman Anda benar-benar matang! ${cleanP.slice(0, 180)}.`
+              : `${transition} ${cleanP.slice(0, 210)}.`
+          };
+        });
+      }
+
+      // Play segments sequentially with continuous background pipelining using accessibility voice!
+      await playPipelinedSegments(segments, lang, chosenVoice, sessionId);
+    }
+
+    async function fetchAndDecodeTTS(text, voice) {
+      const audioCtx = ensureAudioContext();
+      const res = await fetch('/api/tts/speak', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ input: text, voice: voice, speed: 0 })
+      });
+      if (!res.ok) throw new Error('TTS HTTP ' + res.status);
+      const arrayBuffer = await res.arrayBuffer();
+      if (audioCtx) {
+        return await audioCtx.decodeAudioData(arrayBuffer);
+      }
+      return arrayBuffer;
+    }
+
+    async function playPipelinedSegments(segments, lang, chosenVoice, sessionId = activePlaybackSessionId) {
+      if (!segments || segments.length === 0) return;
+
+      const preloadedBuffers = new Array(segments.length);
+
+      const preloadPromise = (idx) => {
+        if (idx < segments.length && !preloadedBuffers[idx]) {
+          preloadedBuffers[idx] = fetchAndDecodeTTS(segments[idx].text, chosenVoice).catch(err => {
+            console.warn(`Preload segment ${idx} failed:`, err);
+            return null;
+          });
+        }
+      };
+
+      // Kick off preload for segment 0 and 1
+      preloadPromise(0);
+      if (segments.length > 1) preloadPromise(1);
+
+      for (let i = 0; i < segments.length; i++) {
+        // Abort immediately if session was invalidated or user skipped
+
+<!-- Orion AI assistant loaded -->
