@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title || 'Riwayat Transaksi Belajar | SkillSphere AI' %></title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400..700;1,6..72,400..700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/stylesheets/style.css">
+  <link rel="stylesheet" href="/stylesheets/claude-theme.css">
+  <style>
+    :root {
+      --font-serif: 'Newsreader', Georgia, serif;
+      --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    body {
+      background-color: var(--color-bg, #FAF9F5);
+      color: var(--color-text, #1F1E1B);
+      font-family: var(--font-sans);
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .dark body {
+      background-color: #141413;
+      color: #E5E4DE;
+    }
+
+    .trx-nav {
+      background: var(--color-surface, #FFFFFF);
+      border-bottom: 1px solid var(--color-border, #E5E4DE);
+      padding: 1rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .dark .trx-nav {
+      background: #1F1E1B;
+      border-color: #2A2926;
+    }
+    .brand-link {
+      font-family: var(--font-serif);
+      font-size: 1.45rem;
+      font-weight: 700;
+      text-decoration: none;
+      color: inherit;
+    }
+    .nav-items {
+      display: flex;
+      gap: 1.25rem;
+      align-items: center;
+    }
+    .nav-item {
+      text-decoration: none;
+      color: var(--color-text-muted, #6B6963);
+      font-size: 0.95rem;
+      font-weight: 500;
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+    }
+    .nav-item:hover, .nav-item.active {
+      color: var(--color-text, #1F1E1B);
+    }
+    .dark .nav-item:hover, .dark .nav-item.active {
+      color: #FFFFFF;
+    }
+
+    .trx-container {
+      max-width: 1080px;
+      margin: 2.5rem auto;
+      padding: 0 1.5rem;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .trx-header {
+      margin-bottom: 2rem;
+    }
+    .trx-title {
+      font-family: var(--font-serif);
+      font-size: 2.25rem;
+      margin: 0 0 0.5rem 0;
+      font-weight: 600;
+    }
+    .trx-subtitle {
+      color: var(--color-text-muted, #6B6963);
+      font-size: 1rem;
+      margin: 0;
+    }
+
+    .trx-table-card {
+      background: var(--color-surface, #FFFFFF);
+      border: 1px solid var(--color-border, #E5E4DE);
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .dark .trx-table-card {
+      background: #1F1E1B;
+      border-color: #2A2926;
+    }
+
+    .trx-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.95rem;
+    }
+    .trx-table th {
+      padding: 1rem 1.25rem;
+      background: rgba(0, 0, 0, 0.02);
+      border-bottom: 1px solid var(--color-border, #E5E4DE);
+      color: var(--color-text-muted, #6B6963);
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      font-weight: 600;
+    }
+    .dark .trx-table th {
+      background: rgba(255, 255, 255, 0.03);
+      border-color: #2A2926;
+    }
+    .trx-table td {
+      padding: 1.15rem 1.25rem;
+      border-bottom: 1px solid var(--color-border, #E5E4DE);
+      vertical-align: middle;
+    }
+    .dark .trx-table td {
+      border-color: #2A2926;
+    }
+    .trx-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.25rem 0.65rem;
+      border-radius: 9999px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+    .badge-success {
+      background: #E6F7ED;
+      color: #0A6C35;
+    }
+    .dark .badge-success {
+      background: #064E24;
+      color: #75F39F;
+    }
+    .badge-pending {
+      background: #FEF3C7;
+      color: #92400E;
+    }
+    .dark .badge-pending {
+      background: #451A03;
+      color: #FCD34D;
+    }
+
+    .btn-action {
+      background: #1F1E1B;
+      color: #FAF9F5;
+      text-decoration: none;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      min-height: 38px;
+    }
+    .dark .btn-action {
+      background: #FAF9F5;
+      color: #1F1E1B;
+    }
+    .btn-action.secondary {
+      background: transparent;
+      border: 1px solid var(--color-border, #E5E4DE);
+      color: inherit;
+    }
+
+    .empty-state {
+      padding: 3.5rem 1.5rem;
+      text-align: center;
+      color: var(--color-text-muted, #6B6963);
+    }
+    .empty-state-title {
+      font-family: var(--font-serif);
+      font-size: 1.35rem;
+      font-weight: 600;
+      margin: 0 0 0.5rem 0;
+      color: var(--color-text, #1F1E1B);
+    }
+    .dark .empty-state-title {
+      color: #FFFFFF;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="trx-nav">
+    <a href="/dashboard" class="brand-link">SkillSphere AI</a>
+    <nav class="nav-items">
+      <a href="/dashboard" class="nav-item">Dashboard</a>
+      <a href="/courses" class="nav-item">Katalog Kursus</a>
+      <a href="/dashboard/wishlist" class="nav-item">Wishlist</a>
+      <a href="/dashboard/transactions" class="nav-item active">Riwayat Pembayaran</a>
+    </nav>
+  </header>
+
+  <main class="trx-container">
+    <div class="trx-header">
+      <h1 class="trx-title">Riwayat Transaksi Belajar</h1>
+      <p class="trx-subtitle">Pantau seluruh status pembayaran pendaftaran kelas dan unduh bukti transaksi resmi Anda.</p>
+    </div>
+
+    <div class="trx-table-card">
+      <table class="trx-table">
+        <thead>
+          <tr>
+            <th>Kode Transaksi</th>
+            <th>Kursus</th>
+            <th>Tanggal</th>
+            <th>Metode Pembayaran</th>
+            <th>Total Bayar</th>
+            <th>Status</th>
+            <th style="text-align: right;">Aksi</th>
+          </tr>
+        </thead>
+        <tbody id="trxTableBody">
+          <tr>
+            <td colspan="7" class="empty-state">
+              <div class="empty-state-title">Memuat riwayat transaksi...</div>
+              <p>Mohon tunggu sebentar, sedang mengambil data dari server.</p>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <script>
+    function formatRupiah(num) {
+      return 'Rp ' + Number(num || 0).toLocaleString('id-ID');
+    }
+
+    async function loadTransactions() {
+      try {
+        const token = localStorage.getItem('token') || localStorage.getItem('accessToken');
+        const headers = { 'Content-Type': 'application/json' };
+        if (token) headers['Authorization'] = 'Bearer ' + token;
+
+        const res = await fetch('/api/payments/transactions', { headers });
+        const json = await res.json();
+
+        const tbody = document.getElementById('trxTableBody');
+        if (!json.success || !json.data || json.data.length === 0) {
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="7" class="empty-state">
+                <div class="empty-state-title">Belum ada riwayat transaksi</div>
+                <p>Anda belum melakukan pembelian kelas. Jelajahi katalog kursus dan mulai belajar hari ini.</p>
+                <div style="margin-top: 1.25rem;">
+                  <a href="/courses" class="btn-action">Eksplorasi Katalog Kursus</a>
+                </div>
+              </td>
+            </tr>
+          `;
+          return;
+        }
+
+        tbody.innerHTML = json.data.map(t => {
+          const isSettled = t.payment_status === 'settlement';
+          const statusBadge = isSettled
+            ? '<span class="badge badge-success">Lunas</span>'
+            : '<span class="badge badge-pending">Menunggu Bayar</span>';
+
+          const dateStr = new Date(t.created_at).toLocaleDateString('id-ID', {
+            day: 'numeric', month: 'short', year: 'numeric'
+          });
+
+          const courseTitle = t.course ? t.course.title : 'Kursus SkillSphere';
+          const courseSlug = t.course ? (t.course.slug || t.course.id) : '';
+
+          let actionBtn = '';
+          if (isSettled) {
+            actionBtn = `<a href="/courses/${courseSlug}/learn" class="btn-action">Mulai Belajar &rarr;</a>`;
+          } else {
+            actionBtn = `<a href="/courses/${courseSlug}/checkout" class="btn-action secondary">Selesaikan Pembayaran</a>`;
+          }
+
+          return `
+            <tr>
+              <td style="font-family: var(--font-mono); font-size: 0.85rem; font-weight: 600;">${t.transaction_code}</td>
+              <td style="font-weight: 600;">${courseTitle}</td>
+              <td style="color: var(--color-text-muted); font-size: 0.9rem;">${dateStr}</td>
+              <td><span style="text-transform: uppercase; font-size: 0.85rem; font-weight: 500;">${t.payment_method || 'Midtrans'}</span></td>
+              <td style="font-weight: 700;">${formatRupiah(t.amount)}</td>
+              <td>${statusBadge}</td>
+              <td style="text-align: right;">${actionBtn}</td>
+            </tr>
+          `;
+        }).join('');
+
+      } catch (err) {
+        console.error('Error loading transactions:', err);
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadTransactions);
+  </script>
+</body>
+</html>
+

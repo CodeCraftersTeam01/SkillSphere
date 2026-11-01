@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title || 'Wishlist Kursus Favorit | SkillSphere AI' %></title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400..700;1,6..72,400..700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/stylesheets/style.css">
+  <link rel="stylesheet" href="/stylesheets/claude-theme.css">
+  <style>
+    :root {
+      --font-serif: 'Newsreader', Georgia, serif;
+      --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    body {
+      background-color: var(--color-bg, #FAF9F5);
+      color: var(--color-text, #1F1E1B);
+      font-family: var(--font-sans);
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .dark body {
+      background-color: #141413;
+      color: #E5E4DE;
+    }
+
+    .wish-nav {
+      background: var(--color-surface, #FFFFFF);
+      border-bottom: 1px solid var(--color-border, #E5E4DE);
+      padding: 1rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .dark .wish-nav {
+      background: #1F1E1B;
+      border-color: #2A2926;
+    }
+    .brand-link {
+      font-family: var(--font-serif);
+      font-size: 1.45rem;
+      font-weight: 700;
+      text-decoration: none;
+      color: inherit;
+    }
+    .nav-items {
+      display: flex;
+      gap: 1.25rem;
+      align-items: center;
+    }
+    .nav-item {
+      text-decoration: none;
+      color: var(--color-text-muted, #6B6963);
+      font-size: 0.95rem;
+      font-weight: 500;
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+    }
+    .nav-item:hover, .nav-item.active {
+      color: var(--color-text, #1F1E1B);
+    }
+    .dark .nav-item:hover, .dark .nav-item.active {
+      color: #FFFFFF;
+    }
+
+    .wish-container {
+      max-width: 1100px;
+      margin: 2.5rem auto;
+      padding: 0 1.5rem;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .wish-header {
+      margin-bottom: 2rem;
+    }
+    .wish-title {
+      font-family: var(--font-serif);
+      font-size: 2.25rem;
+      margin: 0 0 0.5rem 0;
+      font-weight: 600;
+    }
+    .wish-subtitle {
+      color: var(--color-text-muted, #6B6963);
+      font-size: 1rem;
+      margin: 0;
+    }
+
+    /* Course Grid */
+    .courses-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .course-card {
+      background: var(--color-surface, #FFFFFF);
+      border: 1px solid var(--color-border, #E5E4DE);
+      border-radius: 12px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    .dark .course-card {
+      background: #1F1E1B;
+      border-color: #2A2926;
+    }
+    .course-card:hover {
+      transform: translateY(-2px);
+    }
+
+    .course-card-thumb {
+      width: 100%;
+      height: 175px;
+      object-fit: cover;
+      background: #E5E4DE;
+    }
+
+    .course-card-body {
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+
+    .category-tag {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--color-text-muted, #6B6963);
+      margin-bottom: 0.35rem;
+    }
+
+    .card-course-title {
+      font-family: var(--font-serif);
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin: 0 0 0.5rem 0;
+      line-height: 1.35;
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .card-tutor-name {
+      font-size: 0.85rem;
+      color: var(--color-text-muted, #6B6963);
+      margin: 0 0 1rem 0;
+    }
+
+    .card-footer {
+      margin-top: auto;
+      padding-top: 1rem;
+      border-top: 1px solid var(--color-border, #E5E4DE);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .dark .card-footer {
+      border-color: #2A2926;
+    }
+
+    .course-price {
+      font-weight: 700;
+      font-size: 1.15rem;
+      color: var(--color-text, #1F1E1B);
+    }
+    .dark .course-price {
+      color: #FFFFFF;
+    }
+
+    .btn-buy {
+      background: #1F1E1B;
+      color: #FAF9F5;
+      text-decoration: none;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      min-height: 38px;
+    }
+    .dark .btn-buy {
+      background: #FAF9F5;
+      color: #1F1E1B;
+    }
+
+    .btn-remove-wish {
+      background: transparent;
+      border: none;
+      color: #991B1B;
+      cursor: pointer;
+      font-size: 0.85rem;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+    }
+
+    .empty-state {
+      padding: 4rem 1.5rem;
+      text-align: center;
+      color: var(--color-text-muted, #6B6963);
+      background: var(--color-surface, #FFFFFF);
+      border: 1px dashed var(--color-border, #E5E4DE);
+      border-radius: 12px;
+      grid-column: 1 / -1;
+    }
+    .dark .empty-state {
+      background: #1F1E1B;
+      border-color: #2A2926;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="wish-nav">
+    <a href="/dashboard" class="brand-link">SkillSphere AI</a>
+    <nav class="nav-items">
+      <a href="/dashboard" class="nav-item">Dashboard</a>
+      <a href="/courses" class="nav-item">Katalog Kursus</a>
+      <a href="/dashboard/wishlist" class="nav-item active">Wishlist</a>
+      <a href="/dashboard/transactions" class="nav-item">Riwayat Pembayaran</a>
+    </nav>
+  </header>
+
+  <main class="wish-container">
+    <div class="wish-header">
+      <h1 class="wish-title">Daftar Kursus Favorit (Wishlist)</h1>
+      <p class="wish-subtitle">Simpan materi belajar yang ingin Anda ikuti dan lakukan pendaftaran kapan saja.</p>
+    </div>
+
+    <div class="courses-grid" id="wishlistGrid">
+      <div class="empty-state">
+        <h3 style="font-family: var(--font-serif); font-size: 1.35rem; margin: 0 0 0.5rem 0; color: inherit;">Memuat kursus favorit...</h3>
+        <p>Sedang mengambil daftar wishlist Anda dari server.</p>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function formatRupiah(num) {
+      return 'Rp ' + Number(num || 0).toLocaleString('id-ID');
+    }
+
+    async function loadWishlist() {
+      try {
+        const token = localStorage.getItem('token') || localStorage.getItem('accessToken');
+        const headers = { 'Content-Type': 'application/json' };
+        if (token) headers['Authorization'] = 'Bearer ' + token;
+
+        const res = await fetch('/api/courses/wishlist', { headers });
+        const json = await res.json();
+
+        const grid = document.getElementById('wishlistGrid');
+        if (!json.success || !json.data || json.data.length === 0) {
+          grid.innerHTML = `
+            <div class="empty-state">
+              <div style="font-size: 2.5rem; margin-bottom: 0.75rem;">🔖</div>
+              <h3 style="font-family: var(--font-serif); font-size: 1.5rem; margin: 0 0 0.5rem 0; color: inherit;">Wishlist Anda Masih Kosong</h3>
+              <p style="margin: 0 0 1.5rem 0;">Temukan kelas idaman dan klik tombol simpan untuk menyimpannya di sini.</p>
+              <a href="/courses" class="btn-buy" style="margin: 0 auto;">Eksplorasi Katalog Kursus &rarr;</a>
+            </div>
+          `;
+          return;
+        }
+
+        grid.innerHTML = json.data.map(c => {
+          const categoryName = c.category ? c.category.name : 'Umum';
+          const tutorName = c.tutor ? c.tutor.name : 'Instruktur Ahli';
+          const price = Number(c.price || 0);
+          const priceDisplay = price > 0 ? formatRupiah(price) : 'Gratis';
+          const slug = c.slug || c.id;
+
+          return `
+            <div class="course-card" id="wish-card-${c.id}">
+              <img src="${c.thumbnail_url || '/images/course-placeholder.jpg'}" alt="${c.title}" class="course-card-thumb">
+              <div class="course-card-body">
+                <span class="category-tag">${categoryName}</span>
+                <a href="/courses/${slug}" class="card-course-title">${c.title}</a>
+                <p class="card-tutor-name">Instruktur: ${tutorName}</p>
+                <div class="card-footer">
+                  <span class="course-price">${priceDisplay}</span>
+                  <div style="display:flex; align-items:center; gap:6px;">
+                    <button class="btn-remove-wish" onclick="removeFromWishlist(${c.id})" title="Hapus dari Wishlist">Hapus</button>
+                    <a href="/courses/${slug}/checkout" class="btn-buy">Checkout &rarr;</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+      } catch (err) {
+        console.error('Error loading wishlist:', err);
+      }
+    }
+
+    async function removeFromWishlist(courseId) {
+      try {
+        const token = localStorage.getItem('token') || localStorage.getItem('accessToken');
+        const headers = { 'Content-Type': 'application/json' };
+        if (token) headers['Authorization'] = 'Bearer ' + token;
+
+        const res = await fetch('/api/courses/wishlist/toggle', {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({ course_id: courseId }),
+        });
+
+        const json = await res.json();
+        if (json.success) {
+          const card = document.getElementById(`wish-card-${courseId}`);
+          if (card) card.remove();
+          // Jika kosong setelah dihapus, muat ulang
+          const remaining = document.querySelectorAll('.course-card');
+          if (remaining.length === 0) loadWishlist();
+        }
+      } catch (err) {
+        console.error('Error removing from wishlist:', err);
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadWishlist);
+  </script>
+</body>
+</html>
+

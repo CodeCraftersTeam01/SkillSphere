@@ -41,6 +41,17 @@ router.get(['/profile', '/dashboard/profile'], function(req, res, next) {
   res.render('profile', { title: 'Profil & Pengaturan Akun | SkillSphere AI' });
 });
 
+/* GET Student Transactions History (Sprint 3 - Bustanul) */
+router.get(['/transactions', '/dashboard/transactions', '/riwayat-transaksi'], function(req, res, next) {
+  res.render('student/transactions', { title: 'Riwayat Transaksi Belajar | SkillSphere AI' });
+});
+
+/* GET Student Wishlist Page (Sprint 3 - Bustanul) */
+router.get(['/wishlist', '/dashboard/wishlist', '/kursus-favorit'], function(req, res, next) {
+  res.render('student/wishlist', { title: 'Wishlist Kursus Favorit | SkillSphere AI' });
+});
+
+
 /* GET Course Catalog Page (Sprint 2 - Fadiyah) */
 router.get(['/courses', '/catalog', '/katalog'], function(req, res, next) {
   res.render('courses/index', { title: 'Katalog Kursus & Kurikulum | SkillSphere AI' });
