@@ -1682,11 +1682,12 @@
                     <th>No. Rekening / Akun</th>
                     <th>Tanggal Pengajuan</th>
                     <th>Status</th>
+                    <th>Aksi</th>
                   </tr>
                 </thead>
                 <tbody id="withdrawals-table-body">
                   <tr>
-                    <td colspan="6" style="text-align:center; padding:32px; color:var(--text-secondary);">
+                    <td colspan="7" style="text-align:center; padding:32px; color:var(--text-secondary);">
                       <i class="fas fa-spinner fa-spin" style="margin-right:8px;"></i> Memuat data penarikan...
                     </td>
                   </tr>
@@ -4264,6 +4265,20 @@
             if (wd.status === 'completed') statusPill = '<span class="status-pill status-active"><i class="fas fa-check"></i> Selesai</span>';
             if (wd.status === 'rejected') statusPill = '<span class="status-pill status-rejected"><i class="fas fa-xmark"></i> Ditolak</span>';
 
+            let actionButtons = '-';
+            if (wd.status === 'pending') {
+              actionButtons = `
+                <div style="display:flex; gap:6px;">
+                  <button class="btn-action btn-approve" onclick="handleApproveWithdrawal(${wd.id})" title="Setujui Penarikan">
+                    <i class="fas fa-check"></i> Setujui
+                  </button>
+                  <button class="btn-action btn-reject" onclick="handleRejectWithdrawal(${wd.id})" title="Tolak Penarikan">
+                    <i class="fas fa-times"></i> Tolak
+                  </button>
+                </div>
+              `;
+            }
+
             return `
               <tr>
                 <td><strong>${escapeHtml(tutorName)}</strong></td>
@@ -4272,10 +4287,54 @@
                 <td><code>${escapeHtml(wd.account_number || '-')}</code> (${escapeHtml(wd.account_holder_name || '-')})</td>
                 <td>${dateStr}</td>
                 <td>${statusPill}</td>
+                <td>${actionButtons}</td>
               </tr>
             `;
           }).join('');
         }
+      }
+    }
+
+    async function handleApproveWithdrawal(id) {
+      if (!confirm('Apakah Anda yakin ingin menyetujui penarikan dana ini dan menandai transfer telah selesai?')) return;
+      try {
+        const token = localStorage.getItem('token') || localStorage.getItem('accessToken');
+        const res = await fetch(`/api/admin/withdrawals/${id}/approve`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+          body: JSON.stringify({}),
+        });
+        const json = await res.json();
+        if (json.success) {
+          showNotification(json.message || 'Penarikan dana disetujui.', 'success');
+          fetchFinancialData();
+        } else {
+          showNotification(json.message || 'Gagal menyetujui penarikan.', 'error');
+        }
+      } catch (e) {
+        showNotification('Terjadi kesalahan jaringan.', 'error');
+      }
+    }
+
+    async function handleRejectWithdrawal(id) {
+      const reason = prompt('Masukkan alasan penolakan penarikan dana (saldo akan dikembalikan ke dompet tutor):');
+      if (reason === null) return;
+      try {
+        const token = localStorage.getItem('token') || localStorage.getItem('accessToken');
+        const res = await fetch(`/api/admin/withdrawals/${id}/reject`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+          body: JSON.stringify({ reason: reason || 'Data rekening tidak sesuai.' }),
+        });
+        const json = await res.json();
+        if (json.success) {
+          showNotification(json.message || 'Penarikan dana ditolak dan saldo dikembalikan.', 'info');
+          fetchFinancialData();
+        } else {
+          showNotification(json.message || 'Gagal menolak penarikan.', 'error');
+        }
+      } catch (e) {
+        showNotification('Terjadi kesalahan jaringan.', 'error');
       }
     }
 

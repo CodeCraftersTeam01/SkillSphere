@@ -526,6 +526,111 @@ exports.getFinancialData = async (req, res) => {
 };
 
 /**
+ * Approve Payout / Withdrawal Request (Sprint 3 - Satrio & Arjuna)
+ * PUT /api/admin/withdrawals/:id/approve
+ */
+exports.approveWithdrawal = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { proof_url } = req.body;
+
+    const withdrawal = await WithdrawalRequest.findByPk(id);
+    if (!withdrawal) {
+      return res.status(404).json({
+        success: false,
+        message: 'Permohonan penarikan dana tidak ditemukan.',
+      });
+    }
+
+    if (withdrawal.status !== 'pending') {
+      return res.status(400).json({
+        success: false,
+        message: `Permohonan penarikan sudah berstatus '${withdrawal.status}'.`,
+      });
+    }
+
+    withdrawal.status = 'completed';
+    withdrawal.processed_at = new Date();
+    if (proof_url) withdrawal.proof_url = String(proof_url).trim();
+    await withdrawal.save();
+
+    return res.status(200).json({
+      success: true,
+      message: 'Penarikan dana berhasil disetujui dan ditandai selesai.',
+      data: withdrawal,
+    });
+  } catch (err) {
+    console.error('Error in approveWithdrawal:', err);
+    return res.status(500).json({
+      success: false,
+      message: 'Gagal menyetujui penarikan dana.',
+      error: err.message,
+    });
+  }
+};
+
+/**
+ * Reject Payout / Withdrawal Request with Balance Refund (Sprint 3 - Satrio & Arjuna)
+ * PUT /api/admin/withdrawals/:id/reject
+ */
+exports.rejectWithdrawal = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { reason } = req.body;
+
+    const withdrawal = await WithdrawalRequest.findByPk(id);
+    if (!withdrawal) {
+      return res.status(404).json({
+        success: false,
+        message: 'Permohonan penarikan dana tidak ditemukan.',
+      });
+    }
+
+    if (withdrawal.status !== 'pending') {
+      return res.status(400).json({
+        success: false,
+        message: `Permohonan penarikan sudah berstatus '${withdrawal.status}'.`,
+      });
+    }
+
+    withdrawal.status = 'rejected';
+    withdrawal.rejection_reason = reason ? String(reason).trim() : 'Informasi rekening tidak valid.';
+    withdrawal.processed_at = new Date();
+    await withdrawal.save();
+
+    // Kembalikan dana ke saldo tutor wallet
+    const wallet = await TutorWallet.findByPk(withdrawal.wallet_id);
+    if (wallet) {
+      wallet.balance = Number(wallet.balance) + Number(withdrawal.amount);
+      await wallet.save();
+
+      // Catat mutasi adjustment pengembalian dana
+      await WalletTransaction.create({
+        wallet_id: wallet.id,
+        transaction_type: 'credit',
+        amount: Number(withdrawal.amount),
+        reference_id: `REFUND-WD-${withdrawal.id}`,
+        reference_type: 'adjustment',
+        description: `Pengembalian dana penarikan: ${withdrawal.rejection_reason}`,
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: 'Penarikan dana berhasil ditolak dan saldo telah dikembalikan ke dompet tutor.',
+      data: withdrawal,
+    });
+  } catch (err) {
+    console.error('Error in rejectWithdrawal:', err);
+    return res.status(500).json({
+      success: false,
+      message: 'Gagal menolak penarikan dana.',
+      error: err.message,
+    });
+  }
+};
+
+/**
  * Get all courses for Admin with filter & search
  */
 exports.getAllCourses = async (req, res) => {
