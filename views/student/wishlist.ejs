@@ -2,24 +2,29 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
   <title><%= title || 'Wishlist Kursus Favorit | SkillSphere AI' %></title>
+  
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400..700;1,6..72,400..700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
   <link rel="stylesheet" href="/stylesheets/style.css">
   <link rel="stylesheet" href="/stylesheets/claude-theme.css">
+  <link rel="stylesheet" href="/stylesheets/accessibility.css">
+  <link rel="stylesheet" href="/stylesheets/custom-alert.css">
+  <script src="/javascripts/custom-alert.js"></script>
+
   <style>
     :root {
-      --font-serif: 'Newsreader', Georgia, serif;
-      --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-      --font-mono: 'JetBrains Mono', monospace;
+      --navbar-height: 56px;
     }
 
     body {
-      background-color: var(--color-bg, #FAF9F5);
-      color: var(--color-text, #1F1E1B);
-      font-family: var(--font-sans);
+      background-color: var(--bg-app);
+      color: var(--text-primary);
+      font-family: var(--font-sans, 'Plus Jakarta Sans', sans-serif);
       margin: 0;
       padding: 0;
       min-height: 100vh;
@@ -27,226 +32,479 @@
       flex-direction: column;
     }
 
-    .dark body {
-      background-color: #141413;
-      color: #E5E4DE;
+    /* Top Sticky Navigation Bar matching Dashboard exactly */
+    .navbar {
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 0 24px;
+      height: var(--navbar-height);
+      min-height: var(--navbar-height);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
     }
 
-    .wish-nav {
-      background: var(--color-surface, #FFFFFF);
-      border-bottom: 1px solid var(--color-border, #E5E4DE);
-      padding: 1rem 1.5rem;
+    .nav-main-row {
       display: flex;
-      justify-content: space-between;
       align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      gap: 20px;
     }
-    .dark .wish-nav {
-      background: #1F1E1B;
-      border-color: #2A2926;
+
+    .nav-brand-group {
+      display: flex;
+      align-items: center;
+      gap: 24px;
     }
-    .brand-link {
-      font-family: var(--font-serif);
-      font-size: 1.45rem;
+
+    .brand-logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--text-primary);
       font-weight: 700;
+      font-size: 16px;
+    }
+
+    .brand-icon {
+      width: 24px;
+      height: 24px;
+      color: var(--accent-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .nav-links-menu {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .nav-link-item {
+      padding: 7px 14px;
+      font-size: 13.5px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      text-decoration: none;
+      border-radius: var(--radius-md);
+      transition: all 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .nav-link-item:hover {
+      color: var(--text-primary);
+      background: var(--bg-surface-subtle);
+    }
+
+    .nav-link-item.active {
+      color: var(--text-primary);
+      font-weight: 600;
+      background: var(--bg-surface-subtle);
+      border-bottom: 2px solid var(--accent-primary);
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .theme-toggle-btn {
+      background: var(--bg-surface-subtle);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      padding: 6px 14px;
+      border-radius: var(--radius-full);
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-height: 36px;
+      transition: all 0.15s ease;
+    }
+
+    .theme-toggle-btn:hover {
+      color: var(--text-primary);
+      border-color: var(--border-strong);
+    }
+
+    .user-profile-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 12px 4px 6px;
+      border-radius: var(--radius-full);
+      background: var(--bg-surface-subtle);
+      border: 1px solid var(--border-subtle);
       text-decoration: none;
       color: inherit;
     }
-    .nav-items {
+
+    .user-avatar-sm {
+      width: 26px;
+      height: 26px;
+      border-radius: var(--radius-full);
+      background: var(--accent-primary);
+      color: var(--accent-text);
       display: flex;
-      gap: 1.25rem;
       align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
     }
-    .nav-item {
-      text-decoration: none;
-      color: var(--color-text-muted, #6B6963);
-      font-size: 0.95rem;
-      font-weight: 500;
-      min-height: 44px;
+
+    .user-name-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .user-role-tag {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: 2px 6px;
+      border-radius: var(--radius-full);
+      background: var(--bg-surface);
+      color: var(--text-secondary);
+    }
+
+    .logout-btn {
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
       display: inline-flex;
       align-items: center;
-    }
-    .nav-item:hover, .nav-item.active {
-      color: var(--color-text, #1F1E1B);
-    }
-    .dark .nav-item:hover, .dark .nav-item.active {
-      color: #FFFFFF;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: var(--radius-md);
+      transition: color 0.15s ease;
+      min-height: 36px;
     }
 
-    .wish-container {
-      max-width: 1100px;
-      margin: 2.5rem auto;
-      padding: 0 1.5rem;
+    .logout-btn:hover {
+      color: var(--color-danger, #EF4444);
+    }
+
+    /* Main Container */
+    .wish-main-container {
+      max-width: 1140px;
+      margin: 0 auto;
+      padding: 36px 24px 64px;
       width: 100%;
       box-sizing: border-box;
+      flex: 1;
     }
 
-    .wish-header {
-      margin-bottom: 2rem;
+    /* Page Header Banner */
+    .wish-banner-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-xl);
+      padding: 28px 32px;
+      margin-bottom: 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      box-shadow: var(--shadow-sm);
     }
-    .wish-title {
+
+    .wish-banner-title {
       font-family: var(--font-serif);
-      font-size: 2.25rem;
-      margin: 0 0 0.5rem 0;
+      font-size: 26px;
       font-weight: 600;
+      color: var(--text-primary);
+      margin: 0 0 6px 0;
+      letter-spacing: -0.01em;
     }
-    .wish-subtitle {
-      color: var(--color-text-muted, #6B6963);
-      font-size: 1rem;
+
+    .wish-banner-subtitle {
+      font-size: 14px;
+      color: var(--text-secondary);
       margin: 0;
+      line-height: 1.5;
     }
 
-    /* Course Grid */
-    .courses-grid {
+    .wish-counter-badge {
+      background: var(--bg-surface-subtle);
+      border: 1px solid var(--border-subtle);
+      padding: 8px 16px;
+      border-radius: var(--radius-full);
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-primary);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Course Cards Grid */
+    .wishlist-cards-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 1.5rem;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 22px;
     }
 
-    .course-card {
-      background: var(--color-surface, #FFFFFF);
-      border: 1px solid var(--color-border, #E5E4DE);
-      border-radius: 12px;
+    .course-card-custom {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
       overflow: hidden;
       display: flex;
       flex-direction: column;
-      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+      position: relative;
     }
-    .dark .course-card {
-      background: #1F1E1B;
-      border-color: #2A2926;
-    }
-    .course-card:hover {
+
+    .course-card-custom:hover {
       transform: translateY(-2px);
+      border-color: var(--border-strong);
+      box-shadow: var(--shadow-md);
     }
 
-    .course-card-thumb {
+    .course-thumb-box {
       width: 100%;
-      height: 175px;
-      object-fit: cover;
-      background: #E5E4DE;
+      height: 185px;
+      position: relative;
+      background: var(--bg-surface-subtle);
+      overflow: hidden;
     }
 
-    .course-card-body {
-      padding: 1.25rem;
+    .course-thumb-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .card-body-content {
+      padding: 18px 20px;
       display: flex;
       flex-direction: column;
       flex: 1;
     }
 
-    .category-tag {
-      font-size: 0.75rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      color: var(--color-text-muted, #6B6963);
-      margin-bottom: 0.35rem;
-    }
-
-    .card-course-title {
-      font-family: var(--font-serif);
-      font-size: 1.25rem;
-      font-weight: 600;
-      margin: 0 0 0.5rem 0;
-      line-height: 1.35;
-      color: inherit;
-      text-decoration: none;
-    }
-
-    .card-tutor-name {
-      font-size: 0.85rem;
-      color: var(--color-text-muted, #6B6963);
-      margin: 0 0 1rem 0;
-    }
-
-    .card-footer {
-      margin-top: auto;
-      padding-top: 1rem;
-      border-top: 1px solid var(--color-border, #E5E4DE);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 0.5rem;
-    }
-    .dark .card-footer {
-      border-color: #2A2926;
-    }
-
-    .course-price {
+    .card-category-pill {
+      font-size: 11px;
       font-weight: 700;
-      font-size: 1.15rem;
-      color: var(--color-text, #1F1E1B);
-    }
-    .dark .course-price {
-      color: #FFFFFF;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-tertiary);
+      margin-bottom: 6px;
     }
 
-    .btn-buy {
-      background: #1F1E1B;
-      color: #FAF9F5;
+    .card-course-heading {
+      font-family: var(--font-serif);
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-primary);
       text-decoration: none;
-      padding: 0.5rem 1rem;
-      border-radius: 6px;
-      font-size: 0.85rem;
+      margin: 0 0 8px 0;
+      line-height: 1.4;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .card-course-heading:hover {
+      text-decoration: underline;
+    }
+
+    .card-tutor-meta {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .card-bottom-bar {
+      margin-top: auto;
+      padding-top: 14px;
+      border-top: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .price-value-tag {
+      font-family: var(--font-mono, monospace);
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .card-actions-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-remove-item {
+      background: none;
+      border: 1px solid var(--border-subtle);
+      color: var(--color-danger, #EF4444);
+      padding: 7px 12px;
+      border-radius: var(--radius-md);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      min-height: 38px;
+      transition: all 0.15s ease;
+    }
+
+    .btn-remove-item:hover {
+      background: rgba(239, 68, 68, 0.08);
+      border-color: var(--color-danger, #EF4444);
+    }
+
+    .btn-enroll-now {
+      background: var(--accent-primary);
+      color: var(--accent-text);
+      text-decoration: none;
+      padding: 8px 16px;
+      border-radius: var(--radius-md);
+      font-size: 13px;
       font-weight: 600;
       display: inline-flex;
       align-items: center;
-      gap: 0.35rem;
+      gap: 6px;
       min-height: 38px;
-    }
-    .dark .btn-buy {
-      background: #FAF9F5;
-      color: #1F1E1B;
+      transition: opacity 0.15s ease;
     }
 
-    .btn-remove-wish {
-      background: transparent;
-      border: none;
-      color: #991B1B;
-      cursor: pointer;
-      font-size: 0.85rem;
-      padding: 0.25rem 0.5rem;
-      border-radius: 4px;
+    .btn-enroll-now:hover {
+      opacity: 0.9;
     }
 
-    .empty-state {
-      padding: 4rem 1.5rem;
+    /* Empty State Card */
+    .empty-state-card {
+      background: var(--bg-surface);
+      border: 1px dashed var(--border-strong);
+      border-radius: var(--radius-xl);
+      padding: 56px 24px;
       text-align: center;
-      color: var(--color-text-muted, #6B6963);
-      background: var(--color-surface, #FFFFFF);
-      border: 1px dashed var(--color-border, #E5E4DE);
-      border-radius: 12px;
       grid-column: 1 / -1;
     }
-    .dark .empty-state {
-      background: #1F1E1B;
-      border-color: #2A2926;
+
+    .empty-icon-wrap {
+      width: 56px;
+      height: 56px;
+      border-radius: var(--radius-full);
+      background: var(--bg-surface-subtle);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      color: var(--text-secondary);
+      margin-bottom: 16px;
+    }
+
+    @media (max-width: 768px) {
+      .navbar {
+        padding: 0 16px;
+      }
+      .wish-main-container {
+        padding: 20px 16px 40px;
+      }
+      .wish-banner-card {
+        padding: 20px;
+      }
+      .wish-banner-title {
+        font-size: 22px;
+      }
     }
   </style>
 </head>
 <body>
 
-  <header class="wish-nav">
-    <a href="/dashboard" class="brand-link">SkillSphere AI</a>
-    <nav class="nav-items">
-      <a href="/dashboard" class="nav-item">Dashboard</a>
-      <a href="/courses" class="nav-item">Katalog Kursus</a>
-      <a href="/dashboard/wishlist" class="nav-item active">Wishlist</a>
-      <a href="/dashboard/transactions" class="nav-item">Riwayat Pembayaran</a>
-    </nav>
-  </header>
+  <!-- Top Sticky Navigation Bar -->
+  <header class="navbar" role="banner">
+    <div class="nav-main-row">
+      <div class="nav-brand-group">
+        <a href="/dashboard" class="brand-logo" aria-label="Beranda SkillSphere AI">
+          <div class="brand-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path opacity="0.38" d="M12 7.6L17.3 4.7L14.4 10L17.3 15.3L12 12.4L6.7 15.3L9.6 10L6.7 4.7Z" />
+              <path d="M12 0L13.8 8.2L22 10L13.8 11.8L12 20L10.2 11.8L2 10L10.2 8.2L12 0Z" />
+            </svg>
+          </div>
+          <span>SkillSphere AI</span>
+        </a>
 
-  <main class="wish-container">
-    <div class="wish-header">
-      <h1 class="wish-title">Daftar Kursus Favorit (Wishlist)</h1>
-      <p class="wish-subtitle">Simpan materi belajar yang ingin Anda ikuti dan lakukan pendaftaran kapan saja.</p>
-    </div>
+        <!-- Desktop Navigation Links -->
+        <nav class="nav-links-menu desktop-only" aria-label="Navigasi Utama">
+          <a href="/dashboard" class="nav-link-item">Beranda</a>
+          <a href="/courses" class="nav-link-item">Katalog Kursus</a>
+          <a href="/dashboard/roadmap" class="nav-link-item">Jalur Belajar AI</a>
+        </nav>
+      </div>
 
-    <div class="courses-grid" id="wishlistGrid">
-      <div class="empty-state">
-        <h3 style="font-family: var(--font-serif); font-size: 1.35rem; margin: 0 0 0.5rem 0; color: inherit;">Memuat kursus favorit...</h3>
-        <p>Sedang mengambil daftar wishlist Anda dari server.</p>
+      <div class="nav-actions">
+        <!-- Theme Toggle -->
+        <button class="theme-toggle-btn" id="theme-toggle-btn" type="button" aria-label="Ganti mode gelap atau terang" onclick="toggleThemeMode()">
+          <i class="fas fa-moon" id="theme-icon-moon"></i>
+          <span id="theme-text">Mode Gelap</span>
+        </button>
+
+        <!-- User Profile Pill -->
+        <a href="/profile" class="user-profile-badge" title="Buka Pengaturan Profil Saya" aria-label="Profil Pengguna">
+          <div class="user-avatar-sm" id="nav-avatar">S</div>
+          <span class="user-name-label" id="nav-user-name">Siswa</span>
+          <span class="user-role-tag">SISWA</span>
+        </a>
+
+        <!-- Logout Button -->
+        <button class="logout-btn" id="logout-btn" type="button" onclick="handleLogout()" title="Keluar dari Akun">
+          <i class="fas fa-arrow-right-from-bracket" aria-hidden="true"></i>
+          <span>Keluar</span>
+        </button>
       </div>
     </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="wish-main-container" id="main-content" role="main">
+    <div class="wish-banner-card">
+      <div>
+        <h1 class="wish-banner-title">Daftar Kursus Favorit (Wishlist)</h1>
+        <p class="wish-banner-subtitle">Simpan kurikulum yang ingin Anda ikuti dan mulai proses pendaftaran kapan pun Anda siap.</p>
+      </div>
+      <div class="wish-counter-badge" id="wishlistCountBadge">
+        <i class="fas fa-bookmark" aria-hidden="true"></i>
+        <span id="wishlistCountText">0 Kursus Tersimpan</span>
+      </div>
+    </div>
+
+    <section aria-label="Daftar Kelas Wishlist">
+      <div class="wishlist-cards-grid" id="wishlistGrid" aria-live="polite">
+        <div class="empty-state-card">
+          <div class="empty-icon-wrap"><i class="fas fa-spinner fa-spin" aria-hidden="true"></i></div>
+          <h2 style="font-family:var(--font-serif); font-size:18px; margin:0 0 6px 0;">Menghubungkan ke Server...</h2>
+          <p style="color:var(--text-secondary); margin:0;">Sedang mengambil daftar kursus favorit Anda.</p>
+        </div>
+      </div>
+    </section>
   </main>
 
   <script>
@@ -254,51 +512,104 @@
       return 'Rp ' + Number(num || 0).toLocaleString('id-ID');
     }
 
-    async function loadWishlist() {
+    function toggleThemeMode() {
+      const isDark = document.documentElement.classList.toggle('dark');
+      localStorage.setItem('theme', isDark ? 'dark' : 'light');
+      updateThemeDisplay(isDark);
+    }
+
+    function updateThemeDisplay(isDark) {
+      const icon = document.getElementById('theme-icon-moon');
+      const label = document.getElementById('theme-text');
+      if (isDark) {
+        icon.className = 'fas fa-sun';
+        label.textContent = 'Mode Terang';
+      } else {
+        icon.className = 'fas fa-moon';
+        label.textContent = 'Mode Gelap';
+      }
+    }
+
+    if (localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark');
+      updateThemeDisplay(true);
+    }
+
+    async function loadWishlistPage() {
       try {
         const token = localStorage.getItem('token') || localStorage.getItem('accessToken');
         const headers = { 'Content-Type': 'application/json' };
         if (token) headers['Authorization'] = 'Bearer ' + token;
 
+        // Fetch User Info
+        const resUser = await fetch('/api/auth/me', { headers });
+        const userJson = await resUser.json();
+        if (userJson.success && userJson.user) {
+          const u = userJson.user;
+          document.getElementById('nav-user-name').textContent = u.name || 'Siswa';
+          document.getElementById('nav-avatar').textContent = (u.name || 'S')[0].toUpperCase();
+        }
+
+        // Fetch Wishlist Items
         const res = await fetch('/api/courses/wishlist', { headers });
         const json = await res.json();
 
         const grid = document.getElementById('wishlistGrid');
+        const countBadge = document.getElementById('wishlistCountText');
+
         if (!json.success || !json.data || json.data.length === 0) {
+          countBadge.textContent = '0 Kursus Tersimpan';
           grid.innerHTML = `
-            <div class="empty-state">
-              <div style="font-size: 2.5rem; margin-bottom: 0.75rem;">🔖</div>
-              <h3 style="font-family: var(--font-serif); font-size: 1.5rem; margin: 0 0 0.5rem 0; color: inherit;">Wishlist Anda Masih Kosong</h3>
-              <p style="margin: 0 0 1.5rem 0;">Temukan kelas idaman dan klik tombol simpan untuk menyimpannya di sini.</p>
-              <a href="/courses" class="btn-buy" style="margin: 0 auto;">Eksplorasi Katalog Kursus &rarr;</a>
+            <div class="empty-state-card">
+              <div class="empty-icon-wrap"><i class="fas fa-bookmark" aria-hidden="true"></i></div>
+              <h2 style="font-family:var(--font-serif); font-size:20px; font-weight:600; margin:0 0 8px 0; color:var(--text-primary);">Wishlist Anda Masih Kosong</h2>
+              <p style="color:var(--text-secondary); max-width:440px; margin:0 auto 20px auto; font-size:14px; line-height:1.5;">
+                Temukan materi belajar terbaik dari kurikulum adaptif kami dan klik tombol bookmark untuk menyimpannya di sini.
+              </p>
+              <a href="/courses" class="btn-enroll-now" style="display:inline-flex; margin:0 auto;">
+                <i class="fas fa-compass" aria-hidden="true"></i> Jelajahi Katalog Kursus &rarr;
+              </a>
             </div>
           `;
           return;
         }
 
-        grid.innerHTML = json.data.map(c => {
-          const categoryName = c.category ? c.category.name : 'Umum';
+        const courses = json.data;
+        countBadge.textContent = `${courses.length} Kursus Tersimpan`;
+
+        grid.innerHTML = courses.map(c => {
+          const categoryName = c.category ? c.category.name : 'Teknologi';
           const tutorName = c.tutor ? c.tutor.name : 'Instruktur Ahli';
           const price = Number(c.price || 0);
           const priceDisplay = price > 0 ? formatRupiah(price) : 'Gratis';
           const slug = c.slug || c.id;
+          const checkoutLink = price > 0 ? `/courses/${slug}/checkout` : `/courses/${slug}`;
 
           return `
-            <div class="course-card" id="wish-card-${c.id}">
-              <img src="${c.thumbnail_url || '/images/course-placeholder.jpg'}" alt="${c.title}" class="course-card-thumb">
-              <div class="course-card-body">
-                <span class="category-tag">${categoryName}</span>
-                <a href="/courses/${slug}" class="card-course-title">${c.title}</a>
-                <p class="card-tutor-name">Instruktur: ${tutorName}</p>
-                <div class="card-footer">
-                  <span class="course-price">${priceDisplay}</span>
-                  <div style="display:flex; align-items:center; gap:6px;">
-                    <button class="btn-remove-wish" onclick="removeFromWishlist(${c.id})" title="Hapus dari Wishlist">Hapus</button>
-                    <a href="/courses/${slug}/checkout" class="btn-buy">Checkout &rarr;</a>
+            <article class="course-card-custom" id="wish-card-${c.id}">
+              <div class="course-thumb-box">
+                <img src="${c.thumbnail_url || '/images/course-placeholder.jpg'}" alt="Thumbnail ${c.title}" class="course-thumb-img" loading="lazy">
+              </div>
+              <div class="card-body-content">
+                <span class="card-category-pill">${categoryName}</span>
+                <a href="/courses/${slug}" class="card-course-heading">${c.title}</a>
+                <div class="card-tutor-meta">
+                  <i class="fas fa-chalkboard-user" style="font-size:12px;" aria-hidden="true"></i>
+                  <span>${tutorName}</span>
+                </div>
+                <div class="card-bottom-bar">
+                  <span class="price-value-tag">${priceDisplay}</span>
+                  <div class="card-actions-row">
+                    <button class="btn-remove-item" onclick="removeWishlistItem(${c.id})" aria-label="Hapus ${c.title} dari Wishlist">
+                      Hapus
+                    </button>
+                    <a href="${checkoutLink}" class="btn-enroll-now">
+                      Daftar &rarr;
+                    </a>
                   </div>
                 </div>
               </div>
-            </div>
+            </article>
           `;
         }).join('');
 
@@ -307,7 +618,7 @@
       }
     }
 
-    async function removeFromWishlist(courseId) {
+    async function removeWishlistItem(courseId) {
       try {
         const token = localStorage.getItem('token') || localStorage.getItem('accessToken');
         const headers = { 'Content-Type': 'application/json' };
@@ -323,17 +634,26 @@
         if (json.success) {
           const card = document.getElementById(`wish-card-${courseId}`);
           if (card) card.remove();
-          // Jika kosong setelah dihapus, muat ulang
-          const remaining = document.querySelectorAll('.course-card');
-          if (remaining.length === 0) loadWishlist();
+          const remaining = document.querySelectorAll('.course-card-custom');
+          document.getElementById('wishlistCountText').textContent = `${remaining.length} Kursus Tersimpan`;
+          if (remaining.length === 0) loadWishlistPage();
         }
       } catch (err) {
         console.error('Error removing from wishlist:', err);
       }
     }
 
-    document.addEventListener('DOMContentLoaded', loadWishlist);
+    function handleLogout() {
+      localStorage.removeItem('token');
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+      window.location.href = '/login';
+    }
+
+    document.addEventListener('DOMContentLoaded', loadWishlistPage);
   </script>
+
+  <!-- Inclusive Accessibility, TTS, & Head Tracking Script -->
+  <script src="/javascripts/accessibility.js"></script>
 </body>
 </html>
-

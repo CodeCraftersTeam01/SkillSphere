@@ -1368,6 +1368,10 @@
       display: flex !important;
     }
 
+    .desktop-only.is-hidden {
+      display: none !important;
+    }
+
     .mobile-only {
       display: none !important;
     }
@@ -1713,7 +1717,11 @@
             </a>
             <a href="/tutor/wallet" class="sidebar-nav-pill">
               <i class="fas fa-wallet sidebar-nav-icon"></i>
-              <span>Dompet & Penarikan Dana</span>
+              <span>Dompet Digital</span>
+            </a>
+            <a href="/tutor/withdrawal" class="sidebar-nav-pill">
+              <i class="fas fa-money-bill-transfer sidebar-nav-icon"></i>
+              <span>Penarikan Dana</span>
             </a>
             <a href="/tutor/verify" class="sidebar-nav-pill">
               <i class="fas fa-id-card-clip sidebar-nav-icon"></i>
@@ -2439,38 +2447,69 @@
     function updateNavLinksForRole(role) {
       const desktopNav = document.getElementById('desktop-nav-menu');
       const mobileNavRow = document.getElementById('mobile-nav-row');
+      const mobileNav = document.getElementById('mobile-nav-menu');
       const sidebarToggle = document.getElementById('classroom-sidebar-toggle');
       const streakBadge = document.querySelector('.streak-badge');
       const navbar = document.querySelector('.navbar');
       
-      if (role === 'tutor' || role === 'admin') {
-        // Hide horizontal navbar text links for tutor (per Google Classroom design)
+      if (role === 'tutor') {
+        if (streakBadge) streakBadge.style.display = 'none';
+        if (sidebarToggle) sidebarToggle.style.display = 'inline-flex';
+        if (navbar) navbar.classList.remove('no-subnav');
+
+        // Render dedicated tutor navigation links (strictly no student wishlist or transactions)
+        const tutorNavHtml = `
+          <li><a href="/dashboard" class="nav-link-item active">Beranda</a></li>
+          <li><a href="/courses" class="nav-link-item">Katalog Kursus</a></li>
+          <li><a href="/tutor/materials" class="nav-link-item">Portal Materi</a></li>
+          <li><a href="/tutor/wallet" class="nav-link-item">Dompet Digital</a></li>
+          <li><a href="/tutor/withdrawal" class="nav-link-item">Penarikan Dana</a></li>
+        `;
+
         if (desktopNav) {
-          desktopNav.style.display = 'none';
-          desktopNav.classList.add('is-hidden');
+          desktopNav.innerHTML = tutorNavHtml;
+          desktopNav.classList.remove('is-hidden');
+          desktopNav.style.display = 'flex';
+        }
+        if (mobileNav) {
+          mobileNav.innerHTML = tutorNavHtml;
         }
         if (mobileNavRow) {
-          mobileNavRow.style.display = 'none';
-          mobileNavRow.classList.add('is-hidden');
+          mobileNavRow.classList.remove('is-hidden');
+          mobileNavRow.style.display = 'block';
         }
+      } else if (role === 'admin') {
+        if (desktopNav) desktopNav.classList.add('is-hidden');
+        if (mobileNavRow) mobileNavRow.classList.add('is-hidden');
         if (navbar) navbar.classList.add('no-subnav');
         if (streakBadge) streakBadge.style.display = 'none';
-        // Show Classroom Drawer Hamburger button
-        if (sidebarToggle) sidebarToggle.style.display = 'inline-flex';
+        if (sidebarToggle) sidebarToggle.style.display = 'none';
       } else {
         // Show standard navigation links for students
+        if (streakBadge) streakBadge.style.display = '';
+        if (sidebarToggle) sidebarToggle.style.display = 'none';
+        if (navbar) navbar.classList.remove('no-subnav');
+
+        const studentNavHtml = `
+          <li><a href="/dashboard" class="nav-link-item active">Beranda</a></li>
+          <li><a href="#courses-catalog-section" class="nav-link-item">Katalog Kursus</a></li>
+          <li><a href="/dashboard/roadmap" class="nav-link-item">Jalur Belajar AI</a></li>
+          <li><a href="/dashboard/wishlist" class="nav-link-item">Wishlist</a></li>
+          <li><a href="/dashboard/transactions" class="nav-link-item">Riwayat Transaksi</a></li>
+        `;
+
         if (desktopNav) {
-          desktopNav.style.display = '';
+          desktopNav.innerHTML = studentNavHtml;
           desktopNav.classList.remove('is-hidden');
+          desktopNav.style.display = 'flex';
+        }
+        if (mobileNav) {
+          mobileNav.innerHTML = studentNavHtml;
         }
         if (mobileNavRow) {
-          mobileNavRow.style.display = '';
           mobileNavRow.classList.remove('is-hidden');
+          mobileNavRow.style.display = 'block';
         }
-        if (navbar) navbar.classList.remove('no-subnav');
-        if (streakBadge) streakBadge.style.display = '';
-        // Hide Classroom Drawer Hamburger button for students
-        if (sidebarToggle) sidebarToggle.style.display = 'none';
         toggleClassroomSidebar(false);
       }
     }
