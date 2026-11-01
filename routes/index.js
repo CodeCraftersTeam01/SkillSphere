@@ -51,6 +51,17 @@ router.get('/courses/:id', function(req, res, next) {
   res.render('courses/detail', { title: 'Detail Kursus | SkillSphere AI', courseId: req.params.id });
 });
 
+/* GET Course Checkout & Payment Page (Sprint 3 - Fadiyah) */
+router.get(['/courses/:id/checkout', '/checkout/:id'], function(req, res, next) {
+  res.render('courses/checkout', {
+    title: 'Checkout Pembayaran Kursus | SkillSphere AI',
+    courseId: req.params.id,
+    midtransClientKey: process.env.MIDTRANS_CLIENT_KEY,
+    midtransSnapUrl: process.env.MIDTRANS_SNAP_URL,
+  });
+});
+
+
 /* GET Interactive Classroom Learning Space (Sprint 2 - Dicoding & Claude Style) */
 router.get(['/courses/:id/learn', '/courses/:id/ruang-belajar'], function(req, res, next) {
   res.render('courses/learn', { title: 'Ruang Belajar Interaktif | SkillSphere AI', courseId: req.params.id });
