@@ -1068,13 +1068,20 @@
           const hasCompletedOnboarding = userRole === 'admin' || userRole === 'tutor' || 
             (result.data.user && result.data.user.profile && result.data.user.profile.study_preferences && result.data.user.profile.study_preferences.onboarding_completed);
 
-          let targetUrl = '/dashboard';
+          const urlParams = new URLSearchParams(window.location.search);
+          const redirectParam = urlParams.get('redirect');
+          const safeRedirect = (redirectParam && redirectParam.startsWith('/') && !redirectParam.startsWith('//')) ? redirectParam : null;
+
+          let targetUrl = safeRedirect || '/dashboard';
           if (userRole === 'admin') {
             targetUrl = '/admin';
             showAlert('success', 'Login berhasil! Mengalihkan ke Admin Portal...');
           } else if (userRole === 'tutor') {
-            targetUrl = '/dashboard';
+            targetUrl = safeRedirect || '/dashboard';
             showAlert('success', 'Login berhasil! Menyiapkan Studio Tutor...');
+          } else if (safeRedirect) {
+            targetUrl = safeRedirect;
+            showAlert('success', 'Login berhasil! Mengalihkan kembali ke halaman tujuan...');
           } else if (!hasCompletedOnboarding || result.data.requires_onboarding) {
             targetUrl = '/dashboard/onboarding';
             showAlert('success', 'Login berhasil! Mengalihkan ke formulir personalisasi...');
@@ -1287,11 +1294,17 @@
             const hasCompletedOnboarding = userRole === 'admin' || userRole === 'tutor' || 
               (result.data.user && result.data.user.profile && result.data.user.profile.study_preferences && result.data.user.profile.study_preferences.onboarding_completed);
 
-            let targetUrl = '/dashboard';
+            const otpUrlParams = new URLSearchParams(window.location.search);
+            const otpRedirectParam = otpUrlParams.get('redirect');
+            const safeOtpRedirect = (otpRedirectParam && otpRedirectParam.startsWith('/') && !otpRedirectParam.startsWith('//')) ? otpRedirectParam : null;
+
+            let targetUrl = safeOtpRedirect || '/dashboard';
             if (userRole === 'admin') {
               targetUrl = '/admin';
             } else if (userRole === 'tutor') {
-              targetUrl = '/dashboard';
+              targetUrl = safeOtpRedirect || '/dashboard';
+            } else if (safeOtpRedirect) {
+              targetUrl = safeOtpRedirect;
             } else if (!hasCompletedOnboarding || result.data.requires_onboarding) {
               targetUrl = '/dashboard/onboarding';
             }

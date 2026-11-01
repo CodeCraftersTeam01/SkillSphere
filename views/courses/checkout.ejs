@@ -171,6 +171,27 @@
       cursor: pointer;
     }
 
+    .login-nav-cta-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 6px 16px;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: #FFFFFF;
+      background: var(--accent-primary, #1F1E1B);
+      border-radius: var(--radius-full);
+      text-decoration: none;
+      transition: opacity 0.2s ease;
+    }
+    .login-nav-cta-btn:hover {
+      opacity: 0.88;
+    }
+    [data-theme="dark"] .login-nav-cta-btn {
+      color: #141413;
+      background: #FFFFFF;
+    }
+
     /* Checkout Page Layout */
     .checkout-page-container {
       max-width: 1080px;
@@ -464,17 +485,23 @@
           <span id="theme-text">Mode Gelap</span>
         </button>
 
-        <!-- User Profile Pill -->
-        <div class="user-profile-badge" onclick="window.location.href='/profile'" title="Profil Saya">
+        <!-- User Profile Pill (Visible when logged in) -->
+        <div class="user-profile-badge" id="nav-user-badge" onclick="window.location.href='/profile'" title="Profil Saya" style="display:none;">
           <div class="user-avatar-sm" id="nav-avatar">S</div>
-          <span class="user-name-label" id="nav-user-name">Memuat...</span>
+          <span class="user-name-label" id="nav-user-name">Pengguna</span>
         </div>
 
-        <!-- Logout Button -->
-        <button class="logout-btn" id="logout-btn" type="button" title="Keluar">
+        <!-- Logout Button (Visible when logged in) -->
+        <button class="logout-btn" id="logout-btn" type="button" title="Keluar" style="display:none;">
           <i class="fas fa-arrow-right-from-bracket" aria-hidden="true"></i>
           <span>Keluar</span>
         </button>
+
+        <!-- Login CTA Button (Visible when guest) -->
+        <a href="/login" class="login-nav-cta-btn" id="nav-login-cta" style="display:none;">
+          <i class="fas fa-right-to-bracket"></i>
+          <span>Masuk Akun</span>
+        </a>
       </div>
     </div>
   </header>
@@ -532,20 +559,18 @@
           </div>
         </section>
 
-        <!-- Payment Gateway Info -->
+        <!-- Payment Gateway Info (Eksklusif QRIS & Bank Transfer Midtrans) -->
         <section class="content-card" aria-labelledby="gatewayTitle">
           <h2 class="card-heading" id="gatewayTitle">
             <i class="fas fa-lock" style="color:var(--accent-primary);"></i>
-            Gateway Pembayaran Aman
+            Metode Pembayaran Resmi Midtrans
           </h2>
           <p style="font-size:13px; color:var(--text-secondary); line-height:1.6; margin:0 0 16px;">
-            Transaksi diproses melalui Midtrans Snap. Anda dapat memilih metode pembayaran instan seperti <strong>GoPay, QRIS, Virtual Account BCA, Mandiri, BRI, BNI</strong>, atau transfer antarbank.
+            Transaksi diproses secara instan dan aman melalui Midtrans Snap. Sistem secara eksklusif mendukung pembayaran melalui <strong>QRIS</strong> dan <strong>Virtual Account Transfer Bank</strong> dengan verifikasi otomatis 24 jam.
           </p>
           <div style="display:flex; flex-wrap:wrap; gap:10px; align-items:center;">
-            <span class="preset-pill" style="font-size:11px; font-weight:700;"><i class="fas fa-qrcode"></i> QRIS</span>
-            <span class="preset-pill" style="font-size:11px; font-weight:700;"><i class="fas fa-wallet"></i> GoPay / ShopeePay</span>
-            <span class="preset-pill" style="font-size:11px; font-weight:700;"><i class="fas fa-building-columns"></i> Virtual Account Bank</span>
-            <span class="preset-pill" style="font-size:11px; font-weight:700;"><i class="fas fa-credit-card"></i> Kartu Kredit / Debit</span>
+            <span class="preset-pill" style="font-size:11.5px; font-weight:700;"><i class="fas fa-qrcode"></i> QRIS (Semua E-Wallet & M-Banking)</span>
+            <span class="preset-pill" style="font-size:11.5px; font-weight:700;"><i class="fas fa-building-columns"></i> Virtual Account Bank (BCA, Mandiri, BNI, BRI, Permata)</span>
           </div>
         </section>
       </div>
@@ -578,9 +603,21 @@
             <span class="total-amount-display" id="summaryTotalPrice">Rp 0</span>
           </div>
 
+          <!-- Login Warning Banner (Visible when guest) -->
+          <div id="loginWarningBox" style="display:none; background:rgba(245, 158, 11, 0.12); border:1px solid rgba(245, 158, 11, 0.3); border-radius:var(--radius-md); padding:14px; margin-bottom:16px; font-size:12.5px; color:var(--text-primary);">
+            <div style="display:flex; gap:10px; align-items:flex-start;">
+              <i class="fas fa-circle-exclamation" style="color:#D97706; margin-top:2px;"></i>
+              <div>
+                <strong style="color:#D97706; display:block; margin-bottom:3px;">Perlu Masuk Akun</strong>
+                <span style="color:var(--text-secondary); line-height:1.4; display:block; margin-bottom:8px;">Silakan masuk terlebih dahulu agar sertifikat dan akses belajar kelas ini tersimpan resmi di akun Anda.</span>
+                <a href="/login" id="linkLoginPrompt" style="display:inline-flex; align-items:center; gap:5px; font-weight:700; color:#D97706; text-decoration:none; font-size:12px;">Masuk Akun Sekarang &rarr;</a>
+              </div>
+            </div>
+          </div>
+
           <button type="button" class="btn-pay-action" id="payNowBtn" onclick="handlePayWithMidtrans()">
             <i class="fas fa-shield-check"></i>
-            <span>Bayar Sekarang via Midtrans</span>
+            <span>Bayar via QRIS & Transfer Bank (Midtrans)</span>
           </button>
 
           <p style="font-size:11px; color:var(--text-tertiary); text-align:center; margin:14px 0 0; line-height:1.4;">
@@ -674,17 +711,70 @@
 
     async function loadUserProfile() {
       const token = getAuthToken();
-      if (!token) return;
+      const userBadge = document.getElementById('nav-user-badge');
+      const logoutBtn = document.getElementById('logout-btn');
+      const loginNavBtn = document.getElementById('nav-login-cta');
+      const loginWarning = document.getElementById('loginWarningBox');
+      const linkPrompt = document.getElementById('linkLoginPrompt');
+      const payBtn = document.getElementById('payNowBtn');
+
+      const loginRedirectUrl = `/login?redirect=${encodeURIComponent(window.location.pathname)}`;
+      if (linkPrompt) linkPrompt.href = loginRedirectUrl;
+
+      if (!token) {
+        if (userBadge) userBadge.style.display = 'none';
+        if (logoutBtn) logoutBtn.style.display = 'none';
+        if (loginNavBtn) {
+          loginNavBtn.href = loginRedirectUrl;
+          loginNavBtn.style.display = 'inline-flex';
+        }
+        if (loginWarning) loginWarning.style.display = 'block';
+        if (payBtn) {
+          payBtn.innerHTML = '<i class="fas fa-right-to-bracket"></i> <span>Masuk Akun untuk Melanjutkan Pembayaran</span>';
+        }
+        return;
+      }
+
       try {
         const res = await fetch('/api/auth/me', {
           headers: { 'Authorization': 'Bearer ' + token }
         });
+
+        if (!res.ok) {
+          if (userBadge) userBadge.style.display = 'none';
+          if (logoutBtn) logoutBtn.style.display = 'none';
+          if (loginNavBtn) {
+            loginNavBtn.href = loginRedirectUrl;
+            loginNavBtn.style.display = 'inline-flex';
+          }
+          if (loginWarning) loginWarning.style.display = 'block';
+          if (payBtn) {
+            payBtn.innerHTML = '<i class="fas fa-right-to-bracket"></i> <span>Masuk Akun untuk Melanjutkan Pembayaran</span>';
+          }
+          return;
+        }
+
         const json = await res.json();
         if (json.success && json.data) {
           const u = json.data;
+          currentUser = u;
+          if (userBadge) userBadge.style.display = 'inline-flex';
+          if (logoutBtn) logoutBtn.style.display = 'inline-flex';
+          if (loginNavBtn) loginNavBtn.style.display = 'none';
+          if (loginWarning) loginWarning.style.display = 'none';
+
           document.getElementById('nav-user-name').innerText = u.name;
           const initials = u.name.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
           document.getElementById('nav-avatar').innerText = initials;
+
+          if (payBtn) {
+            const price = Number(courseData ? (courseData.price || 0) : 1);
+            if (price <= 0) {
+              payBtn.innerHTML = '<i class="fas fa-play"></i> <span>Daftar Kelas Gratis Sekarang</span>';
+            } else {
+              payBtn.innerHTML = '<i class="fas fa-shield-check"></i> <span>Bayar via QRIS & Transfer Bank (Midtrans)</span>';
+            }
+          }
         }
       } catch (err) {
         console.error('Failed to load profile:', err);
@@ -712,8 +802,13 @@
         document.getElementById('summaryCoursePrice').textContent = formatRupiah(price);
         document.getElementById('summaryTotalPrice').textContent = formatRupiah(price);
 
+        const payBtn = document.getElementById('payNowBtn');
         if (price <= 0) {
-          document.getElementById('payNowBtn').innerHTML = '<i class="fas fa-play"></i> <span>Daftar Kelas Gratis Sekarang</span>';
+          payBtn.innerHTML = '<i class="fas fa-play"></i> <span>Daftar Kelas Gratis Sekarang</span>';
+        } else if (getAuthToken()) {
+          payBtn.innerHTML = '<i class="fas fa-shield-check"></i> <span>Bayar via QRIS & Transfer Bank (Midtrans)</span>';
+        } else {
+          payBtn.innerHTML = '<i class="fas fa-right-to-bracket"></i> <span>Masuk Akun untuk Melanjutkan Pembayaran</span>';
         }
       } catch (err) {
         console.error('Error loading course for checkout:', err);
@@ -725,14 +820,18 @@
       const token = getAuthToken();
 
       if (!token) {
-        alert('Silakan masuk ke akun Anda terlebih dahulu untuk mendaftar kursus.');
         window.location.href = `/login?redirect=${encodeURIComponent(window.location.pathname)}`;
+        return;
+      }
+
+      if (!courseData || !courseData.id) {
+        alert('Data kelas sedang dimuat. Silakan tunggu beberapa saat.');
         return;
       }
 
       try {
         btn.disabled = true;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>Membuka Sesi Pembayaran...</span>';
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>Membuka Pembayaran QRIS / Bank...</span>';
 
         const res = await fetch('/api/payments/snap-token', {
           method: 'POST',
@@ -745,6 +844,10 @@
 
         const json = await res.json();
         if (!json.success) {
+          if (res.status === 401) {
+            window.location.href = `/login?redirect=${encodeURIComponent(window.location.pathname)}`;
+            return;
+          }
           throw new Error(json.message || 'Gagal memproses pembayaran.');
         }
 
@@ -762,19 +865,21 @@
               showSuccessModal(currentTrxCode);
             },
             onPending: function(result) {
-              alert('Pembayaran tertunda. Silakan selesaikan pembayaran sesuai instruksi.');
-              window.location.href = '/dashboard/transactions';
+              alert('Pembayaran tertunda. Silakan selesaikan pembayaran QRIS atau Virtual Account Anda.');
+              window.location.href = '/dashboard/transactions?status=pending';
             },
             onError: function(result) {
-              alert('Pembayaran gagal atau dibatalkan.');
+              alert('Pembayaran dibatalkan atau terjadi kendala jaringan.');
               btn.disabled = false;
-              btn.innerHTML = '<i class="fas fa-shield-check"></i> <span>Bayar Sekarang via Midtrans</span>';
+              btn.innerHTML = '<i class="fas fa-shield-check"></i> <span>Bayar via QRIS & Transfer Bank (Midtrans)</span>';
             },
             onClose: function() {
               btn.disabled = false;
-              btn.innerHTML = '<i class="fas fa-shield-check"></i> <span>Bayar Sekarang via Midtrans</span>';
+              btn.innerHTML = '<i class="fas fa-shield-check"></i> <span>Bayar via QRIS & Transfer Bank (Midtrans)</span>';
             }
           });
+        } else if (json.data && json.data.redirect_url) {
+          window.location.href = json.data.redirect_url;
         } else {
           showSuccessModal(currentTrxCode);
         }
@@ -782,7 +887,7 @@
       } catch (err) {
         alert(err.message || 'Terjadi kesalahan sistem.');
         btn.disabled = false;
-        btn.innerHTML = '<i class="fas fa-shield-check"></i> <span>Bayar Sekarang via Midtrans</span>';
+        btn.innerHTML = '<i class="fas fa-shield-check"></i> <span>Bayar via QRIS & Transfer Bank (Midtrans)</span>';
       }
     }
 
@@ -796,8 +901,12 @@
     }
 
     document.getElementById('logout-btn').addEventListener('click', () => {
+      localStorage.removeItem('skillsphere_access_token');
+      localStorage.removeItem('skillsphere_refresh_token');
       localStorage.removeItem('accessToken');
+      localStorage.removeItem('token');
       localStorage.removeItem('refreshToken');
+      localStorage.removeItem('skillsphere_user');
       window.location.href = '/login';
     });
 
