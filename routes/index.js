@@ -76,6 +76,12 @@ router.get('/tutor/materials', function(req, res, next) {
   res.render('tutor/materials', { title: 'Portal Manajemen & Upload Materi | Tutor SkillSphere' });
 });
 
+/* GET Tutor Financial Wallet & Withdrawal Portal (Sprint 3 - Satrio) */
+router.get(['/tutor/wallet', '/dashboard/wallet'], function(req, res, next) {
+  res.render('tutor/wallet', { title: 'Dompet Digital & Pendapatan Pengajar | SkillSphere AI' });
+});
+
+
 /* GET Standalone Tutor Verification Form Page */
 router.get(['/tutor/verify', '/tutor/verification', '/dashboard/tutor-verify'], function(req, res, next) {
   res.render('tutor/verify', { title: 'Verifikasi Akun Pengajar | SkillSphere AI' });

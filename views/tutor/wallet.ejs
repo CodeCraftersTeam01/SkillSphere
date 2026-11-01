@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title || 'Dompet Digital & Pendapatan Pengajar | SkillSphere AI' %></title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400..700;1,6..72,400..700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/stylesheets/style.css">
+  <link rel="stylesheet" href="/stylesheets/claude-theme.css">
+  <style>
+    :root {
+      --font-serif: 'Newsreader', Georgia, serif;
+      --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    body {
+      background-color: var(--color-bg, #FAF9F5);
+      color: var(--color-text, #1F1E1B);
+      font-family: var(--font-sans);
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .dark body {
+      background-color: #141413;
+      color: #E5E4DE;
+    }
+
+    .wallet-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2.5rem 1.5rem;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    /* Top Navigation Bar */
+    .top-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 1.5rem;
+      background: var(--color-surface, #FFFFFF);
+      border-bottom: 1px solid var(--color-border, #E5E4DE);
+    }
+    .dark .top-nav {
+      background: #1F1E1B;
+      border-color: #2A2926;
+    }
+    .brand-title {
+      font-family: var(--font-serif);
+      font-size: 1.5rem;
+      font-weight: 700;
+      text-decoration: none;
+      color: inherit;
+    }
+    .nav-links {
+      display: flex;
+      gap: 1.25rem;
+      align-items: center;
+    }
+    .nav-link {
+      text-decoration: none;
+      color: var(--color-text-muted, #6B6963);
+      font-size: 0.95rem;
+      font-weight: 500;
+      transition: color 0.15s ease;
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+    }
+    .nav-link:hover, .nav-link.active {
+      color: var(--color-text, #1F1E1B);
+    }
+    .dark .nav-link:hover, .dark .nav-link.active {
+      color: #FFFFFF;
+    }
+
+    /* Header Section */
+    .wallet-header {
+      margin-bottom: 2.5rem;
+    }
+    .wallet-title {
+      font-family: var(--font-serif);
+      font-size: 2.25rem;
+      font-weight: 600;
+      margin: 0 0 0.5rem 0;
+      letter-spacing: -0.02em;
+    }
+    .wallet-subtitle {
+      color: var(--color-text-muted, #6B6963);
+      font-size: 1.05rem;
+      margin: 0;
+      line-height: 1.5;
+    }
+
+    /* Stats Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.25rem;
+      margin-bottom: 2.5rem;
+    }
+    .stat-card {
+      background: var(--color-surface, #FFFFFF);
+      border: 1px solid var(--color-border, #E5E4DE);
+      border-radius: 12px;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+    }
+    .dark .stat-card {
+      background: #1F1E1B;
+      border-color: #2A2926;
+    }
+    .stat-card.featured {
+      background: #FAF7F0;
+      border-color: #D8D4C7;
+    }
+    .dark .stat-card.featured {
+      background: #252320;
+      border-color: #3B3934;
+    }
+    .stat-label {
+      font-size: 0.875rem;
+      color: var(--color-text-muted, #6B6963);
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .stat-value {
+      font-family: var(--font-serif);
+      font-size: 2rem;
+      font-weight: 700;
+      margin: 0;
+      color: var(--color-text, #1F1E1B);
+    }
+    .dark .stat-value {
+      color: #FFFFFF;
+    }
+    .stat-note {
+      font-size: 0.85rem;
+      color: var(--color-text-muted, #6B6963);
+      margin-top: 0.75rem;
+    }
+
+    /* Action Toolbar */
+    .action-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .tab-pills {
+      display: flex;
+      gap: 0.5rem;
+      background: var(--color-surface, #FFFFFF);
+      border: 1px solid var(--color-border, #E5E4DE);
+      padding: 0.25rem;
+      border-radius: 8px;
+    }
+    .dark .tab-pills {
+      background: #1F1E1B;
+      border-color: #2A2926;
+    }
+    .tab-btn {
+      background: transparent;
+      border: none;
+      padding: 0.5rem 1rem;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--color-text-muted, #6B6963);
+      border-radius: 6px;
+      cursor: pointer;
+      min-height: 40px;
+    }
+    .tab-btn.active {
+      background: var(--color-bg, #FAF9F5);
+      color: var(--color-text, #1F1E1B);
+    }
+    .dark .tab-btn.active {
+      background: #2A2926;
+      color: #FFFFFF;
+    }
+    .btn-primary {
+      background: #1F1E1B;
+      color: #FAF9F5;
+      border: 1px solid #1F1E1B;
+      padding: 0.75rem 1.5rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      min-height: 44px;
+      transition: opacity 0.15s ease;
+    }
+    .dark .btn-primary {
+      background: #FAF9F5;
+      color: #1F1E1B;
+      border-color: #FAF9F5;
+    }
+    .btn-primary:hover {
+      opacity: 0.9;
+    }
+
+    /* Tables & Cards */
+    .data-table-container {
+      background: var(--color-surface, #FFFFFF);
+      border: 1px solid var(--color-border, #E5E4DE);
+      border-radius: 12px;
+      overflow-x: auto;
+      margin-bottom: 2rem;
+    }
+    .dark .data-table-container {
+      background: #1F1E1B;
+      border-color: #2A2926;
+    }
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.95rem;
+    }
+    .data-table th {
+      padding: 1rem 1.25rem;
+      background: rgba(0, 0, 0, 0.02);
+      border-bottom: 1px solid var(--color-border, #E5E4DE);
+      font-weight: 600;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--color-text-muted, #6B6963);
+    }
+    .dark .data-table th {
+      background: rgba(255, 255, 255, 0.03);
+      border-color: #2A2926;
+    }
+    .data-table td {
+      padding: 1.15rem 1.25rem;
+      border-bottom: 1px solid var(--color-border, #E5E4DE);
+      vertical-align: middle;
+    }
+    .dark .data-table td {
+      border-color: #2A2926;
+    }
+    .data-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    /* Status Badges */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.25rem 0.65rem;
+      border-radius: 9999px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      line-height: 1;
+    }
+    .badge-success {
+      background: #E6F7ED;
+      color: #0A6C35;
+    }
+    .dark .badge-success {
+      background: #064E24;
+      color: #75F39F;
+    }
+    .badge-pending {
+      background: #FEF3C7;
+      color: #92400E;
+    }
+    .dark .badge-pending {
+      background: #451A03;
+      color: #FCD34D;
+    }
+    .badge-danger {
+      background: #FEE2E2;
+      color: #991B1B;
+    }
+    .dark .badge-danger {
+      background: #450A0A;
+      color: #FCA5A5;
+    }
+
+    /* Empty State */
+    .empty-state {
+      padding: 3rem 1.5rem;
+      text-align: center;
+      color: var(--color-text-muted, #6B6963);
+    }
+    .empty-state-title {
+      font-family: var(--font-serif);
+      font-size: 1.35rem;
+      font-weight: 600;
+      margin: 0 0 0.5rem 0;
+      color: var(--color-text, #1F1E1B);
+    }
+    .dark .empty-state-title {
+      color: #FFFFFF;
+    }
+
+    /* Withdrawal Modal */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.45);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      padding: 1rem;
+    }
+    .modal-backdrop.active {
+      display: flex;
+    }
+    .modal-dialog {
+      background: var(--color-surface, #FFFFFF);
+      border: 1px solid var(--color-border, #E5E4DE);
+      border-radius: 14px;
+      max-width: 500px;
+      width: 100%;
+      padding: 2rem;
+      box-sizing: border-box;
+      position: relative;
+    }
+    .dark .modal-dialog {
+      background: #1F1E1B;
+      border-color: #2A2926;
+    }
+    .modal-title {
+      font-family: var(--font-serif);
+      font-size: 1.5rem;
+      margin: 0 0 0.5rem 0;
+      font-weight: 600;
+    }
+    .modal-desc {
+      font-size: 0.95rem;
+      color: var(--color-text-muted, #6B6963);
+      margin: 0 0 1.5rem 0;
+    }
+    .form-group {
+      margin-bottom: 1.25rem;
+    }
+    .form-label {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 600;
+      margin-bottom: 0.4rem;
+    }
+    .form-input, .form-select {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 1px solid var(--color-border, #E5E4DE);
+      border-radius: 8px;
+      font-size: 0.95rem;
+      background: var(--color-bg, #FAF9F5);
+      color: inherit;
+      box-sizing: border-box;
+      min-height: 44px;
+    }
+    .dark .form-input, .dark .form-select {
+      background: #141413;
+      border-color: #2A2926;
+    }
+    .form-input:focus, .form-select:focus {
+      outline: 2px solid #1F1E1B;
+      outline-offset: 1px;
+    }
+    .dark .form-input:focus, .dark .form-select:focus {
+      outline-color: #FAF9F5;
+    }
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.75rem;
+      margin-top: 1.75rem;
+    }
+    .btn-secondary {
+      background: transparent;
+      border: 1px solid var(--color-border, #E5E4DE);
+      color: inherit;
+      padding: 0.75rem 1.25rem;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      min-height: 44px;
+    }
+    .dark .btn-secondary {
+      border-color: #2A2926;
+    }
+
+    @media (max-width: 768px) {
+      .wallet-container {
+        padding: 1.5rem 1rem;
+      }
+      .wallet-title {
+        font-size: 1.85rem;
+      }
+      .action-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .btn-primary {
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation -->
+  <header class="top-nav">
+    <a href="/dashboard" class="brand-title">SkillSphere AI</a>
+    <nav class="nav-links">
+      <a href="/dashboard" class="nav-link">Studio Belajar</a>
+      <a href="/tutor/materials" class="nav-link">Materi Kursus</a>
+      <a href="/tutor/wallet" class="nav-link active">Dompet Digital</a>
+      <a href="/tutor/verify" class="nav-link">Verifikasi Pengajar</a>
+      <button id="themeToggleBtn" class="nav-link" style="background:none;border:none;cursor:pointer;">Tema</button>
+    </nav>
+  </header>
+
+  <main class="wallet-container">
+    <div class="wallet-header">
+      <h1 class="wallet-title">Dompet & Pendapatan Pengajar</h1>
+      <p class="wallet-subtitle">
+        Kelola bagi hasil 80% hak tutor secara transparan, pantau mutasi penjualan kursus, dan ajukan pencairan dana langsung ke rekening Anda.
+      </p>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="stats-grid">
+      <div class="stat-card featured">
+        <span class="stat-label">Saldo Siap Ditarik</span>
+        <h2 class="stat-value" id="availableBalanceDisplay">Rp 0</h2>
+        <div class="stat-note">Bebas ditarik kapan saja (Min. Rp 100.000)</div>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">Saldo Masa Holding (7 Hari)</span>
+        <h2 class="stat-value" id="pendingBalanceDisplay">Rp 0</h2>
+        <div class="stat-note">Perlindungan mitigasi sengketa & refund</div>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">Total Akumulasi Bagi Hasil (80%)</span>
+        <h2 class="stat-value" id="totalEarningsDisplay">Rp 0</h2>
+        <div class="stat-note">20% dialokasikan untuk pemeliharaan server & AI</div>
+      </div>
+    </div>
+
+    <!-- Action Toolbar -->
+    <div class="action-toolbar">
+      <div class="tab-pills">
+        <button class="tab-btn active" id="tabMutationsBtn" onclick="switchTab('mutations')">Riwayat Mutasi Saldo</button>
+        <button class="tab-btn" id="tabWithdrawalsBtn" onclick="switchTab('withdrawals')">Pengajuan Penarikan Dana</button>
+      </div>
+      <button class="btn-primary" onclick="openWithdrawModal()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+        Ajukan Penarikan Dana
+      </button>
+    </div>
+
+    <!-- Mutations Table -->
+    <div id="mutationsSection" class="data-table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Tanggal</th>
+            <th>Tipe Transaksi</th>
+            <th>Referensi</th>
+            <th>Keterangan</th>
+            <th style="text-align: right;">Nominal</th>
+          </tr>
+        </thead>
+        <tbody id="mutationsTableBody">
+          <tr>
+            <td colspan="5" class="empty-state">
+              <div class="empty-state-title">Memuat data dompet...</div>
+              <p>Mohon tunggu sebentar, sedang menyinkronkan saldo pengajar.</p>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Withdrawals Table -->
+    <div id="withdrawalsSection" class="data-table-container" style="display: none;">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>ID Pengajuan</th>
+            <th>Tanggal</th>
+            <th>Bank / E-Wallet</th>
+            <th>Nomor Rekening</th>
+            <th>Nominal</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="withdrawalsTableBody">
+          <tr>
+            <td colspan="6" class="empty-state">
+              <div class="empty-state-title">Belum ada riwayat penarikan</div>
+              <p>Pengajuan penarikan dana yang Anda buat akan tercatat lengkap di sini.</p>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <!-- Modal Tarik Dana -->
+  <div class="modal-backdrop" id="withdrawModal" onclick="closeModalOnBackdrop(event)">
+    <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="modalHeading">
+      <h3 class="modal-title" id="modalHeading">Tarik Saldo ke Rekening</h3>
+      <p class="modal-desc">
+        Dana akan ditransfer oleh bagian keuangan dalam 1 sampai 3 hari kerja. Batas penarikan minimum adalah Rp 100.000.
+      </p>
+
+      <form id="withdrawForm" onsubmit="submitWithdrawal(event)">
+        <div class="form-group">
+          <label class="form-label" for="withdrawAmount">Nominal Penarikan (Rp)</label>
+          <input type="number" id="withdrawAmount" class="form-input" min="100000" step="10000" placeholder="Contoh: 150000" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="bankName">Pilihan Bank atau Dompet Digital</label>
+          <select id="bankName" class="form-select" required>
+            <option value="">Pilih Bank / E-Wallet</option>
+            <option value="BCA">BCA (Bank Central Asia)</option>
+            <option value="Mandiri">Bank Mandiri</option>
+            <option value="BNI">BNI (Bank Negara Indonesia)</option>
+            <option value="BRI">BRI (Bank Rakyat Indonesia)</option>
+            <option value="BSI">BSI (Bank Syariah Indonesia)</option>
+            <option value="GoPay">GoPay</option>
+            <option value="OVO">OVO</option>
+            <option value="DANA">DANA</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="accountNumber">Nomor Rekening / No. HP E-Wallet</label>
+          <input type="text" id="accountNumber" class="form-input" placeholder="Contoh: 08123456789 atau 5210123456" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="accountHolder">Nama Lengkap Pemilik Rekening</label>
+          <input type="text" id="accountHolder" class="form-input" placeholder="Sesuai nama di buku tabungan / KTP" required>
+        </div>
+
+        <div id="withdrawAlert" style="display: none; padding: 0.75rem; border-radius: 8px; margin-bottom: 1rem; font-size: 0.9rem;"></div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" onclick="closeWithdrawModal()">Batal</button>
+          <button type="submit" class="btn-primary" id="withdrawSubmitBtn">Kirim Pengajuan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Theme Toggle Handler
+    const themeBtn = document.getElementById('themeToggleBtn');
+    if (themeBtn) {
+      themeBtn.addEventListener('click', () => {
+        const isDark = document.documentElement.classList.toggle('dark');
+        localStorage.setItem('theme', isDark ? 'dark' : 'light');
+      });
+      if (localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+      }
+    }
+
+    let walletData = { balance: 0, pending_balance: 0, total_earnings: 0 };
+
+    function formatRupiah(num) {
+      return 'Rp ' + Number(num || 0).toLocaleString('id-ID');
+    }
+
+    function switchTab(tab) {
+      const mutTab = document.getElementById('tabMutationsBtn');
+      const wdTab = document.getElementById('tabWithdrawalsBtn');
+      const mutSec = document.getElementById('mutationsSection');
+      const wdSec = document.getElementById('withdrawalsSection');
+
+      if (tab === 'mutations') {
+        mutTab.classList.add('active');
+        wdTab.classList.remove('active');
+        mutSec.style.display = 'block';
+        wdSec.style.display = 'none';
+      } else {
+        wdTab.classList.add('active');
+        mutTab.classList.remove('active');
+        wdSec.style.display = 'block';
+        mutSec.style.display = 'none';
+      }
+    }
+
+    async function loadWalletData() {
+      try {
+        const token = localStorage.getItem('token') || localStorage.getItem('accessToken');
+        const headers = { 'Content-Type': 'application/json' };
+        if (token) headers['Authorization'] = 'Bearer ' + token;
+
+        const res = await fetch('/api/tutor/wallet', { headers });
+        const json = await res.json();
+
+        if (!json.success) {
+          throw new Error(json.message || 'Gagal memuat data');
+        }
+
+        const data = json.data;
+        walletData = data.wallet;
+
+        document.getElementById('availableBalanceDisplay').textContent = formatRupiah(data.wallet.balance);
+        document.getElementById('pendingBalanceDisplay').textContent = formatRupiah(data.wallet.pending_balance);
+        document.getElementById('totalEarningsDisplay').textContent = formatRupiah(data.wallet.total_earnings);
+
+        // Render Mutations
+        const mutBody = document.getElementById('mutationsTableBody');
+        if (!data.transactions || data.transactions.length === 0) {
+          mutBody.innerHTML = `
+            <tr>
+              <td colspan="5" class="empty-state">
+                <div class="empty-state-title">Belum ada mutasi transaksi</div>
+                <p>Bagi hasil 80% dari setiap siswa yang mendaftar kursus Anda akan otomatis tercatat di sini.</p>
+              </td>
+            </tr>
+          `;
+        } else {
+          mutBody.innerHTML = data.transactions.map(t => {
+            const isCredit = t.transaction_type === 'credit';
+            const dateStr = new Date(t.created_at).toLocaleDateString('id-ID', {
+              day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
+            });
+            const badgeClass = isCredit ? 'badge-success' : 'badge-danger';
+            const sign = isCredit ? '+' : '-';
+            const color = isCredit ? '#0A6C35' : '#991B1B';
+
+            return `
+              <tr>
+                <td style="color: var(--color-text-muted); font-size: 0.9rem;">${dateStr}</td>
+                <td><span class="badge ${badgeClass}">${isCredit ? 'Kredit (Penjualan)' : 'Debet (Penarikan)'}</span></td>
+                <td style="font-family: var(--font-mono); font-size: 0.85rem;">${t.reference_id || '-'}</td>
+                <td>${t.description || '-'}</td>
+                <td style="text-align: right; font-weight: 700; color: ${color};">${sign} ${formatRupiah(t.amount)}</td>
+              </tr>
+            `;
+          }).join('');
+        }
+
+        // Render Withdrawals
+        const wdBody = document.getElementById('withdrawalsTableBody');
+        if (!data.withdrawals || data.withdrawals.length === 0) {
+          wdBody.innerHTML = `
+            <tr>
+              <td colspan="6" class="empty-state">
+                <div class="empty-state-title">Belum ada pengajuan penarikan</div>
+                <p>Klik tombol "Ajukan Penarikan Dana" untuk mencairkan saldo Anda ke rekening.</p>
+              </td>
+            </tr>
+          `;
+        } else {
+          wdBody.innerHTML = data.withdrawals.map(w => {
+            const dateStr = new Date(w.created_at).toLocaleDateString('id-ID', {
+              day: 'numeric', month: 'short', year: 'numeric'
+            });
+            let statusBadge = '<span class="badge badge-pending">Menunggu Konfirmasi</span>';
+            if (w.status === 'completed' || w.status === 'approved') {
+              statusBadge = '<span class="badge badge-success">Selesai Ditransfer</span>';
+            } else if (w.status === 'rejected') {
+              statusBadge = '<span class="badge badge-danger">Ditolak: ' + (w.rejection_reason || '') + '</span>';
+            }
+
+            return `
+              <tr>
+                <td style="font-family: var(--font-mono); font-size: 0.85rem;">WD-#${w.id}</td>
+                <td style="color: var(--color-text-muted); font-size: 0.9rem;">${dateStr}</td>
+                <td style="font-weight: 600;">${w.bank_name}</td>
+                <td style="font-family: var(--font-mono);">${w.account_number} <br><small style="color: var(--color-text-muted);">${w.account_holder_name}</small></td>
+                <td style="font-weight: 700;">${formatRupiah(w.amount)}</td>
+                <td>${statusBadge}</td>
+              </tr>
+            `;
+          }).join('');
+        }
+
+      } catch (err) {
+        console.error('Error loading wallet:', err);
+      }
+    }
+
+    // Modal Handlers
+    function openWithdrawModal() {
+      const modal = document.getElementById('withdrawModal');
+      modal.classList.add('active');
+      document.getElementById('withdrawAmount').max = walletData.balance;
+      document.getElementById('withdrawAlert').style.display = 'none';
+      document.getElementById('withdrawAmount').focus();
+    }
+
+    function closeWithdrawModal() {
+      document.getElementById('withdrawModal').classList.remove('active');
+    }
+
+    function closeModalOnBackdrop(e) {
+      if (e.target.id === 'withdrawModal') {
+        closeWithdrawModal();
+      }
+    }
+
+    // Keyboard support: Escape closes modal
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeWithdrawModal();
+    });
+
+    async function submitWithdrawal(e) {
+      e.preventDefault();
+      const amount = Number(document.getElementById('withdrawAmount').value);
+      const bank_name = document.getElementById('bankName').value;
+      const account_number = document.getElementById('accountNumber').value;
+      const account_holder_name = document.getElementById('accountHolder').value;
+      const alertBox = document.getElementById('withdrawAlert');
+      const submitBtn = document.getElementById('withdrawSubmitBtn');
+
+      if (amount < 100000) {
+        alertBox.style.display = 'block';
+        alertBox.style.background = '#FEE2E2';
+        alertBox.style.color = '#991B1B';
+        alertBox.textContent = 'Batas penarikan minimum adalah Rp 100.000.';
+        return;
+      }
+
+      if (amount > walletData.balance) {
+        alertBox.style.display = 'block';
+        alertBox.style.background = '#FEE2E2';
+        alertBox.style.color = '#991B1B';
+        alertBox.textContent = 'Saldo Anda yang tersedia tidak mencukupi.';
+        return;
+      }
+
+      try {
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Memproses...';
+
+        const token = localStorage.getItem('token') || localStorage.getItem('accessToken');
+        const headers = { 'Content-Type': 'application/json' };
+        if (token) headers['Authorization'] = 'Bearer ' + token;
+
+        const res = await fetch('/api/tutor/withdraw', {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({ amount, bank_name, account_number, account_holder_name }),
+        });
+
+        const json = await res.json();
+        if (!json.success) {
+          throw new Error(json.message || 'Gagal mengajukan penarikan');
+        }
+
+        alertBox.style.display = 'block';
+        alertBox.style.background = '#E6F7ED';
+        alertBox.style.color = '#0A6C35';
+        alertBox.textContent = 'Pengajuan penarikan berhasil dikirim.';
+
+        setTimeout(() => {
+          closeWithdrawModal();
+          document.getElementById('withdrawForm').reset();
+          loadWalletData();
+          switchTab('withdrawals');
+        }, 1200);
+
+      } catch (err) {
+        alertBox.style.display = 'block';
+        alertBox.style.background = '#FEE2E2';
+        alertBox.style.color = '#991B1B';
+        alertBox.textContent = err.message;
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Kirim Pengajuan';
+      }
+    }
+
+    // Auto-load on page ready
+    document.addEventListener('DOMContentLoaded', loadWalletData);
+  </script>
+</body>
+</html>
