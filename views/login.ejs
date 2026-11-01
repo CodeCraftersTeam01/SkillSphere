@@ -1051,8 +1051,13 @@
 
         // 2. Case B: Successful Login
         if (response.ok && result.success) {
-          localStorage.setItem('skillsphere_access_token', result.data.accessToken);
-          localStorage.setItem('skillsphere_refresh_token', result.data.refreshToken);
+          const accessToken = result.data.accessToken;
+          const refreshToken = result.data.refreshToken;
+          localStorage.setItem('skillsphere_access_token', accessToken);
+          localStorage.setItem('accessToken', accessToken);
+          localStorage.setItem('token', accessToken);
+          localStorage.setItem('skillsphere_refresh_token', refreshToken);
+          localStorage.setItem('refreshToken', refreshToken);
           localStorage.setItem('skillsphere_user', JSON.stringify(result.data.user));
 
           if (rememberMeCheckbox.checked) {
@@ -1267,8 +1272,13 @@
             if (backLoginBtn) backLoginBtn.style.visibility = 'hidden';
 
             // Save tokens & credentials
-            localStorage.setItem('skillsphere_access_token', result.data.accessToken);
-            localStorage.setItem('skillsphere_refresh_token', result.data.refreshToken);
+            const accessToken = result.data.accessToken;
+            const refreshToken = result.data.refreshToken;
+            localStorage.setItem('skillsphere_access_token', accessToken);
+            localStorage.setItem('accessToken', accessToken);
+            localStorage.setItem('token', accessToken);
+            localStorage.setItem('skillsphere_refresh_token', refreshToken);
+            localStorage.setItem('refreshToken', refreshToken);
             localStorage.setItem('skillsphere_user', JSON.stringify(result.data.user));
 
             saveAccountLocally(result.data.user, activeLoginPassword);

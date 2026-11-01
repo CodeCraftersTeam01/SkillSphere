@@ -710,17 +710,6 @@
         </a>
       </div>
 
-      <!-- Dedicated Tutor Header Navigation (Strictly No Wishlist / No Riwayat Transaksi) -->
-      <nav class="desktop-only" aria-label="Navigasi Pengajar">
-        <ul class="nav-links-menu">
-          <li><a href="/dashboard" class="nav-link-item">Beranda</a></li>
-          <li><a href="/courses" class="nav-link-item">Katalog Kursus</a></li>
-          <li><a href="/tutor/materials" class="nav-link-item">Portal Materi</a></li>
-          <li><a href="/tutor/wallet" class="nav-link-item">Dompet Digital</a></li>
-          <li><a href="/tutor/withdrawal" class="nav-link-item active">Penarikan Dana</a></li>
-        </ul>
-      </nav>
-
       <div class="nav-actions">
         <!-- Theme Toggle -->
         <button class="theme-toggle-btn" id="theme-toggle-btn" type="button" aria-label="Ganti mode gelap atau terang">
@@ -758,15 +747,25 @@
             <i class="fas fa-home sidebar-nav-icon"></i>
             <span>Beranda Studio</span>
           </a>
-          <a href="/courses" class="sidebar-nav-pill">
-            <i class="fas fa-compass sidebar-nav-icon"></i>
-            <span>Katalog Kursus Publik</span>
+        </div>
+
+        <div class="sidebar-divider-line"></div>
+
+        <div class="sidebar-section-header">Keuangan & Dompet</div>
+        <div class="sidebar-nav-group">
+          <a href="/tutor/wallet" class="sidebar-nav-pill">
+            <i class="fas fa-wallet sidebar-nav-icon"></i>
+            <span>Dompet Digital</span>
+          </a>
+          <a href="/tutor/withdrawal" class="sidebar-nav-pill active">
+            <i class="fas fa-money-bill-transfer sidebar-nav-icon"></i>
+            <span>Penarikan Dana</span>
           </a>
         </div>
 
         <div class="sidebar-divider-line"></div>
 
-        <div class="sidebar-section-header">Studio Pengajar</div>
+        <div class="sidebar-section-header">Studio Pengajar & Alat</div>
         <div class="sidebar-nav-group">
           <a href="/dashboard" class="sidebar-nav-pill">
             <i class="fas fa-chalkboard-user sidebar-nav-icon"></i>
@@ -776,17 +775,13 @@
             <i class="fas fa-folder-open sidebar-nav-icon"></i>
             <span>Portal Upload Materi</span>
           </a>
-          <a href="/tutor/wallet" class="sidebar-nav-pill">
-            <i class="fas fa-wallet sidebar-nav-icon"></i>
-            <span>Dompet & Pendapatan</span>
-          </a>
-          <a href="/tutor/withdrawal" class="sidebar-nav-pill active">
-            <i class="fas fa-money-bill-transfer sidebar-nav-icon"></i>
-            <span>Pencairan / Penarikan Dana</span>
-          </a>
           <a href="/tutor/verify" class="sidebar-nav-pill">
             <i class="fas fa-id-card-clip sidebar-nav-icon"></i>
             <span>Verifikasi Pengajar</span>
+          </a>
+          <a href="/courses" class="sidebar-nav-pill">
+            <i class="fas fa-compass sidebar-nav-icon"></i>
+            <span>Katalog Kursus Publik</span>
           </a>
         </div>
 
@@ -1086,8 +1081,18 @@
 
     document.getElementById('inputAmount').addEventListener('input', updatePreviewAmounts);
 
+    function getAuthToken() {
+      const t = localStorage.getItem('skillsphere_access_token') || localStorage.getItem('accessToken') || localStorage.getItem('token');
+      if (t) {
+        if (!localStorage.getItem('skillsphere_access_token')) localStorage.setItem('skillsphere_access_token', t);
+        if (!localStorage.getItem('accessToken')) localStorage.setItem('accessToken', t);
+        if (!localStorage.getItem('token')) localStorage.setItem('token', t);
+      }
+      return t;
+    }
+
     async function loadUserProfile() {
-      const token = localStorage.getItem('accessToken');
+      const token = getAuthToken();
       if (!token) {
         window.location.href = '/login?redirect=/tutor/withdrawal';
         return;
@@ -1115,7 +1120,7 @@
     }
 
     async function fetchWalletData() {
-      const token = localStorage.getItem('accessToken');
+      const token = getAuthToken();
       if (!token) return;
 
       try {
@@ -1125,12 +1130,17 @@
         const json = await res.json();
         if (json.success && json.data) {
           const w = json.data;
-          currentAvailableBalance = Number(w.balance || 0);
-          document.getElementById('valAvailableBalance').innerText = formatRupiah(w.balance);
-          document.getElementById('valHoldingBalance').innerText = formatRupiah(w.holding_balance);
-          document.getElementById('valWithdrawnTotal').innerText = formatRupiah(w.withdrawn_total || 0);
+          const balance = Number(w.wallet ? w.wallet.balance : (w.balance || 0));
+          const holdingBalance = Number(w.wallet ? (w.wallet.pending_balance || w.wallet.holding_balance) : (w.holding_balance || 0));
+          const withdrawnTotal = Number(w.withdrawn_total || 0);
 
-          renderWithdrawalTable(w.mutations || []);
+          currentAvailableBalance = balance;
+          document.getElementById('valAvailableBalance').innerText = formatRupiah(balance);
+          document.getElementById('valHoldingBalance').innerText = formatRupiah(holdingBalance);
+          document.getElementById('valWithdrawnTotal').innerText = formatRupiah(withdrawnTotal);
+
+          const list = w.mutations || w.transactions || [];
+          renderWithdrawalTable(list);
         }
       } catch (err) {
         console.error('Failed to load wallet data:', err);
@@ -1182,8 +1192,11 @@
 
     async function handleWithdrawalSubmit(e) {
       e.preventDefault();
-      const token = localStorage.getItem('accessToken');
-      if (!token) return;
+      const token = getAuthToken();
+      if (!token) {
+        showAlert('Sesi telah berakhir. Silakan masuk kembali.', 'error');
+        return;
+      }
 
       const amount = Number(document.getElementById('inputAmount').value);
       const bank_name = document.getElementById('selectBank').value;
@@ -1217,7 +1230,8 @@
             amount,
             bank_name,
             account_number,
-            account_name
+            account_name,
+            account_holder_name: account_name
           })
         });
 
@@ -1262,8 +1276,12 @@
     }
 
     document.getElementById('logout-btn').addEventListener('click', () => {
+      localStorage.removeItem('skillsphere_access_token');
+      localStorage.removeItem('skillsphere_refresh_token');
       localStorage.removeItem('accessToken');
+      localStorage.removeItem('token');
       localStorage.removeItem('refreshToken');
+      localStorage.removeItem('skillsphere_user');
       window.location.href = '/login';
     });
 

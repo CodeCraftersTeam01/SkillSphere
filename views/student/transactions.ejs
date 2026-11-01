@@ -705,8 +705,18 @@
       });
     }
 
+    function getAuthToken() {
+      const t = localStorage.getItem('skillsphere_access_token') || localStorage.getItem('accessToken') || localStorage.getItem('token');
+      if (t) {
+        if (!localStorage.getItem('skillsphere_access_token')) localStorage.setItem('skillsphere_access_token', t);
+        if (!localStorage.getItem('accessToken')) localStorage.setItem('accessToken', t);
+        if (!localStorage.getItem('token')) localStorage.setItem('token', t);
+      }
+      return t;
+    }
+
     async function loadUserProfile() {
-      const token = localStorage.getItem('accessToken');
+      const token = getAuthToken();
       if (!token) {
         window.location.href = '/login?redirect=/dashboard/transactions';
         return;
@@ -728,7 +738,7 @@
     }
 
     async function loadTransactions() {
-      const token = localStorage.getItem('accessToken');
+      const token = getAuthToken();
       const tbody = document.getElementById('trxTableBody');
       if (!token) return;
 
@@ -879,8 +889,12 @@
     }
 
     document.getElementById('logout-btn').addEventListener('click', () => {
+      localStorage.removeItem('skillsphere_access_token');
+      localStorage.removeItem('skillsphere_refresh_token');
       localStorage.removeItem('accessToken');
+      localStorage.removeItem('token');
       localStorage.removeItem('refreshToken');
+      localStorage.removeItem('skillsphere_user');
       window.location.href = '/login';
     });
 

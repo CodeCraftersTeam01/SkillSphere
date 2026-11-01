@@ -1547,8 +1547,13 @@
             if (backBtn) backBtn.style.visibility = 'hidden';
 
             // Save tokens & credentials to localStorage
-            localStorage.setItem('skillsphere_access_token', result.data.accessToken);
-            localStorage.setItem('skillsphere_refresh_token', result.data.refreshToken);
+            const regAccessToken = result.data.accessToken;
+            const regRefreshToken = result.data.refreshToken;
+            localStorage.setItem('skillsphere_access_token', regAccessToken);
+            localStorage.setItem('accessToken', regAccessToken);
+            localStorage.setItem('token', regAccessToken);
+            localStorage.setItem('skillsphere_refresh_token', regRefreshToken);
+            localStorage.setItem('refreshToken', regRefreshToken);
             localStorage.setItem('skillsphere_user', JSON.stringify(result.data.user));
 
             // Save account credentials to saved accounts for Quick Device / TouchID Login

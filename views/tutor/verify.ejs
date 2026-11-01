@@ -498,9 +498,13 @@
     });
 
     // Auth & Form Logic
-    const token = localStorage.getItem('skillsphere_access_token');
+    const token = localStorage.getItem('skillsphere_access_token') || localStorage.getItem('accessToken') || localStorage.getItem('token');
     if (!token) {
-      window.location.href = '/login';
+      window.location.href = '/login?redirect=/tutor/verify';
+    } else {
+      if (!localStorage.getItem('skillsphere_access_token')) localStorage.setItem('skillsphere_access_token', token);
+      if (!localStorage.getItem('accessToken')) localStorage.setItem('accessToken', token);
+      if (!localStorage.getItem('token')) localStorage.setItem('token', token);
     }
 
     document.addEventListener('DOMContentLoaded', () => {

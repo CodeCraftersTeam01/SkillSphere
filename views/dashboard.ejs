@@ -1704,17 +1704,13 @@
 
           <div class="sidebar-divider-line"></div>
 
-          <!-- Terdaftar & Pintasan Section -->
-          <div class="sidebar-section-header" onclick="toggleSidebarSection('registered')">
-            <span>Terdaftar & Lainnya</span>
-            <i class="fas fa-chevron-down" id="chevron-registered" style="font-size:10px; color:var(--text-tertiary); transition:transform 0.2s;"></i>
+          <!-- Keuangan & Dompet Section (Tutor Financial Hub) -->
+          <div class="sidebar-section-header" onclick="toggleSidebarSection('financial')">
+            <span>Keuangan & Dompet</span>
+            <i class="fas fa-chevron-down" id="chevron-financial" style="font-size:10px; color:var(--text-tertiary); transition:transform 0.2s;"></i>
           </div>
 
-          <div class="sidebar-nav-group" id="sidebar-registered-group">
-            <a href="/tutor/materials" class="sidebar-nav-pill">
-              <i class="fas fa-folder-open sidebar-nav-icon"></i>
-              <span>Portal Upload Materi</span>
-            </a>
+          <div class="sidebar-nav-group" id="sidebar-financial-group">
             <a href="/tutor/wallet" class="sidebar-nav-pill">
               <i class="fas fa-wallet sidebar-nav-icon"></i>
               <span>Dompet Digital</span>
@@ -1722,6 +1718,21 @@
             <a href="/tutor/withdrawal" class="sidebar-nav-pill">
               <i class="fas fa-money-bill-transfer sidebar-nav-icon"></i>
               <span>Penarikan Dana</span>
+            </a>
+          </div>
+
+          <div class="sidebar-divider-line"></div>
+
+          <!-- Alat Pengajar & Verifikasi Section -->
+          <div class="sidebar-section-header" onclick="toggleSidebarSection('registered')">
+            <span>Alat & Verifikasi</span>
+            <i class="fas fa-chevron-down" id="chevron-registered" style="font-size:10px; color:var(--text-tertiary); transition:transform 0.2s;"></i>
+          </div>
+
+          <div class="sidebar-nav-group" id="sidebar-registered-group">
+            <a href="/tutor/materials" class="sidebar-nav-pill">
+              <i class="fas fa-folder-open sidebar-nav-icon"></i>
+              <span>Portal Upload Materi</span>
             </a>
             <a href="/tutor/verify" class="sidebar-nav-pill">
               <i class="fas fa-id-card-clip sidebar-nav-icon"></i>
@@ -2261,12 +2272,17 @@
     });
 
     // 2. Check Authentication & Load Data
-    const token = localStorage.getItem('skillsphere_access_token');
+    const token = localStorage.getItem('skillsphere_access_token') || localStorage.getItem('accessToken') || localStorage.getItem('token');
     let currentUser = null;
 
     if (!token) {
       window.location.href = '/login';
     } else {
+      // Synchronize all token keys to avoid cross-page redirect bounces
+      if (!localStorage.getItem('skillsphere_access_token')) localStorage.setItem('skillsphere_access_token', token);
+      if (!localStorage.getItem('accessToken')) localStorage.setItem('accessToken', token);
+      if (!localStorage.getItem('token')) localStorage.setItem('token', token);
+
       // Early check: if user is admin, route immediately to Admin Portal
       try {
         const savedUser = localStorage.getItem('skillsphere_user');
@@ -2455,28 +2471,20 @@
       if (role === 'tutor') {
         if (streakBadge) streakBadge.style.display = 'none';
         if (sidebarToggle) sidebarToggle.style.display = 'inline-flex';
-        if (navbar) navbar.classList.remove('no-subnav');
+        if (navbar) navbar.classList.add('no-subnav');
 
-        // Render dedicated tutor navigation links (strictly no student wishlist or transactions)
-        const tutorNavHtml = `
-          <li><a href="/dashboard" class="nav-link-item active">Beranda</a></li>
-          <li><a href="/courses" class="nav-link-item">Katalog Kursus</a></li>
-          <li><a href="/tutor/materials" class="nav-link-item">Portal Materi</a></li>
-          <li><a href="/tutor/wallet" class="nav-link-item">Dompet Digital</a></li>
-          <li><a href="/tutor/withdrawal" class="nav-link-item">Penarikan Dana</a></li>
-        `;
-
+        // Navigasi pengajar (Dompet & Penarikan) terpusat di sidebar kiri, header tetap bersih
         if (desktopNav) {
-          desktopNav.innerHTML = tutorNavHtml;
-          desktopNav.classList.remove('is-hidden');
-          desktopNav.style.display = 'flex';
+          desktopNav.innerHTML = '';
+          desktopNav.classList.add('is-hidden');
+          desktopNav.style.display = 'none';
         }
         if (mobileNav) {
-          mobileNav.innerHTML = tutorNavHtml;
+          mobileNav.innerHTML = '';
         }
         if (mobileNavRow) {
-          mobileNavRow.classList.remove('is-hidden');
-          mobileNavRow.style.display = 'block';
+          mobileNavRow.classList.add('is-hidden');
+          mobileNavRow.style.display = 'none';
         }
       } else if (role === 'admin') {
         if (desktopNav) desktopNav.classList.add('is-hidden');
@@ -3201,7 +3209,7 @@
 
     // 6. Logout Logic
     document.getElementById('logout-btn').addEventListener('click', async () => {
-      const accessToken = localStorage.getItem('skillsphere_access_token');
+      const accessToken = localStorage.getItem('skillsphere_access_token') || localStorage.getItem('accessToken') || localStorage.getItem('token');
       try {
         if (accessToken) {
           await fetch('/api/auth/logout', {
@@ -3215,6 +3223,9 @@
 
       localStorage.removeItem('skillsphere_access_token');
       localStorage.removeItem('skillsphere_refresh_token');
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('token');
+      localStorage.removeItem('refreshToken');
       localStorage.removeItem('skillsphere_user');
       window.location.href = '/login';
     });

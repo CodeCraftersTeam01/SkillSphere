@@ -535,19 +535,29 @@
       updateThemeDisplay(true);
     }
 
+    function getAuthToken() {
+      const t = localStorage.getItem('skillsphere_access_token') || localStorage.getItem('accessToken') || localStorage.getItem('token');
+      if (t) {
+        if (!localStorage.getItem('skillsphere_access_token')) localStorage.setItem('skillsphere_access_token', t);
+        if (!localStorage.getItem('accessToken')) localStorage.setItem('accessToken', t);
+        if (!localStorage.getItem('token')) localStorage.setItem('token', t);
+      }
+      return t;
+    }
+
     async function loadWishlistPage() {
       try {
-        const token = localStorage.getItem('token') || localStorage.getItem('accessToken');
+        const token = getAuthToken();
         const headers = { 'Content-Type': 'application/json' };
         if (token) headers['Authorization'] = 'Bearer ' + token;
 
         // Fetch User Info
         const resUser = await fetch('/api/auth/me', { headers });
         const userJson = await resUser.json();
-        if (userJson.success && userJson.user) {
-          const u = userJson.user;
-          document.getElementById('nav-user-name').textContent = u.name || 'Siswa';
-          document.getElementById('nav-avatar').textContent = (u.name || 'S')[0].toUpperCase();
+        const userData = userJson.data || userJson.user;
+        if (userJson.success && userData) {
+          document.getElementById('nav-user-name').textContent = userData.name || 'Siswa';
+          document.getElementById('nav-avatar').textContent = (userData.name || 'S')[0].toUpperCase();
         }
 
         // Fetch Wishlist Items
@@ -620,7 +630,7 @@
 
     async function removeWishlistItem(courseId) {
       try {
-        const token = localStorage.getItem('token') || localStorage.getItem('accessToken');
+        const token = getAuthToken();
         const headers = { 'Content-Type': 'application/json' };
         if (token) headers['Authorization'] = 'Bearer ' + token;
 
@@ -644,9 +654,12 @@
     }
 
     function handleLogout() {
-      localStorage.removeItem('token');
+      localStorage.removeItem('skillsphere_access_token');
+      localStorage.removeItem('skillsphere_refresh_token');
       localStorage.removeItem('accessToken');
+      localStorage.removeItem('token');
       localStorage.removeItem('refreshToken');
+      localStorage.removeItem('skillsphere_user');
       window.location.href = '/login';
     }
 

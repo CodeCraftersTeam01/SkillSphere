@@ -778,13 +778,17 @@
             <i class="fas fa-clipboard-check sidebar-nav-icon"></i>
             <span>Daftar Kelas Mengajar</span>
           </a>
+          <a href="/tutor/wallet" class="sidebar-nav-pill active">
+            <i class="fas fa-wallet sidebar-nav-icon"></i>
+            <span>Dompet Digital</span>
+          </a>
+          <a href="/tutor/withdrawal" class="sidebar-nav-pill">
+            <i class="fas fa-money-bill-transfer sidebar-nav-icon"></i>
+            <span>Penarikan Dana</span>
+          </a>
           <a href="/tutor/materials" class="sidebar-nav-pill">
             <i class="fas fa-folder-open sidebar-nav-icon"></i>
             <span>Portal Upload Materi</span>
-          </a>
-          <a href="/tutor/wallet" class="sidebar-nav-pill active">
-            <i class="fas fa-wallet sidebar-nav-icon"></i>
-            <span>Dompet & Penarikan Dana</span>
           </a>
           <a href="/tutor/verify" class="sidebar-nav-pill">
             <i class="fas fa-id-card-clip sidebar-nav-icon"></i>
@@ -1101,20 +1105,40 @@
       document.getElementById('inputAmount').value = currentBalance;
     }
 
+    function getAuthToken() {
+      const t = localStorage.getItem('skillsphere_access_token') || localStorage.getItem('accessToken') || localStorage.getItem('token');
+      if (t) {
+        if (!localStorage.getItem('skillsphere_access_token')) localStorage.setItem('skillsphere_access_token', t);
+        if (!localStorage.getItem('accessToken')) localStorage.setItem('accessToken', t);
+        if (!localStorage.getItem('token')) localStorage.setItem('token', t);
+      }
+      return t;
+    }
+
     // Load Wallet & Transactions
     async function loadWalletPageData() {
       try {
-        const token = localStorage.getItem('token') || localStorage.getItem('accessToken');
-        const headers = { 'Content-Type': 'application/json' };
-        if (token) headers['Authorization'] = 'Bearer ' + token;
+        const token = getAuthToken();
+        if (!token) {
+          window.location.href = '/login?redirect=/tutor/wallet';
+          return;
+        }
+
+        const headers = { 
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + token
+        };
 
         // Load profile info
         const resUser = await fetch('/api/auth/me', { headers });
         const userJson = await resUser.json();
-        if (userJson.success && userJson.user) {
-          const u = userJson.user;
-          document.getElementById('nav-user-name').textContent = u.name || 'Tutor';
-          document.getElementById('nav-avatar').textContent = (u.name || 'T')[0].toUpperCase();
+        const userData = userJson.data || userJson.user;
+        if (userJson.success && userData) {
+          document.getElementById('nav-user-name').textContent = userData.name || 'Tutor';
+          document.getElementById('nav-avatar').textContent = (userData.name || 'T')[0].toUpperCase();
+          if (document.getElementById('inputAccountHolder')) {
+            document.getElementById('inputAccountHolder').value = userData.name || '';
+          }
         }
 
         // Load financial wallet data
@@ -1122,12 +1146,16 @@
         const json = await res.json();
         if (!json.success) throw new Error(json.message || 'Gagal memuat dompet');
 
-        const { wallet, transactions, withdrawals } = json.data;
+        const wData = json.data;
+        const wallet = wData.wallet || wData;
+        const transactions = wData.transactions || wData.mutations || [];
+        const withdrawals = wData.withdrawals || [];
+
         currentBalance = Number(wallet.balance || 0);
 
         document.getElementById('valAvailableBalance').textContent = formatRupiah(wallet.balance);
-        document.getElementById('valHoldingBalance').textContent = formatRupiah(wallet.pending_balance);
-        document.getElementById('valTotalEarnings').textContent = formatRupiah(wallet.total_earnings);
+        document.getElementById('valHoldingBalance').textContent = formatRupiah(wallet.pending_balance || wallet.holding_balance || 0);
+        document.getElementById('valTotalEarnings').textContent = formatRupiah(wallet.total_earnings || 0);
 
         // Render Withdrawals Table
         const tbodyWd = document.getElementById('tbodyWithdrawals');
@@ -1238,14 +1266,26 @@
         btn.disabled = true;
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses Permohonan...';
 
-        const token = localStorage.getItem('token') || localStorage.getItem('accessToken');
-        const headers = { 'Content-Type': 'application/json' };
-        if (token) headers['Authorization'] = 'Bearer ' + token;
+        const token = getAuthToken();
+        if (!token) {
+          window.location.href = '/login?redirect=/tutor/wallet';
+          return;
+        }
+        const headers = { 
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + token
+        };
 
         const res = await fetch('/api/tutor/withdraw', {
           method: 'POST',
           headers,
-          body: JSON.stringify({ amount, bank_name, account_number, account_holder_name }),
+          body: JSON.stringify({ 
+            amount, 
+            bank_name, 
+            account_number, 
+            account_holder_name,
+            account_name: account_holder_name
+          }),
         });
 
         const json = await res.json();
@@ -1272,9 +1312,12 @@
     }
 
     function handleLogout() {
-      localStorage.removeItem('token');
+      localStorage.removeItem('skillsphere_access_token');
+      localStorage.removeItem('skillsphere_refresh_token');
       localStorage.removeItem('accessToken');
+      localStorage.removeItem('token');
       localStorage.removeItem('refreshToken');
+      localStorage.removeItem('skillsphere_user');
       window.location.href = '/login';
     }
 

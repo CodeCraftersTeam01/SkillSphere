@@ -662,8 +662,18 @@
       return 'Rp ' + Number(num).toLocaleString('id-ID');
     }
 
+    function getAuthToken() {
+      const t = localStorage.getItem('skillsphere_access_token') || localStorage.getItem('accessToken') || localStorage.getItem('token');
+      if (t) {
+        if (!localStorage.getItem('skillsphere_access_token')) localStorage.setItem('skillsphere_access_token', t);
+        if (!localStorage.getItem('accessToken')) localStorage.setItem('accessToken', t);
+        if (!localStorage.getItem('token')) localStorage.setItem('token', t);
+      }
+      return t;
+    }
+
     async function loadUserProfile() {
-      const token = localStorage.getItem('accessToken');
+      const token = getAuthToken();
       if (!token) return;
       try {
         const res = await fetch('/api/auth/me', {
@@ -712,7 +722,7 @@
 
     async function handlePayWithMidtrans() {
       const btn = document.getElementById('payNowBtn');
-      const token = localStorage.getItem('token') || localStorage.getItem('accessToken');
+      const token = getAuthToken();
 
       if (!token) {
         alert('Silakan masuk ke akun Anda terlebih dahulu untuk mendaftar kursus.');
