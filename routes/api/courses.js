@@ -17,9 +17,17 @@ router.get('/tutor/my-courses', authenticateJWT, authorizeRoles('tutor', 'admin'
 // Student learning activities list
 router.get('/student/my-learning', authenticateJWT, courseController.getMyLearning);
 
+// Wishlist Management (Sprint 3 - Tegar)
+router.post('/wishlist/toggle', authenticateJWT, courseController.toggleWishlist);
+router.get('/wishlist', authenticateJWT, courseController.getWishlist);
+
 // Course enrollment & learning progress
 router.post('/:id/enroll', authenticateJWT, invalidateCacheMiddleware(['cache:/api/courses*', 'cache:/api/admin*']), courseController.enrollCourse);
 router.patch('/:id/progress', authenticateJWT, invalidateCacheMiddleware(['cache:/api/courses*']), courseController.updateLearningProgress);
+
+// Rating & Reviews (Sprint 3 - Tegar)
+router.post('/:id/reviews', authenticateJWT, invalidateCacheMiddleware(['cache:/api/courses*']), courseController.submitReview);
+router.get('/:id/reviews', courseController.getCourseReviews);
 
 // Course details
 router.get('/:id', optionalAuth, courseController.getCourseById);
