@@ -31,6 +31,14 @@ const Enrollment = sequelize.define('Enrollment', {
     type: DataTypes.DATE,
     allowNull: true,
   },
+  rating: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+  },
+  review: {
+    type: DataTypes.TEXT,
+    allowNull: true,
+  },
 }, {
   tableName: 'enrollments',
   timestamps: true,

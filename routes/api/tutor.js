@@ -15,4 +15,9 @@ router.post('/certifications', tutorController.addCertification);
 router.get('/my-certifications', tutorController.getMyCertifications);
 router.delete('/certifications/:id', tutorController.deleteCertification);
 
+// Tutor Wallet & Withdrawal Endpoints (Sprint 3 - Arjuna & Satrio)
+const paymentController = require('../../controllers/paymentController');
+router.get('/wallet', paymentController.getTutorWallet);
+router.post('/withdraw', paymentController.requestWithdrawal);
+
 module.exports = router;

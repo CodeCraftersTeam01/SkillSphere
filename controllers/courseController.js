@@ -1,9 +1,11 @@
+const { Op } = require('sequelize');
 const {
   Course,
   CourseSection,
   CourseMaterial,
   Category,
   User,
+  UserProfile,
   Enrollment,
 } = require('../models');
 
@@ -685,4 +687,279 @@ exports.updateLearningProgress = async (req, res) => {
     });
   }
 };
+
+/**
+ * Submit Course Rating & Review (Sprint 3 - Tegar)
+ * POST /api/courses/:id/reviews
+ */
+exports.submitReview = async (req, res) => {
+  try {
+    const studentId = req.user.id;
+    const { id } = req.params;
+    const { rating, review } = req.body;
+
+    const numRating = parseInt(rating, 10);
+    if (isNaN(numRating) || numRating < 1 || numRating > 5) {
+      return res.status(400).json({
+        success: false,
+        message: 'Rating wajib berupa angka bulat antara 1 sampai 5.',
+      });
+    }
+
+    const isNumeric = /^\d+$/.test(id);
+    const course = await Course.findOne({
+      where: isNumeric ? { id: parseInt(id, 10) } : { slug: id },
+    });
+    if (!course) {
+      return res.status(404).json({
+        success: false,
+        message: 'Kursus tidak ditemukan.',
+      });
+    }
+
+    const enrollment = await Enrollment.findOne({
+      where: { user_id: studentId, course_id: course.id },
+    });
+    if (!enrollment) {
+      return res.status(403).json({
+        success: false,
+        message: 'Anda harus terdaftar di kursus ini untuk dapat memberikan ulasan dan rating.',
+      });
+    }
+
+    enrollment.rating = numRating;
+    enrollment.review = review ? String(review).trim() : null;
+    await enrollment.save();
+
+    // Hitung ulang rata-rata rating kursus
+    const allReviews = await Enrollment.findAll({
+      where: {
+        course_id: course.id,
+        rating: { [Op.ne]: null },
+      },
+      attributes: ['rating'],
+    });
+
+    const count = allReviews.length;
+    const avg = count > 0 ? allReviews.reduce((sum, r) => sum + r.rating, 0) / count : 0;
+
+    course.rating_avg = parseFloat(avg.toFixed(1));
+    course.rating_count = count;
+    await course.save();
+
+    return res.status(200).json({
+      success: true,
+      message: 'Ulasan dan rating Anda berhasil disimpan.',
+      data: {
+        rating: enrollment.rating,
+        review: enrollment.review,
+        course_rating_avg: course.rating_avg,
+        course_rating_count: course.rating_count,
+      },
+    });
+  } catch (err) {
+    console.error('Error in submitReview:', err);
+    return res.status(500).json({
+      success: false,
+      message: 'Gagal mengirimkan ulasan.',
+      error: err.message,
+    });
+  }
+};
+
+/**
+ * Get Course Reviews (Sprint 3 - Tegar)
+ * GET /api/courses/:id/reviews
+ */
+exports.getCourseReviews = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const isNumeric = /^\d+$/.test(id);
+    const course = await Course.findOne({
+      where: isNumeric ? { id: parseInt(id, 10) } : { slug: id },
+    });
+    if (!course) {
+      return res.status(404).json({
+        success: false,
+        message: 'Kursus tidak ditemukan.',
+      });
+    }
+
+    const enrollments = await Enrollment.findAll({
+      where: {
+        course_id: course.id,
+        rating: { [Op.ne]: null },
+      },
+      include: [
+        {
+          model: User,
+          as: 'student',
+          attributes: ['id', 'name', 'email'],
+          include: [
+            {
+              model: UserProfile,
+              as: 'profile',
+              attributes: ['avatar_url', 'career_goal'],
+            },
+          ],
+        },
+      ],
+      order: [['updated_at', 'DESC']],
+      limit: 50,
+    });
+
+    const reviews = enrollments.map(e => ({
+      id: e.id,
+      rating: e.rating,
+      review: e.review,
+      created_at: e.updated_at,
+      student_name: (e.student && e.student.name) || 'Pelajar',
+      avatar_url: (e.student && e.student.profile && e.student.profile.avatar_url) || null,
+    }));
+
+    return res.status(200).json({
+      success: true,
+      data: {
+        rating_avg: course.rating_avg,
+        rating_count: course.rating_count,
+        reviews,
+      },
+    });
+  } catch (err) {
+    console.error('Error in getCourseReviews:', err);
+    return res.status(500).json({
+      success: false,
+      message: 'Gagal memuat ulasan kursus.',
+      error: err.message,
+    });
+  }
+};
+
+/**
+ * Toggle Wishlist (Sprint 3 - Tegar)
+ * POST /api/courses/wishlist/toggle
+ */
+exports.toggleWishlist = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { course_id } = req.body;
+
+    if (!course_id) {
+      return res.status(400).json({
+        success: false,
+        message: 'Parameter course_id wajib disertakan.',
+      });
+    }
+
+    const targetCourseId = parseInt(course_id, 10);
+    const course = await Course.findByPk(targetCourseId);
+    if (!course) {
+      return res.status(404).json({
+        success: false,
+        message: 'Kursus tidak ditemukan.',
+      });
+    }
+
+    const [profile] = await UserProfile.findOrCreate({
+      where: { user_id: userId },
+      defaults: { study_preferences: { wishlist: [] } },
+    });
+
+    let prefs = profile.study_preferences;
+    if (!prefs || typeof prefs !== 'object') {
+      prefs = { wishlist: [] };
+    }
+    if (!Array.isArray(prefs.wishlist)) {
+      prefs.wishlist = [];
+    }
+
+    const index = prefs.wishlist.indexOf(targetCourseId);
+    let isWishlisted = false;
+    if (index > -1) {
+      // Hapus dari wishlist
+      prefs.wishlist.splice(index, 1);
+      isWishlisted = false;
+    } else {
+      // Tambahkan ke wishlist
+      prefs.wishlist.push(targetCourseId);
+      isWishlisted = true;
+    }
+
+    profile.study_preferences = { ...prefs };
+    profile.changed('study_preferences', true);
+    await profile.save();
+
+    return res.status(200).json({
+      success: true,
+      message: isWishlisted
+        ? 'Kursus berhasil ditambahkan ke wishlist.'
+        : 'Kursus berhasil dihapus dari wishlist.',
+      data: {
+        is_wishlisted: isWishlisted,
+        wishlist_count: prefs.wishlist.length,
+      },
+    });
+  } catch (err) {
+    console.error('Error in toggleWishlist:', err);
+    return res.status(500).json({
+      success: false,
+      message: 'Gagal memperbarui wishlist.',
+      error: err.message,
+    });
+  }
+};
+
+/**
+ * Get Wishlist Courses (Sprint 3 - Tegar)
+ * GET /api/courses/wishlist
+ */
+exports.getWishlist = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const profile = await UserProfile.findOne({ where: { user_id: userId } });
+
+    const wishlistIds = (profile && profile.study_preferences && Array.isArray(profile.study_preferences.wishlist))
+      ? profile.study_preferences.wishlist
+      : [];
+
+    if (wishlistIds.length === 0) {
+      return res.status(200).json({
+        success: true,
+        data: [],
+      });
+    }
+
+    const courses = await Course.findAll({
+      where: {
+        id: { [Op.in]: wishlistIds },
+      },
+      include: [
+        {
+          model: Category,
+          as: 'category',
+          attributes: ['id', 'name', 'slug'],
+        },
+        {
+          model: User,
+          as: 'tutor',
+          attributes: ['id', 'name'],
+        },
+      ],
+      order: [['created_at', 'DESC']],
+    });
+
+    return res.status(200).json({
+      success: true,
+      data: courses,
+    });
+  } catch (err) {
+    console.error('Error in getWishlist:', err);
+    return res.status(500).json({
+      success: false,
+      message: 'Gagal memuat daftar wishlist.',
+      error: err.message,
+    });
+  }
+};
+
 

@@ -6,7 +6,7 @@
     "start": "node ./bin/www",
     "dev": "node --watch ./bin/www",
     "seed": "node seeders/seed.js",
-    "test": "node tests/db.test.js && node tests/auth.test.js && node tests/imageHelper.test.js && node tests/mediaStorage.test.js && node tests/adminVerification.test.js && node tests/tutorVerificationApi.test.js && node tests/tutorMaterialsPortal.test.js && node tests/aiGeminiIntegration.test.js && node tests/adminUserManagement.test.js && node tests/studentViewsCatalog.test.js && node tests/redisCompression.test.js && node tests/ttsAccessibility.test.js"
+    "test": "node tests/db.test.js && node tests/auth.test.js && node tests/imageHelper.test.js && node tests/mediaStorage.test.js && node tests/adminVerification.test.js && node tests/tutorVerificationApi.test.js && node tests/tutorMaterialsPortal.test.js && node tests/aiGeminiIntegration.test.js && node tests/adminUserManagement.test.js && node tests/studentViewsCatalog.test.js && node tests/redisCompression.test.js && node tests/ttsAccessibility.test.js && node tests/paymentFinance.test.js && node tests/reviewsWishlist.test.js"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",
@@ -21,6 +21,7 @@
     "http-errors": "~1.6.3",
     "ioredis": "^6.0.0",
     "jsonwebtoken": "^9.0.3",
+    "midtrans-client": "^1.4.3",
     "morgan": "~1.9.1",
     "multer": "^2.4.0",
     "mysql2": "^3.24.4",
