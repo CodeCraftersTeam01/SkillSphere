@@ -272,32 +272,36 @@ Format JSON yang wajib dihasilkan:
 async function chatStudyAssistant({ message, conversationHistory = [], courseContext = null, studentName = 'Pelajar' }) {
   const currentTopic = (courseContext && (courseContext.currentTopic || courseContext.currentSection)) || 'Materi Belajar';
   const materialSnippet = (courseContext && courseContext.materialContent)
-    ? `\nCuplikan Referensi Materi yang Sedang Dibaca Siswa:\n"""\n${courseContext.materialContent.substring(0, 2500)}\n"""\n`
+    ? `\nKONTEN RESMI DARI MODUL YANG SEDANG DIBACA SISWA (SUMBER KEBENARAN UTAMA):\n"""\n${courseContext.materialContent.substring(0, 4500)}\n"""\n`
     : '';
 
-  const systemPrompt = `Anda adalah "Orion", partner belajar AI yang sangat cerdas, ramah, manusiawi, dan on-point di platform SkillSphere AI.
+  const systemPrompt = `Anda adalah "Orion", partner belajar AI cerdas, ramah, manusiawi, dan on-point di platform SkillSphere AI.
 
-Karakter & Gaya Komunikasi Orion (Human-like & On-point):
-1. JAWAB LANGSUNG PADA INTI PERTANYAAN (ON-POINT):
-   - Pahami maksud utama siswa. Langsung jawab pertanyaan secara jelas, tuntas, dan berbobot tanpa berputar-putar atau basa-basi berlebihan.
-   - Jika siswa menanyakan definisi atau konsep (misalnya normalisasi, functional dependency): berikan definisi yang mudah dipahami, mengapa konsep itu ada, dan analogi dunia nyata yang membumi.
-   - Jika siswa menanyakan syarat/poin-poin (misalnya "Tiga Syarat Basis Data Normal yang Ideal"): langsung sebutkan poin 1, 2, 3 secara terstruktur, jelaskan intinya masing-masing, dan beri contoh ringkas.
-   - Jika siswa menanyakan kode atau perbandingan: berikan contoh kode bersih atau tabel ringkas.
-   - JANGAN PERNAH menolak menjawab atau membalas dengan melempar balik pertanyaan seperti "menurut Anda apa?". Tugas Anda adalah menjelaskan materi hingga siswa paham dengan senang hati.
+PRINSIP WAJIB JAWABAN ORION:
+1. SUMBER KEBENARAN UTAMA (GROUND TRUTH):
+   - Jika teks "KONTEN RESMI DARI MODUL YANG SEDANG DIBACA SISWA" tersedia di bawah, JADIKAN MATERI TERSEBUT SEBAGAI ACUAN UTAMA & WAJIB SESUAI DENGAN MODUL TERSEBUT.
+   - Gunakan istilah, definisi, poin-poin penting, rumus, atau analogi yang SAMA PERSIS dengan materi yang tertulis di modul tersebut.
+   - Contoh nyata: Jika materi modul menyebutkan:
+     "4. Tiga Syarat Basis Data Normal yang Ideal:
+     1. Lossless-Join Decomposition (Dekomposisi Tanpa Kehilangan Informasi)
+     2. Dependency Preservation (Pemeliharaan Ketergantungan Fungsional)
+     3. Memenuhi Bentuk Normal Minimum (Minimal 3NF / BCNF)"
+     maka ketika siswa bertanya mengenai "Tiga Syarat Basis Data Normal yang Ideal", Anda WAJIB menjawab dengan 3 syarat tersebut persis seperti yang tertulis di modul, lalu jelaskan maksud masing-masing syarat secara gamblang!
+   - Jangan gunakan versi buku/sumber lain yang bertolak belakang dengan modul yang sedang dipelajari siswa.
 
-2. NADA BICARA ALAMI SEPERTI MANUSIA (HUMAN-LIKE):
-   - Bersikaplah seperti teman belajar atau senior engineer yang suportif, hangat, dan asyik diajak diskusi.
-   - DILARANG menggunakan pembuka robotik yang kaku seperti "Saya menangkap pertanyaan Anda mengenai...". Langsung sapa ramah atau langsung jawab dengan bahasa yang mengalir enak dibaca.
-   - Gunakan format Markdown yang rapi (bold, daftar bernomor/bullet, kode inline atau blok) agar visualnya nyaman di mata.
+2. JAWAB LANGSUNG ON-POINT & TUNTAS:
+   - Jawab langsung inti pertanyaan tanpa berbelit-belit atau menunda jawaban.
+   - DILARANG melempar balik pertanyaan pemantik atau menolak menjawab.
 
-3. PENUTUP YANG INTERAKTIF & RAMAH:
-   - Di bagian akhir setelah materi inti terjawab tuntas, tawarkan langkah berikutnya secara santai, misalnya: "Ada bagian dari poin tadi yang mau kita buatkan contoh tabelnya?" atau "Kira-kira konsep ini sudah cukup jelas, atau mau kita coba bedah studi kasusnya?".
+3. HUMAN-LIKE & BERSAHABAT:
+   - Berbahasa santai, hangat, dan komunikatif seperti mentor atau senior programmer yang asyik.
+   - DILARANG menggunakan pembuka kaku seperti "Saya menangkap pertanyaan Anda...".
 
-4. KEPATUHAN KUALITAS & ANTI-SLOP:
+4. FORMATTING MARKDOWN RAPI (TABEL & LIST):
+   - Gunakan format tabel Markdown (| Header 1 | Header 2 |) jika menjelaskan perbandingan atau ringkasan, blockquote (> ...) untuk analogi/tips, dan list teratur (1, 2, 3) agar visualnya nyaman dibaca.
    - Dilarang keras menggunakan tanda em dash (—). Gunakan tanda hubung biasa (-) atau titik dua (:).
-   - Jaga respons tetap kontekstual dengan materi yang sedang dibuka siswa.
 
-${courseContext ? `Konteks Kelas Saat Ini:\n- Judul Kursus: ${courseContext.title || 'Kursus'}\n- Topik/Modul yang Sedang Dibuka: ${currentTopic}${materialSnippet}` : ''}`;
+${courseContext ? `Konteks Kelas:\n- Kursus: ${courseContext.title || 'Kursus'}\n- Modul Aktif: ${currentTopic}${materialSnippet}` : ''}`;
 
   let prompt = '';
   if (Array.isArray(conversationHistory) && conversationHistory.length > 0) {
@@ -799,18 +803,24 @@ Saat ini Anda sedang mempelajari topik **${currentTopic}**. Ada konsep, baris ko
     msgLower.includes('kriteria emas') ||
     (msgLower.includes('syarat') && msgLower.includes('normal'))
   ) {
-    return `Tiga syarat basis data normal yang ideal (kriteria emas dekomposisi relasional Codd) adalah:
+    return `Berdasarkan materi pada modul ini, sebuah proses dekomposisi tabel dikatakan berhasil dan normal apabila memenuhi **tiga kriteria emas**:
 
 1. **Lossless-Join Decomposition (Dekomposisi Tanpa Kehilangan Informasi):**
-   Ketika sebuah tabel besar dipecah menjadi beberapa tabel relasional yang lebih kecil, tabel-tabel tersebut harus bisa digabungkan kembali (*JOIN*) menghasilkan data asli yang persis sama, tanpa menghasilkan data palsu (*spurious tuples*) atau data hilang.
+   Setelah tabel besar dipecah menjadi beberapa tabel kecil, tabel-tabel tersebut harus bisa digabungkan kembali (*JOIN*) menggunakan foreign key dan menghasilkan data awal yang sama persis tanpa ada baris data silang fiktif (*spurious tuples*).
 
-2. **Dependency Preservation (Preservasi Ketergantungan Fungsional):**
-   Seluruh relasi ketergantungan fungsional (*functional dependencies*) antar-atribut harus tetap dapat diverifikasi di masing-masing tabel hasil pecahan tanpa harus melakukan operasi JOIN yang membebani kinerja query.
+2. **Dependency Preservation (Pemeliharaan Ketergantungan Fungsional):**
+   Seluruh relasi ketergantungan antar-atribut tetap dapat ditegakkan tanpa harus melakukan join antar semua tabel setiap saat.
 
-3. **Minimal Redundancy (Redudansi Minimal / Non-Redundancy):**
-   Setiap fakta informasi hanya boleh disimpan satu kali di satu tempat. Atribut non-kunci harus bergantung penuh pada *primary key* (aturan "Key, Whole Key, and Nothing but the Key"), sehingga tabel terbebas dari anomali *insert*, *update*, dan *delete*.
+3. **Memenuhi Bentuk Normal Minimum (Minimal 3NF / BCNF):**
+   Tabel tidak melanggar kriteria Bentuk Normal Ketiga (3NF) atau Boyce-Codd Normal Form (BCNF).
 
-Ketiga syarat inilah yang menjadi fondasi utama sebelum sistem basis data masuk ke bentuk normalisasi tingkat lanjut (3NF dan BCNF). Apakah Anda ingin melihat contoh simulasi tabelnya?`;
+| Kriteria Emas | Tujuan Utama | Dampak Jika Gagal |
+|---|---|---|
+| Lossless-Join | Menjaga keutuhan data saat JOIN | Muncul data fiktif / spurious tuples |
+| Dependency Preservation | Menjaga aturan fungsionalitas kolom | Query verifikasi jadi sangat lambat |
+| Minimal 3NF / BCNF | Mengeliminasi redundansi data | Terjadi anomali insert, update, delete |
+
+Ketiga syarat inilah yang menjadi fondasi utama dalam perancangan skema relasional yang tangguh. Ada bagian dari 3 syarat ini yang ingin kita simulasikan dengan contoh tabel?`;
   }
 
   // Definisi & Konsep Normalisasi Data
