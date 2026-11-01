@@ -203,7 +203,7 @@ exports.updateMilestoneStatus = async (req, res) => {
  */
 exports.chatStudyAssistant = async (req, res) => {
   try {
-    const { message, conversation_history, course_id, current_topic } = req.body;
+    const { message, conversation_history, course_id, current_topic, material_content } = req.body;
     const studentName = req.user ? req.user.name : 'Pelajar';
 
     if (!message || message.trim().length === 0) {
@@ -223,12 +223,14 @@ exports.chatStudyAssistant = async (req, res) => {
           title: course.title,
           description: course.description,
           currentTopic: current_topic || 'Materi Belajar',
+          materialContent: material_content || null,
           sections: course.sections ? course.sections.map((s) => s.title) : [],
         };
       }
     } else if (current_topic) {
       courseContext = {
         currentTopic: current_topic,
+        materialContent: material_content || null,
       };
     }
 

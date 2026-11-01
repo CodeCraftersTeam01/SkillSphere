@@ -2491,13 +2491,20 @@
         return `<pre class="code-editor-body" style="margin:8px 0; padding:10px; font-size:12px; border-radius:6px; background:#181816; color:#ECEBE8; overflow-x:auto;"><code>${code}</code></pre>`;
       });
 
+      // Headings (### and ##)
+      text = text.replace(/^### (.*$)/gim, '<strong style="display:block; margin:8px 0 4px; font-size:13.5px; color:var(--text-primary);">$1</strong>');
+      text = text.replace(/^## (.*$)/gim, '<strong style="display:block; margin:10px 0 6px; font-size:14px; color:var(--text-primary); border-bottom:1px solid var(--border-subtle); padding-bottom:3px;">$1</strong>');
+
       // Bold & Italic & Inline code
       text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
       text = text.replace(/\*(.*?)\*/g, '<em>$1</em>');
       text = text.replace(/`([^`]+)`/g, '<code style="background:var(--bg-surface-subtle); padding:2px 5px; border-radius:4px; font-family:var(--font-mono); font-size:12px;">$1</code>');
 
+      // Numbered lists
+      text = text.replace(/^\s*(\d+)\.\s+(.*)$/gim, '<div style="margin-left:8px; margin-bottom:4px;"><strong>$1.</strong> $2</div>');
+
       // Unordered lists
-      text = text.replace(/^\s*[\-\*]\s+(.*)$/gim, '<li style="margin-left:14px;">$1</li>');
+      text = text.replace(/^\s*[\-\*]\s+(.*)$/gim, '<li style="margin-left:14px; margin-bottom:3px;">$1</li>');
 
       // Line breaks
       text = text.replace(/\n\n+/g, '<br><br>');
@@ -2566,7 +2573,8 @@
             message: text,
             conversation_history: aiConversationHistory,
             course_id: courseData ? courseData.id : null,
-            current_topic: currentMat.title || 'Materi Belajar HTML5'
+            current_topic: currentMat.title || 'Materi Belajar',
+            material_content: currentMat.content || (document.getElementById('reading-article-pane')?.innerText || '')
           })
         });
         const json = await res.json();
