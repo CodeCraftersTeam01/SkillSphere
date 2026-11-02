@@ -41,6 +41,17 @@ router.get(['/profile', '/dashboard/profile'], function(req, res, next) {
   res.render('profile', { title: 'Profil & Pengaturan Akun | SkillSphere AI' });
 });
 
+/* GET Student Transactions History (Sprint 3 - Bustanul) */
+router.get(['/transactions', '/dashboard/transactions', '/riwayat-transaksi'], function(req, res, next) {
+  res.render('student/transactions', { title: 'Riwayat Transaksi Belajar | SkillSphere AI' });
+});
+
+/* GET Student Wishlist Page (Sprint 3 - Bustanul) */
+router.get(['/wishlist', '/dashboard/wishlist', '/kursus-favorit'], function(req, res, next) {
+  res.render('student/wishlist', { title: 'Wishlist Kursus Favorit | SkillSphere AI' });
+});
+
+
 /* GET Course Catalog Page (Sprint 2 - Fadiyah) */
 router.get(['/courses', '/catalog', '/katalog'], function(req, res, next) {
   res.render('courses/index', { title: 'Katalog Kursus & Kurikulum | SkillSphere AI' });
@@ -50,6 +61,17 @@ router.get(['/courses', '/catalog', '/katalog'], function(req, res, next) {
 router.get('/courses/:id', function(req, res, next) {
   res.render('courses/detail', { title: 'Detail Kursus | SkillSphere AI', courseId: req.params.id });
 });
+
+/* GET Course Checkout & Payment Page (Sprint 3 - Fadiyah) */
+router.get(['/courses/:id/checkout', '/checkout/:id'], function(req, res, next) {
+  res.render('courses/checkout', {
+    title: 'Checkout Pembayaran Kursus | SkillSphere AI',
+    courseId: req.params.id,
+    midtransClientKey: process.env.MIDTRANS_CLIENT_KEY,
+    midtransSnapUrl: process.env.MIDTRANS_SNAP_URL,
+  });
+});
+
 
 /* GET Interactive Classroom Learning Space (Sprint 2 - Dicoding & Claude Style) */
 router.get(['/courses/:id/learn', '/courses/:id/ruang-belajar'], function(req, res, next) {

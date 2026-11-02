@@ -1408,6 +1408,12 @@
         return;
       }
 
+      // Jika kursus berbayar, arahkan langsung ke halaman checkout Midtrans
+      if (currentCourse && Number(currentCourse.price || 0) > 0) {
+        window.location.href = `/courses/${currentCourse.slug || currentCourse.id}/checkout`;
+        return;
+      }
+
       const btn = document.getElementById('btn-enroll-main');
       let originalText = '';
       if (btn) {
