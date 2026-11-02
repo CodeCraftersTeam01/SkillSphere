@@ -102,6 +102,21 @@ function verifySignatureKey({ orderId, statusCode, grossAmount, signatureKey }) 
 }
 
 /**
+ * Cek status transaksi real-time langsung ke Midtrans API
+ * @param {string} orderId - Kode transaksi (TRX-...)
+ * @returns {Promise<Object|null>}
+ */
+async function checkTransactionStatus(orderId) {
+  if (!orderId) return null;
+  try {
+    const res = await snap.transaction.status(orderId);
+    return res;
+  } catch (err) {
+    return null;
+  }
+}
+
+/**
  * Generate mock signature untuk pengujian otomatis (Unit Testing)
  */
 function generateMockSignature(orderId, statusCode, grossAmount) {
@@ -115,6 +130,7 @@ module.exports = {
   serverKey,
   isProduction,
   createSnapTransaction,
+  checkTransactionStatus,
   verifySignatureKey,
   generateMockSignature,
 };

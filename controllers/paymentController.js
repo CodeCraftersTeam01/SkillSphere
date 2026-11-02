@@ -445,24 +445,6 @@ async function getStudentTransactions(req, res) {
   try {
     const userId = req.user.id;
 
-    // Bersihkan duplikasi transaksi pending untuk kursus yang sama (hanya simpan 1 transaksi pending aktif terbaru)
-    const pendingTrxs = await Transaction.findAll({
-      where: { user_id: userId, payment_status: 'pending' },
-      order: [['created_at', 'DESC']],
-    });
-    const seenCourses = new Set();
-    const duplicateIds = [];
-    for (const pt of pendingTrxs) {
-      if (seenCourses.has(pt.course_id)) {
-        duplicateIds.push(pt.id);
-      } else {
-        seenCourses.add(pt.course_id);
-      }
-    }
-    if (duplicateIds.length > 0) {
-      await Transaction.destroy({ where: { id: duplicateIds } });
-    }
-
     const transactions = await Transaction.findAll({
       where: { user_id: userId },
       include: [
@@ -474,6 +456,70 @@ async function getStudentTransactions(req, res) {
       ],
       order: [['created_at', 'DESC']],
     });
+
+    // Sinkronisasi status real-time langsung dari Midtrans API
+    for (const trx of transactions) {
+      if (trx.payment_status === 'settlement') continue;
+
+      try {
+        const midtransRes = await midtransService.checkTransactionStatus(trx.transaction_code);
+        if (midtransRes && midtransRes.transaction_status) {
+          const mStatus = (midtransRes.transaction_status || '').toLowerCase();
+          const fraudStatus = (midtransRes.fraud_status || '').toLowerCase();
+          const paymentType = midtransRes.payment_type || trx.payment_method;
+
+          if (mStatus === 'settlement' || (mStatus === 'capture' && (!fraudStatus || fraudStatus === 'accept'))) {
+            trx.payment_status = 'settlement';
+            trx.payment_method = paymentType;
+            trx.paid_at = new Date();
+            trx.payment_response = midtransRes;
+            await trx.save();
+
+            // 1. Aktifkan enrollment kursus siswa
+            await Enrollment.findOrCreate({
+              where: { user_id: trx.user_id, course_id: trx.course_id },
+              defaults: { status: 'active', progress_percentage: 0 },
+            });
+
+            // 2. Bagi hasil 80% ke dompet tutor
+            const course = await Course.findByPk(trx.course_id);
+            if (course && course.tutor_id) {
+              const [wallet] = await TutorWallet.findOrCreate({
+                where: { user_id: course.tutor_id },
+                defaults: { balance: 0, holding_balance: 0, total_earned: 0 },
+              });
+              await wallet.increment({
+                balance: trx.tutor_earning,
+                total_earned: trx.tutor_earning,
+              });
+              await WalletTransaction.create({
+                wallet_id: wallet.id,
+                transaction_type: 'credit',
+                amount: trx.tutor_earning,
+                description: `Bagi hasil kursus (80%): ${course.title}`,
+                reference_id: trx.transaction_code,
+              });
+            }
+          } else if (['cancel', 'deny', 'cancelled'].includes(mStatus)) {
+            trx.payment_status = 'failed';
+            trx.payment_method = paymentType;
+            await trx.save();
+          } else if (['expire', 'expired'].includes(mStatus)) {
+            trx.payment_status = 'expired';
+            trx.payment_method = paymentType;
+            await trx.save();
+          } else if (mStatus === 'pending') {
+            trx.payment_status = 'pending';
+            if (paymentType && trx.payment_method !== paymentType) {
+              trx.payment_method = paymentType;
+              await trx.save();
+            }
+          }
+        }
+      } catch (errSync) {
+        // Abaikan jika order tidak ada di Midtrans
+      }
+    }
 
     return res.status(200).json({
       success: true,
@@ -513,6 +559,39 @@ async function getTransactionStatus(req, res) {
         success: false,
         message: 'Transaksi tidak ditemukan.',
       });
+    }
+
+    // Sinkronisasi status jika belum settlement
+    if (transaction.payment_status !== 'settlement') {
+      try {
+        const midtransRes = await midtransService.checkTransactionStatus(transaction.transaction_code);
+        if (midtransRes && midtransRes.transaction_status) {
+          const mStatus = (midtransRes.transaction_status || '').toLowerCase();
+          const fraudStatus = (midtransRes.fraud_status || '').toLowerCase();
+          const paymentType = midtransRes.payment_type || transaction.payment_method;
+
+          if (mStatus === 'settlement' || (mStatus === 'capture' && (!fraudStatus || fraudStatus === 'accept'))) {
+            transaction.payment_status = 'settlement';
+            transaction.payment_method = paymentType;
+            transaction.paid_at = new Date();
+            transaction.payment_response = midtransRes;
+            await transaction.save();
+
+            await Enrollment.findOrCreate({
+              where: { user_id: transaction.user_id, course_id: transaction.course_id },
+              defaults: { status: 'active', progress_percentage: 0 },
+            });
+          } else if (['cancel', 'deny', 'cancelled'].includes(mStatus)) {
+            transaction.payment_status = 'failed';
+            transaction.payment_method = paymentType;
+            await transaction.save();
+          } else if (['expire', 'expired'].includes(mStatus)) {
+            transaction.payment_status = 'expired';
+            transaction.payment_method = paymentType;
+            await transaction.save();
+          }
+        }
+      } catch (e) {}
     }
 
     return res.status(200).json({

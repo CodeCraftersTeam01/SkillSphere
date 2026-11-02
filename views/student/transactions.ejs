@@ -820,7 +820,13 @@
         const courseObj = t.course || t.Course || {};
         const courseTitle = courseObj.title || t.course_title || 'Kursus SkillSphere';
         const courseSlug = courseObj.slug || courseObj.id || t.course_id || 1;
-        const paymentType = t.payment_method || t.payment_type || 'Midtrans Snap';
+        let paymentType = t.payment_method || t.payment_type || 'Midtrans Snap';
+        if (paymentType === 'bank_transfer') paymentType = 'Bank Transfer';
+        else if (paymentType === 'qris') paymentType = 'QRIS';
+        else if (paymentType === 'gopay') paymentType = 'GoPay';
+        else if (paymentType === 'shopeepay') paymentType = 'ShopeePay';
+        else if (paymentType === 'midtrans_snap') paymentType = 'Midtrans Snap';
+
         const dateRaw = t.created_at || t.createdAt;
 
         let statusBadge = '<span class="status-pill status-success"><i class="fas fa-check-circle"></i> Berhasil</span>';
@@ -840,8 +846,15 @@
               <i class="fas fa-credit-card"></i> Bayar Sekarang
             </button>
           `;
-        } else if (status === 'failed' || status === 'expire' || status === 'expired' || status === 'cancel') {
+        } else if (status === 'failed' || status === 'cancel' || status === 'cancelled') {
           statusBadge = '<span class="status-pill status-failed"><i class="fas fa-ban"></i> Dibatalkan</span>';
+          actionBtn = `
+            <a href="/courses/${encodeURIComponent(courseSlug)}/checkout" class="btn-action-sm" title="Pesan Ulang">
+              <i class="fas fa-redo"></i> Pesan Ulang
+            </a>
+          `;
+        } else if (status === 'expire' || status === 'expired') {
+          statusBadge = '<span class="status-pill status-failed" style="color:#71717A; background:rgba(113,113,122,0.12); border-color:rgba(113,113,122,0.25);"><i class="fas fa-hourglass-end"></i> Kedaluwarsa</span>';
           actionBtn = `
             <a href="/courses/${encodeURIComponent(courseSlug)}/checkout" class="btn-action-sm" title="Pesan Ulang">
               <i class="fas fa-redo"></i> Pesan Ulang
