@@ -11,7 +11,7 @@ router.get('/status/:code', paymentController.getTransactionStatus);
 
 // Protected routes (Student/User)
 router.post('/snap-token', authenticateJWT, paymentController.createSnapToken);
-router.get('/transactions', authenticateJWT, paymentController.getStudentTransactions);
+router.get(['/transactions', '/history'], authenticateJWT, paymentController.getStudentTransactions);
 
 // Protected routes (Tutor Financial Portal)
 router.get('/wallet', authenticateJWT, authorizeRoles('tutor', 'admin'), paymentController.getTutorWallet);

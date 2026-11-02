@@ -17,7 +17,7 @@
   <script src="/javascripts/custom-alert.js"></script>
 
   <!-- Midtrans Snap Sandbox JS -->
-  <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="<%= process.env.MIDTRANS_CLIENT_KEY || 'SB-Mid-client-skillsphere-sandbox-key-2026' %>"></script>
+  <script src="<%= (typeof midtransSnapUrl !== 'undefined' && midtransSnapUrl) || 'https://app.sandbox.midtrans.com/snap/snap.js' %>" data-client-key="<%= (typeof midtransClientKey !== 'undefined' && midtransClientKey) || (typeof process !== 'undefined' && process.env.MIDTRANS_CLIENT_KEY) || 'Mid-client-2DnCoRKAaTZ370zD' %>"></script>
 
   <style>
     :root {
