@@ -609,6 +609,47 @@
       border-radius: 14px 14px 14px 2px;
     }
 
+    .ai-chat-bubble.assistant table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      margin: 8px 0;
+    }
+
+    .ai-chat-bubble.assistant th {
+      background: var(--bg-surface);
+      color: var(--text-secondary);
+      font-weight: 700;
+      padding: 6px 10px;
+      border: 1px solid var(--border-subtle);
+      font-size: 11.5px;
+    }
+
+    .ai-chat-bubble.assistant td {
+      padding: 6px 10px;
+      border: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+      vertical-align: top;
+      font-size: 12px;
+    }
+
+    .ai-chat-bubble.assistant blockquote {
+      border-left: 3px solid var(--accent-primary);
+      margin: 8px 0;
+      padding: 6px 12px;
+      background: var(--bg-surface);
+      border-radius: 0 6px 6px 0;
+      font-size: 12.5px;
+      color: var(--text-secondary);
+      font-style: italic;
+    }
+
+    .ai-chat-bubble.assistant hr {
+      border: none;
+      border-top: 1px solid var(--border-subtle);
+      margin: 10px 0;
+    }
+
     .ai-bubble-sender {
       font-size: 10.5px;
       font-weight: 700;
@@ -2481,27 +2522,95 @@
     // Realtime Multi-Turn Conversation History for Orion AI
     let aiConversationHistory = [];
 
-    // Helper to format Orion's markdown replies nicely inside chat bubbles
+    // Helper to format Orion's markdown replies nicely inside chat bubbles with full Table, Blockquote, Divider, and Code Block support
     function formatAIChatMarkdown(md) {
       if (!md) return '';
-      let text = escapeHtml(md);
 
-      // Code blocks
-      text = text.replace(/```([a-zA-Z0-9_-]*)\n([\s\S]*?)```/g, (match, lang, code) => {
-        return `<pre class="code-editor-body" style="margin:8px 0; padding:10px; font-size:12px; border-radius:6px; background:#181816; color:#ECEBE8; overflow-x:auto;"><code>${code}</code></pre>`;
+      // 1. Preserve and extract code blocks before escaping
+      const codeBlocks = [];
+      let text = md.replace(/```([a-zA-Z0-9_-]*)\n([\s\S]*?)```/g, (match, lang, code) => {
+        const placeholder = `___AI_CODE_BLOCK_${codeBlocks.length}___`;
+        codeBlocks.push({
+          lang: lang || 'code',
+          code: escapeHtml(code.trim())
+        });
+        return placeholder;
       });
 
-      // Bold & Italic & Inline code
+      // 2. Escape HTML for safe rendering
+      text = escapeHtml(text);
+
+      // 3. Parse Markdown Tables (| Col 1 | Col 2 | \n |---|---| \n | Val 1 | Val 2 |)
+      text = text.replace(/((?:^\|[^\n]+\|\r?\n)+)/gm, (tableMatch) => {
+        const rawLines = tableMatch.trim().split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+        if (rawLines.length < 2) return tableMatch;
+
+        // Check if second line is separator like |---|---| or |:---|:---:|
+        const sepLine = rawLines[1].replace(/&amp;/g, '&');
+        if (!/^\|[\s\-:]+(\|[\s\-:]+)+\|$/.test(sepLine)) return tableMatch;
+
+        const parseRow = (line) => {
+          return line.split('|')
+            .map(c => c.trim())
+            .filter((_, idx, arr) => idx > 0 && idx < arr.length - 1);
+        };
+
+        const headers = parseRow(rawLines[0]);
+        const dataRows = rawLines.slice(2).map(parseRow);
+
+        let tableHtml = '<div class="ai-chat-table-wrapper" style="overflow-x:auto; margin:10px 0; border:1px solid var(--border-subtle); border-radius:6px; background:var(--bg-surface); box-shadow:var(--shadow-sm);"><table style="width:100%; border-collapse:collapse; font-size:12px; text-align:left;">';
+        
+        tableHtml += '<thead><tr style="background:var(--bg-surface-subtle); border-bottom:1px solid var(--border-subtle);">';
+        headers.forEach(h => {
+          tableHtml += `<th style="padding:7px 10px; font-weight:700; color:var(--text-secondary); white-space:nowrap;">${h}</th>`;
+        });
+        tableHtml += '</tr></thead><tbody>';
+
+        dataRows.forEach((row, rIdx) => {
+          const bgStyle = rIdx % 2 === 1 ? 'background:var(--bg-surface-subtle);' : '';
+          tableHtml += `<tr style="border-bottom:1px solid var(--border-subtle); ${bgStyle}">`;
+          row.forEach(cell => {
+            tableHtml += `<td style="padding:7px 10px; color:var(--text-primary); vertical-align:top; line-height:1.45;">${cell}</td>`;
+          });
+          tableHtml += '</tr>';
+        });
+
+        tableHtml += '</tbody></table></div>';
+        return tableHtml;
+      });
+
+      // 4. Blockquotes (> ...)
+      text = text.replace(/(?:^|\n)&gt;[ \t]*(.*)/g, '<blockquote style="border-left:3px solid var(--accent-primary); margin:8px 0; padding:6px 12px; background:var(--bg-surface-subtle); border-radius:0 6px 6px 0; font-size:12.5px; color:var(--text-secondary); font-style:italic;">$1</blockquote>');
+
+      // 5. Horizontal rules (--- or ***)
+      text = text.replace(/(?:^|\n)(?:---|\*\*\*|___)(?=\n|$)/g, '<hr style="border:none; border-top:1px solid var(--border-subtle); margin:12px 0;">');
+
+      // 6. Headings (###, ##, #)
+      text = text.replace(/^### (.*$)/gim, '<strong style="display:block; margin:8px 0 4px; font-size:13.5px; color:var(--text-primary);">$1</strong>');
+      text = text.replace(/^## (.*$)/gim, '<strong style="display:block; margin:10px 0 6px; font-size:14px; color:var(--text-primary); border-bottom:1px solid var(--border-subtle); padding-bottom:3px;">$1</strong>');
+      text = text.replace(/^# (.*$)/gim, '<strong style="display:block; margin:12px 0 6px; font-size:15px; color:var(--text-primary); border-bottom:1px solid var(--border-subtle); padding-bottom:4px;">$1</strong>');
+
+      // 7. Bold & Italic & Inline code
       text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
       text = text.replace(/\*(.*?)\*/g, '<em>$1</em>');
       text = text.replace(/`([^`]+)`/g, '<code style="background:var(--bg-surface-subtle); padding:2px 5px; border-radius:4px; font-family:var(--font-mono); font-size:12px;">$1</code>');
 
-      // Unordered lists
-      text = text.replace(/^\s*[\-\*]\s+(.*)$/gim, '<li style="margin-left:14px;">$1</li>');
+      // 8. Numbered lists
+      text = text.replace(/^\s*(\d+)\.\s+(.*)$/gim, '<div style="margin-left:8px; margin-bottom:4px;"><strong>$1.</strong> $2</div>');
 
-      // Line breaks
+      // 9. Unordered lists
+      text = text.replace(/^\s*[\-\*]\s+(.*)$/gim, '<li style="margin-left:14px; margin-bottom:3px;">$1</li>');
+
+      // 10. Line breaks
       text = text.replace(/\n\n+/g, '<br><br>');
       text = text.replace(/\n/g, '<br>');
+
+      // 11. Restore Code Blocks
+      codeBlocks.forEach((b, idx) => {
+        const placeholder = `___AI_CODE_BLOCK_${idx}___`;
+        const htmlBlock = `<pre class="code-editor-body" style="margin:8px 0; padding:10px; font-size:12px; border-radius:6px; background:#181816; color:#ECEBE8; overflow-x:auto;"><code>${b.code}</code></pre>`;
+        text = text.split(placeholder).join(htmlBlock);
+      });
 
       return text;
     }
@@ -2554,6 +2663,8 @@
       history.scrollTop = history.scrollHeight;
 
       const currentMat = flatMaterials[currentMaterialIndex] || {};
+      const dynamicArea = document.getElementById('material-dynamic-content-area');
+      const activeArticleText = (dynamicArea ? dynamicArea.innerText : '') || currentMat.content_text || currentMat.content || '';
 
       try {
         const res = await fetch('/api/ai/study-assistant/chat', {
@@ -2566,7 +2677,8 @@
             message: text,
             conversation_history: aiConversationHistory,
             course_id: courseData ? courseData.id : null,
-            current_topic: currentMat.title || 'Materi Belajar HTML5'
+            current_topic: currentMat.title || 'Materi Belajar',
+            material_content: activeArticleText.substring(0, 4500)
           })
         });
         const json = await res.json();

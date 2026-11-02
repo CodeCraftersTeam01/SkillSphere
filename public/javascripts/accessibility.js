@@ -214,7 +214,7 @@ window.speak = speak;
    */
   function extractCleanText(element) {
     if (!element) return '';
-    if (element.closest('#a11y-dialog-panel') || element.closest('#a11y-launcher-btn') || element.closest('#a11y-webcam-pip')) {
+    if (element.closest('#a11y-dialog-panel') || element.closest('#a11y-launcher-btn') || element.closest('#a11y-webcam-pip') || element.closest('#a11y-action-dock')) {
       return '';
     }
 
@@ -245,7 +245,7 @@ window.speak = speak;
       const target = e.target;
       if (!target || target.nodeType !== Node.ELEMENT_NODE) return;
 
-      if (target.closest('#a11y-dialog-panel') || target.closest('#a11y-launcher-btn') || target.closest('#a11y-webcam-pip') || target.closest('#a11y-reading-ruler')) {
+      if (target.closest('#a11y-dialog-panel') || target.closest('#a11y-launcher-btn') || target.closest('#a11y-webcam-pip') || target.closest('#a11y-reading-ruler') || target.closest('#a11y-action-dock')) {
         return;
       }
 
@@ -636,6 +636,41 @@ window.speak = speak;
     showToastNotice('<i class="fas fa-crosshairs" style="color:#EA580C;"></i> Posisi Netral Kepala Berhasil Dikalibrasi!');
   }
 
+  let currentHeadActionMode = 'left';
+
+  function setHeadActionMode(mode) {
+    currentHeadActionMode = mode || 'left';
+
+    const dock = document.getElementById('a11y-action-dock');
+    if (dock) {
+      dock.querySelectorAll('.a11y-dock-btn').forEach((btn) => {
+        if (btn.dataset.mode === currentHeadActionMode) {
+          btn.classList.add('active');
+          btn.setAttribute('aria-pressed', 'true');
+        } else {
+          btn.classList.remove('active');
+          btn.setAttribute('aria-pressed', 'false');
+        }
+      });
+    }
+
+    if (headCursorEl) {
+      headCursorEl.classList.remove('mode-right-click', 'mode-scroll', 'mode-paused');
+      const badge = headCursorEl.querySelector('.cursor-mode-badge');
+
+      if (currentHeadActionMode === 'right') {
+        headCursorEl.classList.add('mode-right-click');
+        if (badge) badge.textContent = 'Klik Kanan (1x)';
+      } else if (currentHeadActionMode === 'scroll') {
+        headCursorEl.classList.add('mode-scroll');
+        if (badge) badge.textContent = 'Mode Scroll';
+      } else if (currentHeadActionMode === 'pause') {
+        headCursorEl.classList.add('mode-paused');
+        if (badge) badge.textContent = 'Jeda Dwell';
+      }
+    }
+  }
+
   async function startHeadTracking() {
     if (headTrackStream) return;
 
@@ -656,6 +691,9 @@ window.speak = speak;
 
       pip.style.display = 'flex';
       headCursorEl.style.display = 'block';
+
+      const actionDock = document.getElementById('a11y-action-dock');
+      if (actionDock) actionDock.style.display = 'flex';
 
       showToastNotice('<i class="fas fa-robot" style="color:#EA580C;"></i> ML Head Tracking Aktif! Menoleh ke sudut layar untuk mengarahkan kursor.');
 
@@ -850,6 +888,10 @@ window.speak = speak;
 
     const pip = document.getElementById('a11y-webcam-pip');
     if (pip) pip.style.display = 'none';
+
+    const actionDock = document.getElementById('a11y-action-dock');
+    if (actionDock) actionDock.style.display = 'none';
+    setHeadActionMode('left');
 
     if (headCursorEl) {
       headCursorEl.style.display = 'none';
@@ -1240,11 +1282,25 @@ window.speak = speak;
       return;
     }
 
-    // Check if target is clickable or interactive container
-    const clickable = el.closest('button, a, input, select, [role="button"], label, .btn, .card, .account-item-card');
+    // Auto-Scroll when in scroll mode and cursor moves toward viewport edges (excluding dock)
+    const isOverDock = Boolean(el.closest('#a11y-action-dock'));
+    if (currentHeadActionMode === 'scroll' && !isOverDock) {
+      if (y < window.innerHeight * 0.20) {
+        window.scrollBy({ top: -16, behavior: 'auto' });
+      } else if (y > window.innerHeight * 0.80) {
+        window.scrollBy({ top: 16, behavior: 'auto' });
+      }
+    }
 
-    // Also trigger hover TTS if Hover Reader is on
-    if (prefs.hoverSpeak && el !== currentHoveredElement) {
+    // Identify clickable target (dock button always clickable, page clickable ignored if paused)
+    const dockBtn = el.closest('.a11y-dock-btn');
+    const pageClickable = (currentHeadActionMode !== 'pause')
+      ? el.closest('button, a, input, select, [role="button"], label, .btn, .card, .account-item-card')
+      : null;
+    const clickable = dockBtn || pageClickable;
+
+    // Trigger hover TTS if Hover Reader is on and not hovering over dock
+    if (prefs.hoverSpeak && !isOverDock && el !== currentHoveredElement) {
       const text = extractCleanText(el);
       if (text && text.length > 2) {
         if (currentHoveredElement) currentHoveredElement.classList.remove('a11y-hover-speaking-element');
@@ -1259,6 +1315,8 @@ window.speak = speak;
     }
 
     if (clickable) {
+      const targetDuration = dockBtn ? 750 : DWELL_CLICK_DURATION;
+
       if (dwellTarget !== clickable) {
         if (dwellTarget) dwellTarget.classList.remove('a11y-dwell-active-target');
         dwellTarget = clickable;
@@ -1267,18 +1325,48 @@ window.speak = speak;
         if (ring) ring.style.strokeDashoffset = '100';
       } else {
         const elapsed = Date.now() - dwellStartTime;
-        const progress = Math.min(1, elapsed / DWELL_CLICK_DURATION);
+        const progress = Math.min(1, elapsed / targetDuration);
         if (ring) {
           ring.style.strokeDashoffset = (100 - progress * 100).toString();
         }
 
-        if (elapsed >= DWELL_CLICK_DURATION) {
-          // Trigger click
-          clickable.click();
-          clickable.focus();
-          showToastNotice('<i class="fas fa-hand-pointer" style="color:#EA580C;"></i> Klik Terpicu!');
-          dwellStartTime = Date.now() + 800; // Reset with cooldown
-          if (ring) ring.style.strokeDashoffset = '100';
+        if (elapsed >= targetDuration) {
+          if (dockBtn) {
+            const targetMode = dockBtn.dataset.mode;
+            setHeadActionMode(targetMode);
+            const modeLabel = dockBtn.textContent.trim();
+            showToastNotice(`<i class="fas fa-check-circle" style="color:#10B981;"></i> Mode Kursor: <strong>${modeLabel}</strong>`);
+            dwellStartTime = Date.now() + 800; // Reset with cooldown
+            if (ring) ring.style.strokeDashoffset = '100';
+          } else {
+            if (currentHeadActionMode === 'right') {
+              const rect = clickable.getBoundingClientRect();
+              const clickX = Math.round(Math.max(rect.left + 5, Math.min(rect.right - 5, x)));
+              const clickY = Math.round(Math.max(rect.top + 5, Math.min(rect.bottom - 5, y)));
+
+              const contextMenuEvt = new MouseEvent('contextmenu', {
+                bubbles: true,
+                cancelable: true,
+                view: window,
+                button: 2,
+                buttons: 2,
+                clientX: clickX,
+                clientY: clickY
+              });
+              clickable.dispatchEvent(contextMenuEvt);
+              clickable.focus();
+              showToastNotice('<i class="fas fa-hand-pointer" style="color:#4F46E5;"></i> Klik Kanan Terpicu!');
+              setHeadActionMode('left');
+              dwellStartTime = Date.now() + 800;
+              if (ring) ring.style.strokeDashoffset = '100';
+            } else {
+              clickable.click();
+              clickable.focus();
+              showToastNotice('<i class="fas fa-mouse-pointer" style="color:#EA580C;"></i> Klik Terpicu!');
+              dwellStartTime = Date.now() + 800; // Reset with cooldown
+              if (ring) ring.style.strokeDashoffset = '100';
+            }
+          }
         }
       }
     } else {
@@ -1352,8 +1440,42 @@ window.speak = speak;
         <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="rgba(234, 88, 12, 0.2)" stroke-width="3" />
         <circle cx="18" cy="18" r="15.9155" />
       </svg>
+      <span class="cursor-mode-badge">Klik Kanan</span>
     `;
     document.body.appendChild(headCursor);
+
+    // 2b. Assistive Action Dock (Mode Selector for Motor Impairment)
+    const actionDock = document.createElement('div');
+    actionDock.id = 'a11y-action-dock';
+    actionDock.setAttribute('role', 'toolbar');
+    actionDock.setAttribute('aria-label', 'Mode Aksi Kursor Pelacak Kepala');
+    actionDock.innerHTML = `
+      <button type="button" class="a11y-dock-btn active" data-mode="left" aria-pressed="true" title="Klik Kiri Normal">
+        <i class="fas fa-mouse-pointer" aria-hidden="true"></i>
+        <span>Kiri</span>
+      </button>
+      <button type="button" class="a11y-dock-btn mode-right" data-mode="right" aria-pressed="false" title="Klik Kanan (Konteks Menu)">
+        <i class="fas fa-hand-pointer" aria-hidden="true"></i>
+        <span>Kanan</span>
+      </button>
+      <button type="button" class="a11y-dock-btn mode-scroll" data-mode="scroll" aria-pressed="false" title="Mode Gulir Halaman">
+        <i class="fas fa-arrows-alt-v" aria-hidden="true"></i>
+        <span>Scroll</span>
+      </button>
+      <button type="button" class="a11y-dock-btn mode-pause" data-mode="pause" aria-pressed="false" title="Jeda Dwell Klik">
+        <i class="fas fa-pause" aria-hidden="true"></i>
+        <span>Jeda</span>
+      </button>
+    `;
+    document.body.appendChild(actionDock);
+
+    actionDock.addEventListener('click', (e) => {
+      const btn = e.target.closest('.a11y-dock-btn');
+      if (btn && btn.dataset.mode) {
+        setHeadActionMode(btn.dataset.mode);
+        showToastNotice(`<i class="fas fa-check-circle" style="color:#10B981;"></i> Mode Kursor: <strong>${btn.textContent.trim()}</strong>`);
+      }
+    });
 
     // 3. Mini Webcam PiP with Live 3D Mesh Overlay Canvas (Clean Unobstructed View)
     const pip = document.createElement('div');

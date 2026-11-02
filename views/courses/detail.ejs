@@ -1115,8 +1115,18 @@
     let currentCourse = null;
     let firstPreviewUrl = '';
 
+    function getAuthToken() {
+      const t = localStorage.getItem('skillsphere_access_token') || localStorage.getItem('accessToken') || localStorage.getItem('token');
+      if (t) {
+        if (!localStorage.getItem('skillsphere_access_token')) localStorage.setItem('skillsphere_access_token', t);
+        if (!localStorage.getItem('accessToken')) localStorage.setItem('accessToken', t);
+        if (!localStorage.getItem('token')) localStorage.setItem('token', t);
+      }
+      return t;
+    }
+
     // Check Auth Token
-    const token = localStorage.getItem('skillsphere_access_token') || localStorage.getItem('access_token');
+    const token = getAuthToken();
     const authBtn = document.getElementById('nav-auth-btn');
     if (token && authBtn) {
       authBtn.textContent = 'Dashboard';
@@ -1396,7 +1406,7 @@
 
     // Enroll Action
     async function handleEnrollCourse() {
-      const activeToken = localStorage.getItem('skillsphere_access_token') || localStorage.getItem('access_token');
+      const activeToken = getAuthToken();
       if (!activeToken) {
         await showCustomAlert({
           title: 'Perlu Masuk Akun',

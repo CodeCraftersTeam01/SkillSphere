@@ -38,9 +38,18 @@ async function createSnapTransaction({ orderId, grossAmount, customerDetails, it
       quantity: 1,
       name: 'Pendaftaran Kursus SkillSphere',
     }],
-    credit_card: {
-      secure: true,
-    },
+    // Pembatasan metode pembayaran resmi Midtrans: Khusus QRIS dan Transfer Bank / Virtual Account
+    enabled_payments: [
+      'qris',
+      'bank_transfer',
+      'bca_va',
+      'bni_va',
+      'bri_va',
+      'permata_va',
+      'cimb_va',
+      'other_va',
+      'echannel',
+    ],
     callbacks: {
       finish: `${process.env.APP_URL || 'http://localhost:3000'}/dashboard/transactions?status=finish`,
     },

@@ -3,7 +3,7 @@ const http = require('http');
 
 const AI_API_BASE_URL = process.env.AI_API_BASE_URL || 'https://pi.leopard-gila.ts.net/v1';
 const AI_API_KEY = process.env.AI_API_KEY || process.env.GEMINI_API_KEY || '';
-const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-1.5-flash';
+const GEMINI_MODEL = process.env.GEMINI_MODEL || 'orion';
 
 /**
  * Universal LLM caller: Supports OpenAI-compatible API endpoints (Orion/Gemini proxy)
@@ -14,80 +14,93 @@ async function callGeminiAPI(prompt, systemInstruction = null, temperature = 0.7
     return null; // Signals fallback mode
   }
 
+  // Candidate models with resilient fallback priority
+  const candidateModels = Array.from(new Set([
+    GEMINI_MODEL,
+    'orion',
+    'orion-auto'
+  ])).filter(Boolean);
+
   // 1. Check if using OpenAI-compatible proxy (e.g., https://pi.leopard-gila.ts.net/v1)
   if (AI_API_BASE_URL.includes('/v1') || AI_API_BASE_URL.includes('http')) {
-    try {
-      const endpoint = AI_API_BASE_URL.endsWith('/chat/completions') 
-        ? AI_API_BASE_URL 
-        : `${AI_API_BASE_URL.replace(/\/+$/, '')}/chat/completions`;
+    const endpoint = AI_API_BASE_URL.endsWith('/chat/completions') 
+      ? AI_API_BASE_URL 
+      : `${AI_API_BASE_URL.replace(/\/+$/, '')}/chat/completions`;
 
-      const messages = [];
-      if (systemInstruction) {
-        messages.push({ role: 'system', content: systemInstruction });
-      }
-      messages.push({ role: 'user', content: prompt });
+    const messages = [];
+    if (systemInstruction) {
+      messages.push({ role: 'system', content: systemInstruction });
+    }
+    messages.push({ role: 'user', content: prompt });
 
-      const payload = JSON.stringify({
-        model: GEMINI_MODEL,
-        messages,
-        temperature,
-        max_tokens: 2048,
-      });
+    for (const modelToTry of candidateModels) {
+      try {
+        const payload = JSON.stringify({
+          model: modelToTry,
+          messages,
+          temperature,
+          max_tokens: 2048,
+        });
 
-      return await new Promise((resolve) => {
-        const url = new URL(endpoint);
-        const isHttps = url.protocol === 'https:';
-        const client = isHttps ? https : http;
+        const reply = await new Promise((resolve) => {
+          const url = new URL(endpoint);
+          const isHttps = url.protocol === 'https:';
+          const client = isHttps ? https : http;
 
-        const options = {
-          method: 'POST',
-          hostname: url.hostname,
-          port: url.port || (isHttps ? 443 : 80),
-          path: url.pathname + url.search,
-          headers: {
-            'Authorization': `Bearer ${AI_API_KEY}`,
-            'Content-Type': 'application/json',
-            'Content-Length': Buffer.byteLength(payload),
-          },
-          timeout: 15000,
-        };
+          const options = {
+            method: 'POST',
+            hostname: url.hostname,
+            port: url.port || (isHttps ? 443 : 80),
+            path: url.pathname + url.search,
+            headers: {
+              'Authorization': `Bearer ${AI_API_KEY}`,
+              'Content-Type': 'application/json',
+              'Content-Length': Buffer.byteLength(payload),
+            },
+            timeout: 5000,
+          };
 
-        const req = client.request(options, (res) => {
-          let data = '';
-          res.on('data', (chunk) => { data += chunk; });
-          res.on('end', () => {
-            try {
-              if (res.statusCode >= 200 && res.statusCode < 300) {
-                const parsed = JSON.parse(data);
-                const content = parsed?.choices?.[0]?.message?.content;
-                resolve(content || null);
-              } else {
-                console.warn(`[AI API] HTTP ${res.statusCode}:`, data);
+          const req = client.request(options, (res) => {
+            let data = '';
+            res.on('data', (chunk) => { data += chunk; });
+            res.on('end', () => {
+              try {
+                if (res.statusCode >= 200 && res.statusCode < 300) {
+                  const parsed = JSON.parse(data);
+                  const content = parsed?.choices?.[0]?.message?.content;
+                  resolve(content || null);
+                } else {
+                  console.warn(`[AI API] Model ${modelToTry} returned HTTP ${res.statusCode}:`, data.substring(0, 150));
+                  resolve(null);
+                }
+              } catch (err) {
+                console.warn(`[AI API] Model ${modelToTry} parse error:`, err.message);
                 resolve(null);
               }
-            } catch (err) {
-              console.warn('[AI API] Parse error:', err.message);
-              resolve(null);
-            }
+            });
           });
+
+          req.on('error', (err) => {
+            console.warn(`[AI API] Model ${modelToTry} request error:`, err.message);
+            resolve(null);
+          });
+
+          req.on('timeout', () => {
+            req.destroy();
+            console.warn(`[AI API] Model ${modelToTry} timed out.`);
+            resolve(null);
+          });
+
+          req.write(payload);
+          req.end();
         });
 
-        req.on('error', (err) => {
-          console.warn('[AI API] Request error:', err.message);
-          resolve(null);
-        });
-
-        req.on('timeout', () => {
-          req.destroy();
-          console.warn('[AI API] Request timed out.');
-          resolve(null);
-        });
-
-        req.write(payload);
-        req.end();
-      });
-    } catch (e) {
-      console.warn('[AI API] Client error:', e.message);
+        if (reply && reply.trim().length > 0) {
+          return reply;
+        }
+      } catch (err) {
+        console.warn(`[AI API] Candidate model ${modelToTry} failed:`, err.message);
+      }
     }
   }
 
@@ -254,30 +267,41 @@ Format JSON yang wajib dihasilkan:
 }
 
 /**
- * 2. AI Study Assistant Chat - Orion (AI Learning Partner with Socratic Scaffolding)
+ * 2. AI Study Assistant Chat - Orion (AI Learning Partner: Human-like, On-Point, Helpful)
  */
 async function chatStudyAssistant({ message, conversationHistory = [], courseContext = null, studentName = 'Pelajar' }) {
   const currentTopic = (courseContext && (courseContext.currentTopic || courseContext.currentSection)) || 'Materi Belajar';
-  const systemPrompt = `Anda adalah "Orion", partner belajar AI (AI Learning Partner & Socratic Study Companion) di platform SkillSphere AI.
+  const materialSnippet = (courseContext && courseContext.materialContent)
+    ? `\nKONTEN RESMI DARI MODUL YANG SEDANG DIBACA SISWA (SUMBER KEBENARAN UTAMA):\n"""\n${courseContext.materialContent.substring(0, 4500)}\n"""\n`
+    : '';
 
-Peran & Karakteristik Orion:
-- Nama Anda adalah Orion. Bersikaplah seperti partner belajar dan mentor yang bersahabat, cerdas, suportif, dan interaktif.
-- Tujuan Anda adalah membantu siswa benar-benar memahami konsep secara mendalam, bukan sekadar memberikan contekan instan.
+  const systemPrompt = `Anda adalah "Orion", partner belajar AI cerdas, ramah, manusiawi, dan on-point di platform SkillSphere AI.
 
-Aturan Utama Bimbingan Bertahap (Scaffolding & Socratic Method):
-1. JANGAN LANGSUNG MEMBERIKAN SEMUA JAWABAN LENGKAP ATAU DUMP KODE SECARA SEKALIGUS.
-2. Berikan penjelasan secara bertahap (step-by-step):
-   - Mulai dengan intuisi atau konsep dasar 1 langkah pertama secara ringkas dan mudah dipahami.
-   - Berikan 1 potongan petunjuk (clue) atau contoh analogi awal.
-   - Akhiri selalu dengan pertanyaan pemantik atau ajakan reflektif, misalnya: "Bagaimana menurutmu tentang bagian ini?", "Sudah siap kita lanjut ke langkah berikutnya?", atau "Coba kamu tebak apa fungsi dari atribut tersebut sebelum saya jelaskan?"
-3. Jika siswa menyapa (seperti "hello", "halo", "hai", "pagi"):
-   - Balas dengan hangat dan ramah sebagai Orion.
-   - Sebutkan materi/topik yang sedang dibuka ("${currentTopic}").
-   - Tanyakan apa hal pertama yang ingin kita bedah bersama.
-4. Gaya Bahasa:
-   - Gunakan Bahasa Indonesia yang natural, mengalir, dan memotivasi.
-   - Dilarang menggunakan tanda em dash (—), gunakan tanda hubung biasa (-) atau titik dua (:).
-${courseContext ? `\nKonteks Kursus Aktif:\nJudul Kursus: ${courseContext.title || 'Kursus'}\nDeskripsi: ${courseContext.description || '-'}\nModul/Topik Saat Ini: ${currentTopic}` : ''}`;
+PRINSIP WAJIB JAWABAN ORION:
+1. SUMBER KEBENARAN UTAMA (GROUND TRUTH):
+   - Jika teks "KONTEN RESMI DARI MODUL YANG SEDANG DIBACA SISWA" tersedia di bawah, JADIKAN MATERI TERSEBUT SEBAGAI ACUAN UTAMA & WAJIB SESUAI DENGAN MODUL TERSEBUT.
+   - Gunakan istilah, definisi, poin-poin penting, rumus, atau analogi yang SAMA PERSIS dengan materi yang tertulis di modul tersebut.
+   - Contoh nyata: Jika materi modul menyebutkan:
+     "4. Tiga Syarat Basis Data Normal yang Ideal:
+     1. Lossless-Join Decomposition (Dekomposisi Tanpa Kehilangan Informasi)
+     2. Dependency Preservation (Pemeliharaan Ketergantungan Fungsional)
+     3. Memenuhi Bentuk Normal Minimum (Minimal 3NF / BCNF)"
+     maka ketika siswa bertanya mengenai "Tiga Syarat Basis Data Normal yang Ideal", Anda WAJIB menjawab dengan 3 syarat tersebut persis seperti yang tertulis di modul, lalu jelaskan maksud masing-masing syarat secara gamblang!
+   - Jangan gunakan versi buku/sumber lain yang bertolak belakang dengan modul yang sedang dipelajari siswa.
+
+2. JAWAB LANGSUNG ON-POINT & TUNTAS:
+   - Jawab langsung inti pertanyaan tanpa berbelit-belit atau menunda jawaban.
+   - DILARANG melempar balik pertanyaan pemantik atau menolak menjawab.
+
+3. HUMAN-LIKE & BERSAHABAT:
+   - Berbahasa santai, hangat, dan komunikatif seperti mentor atau senior programmer yang asyik.
+   - DILARANG menggunakan pembuka kaku seperti "Saya menangkap pertanyaan Anda...".
+
+4. FORMATTING MARKDOWN RAPI (TABEL & LIST):
+   - Gunakan format tabel Markdown (| Header 1 | Header 2 |) jika menjelaskan perbandingan atau ringkasan, blockquote (> ...) untuk analogi/tips, dan list teratur (1, 2, 3) agar visualnya nyaman dibaca.
+   - Dilarang keras menggunakan tanda em dash (—). Gunakan tanda hubung biasa (-) atau titik dua (:).
+
+${courseContext ? `Konteks Kelas:\n- Kursus: ${courseContext.title || 'Kursus'}\n- Modul Aktif: ${currentTopic}${materialSnippet}` : ''}`;
 
   let prompt = '';
   if (Array.isArray(conversationHistory) && conversationHistory.length > 0) {
@@ -762,63 +786,118 @@ function buildAdaptiveRoadmapFallback(targetRole, currentSkills) {
 
 function generateStudyAssistantFallback(message, courseContext) {
   const msgLower = (message || '').toLowerCase().trim();
-  const currentTopic = (courseContext && (courseContext.currentTopic || courseContext.currentSection)) || 'HTML5 & Modern Web Development';
+  const currentTopic = (courseContext && (courseContext.currentTopic || courseContext.currentSection)) || 'Materi Pembelajaran';
 
-  // Greeting handling
-  if (msgLower === 'hello' || msgLower === 'halo' || msgLower === 'hai' || msgLower === 'pagi' || msgLower === 'siang' || msgLower === 'sore' || msgLower === 'malam' || msgLower === 'hi') {
-    return `Halo! Saya **Orion**, partner belajar AI Anda. 
+  // Sapaan / Greeting
+  if (['hello', 'halo', 'hai', 'pagi', 'siang', 'sore', 'malam', 'hi'].includes(msgLower)) {
+    return `Halo! Saya **Orion**, partner belajar AI Anda di SkillSphere.
 
-Saat ini kita sedang membuka modul: **${currentTopic}**. 
-
-Saya di sini untuk menemani dan memandu proses pemahaman Anda langkah demi langkah. Bagian mana yang ingin kita pelajari atau diskusikan bersama terlebih dahulu?`;
+Saat ini Anda sedang mempelajari topik **${currentTopic}**. Ada konsep, baris kode, atau bagian teori tertentu yang ingin kita bahas bersama? Tanyakan saja langsung!`;
   }
 
-  // HTML / DOM / Tag Questions (Scaffolded Step 1)
+  // Tiga Syarat Basis Data Normal / Kriteria Emas
+  if (
+    msgLower.includes('tiga syarat') || 
+    msgLower.includes('3 syarat') || 
+    msgLower.includes('syarat basis data') || 
+    msgLower.includes('kriteria emas') ||
+    (msgLower.includes('syarat') && msgLower.includes('normal'))
+  ) {
+    return `Berdasarkan materi pada modul ini, sebuah proses dekomposisi tabel dikatakan berhasil dan normal apabila memenuhi **tiga kriteria emas**:
+
+1. **Lossless-Join Decomposition (Dekomposisi Tanpa Kehilangan Informasi):**
+   Setelah tabel besar dipecah menjadi beberapa tabel kecil, tabel-tabel tersebut harus bisa digabungkan kembali (*JOIN*) menggunakan foreign key dan menghasilkan data awal yang sama persis tanpa ada baris data silang fiktif (*spurious tuples*).
+
+2. **Dependency Preservation (Pemeliharaan Ketergantungan Fungsional):**
+   Seluruh relasi ketergantungan antar-atribut tetap dapat ditegakkan tanpa harus melakukan join antar semua tabel setiap saat.
+
+3. **Memenuhi Bentuk Normal Minimum (Minimal 3NF / BCNF):**
+   Tabel tidak melanggar kriteria Bentuk Normal Ketiga (3NF) atau Boyce-Codd Normal Form (BCNF).
+
+| Kriteria Emas | Tujuan Utama | Dampak Jika Gagal |
+|---|---|---|
+| Lossless-Join | Menjaga keutuhan data saat JOIN | Muncul data fiktif / spurious tuples |
+| Dependency Preservation | Menjaga aturan fungsionalitas kolom | Query verifikasi jadi sangat lambat |
+| Minimal 3NF / BCNF | Mengeliminasi redundansi data | Terjadi anomali insert, update, delete |
+
+Ketiga syarat inilah yang menjadi fondasi utama dalam perancangan skema relasional yang tangguh. Ada bagian dari 3 syarat ini yang ingin kita simulasikan dengan contoh tabel?`;
+  }
+
+  // Definisi & Konsep Normalisasi Data
+  if (
+    msgLower.includes('normalisasi') || 
+    msgLower.includes('definisi normalisasi') || 
+    msgLower.includes('konsep normalisasi') ||
+    (msgLower.includes('definisi') && msgLower.includes('basis data'))
+  ) {
+    return `**Normalisasi Data** adalah teknik perancangan logis basis data relasional (*relational database design*) untuk mengelompokkan atribut-atribut ke dalam entitas tabel yang terstruktur, efisien, dan bebas dari kerangkapan data (*redundancy*).
+
+### Konsep Inti Normalisasi:
+1. **Eliminasi Redundansi Data:** Mencegah informasi yang sama dicatat berulang kali di baris berbeda, sehingga menghemat kapasitas penyimpanan.
+2. **Mitigasi 3 Anomali Database:**
+   - **Anomali Penyisipan (Insert Anomaly):** Ketidakmampuan memasukkan data baru sebelum data entitas lain tersedia.
+   - **Anomali Pembaruan (Update Anomaly):** Inkonsistensi data ketika pembaruan di satu baris tidak ter-update di baris lain.
+   - **Anomali Penghapusan (Delete Anomaly):** Kehilangan data penting lain yang tidak disengaja saat menghapus satu baris catatan.
+3. **Pemisahan Entitas Sesuai Tanggung Jawab:** Memecah tabel universal menjadi tabel spesifik (misalnya memisahkan data Mahasiswa, Dosen, dan Mata Kuliah) lalu menghubungkannya menggunakan *Foreign Key*.
+
+Hasil akhirnya adalah skema basis data yang fleksibel, aman dari inkonsistensi, dan siap menangani query berkecepatan tinggi. Mau kita bahas contoh kasus anomalinya lebih dalam?`;
+  }
+
+  // Anomali Database
+  if (msgLower.includes('anomali') || msgLower.includes('anomaly')) {
+    return `Dalam perancangan basis data, terdapat tiga jenis anomali yang harus dihindari melalui normalisasi:
+
+1. **Insert Anomaly (Anomali Penyisipan):**
+   Terjadi ketika kita tidak dapat menambahkan informasi baru tanpa harus mengisi atribut lain yang belum relevan. Misalnya, tidak bisa mendaftarkan data mata kuliah baru sebelum ada mahasiswa yang mengambilnya.
+
+2. **Update Anomaly (Anomali Pembaruan):**
+   Terjadi saat data yang terduplikasi diubah di satu baris, namun baris lainnya terlewat. Akibatnya, database memiliki nilai yang bertolak belakang (*inconsistent state*) untuk data yang sama.
+
+3. **Delete Anomaly (Anomali Penghapusan):**
+   Terjadi ketika penghapusan suatu baris informasi secara tidak sengaja ikut melenyapkan informasi berharga lainnya. Misalnya, saat mahasiswa terakhir yang mengambil kelas dibatalkan, data dosen dan ruang kelas tersebut ikut terhapus dari sistem.
+
+Solusinya adalah melakukan dekomposisi tabel menjadi bentuk 1NF, 2NF, dan 3NF. Ada yang ingin Anda diskusikan mengenai langkah pencegahannya?`;
+  }
+
+  // Functional Dependency / 1NF, 2NF, 3NF, BCNF
+  if (msgLower.includes('1nf') || msgLower.includes('2nf') || msgLower.includes('3nf') || msgLower.includes('bcnf') || msgLower.includes('functional dependency')) {
+    return `Tahapan normalisasi basis data berjalan bertingkat:
+
+- **1NF (First Normal Form):** Setiap kolom wajib memiliki nilai atomik (nilai tunggal yang tidak bisa dipecah lagi), dan tidak ada kelompok data berulang (*repeating groups*).
+- **2NF (Second Normal Form):** Memenuhi 1NF dan tidak memiliki ketergantungan parsial (*partial dependency*). Semua atribut non-kunci harus bergantung pada seluruh bagian *primary key*.
+- **3NF (Third Normal Form):** Memenuhi 2NF dan bebas dari ketergantungan transitif (*transitive dependency*). Atribut non-kunci tidak boleh bergantung pada atribut non-kunci lainnya.
+- **BCNF (Boyce-Codd Normal Form):** Bentuk yang lebih ketat dari 3NF, di mana untuk setiap ketergantungan fungsional $X \\rightarrow Y$, $X$ wajib merupakan *super key*.
+
+Apakah Anda ingin melihat contoh konversi tabel dari data mentah hingga menjadi 3NF?`;
+  }
+
+  // HTML / DOM / Frontend
   if (msgLower.includes('html') || msgLower.includes('dom') || msgLower.includes('tag') || msgLower.includes('struktur')) {
-    return `Pertanyaan yang bagus tentang **${currentTopic}**! Mari kita bedah konsepnya secara bertahap:
+    return `Di pengembangan web modern, **HTML5** berfungsi sebagai pondasi struktur konten semantik:
 
-**Langkah 1: Intuisi Dasar**
-Bayangkan HTML seperti kerangka tulang sebuah bangunan. Sebelum kita memberi cat (CSS) atau memasang instalasi listrik interaktif (JavaScript), kita butuh pondasi struktur yang kokoh terlebih dahulu.
+- Tag induk seperti \`<!DOCTYPE html>\`, \`<html lang="id">\`, \`<head>\`, dan \`<body>\` menjamin peramban merender halaman dalam mode standar (bukan *quirks mode*).
+- Elemen semantik (\`<header>\`, \`<nav>\`, \`<main>\`, \`<article>\`, \`<aside>\`, \`<footer>\`) memberikan makna kontekstual yang ramah mesin pencari (SEO) dan pembaca layar (*screen reader* aksesibilitas).
 
-Elemen paling dasar yang wajib ada di setiap dokumen HTML5 adalah deklarasi \`<!DOCTYPE html>\` dan tag induk \`<html>\`.
-
-*Petunjuk Pemantik:*
-Kira-kira apa yang terjadi jika kita tidak menyertakan \`<!DOCTYPE html>\` di awal dokumen? Coba tebak, atau ketik *"lanjut"* jika ingin kita bahas bersama langkah berikutnya!`;
+Ada elemen HTML atau manipulasi DOM JavaScript tertentu yang ingin Anda tanyakan implementasinya?`;
   }
 
-  // JWT / Auth Questions
+  // JWT / Auth
   if (msgLower.includes('jwt') || msgLower.includes('token') || msgLower.includes('auth')) {
-    return `Topik otentikasi sangat penting. Mari kita pahami dari intinya terlebih dahulu:
+    return `Otentikasi modern di aplikasi web umumnya memanfaatkan **JSON Web Token (JWT)**:
 
-**Tahap 1: Konsep Dasar Token**
-JSON Web Token (JWT) ibarat kartu akses digital dengan tanda tangan resmi yang tidak bisa dipalsukan. Kartu ini memuat informasi identitas pengguna (*payload*) dan masa berlaku.
+1. **Access Token:** Memiliki masa berlaku singkat (misal 24 jam) untuk mengotorisasi request ke rute terlindungi via header \`Authorization: Bearer <token>\`.
+2. **Refresh Token:** Memiliki masa aktif lebih panjang (misal 7 hari) dan disimpan aman untuk meminta Access Token baru tanpa memaksa pengguna login ulang.
+3. **Struktur JWT:** Terdiri dari 3 bagian yang dipisahkan titik: Header (algoritma), Payload (klaim user ID/role), dan Signature (validasi integritas dengan secret key).
 
-Di SkillSphere, kami memisahkan token menjadi 2:
-1. **Access Token**: Masa aktif singkat (24 jam) untuk mengakses data aman.
-2. **Refresh Token**: Masa aktif panjang (7 hari) untuk memperbarui sesi.
-
-Apakah peran Access Token ini sudah cukup jelas, atau ingin kita simulasikan bagaimana aliran datanya saat pengguna mengakses endpoint rahasia?`;
+Ada alur verifikasi token atau implementasi middleware di Express yang ingin kita bahas bersama?`;
   }
 
-  // Split Revenue / Business Rules
-  if (msgLower.includes('split') || msgLower.includes('revenue') || msgLower.includes('20%') || msgLower.includes('80%')) {
-    return `Tentang pembagian hasil kursus di platform:
+  // Default response jika tidak cocok keyword spesifik
+  return `Terkait pertanyaan Anda mengenai materi **${currentTopic}**:
 
-**Skema Transparan 20% / 80%:**
-- **20% Biaya Platform**: Digunakan untuk pemeliharaan server, integrasi LLM AI Orion, dan operasional.
-- **80% Pendapatan Bersih**: Langsung dialokasikan ke Virtual Wallet Tutor (\`TutorWallet\`).
+Secara prinsip, konsep ini dirancang untuk menyelesaikan tantangan teknis nyata dalam arsitektur sistem perangkat lunak, baik dari sisi efisiensi data, kebersihan struktur logika, maupun skalabilitas jangka panjang.
 
-Terdapat masa holding selama 7 hari sebelum saldo siap dicairkan (minimal penarikan Rp 100.000). Apakah Anda ingin mengetahui alur penarikan dananya secara lebih detail?`;
-  }
-
-  // General Socratic / Scaffolding Response
-  return `Saya menangkap pertanyaan Anda mengenai **"${message}"** pada modul **${currentTopic}**.
-
-Mari kita mulai dengan satu konsep kunci terlebih dahulu:
-1. Setiap fitur atau konsep pemrograman selalu berangkat dari masalah nyata yang ingin dipecahkan.
-2. Coba kita refleksikan: menurut pemahaman Anda saat ini, tujuan utama dari konsep tersebut apa?
-
-Berikan jawaban atau dugaan awal Anda, dan saya (Orion) akan memandu Anda menyempurnakannya langkah demi langkah!`;
+Bagian mana yang paling menarik atau ingin Anda ulas lebih mendalam? Saya siap mendampingi Anda membedah kode, analogi, maupun langkah implementasinya!`;
 }
 
 function buildQuizFallback(topic, numberOfQuestions, difficulty) {

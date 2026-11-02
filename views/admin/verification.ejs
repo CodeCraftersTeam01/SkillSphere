@@ -4298,7 +4298,7 @@
     async function handleApproveWithdrawal(id) {
       if (!confirm('Apakah Anda yakin ingin menyetujui penarikan dana ini dan menandai transfer telah selesai?')) return;
       try {
-        const token = localStorage.getItem('token') || localStorage.getItem('accessToken');
+        const token = localStorage.getItem('skillsphere_access_token') || localStorage.getItem('token') || localStorage.getItem('accessToken');
         const res = await fetch(`/api/admin/withdrawals/${id}/approve`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
@@ -4320,7 +4320,7 @@
       const reason = prompt('Masukkan alasan penolakan penarikan dana (saldo akan dikembalikan ke dompet tutor):');
       if (reason === null) return;
       try {
-        const token = localStorage.getItem('token') || localStorage.getItem('accessToken');
+        const token = localStorage.getItem('skillsphere_access_token') || localStorage.getItem('token') || localStorage.getItem('accessToken');
         const res = await fetch(`/api/admin/withdrawals/${id}/reject`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },

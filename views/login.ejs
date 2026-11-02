@@ -1051,8 +1051,13 @@
 
         // 2. Case B: Successful Login
         if (response.ok && result.success) {
-          localStorage.setItem('skillsphere_access_token', result.data.accessToken);
-          localStorage.setItem('skillsphere_refresh_token', result.data.refreshToken);
+          const accessToken = result.data.accessToken;
+          const refreshToken = result.data.refreshToken;
+          localStorage.setItem('skillsphere_access_token', accessToken);
+          localStorage.setItem('accessToken', accessToken);
+          localStorage.setItem('token', accessToken);
+          localStorage.setItem('skillsphere_refresh_token', refreshToken);
+          localStorage.setItem('refreshToken', refreshToken);
           localStorage.setItem('skillsphere_user', JSON.stringify(result.data.user));
 
           if (rememberMeCheckbox.checked) {
@@ -1063,13 +1068,20 @@
           const hasCompletedOnboarding = userRole === 'admin' || userRole === 'tutor' || 
             (result.data.user && result.data.user.profile && result.data.user.profile.study_preferences && result.data.user.profile.study_preferences.onboarding_completed);
 
-          let targetUrl = '/dashboard';
+          const urlParams = new URLSearchParams(window.location.search);
+          const redirectParam = urlParams.get('redirect');
+          const safeRedirect = (redirectParam && redirectParam.startsWith('/') && !redirectParam.startsWith('//')) ? redirectParam : null;
+
+          let targetUrl = safeRedirect || '/dashboard';
           if (userRole === 'admin') {
             targetUrl = '/admin';
             showAlert('success', 'Login berhasil! Mengalihkan ke Admin Portal...');
           } else if (userRole === 'tutor') {
-            targetUrl = '/dashboard';
+            targetUrl = safeRedirect || '/dashboard';
             showAlert('success', 'Login berhasil! Menyiapkan Studio Tutor...');
+          } else if (safeRedirect) {
+            targetUrl = safeRedirect;
+            showAlert('success', 'Login berhasil! Mengalihkan kembali ke halaman tujuan...');
           } else if (!hasCompletedOnboarding || result.data.requires_onboarding) {
             targetUrl = '/dashboard/onboarding';
             showAlert('success', 'Login berhasil! Mengalihkan ke formulir personalisasi...');
@@ -1267,8 +1279,13 @@
             if (backLoginBtn) backLoginBtn.style.visibility = 'hidden';
 
             // Save tokens & credentials
-            localStorage.setItem('skillsphere_access_token', result.data.accessToken);
-            localStorage.setItem('skillsphere_refresh_token', result.data.refreshToken);
+            const accessToken = result.data.accessToken;
+            const refreshToken = result.data.refreshToken;
+            localStorage.setItem('skillsphere_access_token', accessToken);
+            localStorage.setItem('accessToken', accessToken);
+            localStorage.setItem('token', accessToken);
+            localStorage.setItem('skillsphere_refresh_token', refreshToken);
+            localStorage.setItem('refreshToken', refreshToken);
             localStorage.setItem('skillsphere_user', JSON.stringify(result.data.user));
 
             saveAccountLocally(result.data.user, activeLoginPassword);
@@ -1277,11 +1294,17 @@
             const hasCompletedOnboarding = userRole === 'admin' || userRole === 'tutor' || 
               (result.data.user && result.data.user.profile && result.data.user.profile.study_preferences && result.data.user.profile.study_preferences.onboarding_completed);
 
-            let targetUrl = '/dashboard';
+            const otpUrlParams = new URLSearchParams(window.location.search);
+            const otpRedirectParam = otpUrlParams.get('redirect');
+            const safeOtpRedirect = (otpRedirectParam && otpRedirectParam.startsWith('/') && !otpRedirectParam.startsWith('//')) ? otpRedirectParam : null;
+
+            let targetUrl = safeOtpRedirect || '/dashboard';
             if (userRole === 'admin') {
               targetUrl = '/admin';
             } else if (userRole === 'tutor') {
-              targetUrl = '/dashboard';
+              targetUrl = safeOtpRedirect || '/dashboard';
+            } else if (safeOtpRedirect) {
+              targetUrl = safeOtpRedirect;
             } else if (!hasCompletedOnboarding || result.data.requires_onboarding) {
               targetUrl = '/dashboard/onboarding';
             }

@@ -281,6 +281,10 @@ async function getTutorWallet(req, res) {
       .filter(t => t.transaction_type === 'credit')
       .reduce((sum, t) => sum + Number(t.amount || 0), 0);
 
+    const totalWithdrawn = withdrawals
+      .filter(w => w.status === 'completed' || w.status === 'approved')
+      .reduce((sum, w) => sum + Number(w.amount || 0), 0);
+
     return res.status(200).json({
       success: true,
       message: 'Data dompet tutor berhasil dimuat.',
@@ -289,12 +293,19 @@ async function getTutorWallet(req, res) {
           id: wallet.id,
           balance: Number(wallet.balance),
           pending_balance: Number(wallet.pending_balance),
+          holding_balance: Number(wallet.pending_balance),
           total_earnings: totalSalesCredit,
           holding_period_days: 7,
           min_withdrawal: WITHDRAWAL_MIN_AMOUNT,
         },
         transactions,
         withdrawals,
+        // Flat aliases for direct access in various view templates
+        balance: Number(wallet.balance),
+        holding_balance: Number(wallet.pending_balance),
+        pending_balance: Number(wallet.pending_balance),
+        withdrawn_total: totalWithdrawn,
+        mutations: transactions,
       },
     });
   } catch (err) {
@@ -314,7 +325,8 @@ async function getTutorWallet(req, res) {
 async function requestWithdrawal(req, res) {
   try {
     const tutorId = req.user.id;
-    const { amount, bank_name, account_number, account_holder_name } = req.body;
+    const { amount, bank_name, account_number, account_holder_name, account_name } = req.body;
+    const finalAccountHolder = (account_holder_name || account_name || '').trim();
 
     const withdrawAmount = Number(amount);
     if (!withdrawAmount || withdrawAmount < WITHDRAWAL_MIN_AMOUNT) {
@@ -324,7 +336,7 @@ async function requestWithdrawal(req, res) {
       });
     }
 
-    if (!bank_name || !account_number || !account_holder_name) {
+    if (!bank_name || !account_number || !finalAccountHolder) {
       return res.status(400).json({
         success: false,
         message: 'Nama bank, nomor rekening, dan nama pemilik rekening wajib diisi.',
@@ -350,7 +362,7 @@ async function requestWithdrawal(req, res) {
       amount: withdrawAmount,
       bank_name: bank_name.trim(),
       account_number: account_number.trim(),
-      account_holder_name: account_holder_name.trim(),
+      account_holder_name: finalAccountHolder,
       status: 'pending',
     });
 

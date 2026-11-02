@@ -1,0 +1,1296 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <title><%= title || 'Portal Penarikan Dana Pengajar | SkillSphere AI' %></title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <link rel="stylesheet" href="/stylesheets/style.css">
+  <link rel="stylesheet" href="/stylesheets/claude-theme.css">
+  <link rel="stylesheet" href="/stylesheets/accessibility.css">
+  <link rel="stylesheet" href="/stylesheets/custom-alert.css">
+  <script src="/javascripts/custom-alert.js"></script>
+
+  <style>
+    :root {
+      --navbar-height: 56px;
+      --sidebar-width: 250px;
+    }
+
+    body {
+      background-color: var(--bg-app);
+      color: var(--text-primary);
+      font-family: var(--font-sans, 'Plus Jakarta Sans', sans-serif);
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Top Sticky Navigation Bar matching Dashboard */
+    .navbar {
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 0 24px;
+      height: var(--navbar-height);
+      min-height: var(--navbar-height);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .nav-main-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      gap: 20px;
+    }
+
+    .nav-brand-group {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .sidebar-toggle-btn {
+      background: transparent;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      color: var(--text-primary);
+      width: 34px;
+      height: 34px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
+
+    .sidebar-toggle-btn:hover {
+      background: var(--bg-surface-subtle);
+    }
+
+    .brand-logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--text-primary);
+      font-weight: 700;
+      font-size: 16px;
+    }
+
+    .brand-icon {
+      width: 24px;
+      height: 24px;
+      color: var(--accent-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .nav-links-menu {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .nav-link-item {
+      padding: 6px 12px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      text-decoration: none;
+      border-radius: var(--radius-full);
+      transition: all 0.15s ease;
+    }
+
+    .nav-link-item:hover {
+      color: var(--text-primary);
+      background: var(--bg-surface-subtle);
+    }
+
+    .nav-link-item.active {
+      color: var(--accent-text);
+      background: var(--accent-primary);
+      font-weight: 600;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .theme-toggle-btn {
+      background: var(--bg-surface-subtle);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+      padding: 6px 12px;
+      border-radius: var(--radius-full);
+      font-size: 12px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+    }
+
+    .user-profile-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 12px 4px 6px;
+      border-radius: var(--radius-full);
+      background: var(--bg-surface-subtle);
+      border: 1px solid var(--border-subtle);
+      cursor: pointer;
+    }
+
+    .user-avatar-sm {
+      width: 26px;
+      height: 26px;
+      border-radius: var(--radius-full);
+      background: var(--accent-primary);
+      color: var(--accent-text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .user-name-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .user-role-tag {
+      font-size: 9px;
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: 2px 6px;
+      border-radius: var(--radius-full);
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+    }
+
+    .logout-btn {
+      background: transparent;
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      padding: 6px 12px;
+      border-radius: var(--radius-full);
+      font-size: 12px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+    }
+
+    /* App Layout Container with Classroom Sidebar */
+    .classroom-app-container {
+      display: flex;
+      flex: 1;
+      min-height: calc(100vh - var(--navbar-height));
+      position: relative;
+    }
+
+    .classroom-left-sidebar {
+      width: var(--sidebar-width);
+      background: var(--bg-surface);
+      border-right: 1px solid var(--border-subtle);
+      flex-shrink: 0;
+      transition: transform 0.25s ease, width 0.25s ease;
+      z-index: 90;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .classroom-sidebar-inner {
+      padding: 16px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      overflow-y: auto;
+      height: 100%;
+    }
+
+    .sidebar-section-header {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-tertiary);
+      padding: 10px 12px 4px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .sidebar-nav-group {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .sidebar-nav-pill {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      border-radius: var(--radius-md);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: all 0.15s ease;
+    }
+
+    .sidebar-nav-pill:hover {
+      background: var(--bg-surface-subtle);
+      color: var(--text-primary);
+    }
+
+    .sidebar-nav-pill.active {
+      background: var(--bg-surface-subtle);
+      color: var(--text-primary);
+      font-weight: 600;
+      border-left: 3px solid var(--accent-primary);
+    }
+
+    .sidebar-nav-icon {
+      font-size: 15px;
+      width: 18px;
+      text-align: center;
+      color: var(--text-secondary);
+    }
+
+    .sidebar-nav-pill.active .sidebar-nav-icon {
+      color: var(--accent-primary);
+    }
+
+    .sidebar-divider-line {
+      height: 1px;
+      background: var(--border-subtle);
+      margin: 8px 0;
+    }
+
+    .classroom-sidebar-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.45);
+      z-index: 85;
+      backdrop-filter: blur(2px);
+    }
+
+    /* Main Content Pane */
+    .classroom-main-pane {
+      flex: 1;
+      padding: 28px 32px 64px;
+      max-width: 1240px;
+      margin: 0 auto;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    /* Top Banner */
+    .tutor-earnings-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      margin-bottom: 28px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .earnings-header-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .earnings-tag {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-secondary);
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .earnings-main-title {
+      font-family: var(--font-serif, 'Newsreader', Georgia, serif);
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin: 0;
+    }
+
+    .earnings-split-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      background: var(--bg-surface-subtle);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-full);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    .earnings-metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 16px;
+    }
+
+    .earnings-metric-box {
+      background: var(--bg-surface-subtle);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 16px 18px;
+    }
+
+    .earnings-metric-box.highlight {
+      border-color: var(--accent-primary);
+      background: var(--bg-surface);
+    }
+
+    .metric-box-label {
+      font-size: 12px;
+      color: var(--text-secondary);
+      font-weight: 500;
+      margin-bottom: 6px;
+    }
+
+    .metric-box-val {
+      font-size: 24px;
+      font-weight: 700;
+      font-family: var(--font-mono, monospace);
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+
+    .metric-box-sub {
+      font-size: 11px;
+      color: var(--text-tertiary);
+    }
+
+    /* Withdrawal Work Grid (Form + Policy) */
+    .withdrawal-work-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 24px;
+      margin-bottom: 32px;
+    }
+
+    .content-box {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .box-heading {
+      font-family: var(--font-serif, 'Newsreader', Georgia, serif);
+      font-size: 19px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin: 0 0 8px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .box-subheading {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin: 0 0 20px;
+      line-height: 1.5;
+    }
+
+    /* Form Inputs */
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+    }
+
+    .form-control {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 10px 14px;
+      background: var(--bg-surface-subtle);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      color: var(--text-primary);
+      font-size: 14px;
+      font-family: var(--font-sans);
+      outline: none;
+      transition: border-color 0.15s ease;
+    }
+
+    .form-control:focus {
+      border-color: var(--accent-primary);
+      background: var(--bg-surface);
+    }
+
+    .amount-presets {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .preset-pill {
+      background: var(--bg-surface-subtle);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-full);
+      padding: 4px 10px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .preset-pill:hover {
+      background: var(--bg-surface);
+      color: var(--text-primary);
+      border-color: var(--text-tertiary);
+    }
+
+    .summary-fee-box {
+      background: var(--bg-surface-subtle);
+      border: 1px dashed var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 12px 16px;
+      margin-bottom: 18px;
+    }
+
+    .fee-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      margin-bottom: 6px;
+      color: var(--text-secondary);
+    }
+
+    .fee-row:last-child {
+      margin-bottom: 0;
+      padding-top: 6px;
+      border-top: 1px solid var(--border-subtle);
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .btn-submit-payout {
+      width: 100%;
+      background: var(--accent-primary);
+      color: var(--accent-text);
+      border: none;
+      padding: 12px 20px;
+      border-radius: var(--radius-md);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: opacity 0.15s ease;
+    }
+
+    .btn-submit-payout:hover {
+      opacity: 0.92;
+    }
+
+    .btn-submit-payout:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* Policy List */
+    .policy-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .policy-item:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .policy-icon {
+      color: var(--accent-primary);
+      font-size: 16px;
+      margin-top: 2px;
+      flex-shrink: 0;
+    }
+
+    .policy-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 3px;
+    }
+
+    .policy-desc {
+      font-size: 12px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+      margin: 0;
+    }
+
+    /* History Table */
+    .history-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .table-container {
+      overflow-x: auto;
+      margin-top: 14px;
+    }
+
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      text-align: left;
+    }
+
+    .data-table th {
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border-subtle);
+      font-weight: 600;
+      color: var(--text-secondary);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      background: var(--bg-surface-subtle);
+    }
+
+    .data-table td {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+      vertical-align: middle;
+    }
+
+    .data-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .badge-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 8px;
+      border-radius: var(--radius-full);
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .badge-pending {
+      background: rgba(245, 158, 11, 0.15);
+      color: #D97706;
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+
+    .badge-processing {
+      background: rgba(59, 130, 246, 0.15);
+      color: #2563EB;
+      border: 1px solid rgba(59, 130, 246, 0.3);
+    }
+
+    .badge-completed {
+      background: rgba(16, 185, 129, 0.15);
+      color: #059669;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .badge-rejected {
+      background: rgba(239, 68, 68, 0.15);
+      color: #DC2626;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 42px 20px;
+      color: var(--text-tertiary);
+    }
+
+    .empty-icon {
+      font-size: 36px;
+      margin-bottom: 12px;
+      opacity: 0.6;
+    }
+
+    @media (max-width: 960px) {
+      .withdrawal-work-grid {
+        grid-template-columns: 1fr;
+      }
+      .classroom-left-sidebar {
+        position: fixed;
+        top: var(--navbar-height);
+        bottom: 0;
+        left: 0;
+        transform: translateX(-100%);
+        box-shadow: 4px 0 24px rgba(0,0,0,0.2);
+      }
+      .classroom-left-sidebar.drawer-open {
+        transform: translateX(0);
+      }
+      .classroom-sidebar-backdrop.active {
+        display: block;
+      }
+      .classroom-main-pane {
+        padding: 20px 16px 48px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Top Navigation Header -->
+  <header class="navbar" role="banner">
+    <div class="nav-main-row">
+      <div class="nav-brand-group">
+        <button class="sidebar-toggle-btn" id="sidebar-toggle" type="button" aria-label="Buka Menu Samping" onclick="toggleClassroomSidebar()">
+          <i class="fas fa-bars"></i>
+        </button>
+        <a href="/dashboard" class="brand-logo" aria-label="SkillSphere AI Beranda">
+          <div class="brand-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path opacity="0.38" d="M12 7.6L17.3 4.7L14.4 10L17.3 15.3L12 12.4L6.7 15.3L9.6 10L6.7 4.7Z" />
+              <path d="M12 0L13.8 8.2L22 10L13.8 11.8L12 20L10.2 11.8L2 10L10.2 8.2L12 0Z" />
+            </svg>
+          </div>
+          <span>SkillSphere AI</span>
+        </a>
+      </div>
+
+      <div class="nav-actions">
+        <!-- Theme Toggle -->
+        <button class="theme-toggle-btn" id="theme-toggle-btn" type="button" aria-label="Ganti mode gelap atau terang">
+          <i class="fas fa-moon" id="theme-icon"></i>
+          <span id="theme-text">Mode Gelap</span>
+        </button>
+
+        <!-- User Profile Pill -->
+        <div class="user-profile-badge" onclick="window.location.href='/profile'" title="Pengaturan Akun Pengajar">
+          <div class="user-avatar-sm" id="nav-avatar">T</div>
+          <span class="user-name-label" id="nav-user-name">Memuat...</span>
+          <span class="user-role-tag">TUTOR</span>
+        </div>
+
+        <!-- Logout Button -->
+        <button class="logout-btn" id="logout-btn" type="button" title="Keluar">
+          <i class="fas fa-arrow-right-from-bracket" aria-hidden="true"></i>
+          <span>Keluar</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <div class="classroom-app-container">
+    <!-- Backdrop for Mobile Drawer -->
+    <div class="classroom-sidebar-backdrop" id="sidebar-backdrop" onclick="toggleClassroomSidebar(false)"></div>
+
+    <!-- Docked Left Sidebar -->
+    <aside class="classroom-left-sidebar" id="classroom-sidebar" aria-label="Menu Studio Pengajar">
+      <div class="classroom-sidebar-inner">
+        <div class="sidebar-section-header">Navigasi Utama</div>
+        <div class="sidebar-nav-group">
+          <a href="/dashboard" class="sidebar-nav-pill">
+            <i class="fas fa-home sidebar-nav-icon"></i>
+            <span>Beranda Studio</span>
+          </a>
+        </div>
+
+        <div class="sidebar-divider-line"></div>
+
+        <div class="sidebar-section-header">Keuangan & Dompet</div>
+        <div class="sidebar-nav-group">
+          <a href="/tutor/wallet" class="sidebar-nav-pill">
+            <i class="fas fa-wallet sidebar-nav-icon"></i>
+            <span>Dompet Digital</span>
+          </a>
+          <a href="/tutor/withdrawal" class="sidebar-nav-pill active">
+            <i class="fas fa-money-bill-transfer sidebar-nav-icon"></i>
+            <span>Penarikan Dana</span>
+          </a>
+        </div>
+
+        <div class="sidebar-divider-line"></div>
+
+        <div class="sidebar-section-header">Studio Pengajar & Alat</div>
+        <div class="sidebar-nav-group">
+          <a href="/dashboard" class="sidebar-nav-pill">
+            <i class="fas fa-chalkboard-user sidebar-nav-icon"></i>
+            <span>Daftar Kelas Mengajar</span>
+          </a>
+          <a href="/tutor/materials" class="sidebar-nav-pill">
+            <i class="fas fa-folder-open sidebar-nav-icon"></i>
+            <span>Portal Upload Materi</span>
+          </a>
+          <a href="/tutor/verify" class="sidebar-nav-pill">
+            <i class="fas fa-id-card-clip sidebar-nav-icon"></i>
+            <span>Verifikasi Pengajar</span>
+          </a>
+          <a href="/courses" class="sidebar-nav-pill">
+            <i class="fas fa-compass sidebar-nav-icon"></i>
+            <span>Katalog Kursus Publik</span>
+          </a>
+        </div>
+
+        <div class="sidebar-divider-line"></div>
+
+        <div class="sidebar-section-header">Setelan</div>
+        <div class="sidebar-nav-group">
+          <a href="/profile" class="sidebar-nav-pill">
+            <i class="fas fa-gear sidebar-nav-icon"></i>
+            <span>Pengaturan Akun</span>
+          </a>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="classroom-main-pane">
+      <!-- 1. Banner Ringkasan Keuangan Pengajar -->
+      <section class="tutor-earnings-card" aria-labelledby="banner-heading">
+        <div class="earnings-header-row">
+          <div class="earnings-title-group">
+            <div class="earnings-tag"><i class="fas fa-shield-halved"></i> Penarikan Dana Aman & Terenkripsi</div>
+            <h1 class="earnings-main-title" id="banner-heading">Pencairan Saldo Dompet Pengajar</h1>
+          </div>
+          <div class="earnings-split-badge" title="Bagi hasil bersih 80% langsung masuk ke dompet Anda">
+            <i class="fas fa-percent"></i> Bagi Hasil 80% Bersih
+          </div>
+        </div>
+
+        <div class="earnings-metrics-grid">
+          <div class="earnings-metric-box highlight">
+            <div class="metric-box-label">Saldo Siap Ditarik</div>
+            <div class="metric-box-val" id="valAvailableBalance">Rp 0</div>
+            <div class="metric-box-sub">Batas minimal penarikan Rp 100.000</div>
+          </div>
+
+          <div class="earnings-metric-box">
+            <div class="metric-box-label">Dana Holding (7 Hari)</div>
+            <div class="metric-box-val" id="valHoldingBalance">Rp 0</div>
+            <div class="metric-box-sub">Proteksi transaksi & mitigasi sengketa</div>
+          </div>
+
+          <div class="earnings-metric-box">
+            <div class="metric-box-label">Total Dana Pernah Ditarik</div>
+            <div class="metric-box-val" id="valWithdrawnTotal">Rp 0</div>
+            <div class="metric-box-sub">Telah berhasil ditransfer ke rekening Anda</div>
+          </div>
+
+          <div class="earnings-metric-box">
+            <div class="metric-box-label">Biaya Transfer Bank</div>
+            <div class="metric-box-val" style="color:#059669;">Rp 0</div>
+            <div class="metric-box-sub">Ditanggung penuh oleh platform SkillSphere</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. Work Grid: Form Pencairan + Ketentuan -->
+      <div class="withdrawal-work-grid">
+        <!-- Form Pengajuan Penarikan -->
+        <section class="content-box" aria-labelledby="form-heading">
+          <h2 class="box-heading" id="form-heading">
+            <i class="fas fa-paper-plane" style="color:var(--accent-primary);"></i>
+            Formulir Permohonan Pencairan
+          </h2>
+          <p class="box-subheading">
+            Tentukan nominal dan pilih rekening penerima Anda. Dana akan diproses dan dikirimkan oleh administrator keuangan SkillSphere.
+          </p>
+
+          <form id="withdrawalForm" onsubmit="handleWithdrawalSubmit(event)">
+            <div class="form-group">
+              <label class="form-label" for="inputAmount">Nominal Penarikan (Rp)</label>
+              <input type="number" id="inputAmount" class="form-control" placeholder="Min. 100000" min="100000" step="10000" required>
+              
+              <div class="amount-presets" role="group" aria-label="Preset Nominal Penarikan">
+                <button type="button" class="preset-pill" onclick="setPresetAmount(100000)">Rp 100.000</button>
+                <button type="button" class="preset-pill" onclick="setPresetAmount(250000)">Rp 250.000</button>
+                <button type="button" class="preset-pill" onclick="setPresetAmount(500000)">Rp 500.000</button>
+                <button type="button" class="preset-pill" onclick="setPresetAmount(1000000)">Rp 1.000.000</button>
+                <button type="button" class="preset-pill" onclick="setAllBalance()">Tarik Semua Saldo</button>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="selectBank">Bank Tujuan atau Dompet Digital</label>
+              <select id="selectBank" class="form-control" required>
+                <option value="">-- Pilih Rekening / E-Wallet Tujuan --</option>
+                <option value="BCA">Bank BCA (Bank Central Asia)</option>
+                <option value="Mandiri">Bank Mandiri</option>
+                <option value="BNI">Bank BNI (Negara Indonesia)</option>
+                <option value="BRI">Bank BRI (Rakyat Indonesia)</option>
+                <option value="BSI">Bank Syariah Indonesia</option>
+                <option value="GoPay">GoPay (Gojek)</option>
+                <option value="OVO">OVO</option>
+                <option value="DANA">DANA</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="inputAccountNumber">Nomor Rekening / No. Ponsel E-Wallet</label>
+              <input type="text" id="inputAccountNumber" class="form-control" placeholder="Contoh: 1234567890 atau 08123456789" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="inputAccountHolder">Nama Pemilik Rekening</label>
+              <input type="text" id="inputAccountHolder" class="form-control" placeholder="Nama lengkap sesuai buku tabungan" required>
+            </div>
+
+            <div class="summary-fee-box">
+              <div class="fee-row">
+                <span>Jumlah yang diminta:</span>
+                <span id="previewReqAmount" style="font-family:var(--font-mono);">Rp 0</span>
+              </div>
+              <div class="fee-row">
+                <span>Biaya administrasi transfer:</span>
+                <span style="color:#059669;">Bebas Biaya (Rp 0)</span>
+              </div>
+              <div class="fee-row">
+                <span>Estimasi dana masuk:</span>
+                <span id="previewNetPayout" style="font-family:var(--font-mono); color:var(--accent-primary);">Rp 0</span>
+              </div>
+            </div>
+
+            <div id="formAlertBox" style="display:none; padding:10px 14px; border-radius:var(--radius-md); font-size:13px; margin-bottom:14px;"></div>
+
+            <button type="submit" class="btn-submit-payout" id="btnSubmitPayout">
+              <i class="fas fa-check-circle"></i>
+              <span>Kirim Permohonan Penarikan Dana</span>
+            </button>
+          </form>
+        </section>
+
+        <!-- Informasi & Prosedur Pencairan -->
+        <section class="content-box" aria-labelledby="policy-heading">
+          <h2 class="box-heading" id="policy-heading">
+            <i class="fas fa-circle-info" style="color:var(--text-secondary);"></i>
+            Ketentuan & SLA Pencairan
+          </h2>
+          <p class="box-subheading">
+            Pedoman pencairan dana tutor untuk menjaga keamanan dan akurasi pelaporan finansial.
+          </p>
+
+          <div class="policy-item">
+            <i class="fas fa-clock policy-icon"></i>
+            <div>
+              <div class="policy-title">Waktu Pemrosesan (1x24 Jam Kerja)</div>
+              <p class="policy-desc">
+                Permohonan penarikan dana diverifikasi dan diproses pada hari kerja (Senin - Jumat, pukul 09.00 - 17.00 WIB).
+              </p>
+            </div>
+          </div>
+
+          <div class="policy-item">
+            <i class="fas fa-shield-cat policy-icon"></i>
+            <div>
+              <div class="policy-title">Masa Holding Transaksi 7 Hari</div>
+              <p class="policy-desc">
+                Setiap pembayaran kursus dari siswa ditahan sementara selama 7 hari sebelum berpindah ke saldo siap ditarik, demi perlindungan sengketa.
+              </p>
+            </div>
+          </div>
+
+          <div class="policy-item">
+            <i class="fas fa-coins policy-icon"></i>
+            <div>
+              <div class="policy-title">Batas Minimal Rp 100.000</div>
+              <p class="policy-desc">
+                Penarikan dapat diajukan jika saldo siap ditarik telah mencapai batas minimal Rp 100.000 tanpa batas maksimum.
+              </p>
+            </div>
+          </div>
+
+          <div class="policy-item">
+            <i class="fas fa-id-badge policy-icon"></i>
+            <div>
+              <div class="policy-title">Kesesuaian Identitas Pemilik Rekening</div>
+              <p class="policy-desc">
+                Nama pemilik rekening harus cocok dengan nama pada data profil tutor yang terverifikasi untuk menghindari penolakan.
+              </p>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- 3. Riwayat Permohonan Penarikan Dana -->
+      <section class="history-card" aria-labelledby="history-heading">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+          <div>
+            <h2 class="box-heading" id="history-heading" style="margin:0;">
+              <i class="fas fa-list-check" style="color:var(--accent-primary);"></i>
+              Riwayat Pengajuan Penarikan
+            </h2>
+            <p style="font-size:12px; color:var(--text-secondary); margin:4px 0 0;">
+              Daftar status pencairan dana yang pernah Anda ajukan ke platform.
+            </p>
+          </div>
+          <button type="button" class="preset-pill" onclick="fetchWalletData()" style="padding:6px 12px;">
+            <i class="fas fa-rotate"></i> Muat Ulang Data
+          </button>
+        </div>
+
+        <div class="table-container">
+          <table class="data-table" role="table" aria-label="Tabel Riwayat Penarikan Dana">
+            <thead>
+              <tr>
+                <th scope="col">ID Mutasi</th>
+                <th scope="col">Tanggal Pengajuan</th>
+                <th scope="col">Tujuan Pembayaran</th>
+                <th scope="col">Nominal</th>
+                <th scope="col">Status</th>
+                <th scope="col">Catatan Admin</th>
+              </tr>
+            </thead>
+            <tbody id="withdrawalTableBody">
+              <tr>
+                <td colspan="6" class="empty-state">
+                  <i class="fas fa-spinner fa-spin empty-icon"></i>
+                  <div>Memuat data riwayat penarikan...</div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Accessibility Toolbar Module -->
+  <script src="/javascripts/accessibility.js"></script>
+
+  <script>
+    let currentAvailableBalance = 0;
+
+    // Theme Management
+    function initTheme() {
+      const savedTheme = localStorage.getItem('skillsphere_theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', savedTheme);
+      updateThemeUI(savedTheme);
+    }
+
+    function toggleTheme() {
+      const current = document.documentElement.getAttribute('data-theme') || 'dark';
+      const next = current === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      localStorage.setItem('skillsphere_theme', next);
+      updateThemeUI(next);
+    }
+
+    function updateThemeUI(theme) {
+      const icon = document.getElementById('theme-icon');
+      const text = document.getElementById('theme-text');
+      if (theme === 'dark') {
+        if (icon) icon.className = 'fas fa-sun';
+        if (text) text.innerText = 'Mode Terang';
+      } else {
+        if (icon) icon.className = 'fas fa-moon';
+        if (text) text.innerText = 'Mode Gelap';
+      }
+    }
+
+    document.getElementById('theme-toggle-btn').addEventListener('click', toggleTheme);
+
+    function toggleClassroomSidebar(open) {
+      const sidebar = document.getElementById('classroom-sidebar');
+      const backdrop = document.getElementById('sidebar-backdrop');
+      if (!sidebar) return;
+      const shouldOpen = (open !== undefined) ? open : !sidebar.classList.contains('drawer-open');
+      if (shouldOpen) {
+        sidebar.classList.add('drawer-open');
+        if (backdrop) backdrop.classList.add('active');
+      } else {
+        sidebar.classList.remove('drawer-open');
+        if (backdrop) backdrop.classList.remove('active');
+      }
+    }
+
+    function formatRupiah(num) {
+      return 'Rp ' + Number(num || 0).toLocaleString('id-ID');
+    }
+
+    function setPresetAmount(amt) {
+      const input = document.getElementById('inputAmount');
+      input.value = amt;
+      updatePreviewAmounts();
+    }
+
+    function setAllBalance() {
+      const input = document.getElementById('inputAmount');
+      input.value = Math.max(0, Math.floor(currentAvailableBalance));
+      updatePreviewAmounts();
+    }
+
+    function updatePreviewAmounts() {
+      const inputVal = Number(document.getElementById('inputAmount').value) || 0;
+      document.getElementById('previewReqAmount').innerText = formatRupiah(inputVal);
+      document.getElementById('previewNetPayout').innerText = formatRupiah(inputVal);
+    }
+
+    document.getElementById('inputAmount').addEventListener('input', updatePreviewAmounts);
+
+    function getAuthToken() {
+      const t = localStorage.getItem('skillsphere_access_token') || localStorage.getItem('accessToken') || localStorage.getItem('token');
+      if (t) {
+        if (!localStorage.getItem('skillsphere_access_token')) localStorage.setItem('skillsphere_access_token', t);
+        if (!localStorage.getItem('accessToken')) localStorage.setItem('accessToken', t);
+        if (!localStorage.getItem('token')) localStorage.setItem('token', t);
+      }
+      return t;
+    }
+
+    async function loadUserProfile() {
+      const token = getAuthToken();
+      if (!token) {
+        window.location.href = '/login?redirect=/tutor/withdrawal';
+        return;
+      }
+      try {
+        const res = await fetch('/api/auth/me', {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        const json = await res.json();
+        if (json.success && json.data) {
+          const u = json.data;
+          document.getElementById('nav-user-name').innerText = u.name;
+          const initials = u.name.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
+          document.getElementById('nav-avatar').innerText = initials;
+          document.getElementById('inputAccountHolder').value = u.name;
+
+          if (u.role !== 'tutor' && u.role !== 'admin') {
+            alert('Akses khusus Pengajar (Tutor).');
+            window.location.href = '/dashboard';
+          }
+        }
+      } catch (err) {
+        console.error('Failed to load profile:', err);
+      }
+    }
+
+    async function fetchWalletData() {
+      const token = getAuthToken();
+      if (!token) return;
+
+      try {
+        const res = await fetch('/api/payments/wallet', {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        const json = await res.json();
+        if (json.success && json.data) {
+          const w = json.data;
+          const balance = Number(w.wallet ? w.wallet.balance : (w.balance || 0));
+          const holdingBalance = Number(w.wallet ? (w.wallet.pending_balance || w.wallet.holding_balance) : (w.holding_balance || 0));
+          const withdrawnTotal = Number(w.withdrawn_total || 0);
+
+          currentAvailableBalance = balance;
+          document.getElementById('valAvailableBalance').innerText = formatRupiah(balance);
+          document.getElementById('valHoldingBalance').innerText = formatRupiah(holdingBalance);
+          document.getElementById('valWithdrawnTotal').innerText = formatRupiah(withdrawnTotal);
+
+          const list = w.mutations || w.transactions || [];
+          renderWithdrawalTable(list);
+        }
+      } catch (err) {
+        console.error('Failed to load wallet data:', err);
+      }
+    }
+
+    function renderWithdrawalTable(mutations) {
+      const tbody = document.getElementById('withdrawalTableBody');
+      const payoutList = (mutations || []).filter(m => m.type === 'withdrawal' || m.type === 'debit');
+
+      if (!payoutList || payoutList.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="6" class="empty-state">
+              <i class="fas fa-inbox empty-icon"></i>
+              <div>Belum ada riwayat permohonan penarikan dana.</div>
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = payoutList.map(item => {
+        let statusBadge = '<span class="badge-status badge-completed"><i class="fas fa-check"></i> Selesai</span>';
+        if (item.status === 'pending') {
+          statusBadge = '<span class="badge-status badge-pending"><i class="fas fa-clock"></i> Menunggu Persetujuan</span>';
+        } else if (item.status === 'processing') {
+          statusBadge = '<span class="badge-status badge-processing"><i class="fas fa-spinner fa-spin"></i> Diproses</span>';
+        } else if (item.status === 'rejected') {
+          statusBadge = '<span class="badge-status badge-rejected"><i class="fas fa-xmark"></i> Ditolak</span>';
+        }
+
+        const dateStr = item.createdAt ? new Date(item.createdAt).toLocaleDateString('id-ID', {
+          day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
+        }) : '-';
+
+        return `
+          <tr>
+            <td style="font-family:var(--font-mono); font-size:12px;">#MUT-${item.id}</td>
+            <td>${dateStr}</td>
+            <td><strong>${escapeHtml(item.bank_name || 'Bank Transfer')}</strong><br><span style="font-size:11px; color:var(--text-secondary); font-family:var(--font-mono);">${escapeHtml(item.account_number || '-')}</span></td>
+            <td style="font-family:var(--font-mono); font-weight:700;">${formatRupiah(item.amount)}</td>
+            <td>${statusBadge}</td>
+            <td style="font-size:12px; color:var(--text-secondary);">${escapeHtml(item.notes || '-')}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    async function handleWithdrawalSubmit(e) {
+      e.preventDefault();
+      const token = getAuthToken();
+      if (!token) {
+        showAlert('Sesi telah berakhir. Silakan masuk kembali.', 'error');
+        return;
+      }
+
+      const amount = Number(document.getElementById('inputAmount').value);
+      const bank_name = document.getElementById('selectBank').value;
+      const account_number = document.getElementById('inputAccountNumber').value.trim();
+      const account_name = document.getElementById('inputAccountHolder').value.trim();
+
+      const alertBox = document.getElementById('formAlertBox');
+      const submitBtn = document.getElementById('btnSubmitPayout');
+
+      if (amount < 100000) {
+        showAlert('Batas minimal penarikan adalah Rp 100.000.', 'error');
+        return;
+      }
+
+      if (amount > currentAvailableBalance) {
+        showAlert(`Saldo siap ditarik tidak mencukupi (Saldo Anda: ${formatRupiah(currentAvailableBalance)}).`, 'error');
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses Permohonan...';
+
+      try {
+        const res = await fetch('/api/payments/withdraw', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+          body: JSON.stringify({
+            amount,
+            bank_name,
+            account_number,
+            account_name,
+            account_holder_name: account_name
+          })
+        });
+
+        const json = await res.json();
+        if (json.success) {
+          showAlert(json.message || 'Permohonan penarikan dana berhasil diajukan.', 'success');
+          document.getElementById('withdrawalForm').reset();
+          updatePreviewAmounts();
+          await fetchWalletData();
+        } else {
+          showAlert(json.message || 'Gagal mengajukan penarikan dana.', 'error');
+        }
+      } catch (err) {
+        console.error('Withdrawal error:', err);
+        showAlert('Terjadi kesalahan jaringan saat mengirim permohonan.', 'error');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="fas fa-check-circle"></i> <span>Kirim Permohonan Penarikan Dana</span>';
+      }
+    }
+
+    function showAlert(msg, type) {
+      const box = document.getElementById('formAlertBox');
+      box.style.display = 'block';
+      if (type === 'success') {
+        box.style.background = 'rgba(16, 185, 129, 0.15)';
+        box.style.color = '#059669';
+        box.style.border = '1px solid rgba(16, 185, 129, 0.3)';
+      } else {
+        box.style.background = 'rgba(239, 68, 68, 0.15)';
+        box.style.color = '#DC2626';
+        box.style.border = '1px solid rgba(239, 68, 68, 0.3)';
+      }
+      box.innerText = msg;
+    }
+
+    function escapeHtml(text) {
+      if (!text) return '';
+      return String(text).replace(/[&<>"']/g, function(m) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m];
+      });
+    }
+
+    document.getElementById('logout-btn').addEventListener('click', () => {
+      localStorage.removeItem('skillsphere_access_token');
+      localStorage.removeItem('skillsphere_refresh_token');
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('token');
+      localStorage.removeItem('refreshToken');
+      localStorage.removeItem('skillsphere_user');
+      window.location.href = '/login';
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+      initTheme();
+      loadUserProfile();
+      fetchWalletData();
+    });
+  </script>
+</body>
+</html>
+

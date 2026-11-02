@@ -98,9 +98,14 @@ router.get('/tutor/materials', function(req, res, next) {
   res.render('tutor/materials', { title: 'Portal Manajemen & Upload Materi | Tutor SkillSphere' });
 });
 
-/* GET Tutor Financial Wallet & Withdrawal Portal (Sprint 3) */
-router.get(['/tutor/wallet', '/tutor/withdraw', '/tutor/withdrawal', '/dashboard/wallet'], function(req, res, next) {
-  res.render('tutor/wallet', { title: 'Dompet Digital & Penarikan Dana Pengajar | SkillSphere AI' });
+/* GET Tutor Financial Wallet Portal (Sprint 3) */
+router.get(['/tutor/wallet', '/dashboard/wallet'], function(req, res, next) {
+  res.render('tutor/wallet', { title: 'Dompet Digital & Pendapatan Pengajar | SkillSphere AI' });
+});
+
+/* GET Dedicated Tutor Withdrawal Portal (Sprint 3) */
+router.get(['/tutor/withdrawal', '/tutor/withdraw', '/dashboard/withdrawal'], function(req, res, next) {
+  res.render('tutor/withdrawal', { title: 'Portal Penarikan Dana Pengajar | SkillSphere AI' });
 });
 
 
