@@ -38,9 +38,12 @@ async function createSnapTransaction({ orderId, grossAmount, customerDetails, it
       quantity: 1,
       name: 'Pendaftaran Kursus SkillSphere',
     }],
-    // Pembatasan metode pembayaran resmi Midtrans: Khusus QRIS dan Transfer Bank / Virtual Account
+    // Metode pembayaran resmi Midtrans: E-Wallet (GoPay, ShopeePay, QRIS) dan Transfer Bank / Virtual Account
     enabled_payments: [
+      'gopay',
+      'shopeepay',
       'qris',
+      'other_qris',
       'bank_transfer',
       'bca_va',
       'bni_va',
