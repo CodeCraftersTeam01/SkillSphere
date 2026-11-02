@@ -16,6 +16,9 @@
   <link rel="stylesheet" href="/stylesheets/custom-alert.css">
   <script src="/javascripts/custom-alert.js"></script>
 
+  <!-- Midtrans Snap Sandbox JS -->
+  <script src="<%= (typeof midtransSnapUrl !== 'undefined' && midtransSnapUrl) || 'https://app.sandbox.midtrans.com/snap/snap.js' %>" data-client-key="<%= (typeof midtransClientKey !== 'undefined' && midtransClientKey) || (typeof process !== 'undefined' && process.env.MIDTRANS_CLIENT_KEY) || 'Mid-client-2DnCoRKAaTZ370zD' %>"></script>
+
   <style>
     :root {
       --navbar-height: 56px;
@@ -833,9 +836,9 @@
         if (status === 'pending') {
           statusBadge = '<span class="status-pill status-pending"><i class="fas fa-clock"></i> Menunggu Bayar</span>';
           actionBtn = `
-            <a href="/courses/${encodeURIComponent(courseSlug)}/checkout" class="btn-action-sm btn-action-primary" title="Selesaikan Pembayaran">
+            <button type="button" class="btn-action-sm btn-action-primary" onclick="payPendingTransaction('${courseObj.id || t.course_id}', this)" title="Selesaikan Pembayaran">
               <i class="fas fa-credit-card"></i> Bayar Sekarang
-            </a>
+            </button>
           `;
         } else if (status === 'failed' || status === 'expire' || status === 'expired' || status === 'cancel') {
           statusBadge = '<span class="status-pill status-failed"><i class="fas fa-ban"></i> Dibatalkan</span>';
@@ -862,6 +865,69 @@
           </tr>
         `;
       }).join('');
+    }
+
+    async function payPendingTransaction(courseId, btnEl) {
+      const token = getAuthToken();
+      if (!token) {
+        window.location.href = '/login?redirect=/dashboard/transactions';
+        return;
+      }
+      if (btnEl && btnEl.disabled) return;
+      if (btnEl) {
+        btnEl.disabled = true;
+        btnEl.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Membuka...';
+      }
+      try {
+        const res = await fetch('/api/payments/snap-token', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token,
+          },
+          body: JSON.stringify({ course_id: courseId }),
+        });
+        const json = await res.json();
+        if (!json.success) {
+          throw new Error(json.message || 'Gagal memproses sesi pembayaran.');
+        }
+
+        const snapToken = json.data && json.data.token;
+        if (window.snap && typeof window.snap.pay === 'function' && snapToken) {
+          window.snap.pay(snapToken, {
+            onSuccess: function() {
+              loadTransactions();
+            },
+            onPending: function() {
+              loadTransactions();
+            },
+            onError: function() {
+              if (btnEl) {
+                btnEl.disabled = false;
+                btnEl.innerHTML = '<i class="fas fa-credit-card"></i> Bayar Sekarang';
+              }
+              loadTransactions();
+            },
+            onClose: function() {
+              if (btnEl) {
+                btnEl.disabled = false;
+                btnEl.innerHTML = '<i class="fas fa-credit-card"></i> Bayar Sekarang';
+              }
+              loadTransactions();
+            }
+          });
+        } else if (json.data && json.data.redirect_url) {
+          window.location.href = json.data.redirect_url;
+        } else {
+          loadTransactions();
+        }
+      } catch (err) {
+        alert(err.message || 'Terjadi kendala saat membuka pembayaran.');
+        if (btnEl) {
+          btnEl.disabled = false;
+          btnEl.innerHTML = '<i class="fas fa-credit-card"></i> Bayar Sekarang';
+        }
+      }
     }
 
     function openInvoice(orderId) {

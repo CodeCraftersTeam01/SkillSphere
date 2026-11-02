@@ -43,7 +43,11 @@ router.get(['/profile', '/dashboard/profile'], function(req, res, next) {
 
 /* GET Student Transactions History (Sprint 3 - Bustanul) */
 router.get(['/transactions', '/dashboard/transactions', '/riwayat-transaksi'], function(req, res, next) {
-  res.render('student/transactions', { title: 'Riwayat Transaksi Belajar | SkillSphere AI' });
+  res.render('student/transactions', {
+    title: 'Riwayat Transaksi Belajar | SkillSphere AI',
+    midtransClientKey: process.env.MIDTRANS_CLIENT_KEY,
+    midtransSnapUrl: process.env.MIDTRANS_SNAP_URL,
+  });
 });
 
 /* GET Student Wishlist Page (Sprint 3 - Bustanul) */

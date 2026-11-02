@@ -1,3 +1,4 @@
+const { Op } = require('sequelize');
 const {
   Transaction,
   TutorWallet,
@@ -66,35 +67,77 @@ async function createSnapToken(req, res) {
     const platformFee = Math.round((price * PLATFORM_FEE_PERCENTAGE) / 100);
     const tutorEarning = price - platformFee;
 
-    // Generate unique order ID
-    const transactionCode = `TRX-${Date.now()}-${Math.floor(1000 + Math.random() * 9000)}`;
-
-    const transaction = await Transaction.create({
-      transaction_code: transactionCode,
-      user_id: userId,
-      course_id: course.id,
-      amount: price,
-      platform_fee: platformFee,
-      tutor_earning: tutorEarning,
-      payment_method: 'midtrans_snap',
-      payment_status: 'pending',
-    });
-
-    const user = await User.findByPk(userId);
-    const snapResult = await midtransService.createSnapTransaction({
-      orderId: transactionCode,
-      grossAmount: price,
-      customerDetails: {
-        first_name: (user && (user.name || user.username)) || 'Pelajar',
-        email: (user && user.email) || 'student@skillsphere.id',
+    // Cek apakah siswa sudah memiliki transaksi pending yang masih aktif untuk kursus ini (Anti-Duplikasi / Idempotency)
+    let transaction = await Transaction.findOne({
+      where: {
+        user_id: userId,
+        course_id: course.id,
+        payment_status: 'pending',
       },
-      itemDetails: [{
-        id: String(course.id),
-        price: price,
-        quantity: 1,
-        name: course.title.substring(0, 50),
-      }],
+      order: [['created_at', 'DESC']],
     });
+
+    // Jika ada duplikasi transaksi pending lama untuk kursus yang sama, tandai expired agar tidak berulang
+    if (transaction) {
+      await Transaction.update(
+        { payment_status: 'expired' },
+        {
+          where: {
+            user_id: userId,
+            course_id: course.id,
+            payment_status: 'pending',
+            id: { [Op.ne]: transaction.id },
+          },
+        }
+      );
+    }
+
+    let snapResult = null;
+    const user = await User.findByPk(userId);
+
+    // Jika transaksi pending sudah memiliki Snap token yang valid, gunakan kembali (jangan buat order baru)
+    if (transaction && transaction.payment_response && transaction.payment_response.token) {
+      snapResult = transaction.payment_response;
+    } else {
+      // Buat kode transaksi unik baru jika belum memiliki token untuk menghindari "order_id sudah digunakan" di Midtrans
+      const transactionCode = `TRX-${Date.now()}-${Math.floor(1000 + Math.random() * 9000)}`;
+
+      if (!transaction) {
+        transaction = await Transaction.create({
+          transaction_code: transactionCode,
+          user_id: userId,
+          course_id: course.id,
+          amount: price,
+          platform_fee: platformFee,
+          tutor_earning: tutorEarning,
+          payment_method: 'midtrans_snap',
+          payment_status: 'pending',
+        });
+      } else {
+        await transaction.update({
+          transaction_code: transactionCode,
+        });
+      }
+
+      snapResult = await midtransService.createSnapTransaction({
+        orderId: transactionCode,
+        grossAmount: price,
+        customerDetails: {
+          first_name: (user && (user.name || user.username)) || 'Pelajar',
+          email: (user && user.email) || 'student@skillsphere.id',
+        },
+        itemDetails: [{
+          id: String(course.id),
+          price: price,
+          quantity: 1,
+          name: course.title.substring(0, 50),
+        }],
+      });
+
+      await transaction.update({
+        payment_response: snapResult,
+      });
+    }
 
     return res.status(201).json({
       success: true,
@@ -102,7 +145,7 @@ async function createSnapToken(req, res) {
       data: {
         token: snapResult.token,
         redirect_url: snapResult.redirect_url,
-        transaction_code: transactionCode,
+        transaction_code: transaction.transaction_code,
         amount: price,
         platform_fee: platformFee,
         tutor_earning: tutorEarning,
@@ -401,6 +444,24 @@ async function requestWithdrawal(req, res) {
 async function getStudentTransactions(req, res) {
   try {
     const userId = req.user.id;
+
+    // Bersihkan duplikasi transaksi pending untuk kursus yang sama (hanya simpan 1 transaksi pending aktif terbaru)
+    const pendingTrxs = await Transaction.findAll({
+      where: { user_id: userId, payment_status: 'pending' },
+      order: [['created_at', 'DESC']],
+    });
+    const seenCourses = new Set();
+    const duplicateIds = [];
+    for (const pt of pendingTrxs) {
+      if (seenCourses.has(pt.course_id)) {
+        duplicateIds.push(pt.id);
+      } else {
+        seenCourses.add(pt.course_id);
+      }
+    }
+    if (duplicateIds.length > 0) {
+      await Transaction.destroy({ where: { id: duplicateIds } });
+    }
 
     const transactions = await Transaction.findAll({
       where: { user_id: userId },
