@@ -6,7 +6,7 @@
     "start": "node ./bin/www",
     "dev": "node --watch ./bin/www",
     "seed": "node seeders/seed.js",
-    "test": "node tests/db.test.js && node tests/auth.test.js && node tests/imageHelper.test.js && node tests/mediaStorage.test.js && node tests/adminVerification.test.js && node tests/tutorVerificationApi.test.js && node tests/tutorMaterialsPortal.test.js && node tests/aiGeminiIntegration.test.js && node tests/adminUserManagement.test.js && node tests/studentViewsCatalog.test.js && node tests/redisCompression.test.js && node tests/ttsAccessibility.test.js && node tests/paymentFinance.test.js && node tests/reviewsWishlist.test.js && node tests/sprint4GamificationExams.test.js"
+    "test": "node tests/db.test.js && node tests/auth.test.js && node tests/imageHelper.test.js && node tests/mediaStorage.test.js && node tests/adminVerification.test.js && node tests/tutorVerificationApi.test.js && node tests/tutorMaterialsPortal.test.js && node tests/aiGeminiIntegration.test.js && node tests/adminUserManagement.test.js && node tests/studentViewsCatalog.test.js && node tests/redisCompression.test.js && node tests/ttsAccessibility.test.js && node tests/paymentFinance.test.js && node tests/reviewsWishlist.test.js && node tests/sprint4GamificationExams.test.js && node tests/sprint4CertificateAiReadiness.test.js"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",
@@ -26,6 +26,8 @@
     "multer": "^2.4.0",
     "mysql2": "^3.24.4",
     "nodemailer": "^10.0.10",
+    "pdfkit": "^0.20.2",
+    "qrcode": "^1.5.4",
     "sequelize": "^6.37.8",
     "sharp": "^0.35.4",
     "sqlite3": "^6.0.1"

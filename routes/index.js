@@ -128,5 +128,56 @@ router.get(['/privacy', '/privacy-policy', '/kebijakan-privasi'], function(req, 
   res.render('privacy', { title: 'Kebijakan Privasi | SkillSphere AI' });
 });
 
+/* GET Public Certificate Verification Page (Sprint 4 - Arjuna) */
+router.get(['/verify-cert/:code', '/certificate/verify/:code'], async function(req, res, next) {
+  try {
+    const { code } = req.params;
+    const { Certificate, User, Course, ExamResult } = require('../models');
+
+    const certificate = await Certificate.findOne({
+      where: { certificate_code: code },
+      include: [
+        { model: User, as: 'recipient', attributes: ['id', 'name', 'email'] },
+        {
+          model: Course,
+          as: 'course',
+          attributes: ['id', 'title', 'slug', 'level'],
+          include: [{ model: User, as: 'tutor', attributes: ['id', 'name'] }],
+        },
+        { model: ExamResult, as: 'exam_result', attributes: ['id', 'score'] },
+      ],
+    });
+
+    if (!certificate) {
+      return res.render('certificates/verify', {
+        title: 'Verifikasi Sertifikat | SkillSphere AI',
+        isValid: false,
+        queryCode: code,
+        certificate: null,
+      });
+    }
+
+    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    const formattedDate = new Date(certificate.issue_date || Date.now()).toLocaleDateString('id-ID', options);
+
+    return res.render('certificates/verify', {
+      title: `Verifikasi Sertifikat: ${certificate.certificate_code} | SkillSphere AI`,
+      isValid: true,
+      queryCode: code,
+      certificate: {
+        certificate_code: certificate.certificate_code,
+        student_name: certificate.recipient ? certificate.recipient.name : 'Peserta Pembelajaran',
+        course_title: certificate.course ? certificate.course.title : 'Kursus Keahlian',
+        course_slug: certificate.course ? certificate.course.slug : null,
+        tutor_name: certificate.course && certificate.course.tutor ? certificate.course.tutor.name : 'Lead Instructor',
+        score: certificate.exam_result ? certificate.exam_result.score : 100,
+        formatted_date: formattedDate,
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
 module.exports = router;
 

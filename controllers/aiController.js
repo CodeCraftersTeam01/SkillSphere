@@ -1,4 +1,14 @@
-const { AICareerRoadmap, UserProfile, User, Course, CourseSection, CourseMaterial } = require('../models');
+const {
+  AICareerRoadmap,
+  UserProfile,
+  User,
+  Course,
+  CourseSection,
+  CourseMaterial,
+  Exam,
+  ExamResult,
+  Enrollment,
+} = require('../models');
 const geminiService = require('../services/geminiService');
 
 /**
@@ -440,4 +450,112 @@ exports.getAdaptiveCourseRecommendations = async (req, res) => {
     });
   }
 };
+
+/**
+ * Get Orion AI Exam Readiness Assessment for Student (Sprint 4 - Arjuna)
+ * GET /api/ai/exam-readiness/:courseId
+ */
+exports.getExamReadiness = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const courseId = req.params.courseId || req.body.courseId || req.query.courseId;
+
+    if (!courseId) {
+      return res.status(400).json({
+        success: false,
+        message: 'ID Kursus wajib disertakan untuk evaluasi kesiapan ujian.',
+      });
+    }
+
+    const user = await User.findByPk(userId);
+    const profile = await UserProfile.findOne({ where: { user_id: userId } });
+
+    const course = await Course.findByPk(courseId, {
+      include: [
+        {
+          model: CourseSection,
+          as: 'sections',
+          include: [{ model: CourseMaterial, as: 'materials' }],
+        },
+      ],
+    });
+
+    if (!course) {
+      return res.status(404).json({
+        success: false,
+        message: 'Kursus tidak ditemukan.',
+      });
+    }
+
+    // Hitung total materi
+    let totalMaterials = 0;
+    if (Array.isArray(course.sections)) {
+      course.sections.forEach((sec) => {
+        if (Array.isArray(sec.materials)) {
+          totalMaterials += sec.materials.length;
+        }
+      });
+    }
+    if (totalMaterials === 0) totalMaterials = 5; // Default safe fallback
+
+    // Periksa status pendaftaran siswa
+    const enrollment = await Enrollment.findOne({
+      where: { user_id: userId, course_id: courseId },
+    });
+
+    const progressPct = enrollment ? (enrollment.progress_percentage || 0) : 0;
+    const materialsCompleted = Math.round((progressPct / 100) * totalMaterials);
+
+    // Ambil data ujian kursus
+    const exam = await Exam.findOne({
+      where: { course_id: courseId },
+    });
+
+    // Ambil riwayat submission ujian siswa jika ada
+    let examHistory = [];
+    if (exam) {
+      examHistory = await ExamResult.findAll({
+        where: { exam_id: exam.id, user_id: userId },
+        order: [['created_at', 'DESC']],
+      });
+    }
+
+    const evaluation = await geminiService.assessExamReadiness({
+      user: user ? user.toJSON() : {},
+      userProfile: profile ? profile.toJSON() : {},
+      course: course.toJSON(),
+      exam: exam ? exam.toJSON() : { passing_score: 70, duration_minutes: 60, question_count: 5 },
+      materialsCompleted,
+      totalMaterials,
+      examHistory: examHistory.map((h) => h.toJSON()),
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: 'Panduan kesiapan ujian berhasil dianalisis oleh Orion AI.',
+      data: {
+        course_id: course.id,
+        course_title: course.title,
+        has_exam: Boolean(exam),
+        exam_id: exam ? exam.id : null,
+        passing_score: exam ? exam.passing_score : 70,
+        student_progress: {
+          progress_percentage: progressPct,
+          materials_completed: materialsCompleted,
+          total_materials: totalMaterials,
+          previous_attempts: examHistory.length,
+        },
+        readiness_evaluation: evaluation,
+      },
+    });
+  } catch (err) {
+    console.error('Error in getExamReadiness:', err);
+    return res.status(500).json({
+      success: false,
+      message: 'Gagal menganalisis kesiapan ujian AI.',
+      error: err.message,
+    });
+  }
+};
+
 

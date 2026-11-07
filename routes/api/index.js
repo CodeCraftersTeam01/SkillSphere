@@ -11,6 +11,7 @@ const ttsRoutes = require('./tts');
 const paymentRoutes = require('./payments');
 const examRoutes = require('./exams');
 const milestoneRoutes = require('./milestones');
+const certificateRoutes = require('./certificates');
 
 // Health check endpoint
 router.get('/health', (req, res) => {
@@ -52,6 +53,7 @@ router.use('/tts', ttsRoutes);
 router.use('/payments', paymentRoutes);
 router.use('/exams', examRoutes);
 router.use('/milestones', milestoneRoutes);
+router.use('/certificates', certificateRoutes);
 
 
 module.exports = router;

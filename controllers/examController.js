@@ -6,6 +6,7 @@ const {
   Certificate,
   User,
 } = require('../models');
+const certificateGenerator = require('../services/certificateGenerator');
 
 /**
  * 1. Ambil Ujian berdasarkan ID Kursus
@@ -360,22 +361,54 @@ async function submitExam(req, res) {
         where: { user_id: userId, course_id: exam.course_id },
       });
 
+      // Ambil data pendukung untuk rendering PDF sertifikat resmi
+      const studentUser = await User.findByPk(userId, { attributes: ['id', 'name', 'email'] });
+      let tutorName = 'Lead Instructor';
+      if (exam.course && exam.course.tutor_id) {
+        const tutorUser = await User.findByPk(exam.course.tutor_id, { attributes: ['id', 'name'] });
+        if (tutorUser && tutorUser.name) tutorName = tutorUser.name;
+      }
+
       if (!existingCert) {
         const certCode = `CERT-${Date.now()}-${Math.floor(1000 + Math.random() * 9000)}`;
-        existingCert = await Certificate.create({
-          certificate_code: certCode,
-          user_id: userId,
-          course_id: exam.course_id,
-          exam_result_id: examResult.id,
-          issue_date: new Date(),
-          certificate_url: `/api/certificates/${certCode}/pdf`,
-        });
+        
+        // Buat file PDF sertifikat fisik dengan stempel QR code validasi
+        try {
+          const pdfResult = await certificateGenerator.generateCertificatePdf({
+            certificateCode: certCode,
+            studentName: (studentUser && studentUser.name) || 'Peserta Pembelajaran',
+            courseTitle: (exam.course && exam.course.title) || 'Kursus Keahlian',
+            tutorName,
+            score: finalScore,
+            issueDate: new Date(),
+          });
+
+          existingCert = await Certificate.create({
+            certificate_code: certCode,
+            user_id: userId,
+            course_id: exam.course_id,
+            exam_result_id: examResult.id,
+            issue_date: new Date(),
+            certificate_url: pdfResult.publicUrl,
+          });
+        } catch (pdfErr) {
+          console.error('[Certificate] Error generating PDF during exam submission:', pdfErr.message);
+          existingCert = await Certificate.create({
+            certificate_code: certCode,
+            user_id: userId,
+            course_id: exam.course_id,
+            exam_result_id: examResult.id,
+            issue_date: new Date(),
+            certificate_url: `/api/certificates/${certCode}/pdf`,
+          });
+        }
       }
 
       certificateData = {
         certificate_code: existingCert.certificate_code,
         issue_date: existingCert.issue_date,
         certificate_url: existingCert.certificate_url,
+        download_url: `/api/certificates/${existingCert.certificate_code}/pdf`,
       };
     }
 
@@ -495,3 +528,4 @@ module.exports = {
   getExamHistory,
   deleteExam,
 };
+

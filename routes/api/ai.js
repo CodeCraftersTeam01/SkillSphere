@@ -21,5 +21,9 @@ router.post('/material/narrative', optionalAuth, aiController.generateMaterialNa
 // 5. AI Adaptive Learning & Course Recommendations (Stage-based Progression)
 router.get('/recommendations', authenticateJWT, aiController.getAdaptiveCourseRecommendations);
 
+// 6. Orion AI Exam Readiness Assessment & Study Guidance (Sprint 4 - Arjuna)
+router.get('/exam-readiness/:courseId', authenticateJWT, aiController.getExamReadiness);
+router.post('/exam-readiness/:courseId', authenticateJWT, aiController.getExamReadiness);
+
 module.exports = router;
 
