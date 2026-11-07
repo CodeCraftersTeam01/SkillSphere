@@ -9,6 +9,8 @@ const tutorRoutes = require('./tutor');
 const aiRoutes = require('./ai');
 const ttsRoutes = require('./tts');
 const paymentRoutes = require('./payments');
+const examRoutes = require('./exams');
+const milestoneRoutes = require('./milestones');
 
 // Health check endpoint
 router.get('/health', (req, res) => {
@@ -48,6 +50,8 @@ router.use('/tutor', tutorRoutes);
 router.use('/ai', aiRoutes);
 router.use('/tts', ttsRoutes);
 router.use('/payments', paymentRoutes);
+router.use('/exams', examRoutes);
+router.use('/milestones', milestoneRoutes);
 
 
 module.exports = router;
