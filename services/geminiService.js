@@ -1087,6 +1087,165 @@ function buildAdaptiveRecommendationsFallback({ user, careerGoal, topics, comple
   };
 }
 
+/**
+ * Orion AI Exam Readiness Assessment Engine (Sprint 4 - Arjuna)
+ * Menganalisis kesiapan siswa sebelum mengambil ujian akhir sertifikasi kursus.
+ */
+async function assessExamReadiness({
+  user = {},
+  userProfile = {},
+  course = {},
+  exam = {},
+  materialsCompleted = 0,
+  totalMaterials = 1,
+  examHistory = [],
+}) {
+  const studentName = user.name || 'Siswa Pembelajar';
+  const courseTitle = course.title || 'Spesialisasi Teknologi';
+  const passingScore = exam.passing_score || 70;
+  const durationMinutes = exam.duration_minutes || 60;
+  const questionCount = Array.isArray(exam.questions) ? exam.questions.length : (exam.question_count || 5);
+  const progressRatio = totalMaterials > 0 ? Math.min(1, materialsCompleted / totalMaterials) : 1;
+  const progressPct = Math.round(progressRatio * 100);
+
+  const systemPrompt = `Anda adalah Orion AI Pedagogical Assessment Engine pada platform adaptif SkillSphere AI.
+Tugas Anda adalah mengevaluasi kesiapan belajar siswa sebelum mengikuti Ujian Kelulusan Resmi bersertifikat.
+Berikan analisis akademik yang objektif, mendalam, pedagogis, dan terstruktur tanpa kata-kata klise atau tanda em dash.
+Keluarkan respon HANYA dalam format JSON murni (valid RFC 8259) tanpa komentar dan tanpa format markdown di luar json.`;
+
+  const userPrompt = `Analisis data kesiapan siswa berikut untuk Ujian Kelulusan Resmi:
+- Nama Siswa: ${studentName}
+- Target Karir: ${userProfile.career_goal || 'Software Engineer'}
+- Kursus: ${courseTitle} (Level: ${course.level || 'Intermediate'})
+- Progress Pengerjaan Materi: ${progressPct}% (${materialsCompleted} dari ${totalMaterials} materi selesai)
+- Parameter Ujian: Passing Grade ${passingScore}%, Durasi ${durationMinutes} Menit, Jumlah Soal ${questionCount} butir
+- Riwayat Ujian Sebelumnya: ${examHistory.length > 0 ? `${examHistory.length} kali percobaan (skor tertinggi: ${Math.max(...examHistory.map(h => h.score || 0))}%)` : 'Belum pernah mengikuti ujian ini'}
+
+Kembalikan evaluasi dalam format JSON dengan struktur persis seperti ini:
+{
+  "readiness_percentage": 85,
+  "readiness_level": "Sangat Siap",
+  "readiness_badge": "Status: Siap Ujian (85%)",
+  "summary": "Analisis ringkas kesiapan akademik siswa...",
+  "strengths": [
+    "Poin kekuatan 1...",
+    "Poin kekuatan 2..."
+  ],
+  "areas_to_review": [
+    "Topik atau konsep spesifik yang perlu direview 1...",
+    "Topik atau konsep spesifik yang perlu direview 2..."
+  ],
+  "study_strategy": [
+    "Langkah persiapan 1...",
+    "Langkah persiapan 2...",
+    "Langkah persiapan 3..."
+  ],
+  "exam_tips": [
+    "Tips pengerjaan soal dan manajemen waktu 1...",
+    "Tips pengerjaan soal dan manajemen waktu 2..."
+  ],
+  "confidence_verdict": "Kalimat rekomendasi apakah siswa disarankan langsung mulai atau review materi dulu."
+}`;
+
+  let rawResponse = await callGeminiAPI(userPrompt, systemPrompt, 0.4);
+  if (rawResponse) {
+    try {
+      const cleanJson = rawResponse.replace(/```json/gi, '').replace(/```/g, '').trim();
+      const parsed = JSON.parse(cleanJson);
+      if (parsed && typeof parsed.readiness_percentage === 'number' && parsed.readiness_level) {
+        return parsed;
+      }
+    } catch (e) {
+      console.warn('[Orion AI] Exam readiness JSON parse error, falling back to heuristic engine.');
+    }
+  }
+
+  // Heuristic Fallback Engine
+  return buildExamReadinessFallback({
+    studentName,
+    courseTitle,
+    passingScore,
+    durationMinutes,
+    questionCount,
+    progressPct,
+    materialsCompleted,
+    totalMaterials,
+    examHistory,
+  });
+}
+
+function buildExamReadinessFallback({
+  studentName,
+  courseTitle,
+  passingScore,
+  durationMinutes,
+  questionCount,
+  progressPct,
+  materialsCompleted,
+  totalMaterials,
+  examHistory,
+}) {
+  let readinessPercentage = 50;
+  let readinessLevel = 'Perlu Review Tambahan';
+  let confidenceVerdict = 'Sebaiknya selesaikan seluruh materi video dan rangkuman sebelum menempuh ujian akhir.';
+
+  // Perhitungan bobot kesiapan berbasis progres belajar dan riwayat nilai
+  if (progressPct >= 90) {
+    readinessPercentage = 90;
+    readinessLevel = 'Sangat Siap';
+    confidenceVerdict = 'Kesiapan Anda sudah optimal. Anda sangat direkomendasikan untuk langsung menempuh ujian kelulusan.';
+  } else if (progressPct >= 70) {
+    readinessPercentage = 75;
+    readinessLevel = 'Siap Ujian';
+    confidenceVerdict = 'Sebagian besar silabus telah Anda kuasai. Anda dapat mengikuti ujian dengan mereview topik inti terlebih dahulu.';
+  } else if (progressPct >= 40) {
+    readinessPercentage = 55;
+    readinessLevel = 'Perlu Review Tambahan';
+    confidenceVerdict = 'Progres materi Anda masih di bawah 70%. Ulangi modul-modul penting agar mampu melampaui passing grade.';
+  } else {
+    readinessPercentage = 35;
+    readinessLevel = 'Belum Siap';
+    confidenceVerdict = 'Fokuskan pembelajaran pada bab awal dan implementasi dasar sebelum mengaktifkan timer ujian resmi.';
+  }
+
+  // Modifikasi jika pernah mencoba ujian sebelumnya
+  if (examHistory.length > 0) {
+    const highestScore = Math.max(...examHistory.map(h => h.score || 0));
+    if (highestScore >= passingScore) {
+      readinessPercentage = Math.max(readinessPercentage, 95);
+      readinessLevel = 'Sangat Siap';
+      confidenceVerdict = 'Anda telah membuktikan kemampuan dengan skor kelulusan pada percobaan sebelumnya.';
+    } else {
+      readinessPercentage = Math.max(readinessPercentage, Math.round(highestScore * 0.9));
+    }
+  }
+
+  return {
+    readiness_percentage: readinessPercentage,
+    readiness_level: readinessLevel,
+    readiness_badge: `Status: ${readinessLevel} (${readinessPercentage}%)`,
+    summary: `Berdasarkan progres belajar Anda (${progressPct}% materi selesai) pada kursus "${courseTitle}", Orion AI memprediksi peluang kelulusan Anda berada pada tingkat ${readinessPercentage}% terhadap passing score ${passingScore}%.`,
+    strengths: [
+      `Telah menyelesaikan ${materialsCompleted} dari total ${totalMaterials} modul pembelajaran kurikulum.`,
+      `Memahami gambaran umum kompetensi teknis yang diujikan dalam batas waktu ${durationMinutes} menit.`,
+    ],
+    areas_to_review: [
+      'Perdalam kembali modul yang memuat studi kasus arsitektur sistem dan implementasi kode nyata.',
+      'Latih pemahaman konsep teoritis dengan memanfaatkan ringkasan materi AI dan kuis latihan mandiri.',
+    ],
+    study_strategy: [
+      'Langkah 1: Review kembali materi video atau slide presentasi pada bab-bab berbobot tinggi.',
+      'Langkah 2: Buat rangkuman kata kunci dan istilah teknis dengan fitur Study Assistant AI.',
+      'Langkah 3: Pastikan koneksi internet stabil dan cari lingkungan yang tenang sebelum mengklik tombol mulai ujian.',
+    ],
+    exam_tips: [
+      `Alokasikan waktu pengerjaan sekitar ${Math.max(1, Math.floor(durationMinutes / Math.max(1, questionCount)))} menit per butir soal agar tidak kehabisan waktu.`,
+      'Baca pertanyaan secara teliti, eliminasi opsi yang tidak relevan, dan periksa kembali sebelum melakukan final submit.',
+    ],
+    confidence_verdict: confidenceVerdict,
+  };
+}
+
 module.exports = {
   callGeminiAPI,
   generateCareerRoadmap,
@@ -1095,4 +1254,5 @@ module.exports = {
   explainCourseMaterial,
   generateMaterialNarrative,
   generateAdaptiveCourseRecommendations,
+  assessExamReadiness,
 };
