@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ruang Ujian Zen Mode | SkillSphere AI</title>
+
+  <!-- Google Fonts: Newsreader, Plus Jakarta Sans, JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-warm: #FAF9F5;
+      --surface: #FFFFFF;
+      --surface-elevated: #F5F4EE;
+      --border-subtle: #E5E4DE;
+      --border-accent: #C8A86B;
+      --text-main: #141413;
+      --text-muted: #6B6960;
+      --text-subtle: #8F8D83;
+      --primary: #1F1E1B;
+      --accent-gold: #C8A86B;
+      --success: #10B981;
+      --success-bg: #ECFDF5;
+      --warning: #F59E0B;
+      --warning-bg: #FFFBEB;
+      --danger: #EF4444;
+      --danger-bg: #FEF2F2;
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.04);
+      --shadow-md: 0 4px 20px rgba(0,0,0,0.06);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg-warm: #141413;
+        --surface: #1F1E1B;
+        --surface-elevated: #282724;
+        --border-subtle: #2C2B28;
+        --border-accent: #C8A86B;
+        --text-main: #FAF9F5;
+        --text-muted: #A3A196;
+        --text-subtle: #7A7870;
+        --primary: #FAF9F5;
+        --success-bg: #064E3B;
+        --warning-bg: #78350F;
+        --danger-bg: #7F1D1D;
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-warm);
+      color: var(--text-main);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      user-select: none;
+    }
+
+    /* Top Zen Bar */
+    .zen-header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .zen-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 1.05rem;
+      letter-spacing: -0.3px;
+    }
+
+    .zen-pill {
+      font-size: 0.75rem;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: var(--surface-elevated);
+      color: var(--text-muted);
+      font-weight: 600;
+      border: 1px solid var(--border-subtle);
+    }
+
+    .timer-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--surface-elevated);
+      border: 1px solid var(--border-subtle);
+      padding: 6px 16px;
+      border-radius: 999px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text-main);
+      transition: all 0.2s ease;
+    }
+
+    .timer-badge.urgent {
+      background: var(--danger-bg);
+      border-color: var(--danger);
+      color: var(--danger);
+      animation: pulse 1s infinite alternate;
+    }
+
+    @keyframes pulse {
+      from { transform: scale(1); }
+      to { transform: scale(1.04); }
+    }
+
+    /* Main Grid Layout */
+    .exam-container {
+      max-width: 1180px;
+      width: 100%;
+      margin: 28px auto;
+      padding: 0 20px;
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 28px;
+      flex: 1;
+      align-items: start;
+    }
+
+    @media (max-width: 900px) {
+      .exam-container {
+        grid-template-columns: 1fr;
+        margin: 18px auto;
+      }
+    }
+
+    /* Question Panel */
+    .question-panel {
+      background: var(--surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 32px 28px;
+      box-shadow: var(--shadow-sm);
+      position: relative;
+    }
+
+    @media (max-width: 600px) {
+      .question-panel {
+        padding: 20px 16px;
+      }
+    }
+
+    .q-meta-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .q-number-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      font-size: 0.92rem;
+      color: var(--accent-gold);
+    }
+
+    .q-points-tag {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      background: var(--surface-elevated);
+      padding: 3px 10px;
+      border-radius: 999px;
+    }
+
+    .q-text {
+      font-family: 'Newsreader', serif;
+      font-size: 1.45rem;
+      font-weight: 500;
+      line-height: 1.45;
+      margin-bottom: 28px;
+      color: var(--text-main);
+    }
+
+    .answers-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 32px;
+    }
+
+    .answer-card {
+      background: var(--bg-warm);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 14px 18px;
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .answer-card:hover {
+      border-color: var(--border-accent);
+      background: var(--surface-elevated);
+    }
+
+    .answer-card.selected {
+      border-color: var(--text-main);
+      background: var(--surface);
+      box-shadow: 0 0 0 2px var(--text-main);
+    }
+
+    .answer-letter {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      font-size: 0.95rem;
+      width: 28px;
+      height: 28px;
+      border-radius: var(--radius-sm);
+      background: var(--surface);
+      border: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      color: var(--text-muted);
+    }
+
+    .answer-card.selected .answer-letter {
+      background: var(--text-main);
+      color: var(--surface);
+      border-color: var(--text-main);
+    }
+
+    .answer-body {
+      font-size: 0.95rem;
+      color: var(--text-main);
+      padding-top: 2px;
+    }
+
+    /* Question Footer Buttons */
+    .q-nav-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border-subtle);
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 18px;
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      font-size: 0.88rem;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.15s ease;
+      min-height: 40px;
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--text-main);
+      border-color: var(--border-subtle);
+    }
+
+    .btn-outline:hover {
+      background: var(--surface-elevated);
+    }
+
+    .btn-doubt {
+      background: var(--warning-bg);
+      color: var(--warning);
+      border-color: rgba(245, 158, 11, 0.3);
+    }
+
+    .btn-doubt.active {
+      background: var(--warning);
+      color: #FFFFFF;
+    }
+
+    .btn-primary {
+      background: var(--text-main);
+      color: var(--surface);
+    }
+
+    .btn-primary:hover {
+      opacity: 0.92;
+    }
+
+    .btn-success {
+      background: var(--success);
+      color: #FFFFFF;
+    }
+
+    .btn-success:hover {
+      opacity: 0.92;
+    }
+
+    /* Right Sidebar: Navigator & Status */
+    .navigator-panel {
+      background: var(--surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 24px 20px;
+      box-shadow: var(--shadow-sm);
+      position: sticky;
+      top: 86px;
+    }
+
+    .nav-title {
+      font-size: 0.92rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      margin-bottom: 14px;
+    }
+
+    .nav-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .nav-btn {
+      aspect-ratio: 1;
+      border-radius: var(--radius-sm);
+      background: var(--bg-warm);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .nav-btn:hover {
+      border-color: var(--border-accent);
+    }
+
+    .nav-btn.active {
+      border-color: var(--text-main);
+      box-shadow: 0 0 0 2px var(--text-main);
+    }
+
+    .nav-btn.answered {
+      background: var(--text-main);
+      color: var(--surface);
+      border-color: var(--text-main);
+    }
+
+    .nav-btn.doubt {
+      background: var(--warning);
+      color: #FFFFFF;
+      border-color: var(--warning);
+    }
+
+    .legend-box {
+      border-top: 1px solid var(--border-subtle);
+      padding-top: 14px;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 20px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+    }
+
+    .finish-box {
+      border-top: 1px solid var(--border-subtle);
+      padding-top: 18px;
+    }
+
+    /* Result Modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.65);
+      backdrop-filter: blur(4px);
+      z-index: 100;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-content {
+      background: var(--surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      max-width: 520px;
+      width: 100%;
+      padding: 36px 30px;
+      text-align: center;
+      box-shadow: var(--shadow-md);
+      position: relative;
+    }
+
+    .modal-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 999px;
+      margin: 0 auto 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-icon.pass {
+      background: var(--success-bg);
+      color: var(--success);
+    }
+
+    .modal-icon.fail {
+      background: var(--danger-bg);
+      color: var(--danger);
+    }
+
+    .modal-title {
+      font-family: 'Newsreader', serif;
+      font-size: 1.85rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .score-circle {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 2.4rem;
+      font-weight: 700;
+      margin: 16px 0 6px;
+    }
+
+    .score-circle.pass { color: var(--success); }
+    .score-circle.fail { color: var(--danger); }
+  </style>
+</head>
+<body>
+
+  <!-- Top Zen Bar Header -->
+  <header class="zen-header">
+    <div class="zen-brand">
+      <span style="color: var(--accent-gold);">✦</span>
+      <span id="headerCourseTitle">Ujian Kelulusan Resmi</span>
+      <span class="zen-pill">Zen Mode</span>
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 14px;">
+      <div id="timerDisplay" class="timer-badge">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <polyline points="12 6 12 12 16 14"></polyline>
+        </svg>
+        <span id="timerText">--:--</span>
+      </div>
+
+      <button type="button" class="btn btn-outline" style="min-height: 36px; padding: 4px 12px; font-size: 0.8rem;" onclick="exitExamWarning()">
+        Keluar
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="exam-container">
+    <!-- Left: Question Area -->
+    <div class="question-panel" id="questionPanel">
+      <div class="q-meta-bar">
+        <div class="q-number-tag" id="currentQTag">Soal #1</div>
+        <div class="q-points-tag">10 Poin</div>
+      </div>
+
+      <div class="q-text" id="questionText">
+        Memuat soal ujian kelulusan Anda...
+      </div>
+
+      <div class="answers-list" id="answersList">
+        <!-- Opsi Jawaban Dinamis -->
+      </div>
+
+      <div class="q-nav-actions">
+        <button type="button" class="btn btn-outline" id="prevBtn" onclick="prevQuestion()">
+          ← Sebelumnya
+        </button>
+
+        <button type="button" class="btn btn-doubt" id="doubtBtn" onclick="toggleDoubt()">
+          ★ Tandai Ragu
+        </button>
+
+        <button type="button" class="btn btn-primary" id="nextBtn" onclick="nextQuestion()">
+          Selanjutnya →
+        </button>
+      </div>
+    </div>
+
+    <!-- Right: Number Grid Navigator -->
+    <aside class="navigator-panel">
+      <div class="nav-title">Navigasi Butir Soal</div>
+
+      <div class="nav-grid" id="navGrid">
+        <!-- Tombol nomor 1..N dinamis -->
+      </div>
+
+      <div class="legend-box">
+        <div class="legend-item">
+          <span class="legend-dot" style="background: var(--text-main);"></span>
+          <span>Sudah Terjawab</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-dot" style="background: var(--warning);"></span>
+          <span>Ditandai Ragu-Ragu</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-dot" style="background: var(--bg-warm); border: 1px solid var(--border-subtle);"></span>
+          <span>Belum Dijawab</span>
+        </div>
+      </div>
+
+      <div class="finish-box">
+        <button type="button" class="btn btn-success" style="width: 100%; min-height: 44px;" onclick="confirmSubmitExam()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          Kumpulkan Jawaban
+        </button>
+      </div>
+    </aside>
+  </main>
+
+  <!-- Result Modal -->
+  <div class="modal-overlay" id="resultModal">
+    <div class="modal-content">
+      <div class="modal-icon" id="modalIcon"></div>
+      <h2 class="modal-title" id="modalTitle">Hasil Ujian</h2>
+      <p style="color: var(--text-muted); font-size: 0.92rem;" id="modalDesc"></p>
+
+      <div class="score-circle" id="modalScore">0%</div>
+      <div style="font-size: 0.85rem; color: var(--text-subtle); margin-bottom: 24px;" id="modalPassingInfo"></div>
+
+      <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;" id="modalActions">
+        <!-- Tombol dinamis -->
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const examId = '<%= examId %>';
+    let examData = null;
+    let questions = [];
+    let currentIndex = 0;
+    let studentAnswers = {};
+    let doubts = {};
+    let timerInterval = null;
+    let remainingSeconds = 3600;
+    let isSubmitting = false;
+
+    async function initExam() {
+      try {
+        const token = localStorage.getItem('token') || '';
+        const res = await fetch('/api/exams/' + examId, {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        const json = await res.json();
+
+        if (!json.success || !json.data) {
+          alert(json.message || 'Gagal memuat ujian kelulusan.');
+          window.location.href = '/dashboard';
+          return;
+        }
+
+        examData = json.data;
+        questions = examData.questions || [];
+
+        if (questions.length === 0) {
+          alert('Ujian ini belum memiliki pertanyaan.');
+          window.location.href = '/dashboard';
+          return;
+        }
+
+        if (examData.course && examData.course.title) {
+          document.getElementById('headerCourseTitle').textContent = examData.course.title;
+        }
+
+        remainingSeconds = (examData.duration_minutes || 60) * 60;
+        startTimer();
+        renderNavGrid();
+        renderQuestion(0);
+      } catch (err) {
+        console.error('Error init exam:', err);
+        alert('Gagal memuat data ujian.');
+      }
+    }
+
+    function startTimer() {
+      updateTimerDisplay();
+      timerInterval = setInterval(() => {
+        remainingSeconds--;
+        updateTimerDisplay();
+
+        if (remainingSeconds <= 0) {
+          clearInterval(timerInterval);
+          alert('Batas waktu ujian telah habis! Jawaban Anda akan otomatis dikumpulkan.');
+          submitExam();
+        }
+      }, 1000);
+    }
+
+    function updateTimerDisplay() {
+      const minutes = Math.floor(remainingSeconds / 60);
+      const seconds = remainingSeconds % 60;
+      const display = String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
+
+      const el = document.getElementById('timerText');
+      el.textContent = display;
+
+      const badge = document.getElementById('timerDisplay');
+      if (remainingSeconds <= 300) {
+        badge.classList.add('urgent');
+      }
+    }
+
+    function renderNavGrid() {
+      const grid = document.getElementById('navGrid');
+      grid.innerHTML = '';
+
+      questions.forEach((q, idx) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'nav-btn';
+        btn.textContent = idx + 1;
+        btn.id = 'navBtn_' + idx;
+
+        if (idx === currentIndex) btn.classList.add('active');
+        if (studentAnswers[String(q.id || idx + 1)]) btn.classList.add('answered');
+        if (doubts[idx]) btn.classList.add('doubt');
+
+        btn.onclick = () => renderQuestion(idx);
+        grid.appendChild(btn);
+      });
+    }
+
+    function renderQuestion(idx) {
+      if (idx < 0 || idx >= questions.length) return;
+      currentIndex = idx;
+
+      const q = questions[idx];
+      const qId = String(q.id || idx + 1);
+
+      document.getElementById('currentQTag').textContent = 'Soal #' + (idx + 1) + ' dari ' + questions.length;
+      document.getElementById('questionText').textContent = q.question;
+
+      // Update Opsi Jawaban
+      const list = document.getElementById('answersList');
+      list.innerHTML = '';
+
+      const optionLetters = ['A', 'B', 'C', 'D'];
+      (q.options || []).forEach((optText, optIdx) => {
+        const letter = optionLetters[optIdx] || String(optIdx + 1);
+        const card = document.createElement('div');
+        const isSelected = studentAnswers[qId] === letter;
+
+        card.className = 'answer-card ' + (isSelected ? 'selected' : '');
+        card.innerHTML = `
+          <div class="answer-letter">${letter}</div>
+          <div class="answer-body">${escapeHtml(optText)}</div>
+        `;
+        card.onclick = () => selectAnswer(qId, letter);
+        list.appendChild(card);
+      });
+
+      // Tombol Ragu
+      const doubtBtn = document.getElementById('doubtBtn');
+      if (doubts[idx]) {
+        doubtBtn.classList.add('active');
+        doubtBtn.textContent = '★ Ragu (Aktif)';
+      } else {
+        doubtBtn.classList.remove('active');
+        doubtBtn.textContent = '★ Tandai Ragu';
+      }
+
+      // Tombol Navigasi Prev/Next
+      document.getElementById('prevBtn').style.visibility = idx === 0 ? 'hidden' : 'visible';
+      const nextBtn = document.getElementById('nextBtn');
+      if (idx === questions.length - 1) {
+        nextBtn.textContent = 'Selesai & Kumpulkan →';
+        nextBtn.onclick = confirmSubmitExam;
+      } else {
+        nextBtn.textContent = 'Selanjutnya →';
+        nextBtn.onclick = nextQuestion;
+      }
+
+      updateNavButtonsState();
+    }
+
+    function selectAnswer(qId, letter) {
+      studentAnswers[qId] = letter;
+      renderQuestion(currentIndex);
+    }
+
+    function toggleDoubt() {
+      doubts[currentIndex] = !doubts[currentIndex];
+      renderQuestion(currentIndex);
+    }
+
+    function prevQuestion() {
+      if (currentIndex > 0) renderQuestion(currentIndex - 1);
+    }
+
+    function nextQuestion() {
+      if (currentIndex < questions.length - 1) renderQuestion(currentIndex + 1);
+    }
+
+    function updateNavButtonsState() {
+      questions.forEach((q, idx) => {
+        const btn = document.getElementById('navBtn_' + idx);
+        if (!btn) return;
+
+        btn.className = 'nav-btn';
+        if (idx === currentIndex) btn.classList.add('active');
+        if (studentAnswers[String(q.id || idx + 1)]) btn.classList.add('answered');
+        if (doubts[idx]) btn.classList.add('doubt');
+      });
+    }
+
+    function confirmSubmitExam() {
+      const answeredCount = Object.keys(studentAnswers).length;
+      const totalCount = questions.length;
+      const unanswered = totalCount - answeredCount;
+
+      let msg = `Anda telah menjawab ${answeredCount} dari total ${totalCount} soal.`;
+      if (unanswered > 0) {
+        msg += `\nMasih ada ${unanswered} soal yang belum Anda jawab. Yakin ingin mengumpulkan sekarang?`;
+      } else {
+        msg += '\nApakah Anda sudah yakin dengan seluruh jawaban Anda?';
+      }
+
+      if (confirm(msg)) {
+        submitExam();
+      }
+    }
+
+    async function submitExam() {
+      if (isSubmitting) return;
+      isSubmitting = true;
+      clearInterval(timerInterval);
+
+      try {
+        const token = localStorage.getItem('token') || '';
+        const res = await fetch('/api/exams/' + examId + '/submit', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+          body: JSON.stringify({
+            answers: studentAnswers,
+            time_spent_seconds: ((examData.duration_minutes || 60) * 60) - remainingSeconds
+          })
+        });
+
+        const json = await res.json();
+        if (json.success && json.data) {
+          showResultModal(json.data);
+        } else {
+          alert(json.message || 'Gagal mengirimkan jawaban.');
+          isSubmitting = false;
+        }
+      } catch (err) {
+        console.error('Error submitting exam:', err);
+        alert('Terjadi kesalahan koneksi saat mengumpulkan jawaban.');
+        isSubmitting = false;
+      }
+    }
+
+    function showResultModal(data) {
+      const modal = document.getElementById('resultModal');
+      const icon = document.getElementById('modalIcon');
+      const title = document.getElementById('modalTitle');
+      const desc = document.getElementById('modalDesc');
+      const score = document.getElementById('modalScore');
+      const info = document.getElementById('modalPassingInfo');
+      const actions = document.getElementById('modalActions');
+
+      score.textContent = data.score + '%';
+      info.textContent = `Passing Grade Kelulusan: ${data.passing_score}% • Jawaban Benar: ${data.correct_count} / ${data.total_questions}`;
+
+      if (data.is_passed) {
+        icon.className = 'modal-icon pass';
+        icon.innerHTML = `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+        title.textContent = 'Selamat! Anda Dinyatakan Lulus';
+        desc.textContent = 'Kompetensi teknis Anda telah teruji dan memenuhi kualifikasi resmi SkillSphere AI. Sertifikat kelulusan Anda telah diterbitkan secara otomatis.';
+
+        score.className = 'score-circle pass';
+
+        const certCode = data.certificate ? data.certificate.certificate_code : '';
+        actions.innerHTML = `
+          ${certCode ? `
+            <a href="/verify-cert/${certCode}" class="btn btn-primary" target="_blank">
+              Lihat Sertifikat Resmi
+            </a>
+            <a href="/api/certificates/${certCode}/pdf" class="btn btn-outline" target="_blank">
+              Unduh PDF
+            </a>
+          ` : ''}
+          <a href="/dashboard" class="btn btn-outline">Kembali ke Dashboard</a>
+        `;
+      } else {
+        icon.className = 'modal-icon fail';
+        icon.innerHTML = `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
+        title.textContent = 'Belum Mencapai Passing Grade';
+        desc.textContent = 'Jangan berkecil hati. Pelajari kembali materi modul yang belum Anda kuasai dengan bantuan AI Mentor dan Anda dapat mengulang ujian ini.';
+
+        score.className = 'score-circle fail';
+        actions.innerHTML = `
+          <a href="/dashboard" class="btn btn-primary">Kembali ke Silabus Materi</a>
+        `;
+      }
+
+      modal.style.display = 'flex';
+    }
+
+    function exitExamWarning() {
+      if (confirm('Apakah Anda yakin ingin keluar dari sesi ujian? Jawaban Anda yang belum disubmit tidak akan tersimpan.')) {
+        window.location.href = '/dashboard';
+      }
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    document.addEventListener('DOMContentLoaded', initExam);
+  </script>
+</body>
+</html>

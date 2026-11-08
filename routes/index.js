@@ -82,6 +82,24 @@ router.get(['/courses/:id/learn', '/courses/:id/ruang-belajar'], function(req, r
   res.render('courses/learn', { title: 'Ruang Belajar Interaktif | SkillSphere AI', courseId: req.params.id });
 });
 
+/* GET Interactive Zen Exam Mode Room (Sprint 4 - Bustanul Arifin) */
+router.get(['/exam/:id', '/ujian/:id'], function(req, res, next) {
+  res.render('student/exam', { title: 'Ruang Ujian Zen Mode | SkillSphere AI', examId: req.params.id });
+});
+
+router.get(['/courses/:courseId/exam', '/courses/:courseId/ujian'], async function(req, res, next) {
+  try {
+    const { Exam } = require('../models');
+    const exam = await Exam.findOne({ where: { course_id: req.params.courseId } });
+    if (exam) {
+      return res.redirect(`/exam/${exam.id}`);
+    }
+    return res.redirect(`/courses/${req.params.courseId}`);
+  } catch (err) {
+    next(err);
+  }
+});
+
 /* GET cinematic warp transition page */
 router.get('/warp', function(req, res, next) {
   res.render('warp', { title: 'Memasuki Ruang Belajar | SkillSphere AI' });
