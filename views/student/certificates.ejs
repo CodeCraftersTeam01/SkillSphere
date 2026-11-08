@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sertifikat & Milestone Belajar | SkillSphere AI</title>
+
+  <!-- Google Fonts: Newsreader, Plus Jakarta Sans, JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-warm: #FAF9F5;
+      --surface: #FFFFFF;
+      --surface-elevated: #F5F4EE;
+      --border-subtle: #E5E4DE;
+      --border-accent: #C8A86B;
+      --text-main: #141413;
+      --text-muted: #6B6960;
+      --text-subtle: #8F8D83;
+      --primary: #1F1E1B;
+      --accent-gold: #C8A86B;
+      --success: #10B981;
+      --success-bg: #ECFDF5;
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.04);
+      --shadow-md: 0 4px 20px rgba(0,0,0,0.06);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg-warm: #141413;
+        --surface: #1F1E1B;
+        --surface-elevated: #282724;
+        --border-subtle: #2C2B28;
+        --border-accent: #C8A86B;
+        --text-main: #FAF9F5;
+        --text-muted: #A3A196;
+        --text-subtle: #7A7870;
+        --primary: #FAF9F5;
+        --success-bg: #064E3B;
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-warm);
+      color: var(--text-main);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .header-bar {
+      border-bottom: 1px solid var(--border-subtle);
+      background: var(--surface);
+      padding: 16px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 40;
+    }
+
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--text-main);
+      font-weight: 700;
+      font-size: 1.15rem;
+    }
+
+    .brand-sparkle {
+      color: var(--accent-gold);
+      font-size: 1.3rem;
+    }
+
+    .container {
+      max-width: 1040px;
+      width: 100%;
+      margin: 36px auto;
+      padding: 0 20px;
+      flex: 1;
+    }
+
+    .page-header {
+      margin-bottom: 32px;
+    }
+
+    .page-title {
+      font-family: 'Newsreader', serif;
+      font-size: 2.3rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+      letter-spacing: -0.5px;
+    }
+
+    .page-subtitle {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    .section-title {
+      font-family: 'Newsreader', serif;
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin: 36px 0 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* Certificates Grid */
+    .certs-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 20px;
+      margin-bottom: 36px;
+    }
+
+    .cert-card {
+      background: var(--surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .cert-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+      border-color: var(--border-accent);
+    }
+
+    .cert-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #C8A86B, #E5E4DE);
+    }
+
+    .cert-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .cert-code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      background: var(--surface-elevated);
+      padding: 3px 8px;
+      border-radius: var(--radius-sm);
+    }
+
+    .cert-badge {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--success);
+      background: var(--success-bg);
+      padding: 3px 10px;
+      border-radius: 999px;
+    }
+
+    .cert-course-title {
+      font-family: 'Newsreader', serif;
+      font-size: 1.35rem;
+      font-weight: 600;
+      line-height: 1.3;
+      margin-bottom: 8px;
+    }
+
+    .cert-meta {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+    }
+
+    .cert-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    /* Milestone & Discount Vouchers */
+    .vouchers-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 16px;
+      margin-bottom: 36px;
+    }
+
+    .voucher-card {
+      background: var(--surface);
+      border: 1px dashed var(--border-accent);
+      border-radius: var(--radius-md);
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: linear-gradient(135deg, var(--surface) 0%, var(--surface-elevated) 100%);
+    }
+
+    .voucher-discount {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--accent-gold);
+      line-height: 1;
+    }
+
+    .voucher-code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.88rem;
+      font-weight: 600;
+      background: var(--surface);
+      border: 1px solid var(--border-subtle);
+      padding: 4px 10px;
+      border-radius: var(--radius-sm);
+      display: inline-block;
+      margin-top: 6px;
+      user-select: all;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 8px 14px;
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      font-size: 0.82rem;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.15s ease;
+      min-height: 36px;
+    }
+
+    .btn-primary {
+      background: var(--text-main);
+      color: var(--surface);
+      border: 1px solid var(--text-main);
+    }
+
+    .btn-primary:hover {
+      opacity: 0.92;
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--text-main);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .btn-outline:hover {
+      background: var(--surface-elevated);
+    }
+
+    /* Modal Visualisasi Preview Sertifikat */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.65);
+      backdrop-filter: blur(4px);
+      z-index: 100;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-card {
+      background: var(--surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      max-width: 680px;
+      width: 100%;
+      padding: 32px 28px;
+      box-shadow: var(--shadow-md);
+      position: relative;
+    }
+
+    .preview-paper {
+      background: #FAF9F5;
+      color: #141413;
+      border: 2px solid #C8A86B;
+      border-radius: var(--radius-md);
+      padding: 28px 24px;
+      text-align: center;
+      margin-bottom: 20px;
+      position: relative;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 48px 20px;
+      background: var(--surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation -->
+  <header class="header-bar">
+    <a href="/dashboard" class="brand-logo">
+      <span class="brand-sparkle">✦</span>
+      <span>SkillSphere AI</span>
+    </a>
+    <a href="/dashboard" class="btn btn-outline">Kembali ke Dashboard</a>
+  </header>
+
+  <main class="container">
+    <div class="page-header">
+      <h1 class="page-title">Sertifikat & Pencapaian Belajar</h1>
+      <p class="page-subtitle">Pantau seluruh sertifikat kompetensi resmi dan klaim voucher diskon dari milestone belajar Anda.</p>
+    </div>
+
+    <!-- 1. Bagian Sertifikat Kelulusan Resmi -->
+    <h2 class="section-title">
+      <span>✦</span> Sertifikat Kelulusan Resmi
+    </h2>
+
+    <div class="certs-grid" id="certsContainer">
+      <div class="empty-state" style="grid-column: 1 / -1;">
+        Memuat sertifikat resmi Anda...
+      </div>
+    </div>
+
+    <!-- 2. Bagian Voucher Diskon Milestone Belajar -->
+    <h2 class="section-title">
+      <span>★</span> Voucher Diskon dari Tantangan Milestone
+    </h2>
+
+    <div class="vouchers-grid" id="vouchersContainer">
+      <div class="empty-state" style="grid-column: 1 / -1;">
+        Memuat voucher diskon Anda...
+      </div>
+    </div>
+  </main>
+
+  <!-- Modal Preview Sertifikat Interaktif -->
+  <div class="modal-overlay" id="previewModal" onclick="closePreviewModal(event)">
+    <div class="modal-card" onclick="event.stopPropagation()">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
+        <h3 style="font-family: 'Newsreader', serif; font-size: 1.4rem;">Pratinjau Kredensial Resmi</h3>
+        <button type="button" class="btn btn-outline" style="padding: 4px 10px;" onclick="document.getElementById('previewModal').style.display='none'">✕</button>
+      </div>
+
+      <div class="preview-paper">
+        <div style="font-size: 0.78rem; letter-spacing: 2px; font-weight: 700; color: #7A7870;">SKILLSPHERE AI CERTIFICATION</div>
+        <div style="font-family: 'Newsreader', serif; font-size: 1.6rem; font-weight: 600; color: #C8A86B; margin: 6px 0;">SERTIFIKAT KELULUSAN RESMI</div>
+        <div style="font-size: 0.85rem; color: #615F56;">Diberikan dengan bangga kepada:</div>
+        <div style="font-family: 'Newsreader', serif; font-size: 1.5rem; font-weight: 700; margin: 8px 0;" id="previewStudentName">-</div>
+        <div style="font-size: 0.85rem; color: #474640; max-width: 480px; margin: 0 auto 12px;">Telah menyelesaikan kurikulum dan lulus Ujian Kelulusan Resmi pada kelas:</div>
+        <div style="font-size: 1.1rem; font-weight: 700;" id="previewCourseTitle">-</div>
+        <div style="font-size: 0.8rem; color: #615F56; margin-top: 14px;">
+          <span id="previewScore">-</span> • <span id="previewDate">-</span>
+        </div>
+        <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: #8F8D83; margin-top: 10px;" id="previewCertCode">-</div>
+      </div>
+
+      <div style="display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap;">
+        <button type="button" class="btn btn-outline" id="btnCopyVerify">
+          Salin Tautan Verifikasi
+        </button>
+        <a href="#" target="_blank" class="btn btn-outline" id="btnOpenVerify">
+          Buka Halaman Verifikasi
+        </a>
+        <a href="#" target="_blank" class="btn btn-primary" id="btnDownloadPdf">
+          Unduh PDF Resmi
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    async function loadCertificates() {
+      const container = document.getElementById('certsContainer');
+      try {
+        const token = localStorage.getItem('token') || '';
+        const res = await fetch('/api/certificates/my-certificates', {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        const json = await res.json();
+
+        const certs = (json.data && Array.isArray(json.data)) ? json.data : [];
+
+        if (certs.length === 0) {
+          container.innerHTML = `
+            <div class="empty-state" style="grid-column: 1 / -1;">
+              <p style="font-size: 1.05rem; font-weight: 600; margin-bottom: 6px;">Belum Ada Sertifikat Kelulusan</p>
+              <p style="font-size: 0.88rem;">Selesaikan kursus dan ikuti Ujian Kelulusan Resmi untuk memperoleh sertifikat kompetensi Anda.</p>
+              <a href="/catalog" class="btn btn-primary" style="margin-top: 14px;">Jelajahi Katalog Kursus</a>
+            </div>
+          `;
+          return;
+        }
+
+        container.innerHTML = '';
+        certs.forEach(cert => {
+          const card = document.createElement('div');
+          card.className = 'cert-card';
+
+          const formattedDate = new Date(cert.issue_date || Date.now()).toLocaleDateString('id-ID', {
+            year: 'numeric', month: 'long', day: 'numeric'
+          });
+
+          card.innerHTML = `
+            <div>
+              <div class="cert-top">
+                <span class="cert-code">${cert.certificate_code}</span>
+                <span class="cert-badge">Terverifikasi (Skor: ${cert.exam_score}%)</span>
+              </div>
+              <h3 class="cert-course-title">${escapeHtml(cert.course_title)}</h3>
+              <p class="cert-meta">Instruktur: ${escapeHtml(cert.tutor_name)} • Diterbitkan ${formattedDate}</p>
+            </div>
+            <div class="cert-actions">
+              <button type="button" class="btn btn-outline" onclick="openPreview('${cert.certificate_code}', '${escapeHtml(cert.course_title)}', '${cert.exam_score}%', '${formattedDate}')">
+                Lihat Pratinjau
+              </button>
+              <a href="/api/certificates/${cert.certificate_code}/pdf" target="_blank" class="btn btn-primary">
+                Unduh PDF
+              </a>
+              <button type="button" class="btn btn-outline" onclick="copyVerifyUrl('${cert.certificate_code}')">
+                Bagikan
+              </button>
+            </div>
+          `;
+          container.appendChild(card);
+        });
+      } catch (err) {
+        console.error('Error loading certs:', err);
+        container.innerHTML = `<div class="empty-state" style="grid-column: 1 / -1;">Gagal memuat sertifikat Anda.</div>`;
+      }
+    }
+
+    async function loadVouchers() {
+      const container = document.getElementById('vouchersContainer');
+      try {
+        const token = localStorage.getItem('token') || '';
+        const res = await fetch('/api/milestones/discounts', {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        const json = await res.json();
+
+        const vouchers = (json.data && Array.isArray(json.data)) ? json.data : [];
+
+        if (vouchers.length === 0) {
+          container.innerHTML = `
+            <div class="empty-state" style="grid-column: 1 / -1;">
+              <p style="font-size: 1.05rem; font-weight: 600; margin-bottom: 6px;">Belum Ada Voucher Diskon Aktif</p>
+              <p style="font-size: 0.88rem;">Selesaikan modul kursus tepat waktu untuk memenangkan voucher diskon belanja kursus selanjutnya!</p>
+            </div>
+          `;
+          return;
+        }
+
+        container.innerHTML = '';
+        vouchers.forEach(v => {
+          const card = document.createElement('div');
+          card.className = 'voucher-card';
+          card.innerHTML = `
+            <div>
+              <div style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600;">VOUCHER DISKON</div>
+              <div class="voucher-discount">${v.discount_pct}% OFF</div>
+              <div class="voucher-code">${v.discount_code}</div>
+            </div>
+            <div>
+              <button type="button" class="btn btn-outline" onclick="copyCode('${v.discount_code}')">
+                Salin Kode
+              </button>
+            </div>
+          `;
+          container.appendChild(card);
+        });
+      } catch (err) {
+        console.error('Error loading vouchers:', err);
+        container.innerHTML = `<div class="empty-state" style="grid-column: 1 / -1;">Gagal memuat daftar voucher.</div>`;
+      }
+    }
+
+    function openPreview(code, title, score, date) {
+      document.getElementById('previewCertCode').textContent = 'KODE SERTIFIKAT: ' + code;
+      document.getElementById('previewCourseTitle').textContent = title;
+      document.getElementById('previewScore').textContent = 'Nilai: ' + score;
+      document.getElementById('previewDate').textContent = 'Terbit: ' + date;
+      document.getElementById('previewStudentName').textContent = localStorage.getItem('userName') || 'Siswa Pembelajar';
+
+      document.getElementById('btnDownloadPdf').href = '/api/certificates/' + code + '/pdf';
+      document.getElementById('btnOpenVerify').href = '/verify-cert/' + code;
+      document.getElementById('btnCopyVerify').onclick = () => copyVerifyUrl(code);
+
+      document.getElementById('previewModal').style.display = 'flex';
+    }
+
+    function closePreviewModal(e) {
+      if (e.target.id === 'previewModal') {
+        document.getElementById('previewModal').style.display = 'none';
+      }
+    }
+
+    function copyVerifyUrl(code) {
+      const url = window.location.origin + '/verify-cert/' + code;
+      navigator.clipboard.writeText(url).then(() => {
+        alert('Tautan verifikasi keaslian sertifikat berhasil disalin:\n' + url);
+      });
+    }
+
+    function copyCode(code) {
+      navigator.clipboard.writeText(code).then(() => {
+        alert('Kode voucher diskon ' + code + ' berhasil disalin ke clipboard!');
+      });
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadCertificates();
+      loadVouchers();
+    });
+  </script>
+</body>
+</html>

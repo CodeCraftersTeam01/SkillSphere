@@ -55,6 +55,11 @@ router.get(['/wishlist', '/dashboard/wishlist', '/kursus-favorit'], function(req
   res.render('student/wishlist', { title: 'Wishlist Kursus Favorit | SkillSphere AI' });
 });
 
+/* GET Student Certificates & Milestones Page (Sprint 4 - Fadiyah) */
+router.get(['/certificates', '/dashboard/certificates', '/sertifikat'], function(req, res, next) {
+  res.render('student/certificates', { title: 'Sertifikat & Milestone Belajar | SkillSphere AI' });
+});
+
 
 /* GET Course Catalog Page (Sprint 2 - Fadiyah) */
 router.get(['/courses', '/catalog', '/katalog'], function(req, res, next) {
