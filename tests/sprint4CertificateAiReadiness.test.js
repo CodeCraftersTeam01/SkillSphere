@@ -390,6 +390,7 @@ async function runTests() {
     if (server) {
       server.close();
     }
+    process.exit(0);
   }
 }
 
