@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pembuat Ujian Kelulusan | Studio Pengajar SkillSphere AI</title>
+
+  <!-- Google Fonts: Newsreader, Plus Jakarta Sans, JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-warm: #FAF9F5;
+      --surface: #FFFFFF;
+      --surface-elevated: #F4F3EE;
+      --border-subtle: #E5E4DE;
+      --border-accent: #C8A86B;
+      --text-main: #141413;
+      --text-muted: #6B6960;
+      --text-subtle: #8F8D83;
+      --primary: #1F1E1B;
+      --primary-hover: #000000;
+      --accent-gold: #C8A86B;
+      --success: #10B981;
+      --success-bg: #ECFDF5;
+      --danger: #EF4444;
+      --danger-bg: #FEF2F2;
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.04);
+      --shadow-md: 0 4px 16px rgba(0,0,0,0.06);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg-warm: #141413;
+        --surface: #1F1E1B;
+        --surface-elevated: #2A2926;
+        --border-subtle: #2F2E2B;
+        --border-accent: #C8A86B;
+        --text-main: #FAF9F5;
+        --text-muted: #A3A196;
+        --text-subtle: #7A7870;
+        --primary: #FAF9F5;
+        --primary-hover: #FFFFFF;
+        --success-bg: #064E3B;
+        --danger-bg: #7F1D1D;
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-warm);
+      color: var(--text-main);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .header-bar {
+      border-bottom: 1px solid var(--border-subtle);
+      background: var(--surface);
+      padding: 16px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 40;
+    }
+
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--text-main);
+      font-weight: 700;
+      font-size: 1.15rem;
+    }
+
+    .brand-sparkle {
+      color: var(--accent-gold);
+      font-size: 1.3rem;
+    }
+
+    .brand-tag {
+      font-size: 0.75rem;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: var(--surface-elevated);
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .nav-pill {
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      padding: 8px 14px;
+      border-radius: var(--radius-sm);
+      transition: all 0.15s ease;
+    }
+
+    .nav-pill:hover {
+      color: var(--text-main);
+      background: var(--surface-elevated);
+    }
+
+    .nav-pill.active {
+      color: var(--text-main);
+      background: var(--surface-elevated);
+      font-weight: 600;
+    }
+
+    .container {
+      max-width: 1040px;
+      width: 100%;
+      margin: 36px auto;
+      padding: 0 20px;
+      flex: 1;
+    }
+
+    .page-header {
+      margin-bottom: 28px;
+    }
+
+    .page-title {
+      font-family: 'Newsreader', serif;
+      font-size: 2.2rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+      letter-spacing: -0.5px;
+    }
+
+    .page-subtitle {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 28px 24px;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 24px;
+    }
+
+    .card-title {
+      font-family: 'Newsreader', serif;
+      font-size: 1.35rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-desc {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 12px 14px;
+      font-size: 0.95rem;
+      font-family: inherit;
+      color: var(--text-main);
+      background: var(--bg-warm);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      outline: none;
+      transition: border-color 0.15s ease;
+    }
+
+    .form-control:focus {
+      border-color: var(--accent-gold);
+      box-shadow: 0 0 0 3px rgba(200, 168, 107, 0.15);
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    @media (max-width: 680px) {
+      .grid-2 {
+        grid-template-columns: 1fr;
+      }
+      .header-bar {
+        padding: 14px 18px;
+      }
+      .page-title {
+        font-size: 1.8rem;
+      }
+    }
+
+    .question-card {
+      background: var(--bg-warm);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 20px;
+      margin-bottom: 18px;
+      position: relative;
+    }
+
+    .question-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
+    .question-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.82rem;
+      font-weight: 600;
+      background: var(--surface);
+      border: 1px solid var(--border-subtle);
+      padding: 3px 10px;
+      border-radius: 999px;
+    }
+
+    .btn-delete-q {
+      background: transparent;
+      border: none;
+      color: var(--danger);
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 8px;
+      border-radius: var(--radius-sm);
+    }
+
+    .btn-delete-q:hover {
+      background: var(--danger-bg);
+    }
+
+    .options-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    @media (max-width: 600px) {
+      .options-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .option-item {
+      background: var(--surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .option-item.correct {
+      border-color: var(--success);
+      background: var(--success-bg);
+    }
+
+    .option-radio {
+      accent-color: var(--accent-gold);
+      cursor: pointer;
+      width: 18px;
+      height: 18px;
+    }
+
+    .option-input {
+      border: none;
+      background: transparent;
+      outline: none;
+      width: 100%;
+      font-size: 0.9rem;
+      font-family: inherit;
+      color: var(--text-main);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 20px;
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      font-size: 0.92rem;
+      text-decoration: none;
+      cursor: pointer;
+      border: none;
+      transition: all 0.15s ease;
+      min-height: 44px;
+    }
+
+    .btn-primary {
+      background: var(--text-main);
+      color: var(--surface);
+    }
+
+    .btn-primary:hover {
+      opacity: 0.92;
+      transform: translateY(-1px);
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--text-main);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .btn-outline:hover {
+      background: var(--surface-elevated);
+    }
+
+    .btn-accent {
+      background: var(--accent-gold);
+      color: #FFFFFF;
+    }
+
+    .btn-accent:hover {
+      opacity: 0.92;
+      transform: translateY(-1px);
+    }
+
+    .sticky-footer {
+      position: sticky;
+      bottom: 0;
+      background: var(--surface);
+      border-top: 1px solid var(--border-subtle);
+      padding: 16px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      z-index: 30;
+      box-shadow: 0 -4px 12px rgba(0,0,0,0.03);
+    }
+
+    .stat-pill {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .stat-item strong {
+      color: var(--text-main);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .toast {
+      position: fixed;
+      top: 24px;
+      right: 24px;
+      padding: 14px 20px;
+      border-radius: var(--radius-md);
+      font-size: 0.9rem;
+      font-weight: 600;
+      z-index: 9999;
+      display: none;
+      box-shadow: var(--shadow-md);
+    }
+
+    .toast-success {
+      background: var(--success-bg);
+      color: var(--success);
+      border: 1px solid var(--success);
+    }
+
+    .toast-error {
+      background: var(--danger-bg);
+      color: var(--danger);
+      border: 1px solid var(--danger);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <header class="header-bar">
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <a href="/dashboard" class="brand-logo">
+        <span class="brand-sparkle">✦</span>
+        <span>SkillSphere Studio</span>
+        <span class="brand-tag">Pengajar</span>
+      </a>
+
+      <nav class="nav-links">
+        <a href="/tutor/materials" class="nav-pill">Kurikulum & Materi</a>
+        <a href="/tutor/exams" class="nav-pill active">Ujian Kelulusan</a>
+        <a href="/tutor/wallet" class="nav-pill">Dompet & Penarikan</a>
+      </nav>
+    </div>
+
+    <div>
+      <a href="/dashboard" class="btn btn-outline" style="min-height: 36px; padding: 6px 14px; font-size: 0.82rem;">
+        Dashboard Utama
+      </a>
+    </div>
+  </header>
+
+  <div id="toast" class="toast"></div>
+
+  <main class="container">
+    <div class="page-header">
+      <h1 class="page-title">Pembuat Ujian Kelulusan Resmi</h1>
+      <p class="page-subtitle">Rancang butir soal, passing grade kelulusan, dan batas waktu pengerjaan untuk sertifikasi siswa.</p>
+    </div>
+
+    <!-- 1. Pemilihan Kursus -->
+    <div class="card">
+      <h2 class="card-title">1. Pilih Kursus Target</h2>
+      <p class="card-desc">Pilih kelas yang ingin Anda kelola bank soal ujian kelulusannya.</p>
+
+      <div class="form-group">
+        <label class="form-label" for="courseSelect">Kursus yang Anda Ampu</label>
+        <select id="courseSelect" class="form-control" onchange="loadCourseExam()">
+          <option value="">Memuat daftar kursus Anda...</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- 2. Parameter Utama Ujian -->
+    <div class="card" id="examConfigCard" style="opacity: 0.5; pointer-events: none;">
+      <h2 class="card-title">2. Konfigurasi Standar Kelulusan</h2>
+      <p class="card-desc">Tentukan kriteria kelulusan dan durasi pengerjaan sebelum sertifikat diterbitkan.</p>
+
+      <div class="form-group">
+        <label class="form-label" for="examTitle">Judul Ujian Kelulusan</label>
+        <input type="text" id="examTitle" class="form-control" placeholder="Contoh: Ujian Kompetensi Akhir: Fullstack Next.js">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="examDesc">Deskripsi / Instruksi Pengerjaan</label>
+        <textarea id="examDesc" class="form-control" rows="2" placeholder="Instruksi singkat untuk siswa sebelum menekan tombol mulai..."></textarea>
+      </div>
+
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label" for="passingScore">Passing Grade Kelulusan (%)</label>
+          <input type="number" id="passingScore" class="form-control" min="10" max="100" value="75" oninput="updateStats()">
+          <span style="font-size: 0.78rem; color: var(--text-muted); margin-top: 4px; display: block;">
+            Siswa yang meraih nilai sama atau lebih dari nilai ini akan otomatis memperoleh sertifikat.
+          </span>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="durationMinutes">Batas Waktu Pengerjaan (Menit)</label>
+          <input type="number" id="durationMinutes" class="form-control" min="5" max="300" value="60" oninput="updateStats()">
+          <span style="font-size: 0.78rem; color: var(--text-muted); margin-top: 4px; display: block;">
+            Countdown timer di layar siswa akan otomatis mengumpulkan jawaban saat waktu habis.
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. Daftar Butir Pertanyaan -->
+    <div class="card" id="questionsCard" style="opacity: 0.5; pointer-events: none;">
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
+        <div>
+          <h2 class="card-title">3. Bank Soal Pilihan Ganda</h2>
+          <p class="card-desc" style="margin-bottom: 0;">Buat pertanyaan dengan 4 pilihan jawaban dan pilih 1 kunci jawaban benar.</p>
+        </div>
+        <button type="button" class="btn btn-outline" onclick="addQuestion()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          Tambah Butir Soal
+        </button>
+      </div>
+
+      <div id="questionsContainer">
+        <!-- Soal dinamis akan di-render di sini -->
+      </div>
+    </div>
+  </main>
+
+  <!-- Sticky Footer Action -->
+  <footer class="sticky-footer" id="stickyFooter" style="display: none;">
+    <div class="stat-pill">
+      <div class="stat-item">Total Soal: <strong id="statTotalQ">0</strong> butir</div>
+      <div class="stat-item">Passing Grade: <strong id="statPassing">75%</strong></div>
+      <div class="stat-item">Durasi: <strong id="statDuration">60</strong> Menit</div>
+    </div>
+
+    <div style="display: flex; gap: 12px;">
+      <button type="button" class="btn btn-outline" onclick="addQuestion()">
+        + Tambah Soal
+      </button>
+      <button type="button" class="btn btn-primary" onclick="saveExam()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+          <polyline points="17 21 17 13 7 13 7 21"></polyline>
+          <polyline points="7 3 7 8 15 8"></polyline>
+        </svg>
+        Simpan & Publikasikan Ujian
+      </button>
+    </div>
+  </footer>
+
+  <script>
+    let questions = [];
+    let currentCourseId = null;
+
+    function showToast(message, isSuccess = true) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.className = 'toast ' + (isSuccess ? 'toast-success' : 'toast-error');
+      toast.style.display = 'block';
+      setTimeout(() => {
+        toast.style.display = 'none';
+      }, 4000);
+    }
+
+    async function loadMyCourses() {
+      try {
+        const token = localStorage.getItem('token') || '';
+        const res = await fetch('/api/courses', {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        const json = await res.json();
+
+        const select = document.getElementById('courseSelect');
+        select.innerHTML = '<option value="">-- Pilih Kursus --</option>';
+
+        const courseList = (json.data && Array.isArray(json.data.courses)) 
+          ? json.data.courses 
+          : (Array.isArray(json.data) ? json.data : []);
+
+        if (courseList.length === 0) {
+          select.innerHTML = '<option value="">Belum ada kursus yang dibuat</option>';
+          return;
+        }
+
+        courseList.forEach(c => {
+          const opt = document.createElement('option');
+          opt.value = c.id;
+          opt.textContent = c.title + ' (' + (c.level || 'all-level') + ')';
+          select.appendChild(opt);
+        });
+      } catch (err) {
+        console.error('Error loading courses:', err);
+        showToast('Gagal memuat daftar kursus.', false);
+      }
+    }
+
+    async function loadCourseExam() {
+      const select = document.getElementById('courseSelect');
+      currentCourseId = select.value;
+
+      const examCard = document.getElementById('examConfigCard');
+      const qCard = document.getElementById('questionsCard');
+      const footer = document.getElementById('stickyFooter');
+
+      if (!currentCourseId) {
+        examCard.style.opacity = '0.5';
+        examCard.style.pointerEvents = 'none';
+        qCard.style.opacity = '0.5';
+        qCard.style.pointerEvents = 'none';
+        footer.style.display = 'none';
+        return;
+      }
+
+      examCard.style.opacity = '1';
+      examCard.style.pointerEvents = 'auto';
+      qCard.style.opacity = '1';
+      qCard.style.pointerEvents = 'auto';
+      footer.style.display = 'flex';
+
+      try {
+        const token = localStorage.getItem('token') || '';
+        const res = await fetch('/api/exams/course/' + currentCourseId, {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        const json = await res.json();
+
+        if (json.success && json.data) {
+          const ex = json.data;
+          document.getElementById('examTitle').value = ex.title || '';
+          document.getElementById('examDesc').value = ex.description || '';
+          document.getElementById('passingScore').value = ex.passing_score || 75;
+          document.getElementById('durationMinutes').value = ex.duration_minutes || 60;
+          questions = Array.isArray(ex.questions) && ex.questions.length > 0 ? ex.questions : [];
+        } else {
+          document.getElementById('examTitle').value = 'Ujian Kelulusan Resmi';
+          document.getElementById('examDesc').value = 'Ujian kompetensi kelulusan standar industri.';
+          document.getElementById('passingScore').value = 75;
+          document.getElementById('durationMinutes').value = 60;
+          questions = [];
+        }
+
+        if (questions.length === 0) {
+          addQuestion(); // Tambah 1 soal default
+        } else {
+          renderQuestions();
+        }
+        updateStats();
+      } catch (err) {
+        console.error('Error fetching exam:', err);
+        showToast('Gagal mengambil data ujian kursus.', false);
+      }
+    }
+
+    function addQuestion() {
+      const newId = String(Date.now() + Math.floor(Math.random() * 100));
+      questions.push({
+        id: newId,
+        question: '',
+        options: ['', '', '', ''],
+        correct_answer: 'A',
+        points: 10
+      });
+      renderQuestions();
+      updateStats();
+    }
+
+    function deleteQuestion(index) {
+      if (questions.length <= 1) {
+        showToast('Ujian wajib memiliki minimal 1 butir pertanyaan.', false);
+        return;
+      }
+      questions.splice(index, 1);
+      renderQuestions();
+      updateStats();
+    }
+
+    function renderQuestions() {
+      const container = document.getElementById('questionsContainer');
+      container.innerHTML = '';
+
+      questions.forEach((q, idx) => {
+        const qCard = document.createElement('div');
+        qCard.className = 'question-card';
+
+        const qHeader = document.createElement('div');
+        qHeader.className = 'question-header';
+        qHeader.innerHTML = `
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span class="question-badge">Soal #${idx + 1}</span>
+            <span style="font-size: 0.8rem; color: var(--text-muted);">Bobot: 10 Poin</span>
+          </div>
+          <button type="button" class="btn-delete-q" onclick="deleteQuestion(${idx})">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="3 6 5 6 21 6"></polyline>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+            </svg>
+            Hapus
+          </button>
+        `;
+        qCard.appendChild(qHeader);
+
+        // Pertanyaan Textarea
+        const textGroup = document.createElement('div');
+        textGroup.className = 'form-group';
+        textGroup.innerHTML = `
+          <label class="form-label">Teks Pertanyaan</label>
+          <textarea class="form-control" rows="2" placeholder="Tuliskan pertanyaan Anda di sini..." oninput="updateQuestionText(${idx}, this.value)">${escapeHtml(q.question || '')}</textarea>
+        `;
+        qCard.appendChild(textGroup);
+
+        // 4 Pilihan Jawaban
+        const optGrid = document.createElement('div');
+        optGrid.className = 'options-grid';
+
+        const optionLabels = ['A', 'B', 'C', 'D'];
+        optionLabels.forEach((label, optIdx) => {
+          const optVal = (q.options && q.options[optIdx]) ? q.options[optIdx] : '';
+          const isCorrect = String(q.correct_answer || 'A').toUpperCase() === label;
+
+          const optItem = document.createElement('div');
+          optItem.className = 'option-item ' + (isCorrect ? 'correct' : '');
+          optItem.innerHTML = `
+            <input type="radio" name="correct_${q.id}" class="option-radio" ${isCorrect ? 'checked' : ''} onchange="setCorrectAnswer(${idx}, '${label}')" title="Tandai sebagai kunci jawaban benar">
+            <span style="font-weight: 700; font-size: 0.85rem; color: var(--text-muted);">${label}.</span>
+            <input type="text" class="option-input" placeholder="Opsi ${label}" value="${escapeHtml(optVal)}" oninput="updateOptionText(${idx}, ${optIdx}, this.value)">
+          `;
+          optGrid.appendChild(optItem);
+        });
+
+        qCard.appendChild(optGrid);
+        container.appendChild(qCard);
+      });
+    }
+
+    function updateQuestionText(qIdx, text) {
+      if (questions[qIdx]) questions[qIdx].question = text;
+    }
+
+    function updateOptionText(qIdx, optIdx, text) {
+      if (questions[qIdx]) {
+        if (!Array.isArray(questions[qIdx].options)) questions[qIdx].options = ['', '', '', ''];
+        questions[qIdx].options[optIdx] = text;
+      }
+    }
+
+    function setCorrectAnswer(qIdx, label) {
+      if (questions[qIdx]) {
+        questions[qIdx].correct_answer = label;
+        renderQuestions();
+      }
+    }
+
+    function updateStats() {
+      document.getElementById('statTotalQ').textContent = questions.length;
+      document.getElementById('statPassing').textContent = (document.getElementById('passingScore').value || 75) + '%';
+      document.getElementById('statDuration').textContent = document.getElementById('durationMinutes').value || 60;
+    }
+
+    async function saveExam() {
+      if (!currentCourseId) {
+        showToast('Pilih kursus terlebih dahulu.', false);
+        return;
+      }
+
+      const title = document.getElementById('examTitle').value.trim();
+      const description = document.getElementById('examDesc').value.trim();
+      const passingScore = Number(document.getElementById('passingScore').value) || 75;
+      const durationMinutes = Number(document.getElementById('durationMinutes').value) || 60;
+
+      if (!title) {
+        showToast('Judul ujian wajib diisi.', false);
+        return;
+      }
+
+      // Validasi kelengkapan soal
+      for (let i = 0; i < questions.length; i++) {
+        const q = questions[i];
+        if (!q.question || q.question.trim().length === 0) {
+          showToast(`Pertanyaan nomor ${i + 1} masih kosong.`, false);
+          return;
+        }
+        for (let j = 0; j < 4; j++) {
+          if (!q.options[j] || q.options[j].trim().length === 0) {
+            showToast(`Opsi ${['A', 'B', 'C', 'D'][j]} pada soal #${i + 1} masih kosong.`, false);
+            return;
+          }
+        }
+      }
+
+      try {
+        const token = localStorage.getItem('token') || '';
+        const res = await fetch('/api/exams', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+          body: JSON.stringify({
+            course_id: currentCourseId,
+            title,
+            description,
+            passing_score: passingScore,
+            duration_minutes: durationMinutes,
+            questions
+          })
+        });
+
+        const json = await res.json();
+        if (json.success) {
+          showToast('Ujian kelulusan kursus berhasil disimpan!', true);
+        } else {
+          showToast(json.message || 'Gagal menyimpan ujian.', false);
+        }
+      } catch (err) {
+        console.error('Error saving exam:', err);
+        showToast('Terjadi kesalahan jaringan saat menyimpan ujian.', false);
+      }
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadMyCourses();
+    });
+  </script>
+</body>
+</html>
