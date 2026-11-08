@@ -157,7 +157,7 @@ async function getExamById(req, res) {
  */
 async function createOrUpdateExam(req, res) {
   try {
-    const { course_id } = req.params;
+    const course_id = req.params.course_id || req.body.course_id;
     const userId = req.user.id;
     const userRole = req.user.role;
     const {

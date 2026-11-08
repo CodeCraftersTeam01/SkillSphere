@@ -25,6 +25,12 @@ router.post(
   authorizeRoles('tutor', 'admin'),
   examController.createOrUpdateExam
 );
+router.post(
+  '/',
+  authenticateJWT,
+  authorizeRoles('tutor', 'admin'),
+  examController.createOrUpdateExam
+);
 
 // 4. Siswa mengumpulkan ujian & auto-scoring
 router.post(
