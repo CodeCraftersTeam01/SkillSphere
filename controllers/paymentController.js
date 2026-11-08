@@ -320,13 +320,42 @@ async function getTutorWallet(req, res) {
       limit: 20,
     });
 
-    const totalSalesCredit = transactions
-      .filter(t => t.transaction_type === 'credit')
-      .reduce((sum, t) => sum + Number(t.amount || 0), 0);
+    // Hitung seluruh mutasi kredit penjualan (tanpa dibatasi limit pagination)
+    const totalCreditSum = await WalletTransaction.sum('amount', {
+      where: { wallet_id: wallet.id, transaction_type: 'credit' },
+    }) || 0;
 
     const totalWithdrawn = withdrawals
       .filter(w => w.status === 'completed' || w.status === 'approved')
       .reduce((sum, w) => sum + Number(w.amount || 0), 0);
+
+    // Hitung total dari riwayat penjualan kursus aktif milik tutor jika ada
+    const tutorCourses = await Course.findAll({
+      where: { tutor_id: tutorId },
+      attributes: ['id'],
+    });
+    const tutorCourseIds = tutorCourses.map(c => c.id);
+    let totalSalesRevenue = 0;
+    if (tutorCourseIds.length > 0) {
+      totalSalesRevenue = await Transaction.sum('tutor_earning', {
+        where: {
+          course_id: tutorCourseIds,
+          payment_status: 'settlement',
+        },
+      }) || 0;
+    }
+
+    const balanceNum = Number(wallet.balance) || 0;
+    const pendingNum = Number(wallet.pending_balance) || 0;
+    const withdrawnNum = Number(totalWithdrawn) || 0;
+
+    // Total akumulasi penghasilan seumur hidup = total dari kredit penjualan kursus,
+    // dan tidak boleh lebih kecil dari saldo berjalan + dana holding + total dana yang sudah ditarik
+    const totalEarnings = Math.max(
+      Number(totalCreditSum),
+      Number(totalSalesRevenue),
+      balanceNum + pendingNum + withdrawnNum
+    );
 
     return res.status(200).json({
       success: true,
@@ -334,20 +363,22 @@ async function getTutorWallet(req, res) {
       data: {
         wallet: {
           id: wallet.id,
-          balance: Number(wallet.balance),
-          pending_balance: Number(wallet.pending_balance),
-          holding_balance: Number(wallet.pending_balance),
-          total_earnings: totalSalesCredit,
+          balance: balanceNum,
+          pending_balance: pendingNum,
+          holding_balance: pendingNum,
+          total_earnings: totalEarnings,
+          total_earned: totalEarnings,
           holding_period_days: 7,
           min_withdrawal: WITHDRAWAL_MIN_AMOUNT,
         },
         transactions,
         withdrawals,
         // Flat aliases for direct access in various view templates
-        balance: Number(wallet.balance),
-        holding_balance: Number(wallet.pending_balance),
-        pending_balance: Number(wallet.pending_balance),
-        withdrawn_total: totalWithdrawn,
+        balance: balanceNum,
+        holding_balance: pendingNum,
+        pending_balance: pendingNum,
+        total_earnings: totalEarnings,
+        withdrawn_total: withdrawnNum,
         mutations: transactions,
       },
     });
@@ -416,7 +447,7 @@ async function requestWithdrawal(req, res) {
       amount: withdrawAmount,
       reference_id: `WD-${withdrawal.id}`,
       reference_type: 'withdrawal',
-      description: `Pengajuan penarikan dana ke rekening ${bank_name} ${account_number} a.n ${account_holder_name}`,
+      description: `Pengajuan penarikan dana ke rekening ${bank_name} ${account_number} a.n ${finalAccountHolder}`,
     });
 
     return res.status(201).json({
@@ -485,19 +516,19 @@ async function getStudentTransactions(req, res) {
             const course = await Course.findByPk(trx.course_id);
             if (course && course.tutor_id) {
               const [wallet] = await TutorWallet.findOrCreate({
-                where: { user_id: course.tutor_id },
-                defaults: { balance: 0, holding_balance: 0, total_earned: 0 },
+                where: { tutor_id: course.tutor_id },
+                defaults: { balance: 0.00, pending_balance: 0.00 },
               });
-              await wallet.increment({
-                balance: trx.tutor_earning,
-                total_earned: trx.tutor_earning,
-              });
+              wallet.balance = Number(wallet.balance) + Number(trx.tutor_earning);
+              await wallet.save();
+
               await WalletTransaction.create({
                 wallet_id: wallet.id,
                 transaction_type: 'credit',
                 amount: trx.tutor_earning,
-                description: `Bagi hasil kursus (80%): ${course.title}`,
                 reference_id: trx.transaction_code,
+                reference_type: 'sale',
+                description: `Bagi hasil kursus (80%): ${course.title}`,
               });
             }
           } else if (['cancel', 'deny', 'cancelled'].includes(mStatus)) {
