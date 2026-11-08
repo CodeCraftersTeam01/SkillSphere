@@ -238,6 +238,7 @@ async function runQATests() {
     console.log('\n======================================================');
     console.log('🎉 ALL SPRINT 4 E2E LIFECYCLE & QA TESTS PASSED 100%!');
     console.log('======================================================\n');
+    process.exit(0);
   } finally {
     if (server) server.close();
   }
