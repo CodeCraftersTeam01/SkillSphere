@@ -4,58 +4,37 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sertifikat & Milestone Belajar | SkillSphere AI</title>
+  <meta name="description" content="Portofolio sertifikat kompetensi resmi dan voucher diskon milestone belajar siswa SkillSphere AI.">
+
+  <!-- Immediate Theme Initializer -->
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('skillsphere_theme') || localStorage.getItem('theme') || 'light';
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    })();
+  </script>
 
   <!-- Google Fonts: Newsreader, Plus Jakarta Sans, JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 
+  <!-- Font Awesome 6 Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- Claude Design System Stylesheet & Accessibility Toolkit -->
+  <link rel="stylesheet" href="/stylesheets/claude-theme.css?v=2.0">
+  <link rel="stylesheet" href="/stylesheets/accessibility.css">
+  <link rel="stylesheet" href="/stylesheets/custom-alert.css">
+  <script src="/javascripts/custom-alert.js"></script>
+
   <style>
-    :root {
-      --bg-warm: #FAF9F5;
-      --surface: #FFFFFF;
-      --surface-elevated: #F5F4EE;
-      --border-subtle: #E5E4DE;
-      --border-accent: #C8A86B;
-      --text-main: #141413;
-      --text-muted: #6B6960;
-      --text-subtle: #8F8D83;
-      --primary: #1F1E1B;
-      --accent-gold: #C8A86B;
-      --success: #10B981;
-      --success-bg: #ECFDF5;
-      --radius-sm: 8px;
-      --radius-md: 14px;
-      --radius-lg: 20px;
-      --shadow-sm: 0 1px 3px rgba(0,0,0,0.04);
-      --shadow-md: 0 4px 20px rgba(0,0,0,0.06);
-    }
-
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --bg-warm: #141413;
-        --surface: #1F1E1B;
-        --surface-elevated: #282724;
-        --border-subtle: #2C2B28;
-        --border-accent: #C8A86B;
-        --text-main: #FAF9F5;
-        --text-muted: #A3A196;
-        --text-subtle: #7A7870;
-        --primary: #FAF9F5;
-        --success-bg: #064E3B;
-      }
-    }
-
-    * {
-      box-sizing: border-box;
+    body {
       margin: 0;
       padding: 0;
-    }
-
-    body {
-      background-color: var(--bg-warm);
-      color: var(--text-main);
-      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: var(--bg-app);
+      font-family: var(--font-sans);
+      color: var(--text-primary);
       min-height: 100vh;
       display: flex;
       flex-direction: column;
@@ -63,33 +42,86 @@
       -webkit-font-smoothing: antialiased;
     }
 
-    .header-bar {
+    /* Top Navigation Bar */
+    .navbar {
+      background: var(--bg-surface);
       border-bottom: 1px solid var(--border-subtle);
-      background: var(--surface);
-      padding: 16px 28px;
+      padding: 0 24px;
+      height: 60px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       position: sticky;
       top: 0;
       z-index: 40;
+      box-sizing: border-box;
+      gap: 16px;
     }
 
     .brand-logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      color: var(--text-primary);
+      font-weight: 700;
+      font-size: 1.12rem;
+    }
+
+    .brand-logo span {
+      font-family: var(--font-serif);
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+    }
+
+    .nav-links {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 6px;
+    }
+
+    .nav-pill {
       text-decoration: none;
-      color: var(--text-main);
-      font-weight: 700;
-      font-size: 1.15rem;
+      font-size: 0.88rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      padding: 8px 14px;
+      border-radius: var(--radius-md);
+      transition: all 0.15s ease-out;
     }
 
-    .brand-sparkle {
-      color: var(--accent-gold);
-      font-size: 1.3rem;
+    .nav-pill:hover {
+      color: var(--text-primary);
+      background: var(--bg-surface-subtle);
     }
 
+    .nav-pill.active {
+      color: var(--text-primary);
+      background: var(--bg-surface-subtle);
+      font-weight: 600;
+    }
+
+    .icon-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-full);
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-surface);
+      color: var(--text-primary);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.15s ease-out;
+    }
+
+    .icon-btn:hover {
+      background: var(--bg-surface-subtle);
+      transform: translateY(-1px);
+    }
+
+    /* Main Container */
     .container {
       max-width: 1040px;
       width: 100%;
@@ -103,26 +135,29 @@
     }
 
     .page-title {
-      font-family: 'Newsreader', serif;
+      font-family: var(--font-serif);
       font-size: 2.3rem;
       font-weight: 600;
       margin-bottom: 8px;
       letter-spacing: -0.5px;
+      color: var(--text-primary);
     }
 
     .page-subtitle {
-      color: var(--text-muted);
+      color: var(--text-secondary);
       font-size: 0.95rem;
+      max-width: 720px;
     }
 
     .section-title {
-      font-family: 'Newsreader', serif;
+      font-family: var(--font-serif);
       font-size: 1.5rem;
       font-weight: 600;
       margin: 36px 0 16px;
       display: flex;
       align-items: center;
       gap: 10px;
+      color: var(--text-primary);
     }
 
     /* Certificates Grid */
@@ -134,7 +169,7 @@
     }
 
     .cert-card {
-      background: var(--surface);
+      background: var(--bg-surface);
       border: 1px solid var(--border-subtle);
       border-radius: var(--radius-lg);
       padding: 24px;
@@ -144,13 +179,13 @@
       justify-content: space-between;
       position: relative;
       overflow: hidden;
-      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      transition: transform 0.16s ease-out, border-color 0.16s ease-out, box-shadow 0.16s ease-out;
     }
 
     .cert-card:hover {
       transform: translateY(-2px);
       box-shadow: var(--shadow-md);
-      border-color: var(--border-accent);
+      border-color: var(--border-strong);
     }
 
     .cert-card::before {
@@ -159,8 +194,8 @@
       top: 0;
       left: 0;
       right: 0;
-      height: 4px;
-      background: linear-gradient(90deg, #C8A86B, #E5E4DE);
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent-amber), var(--border-subtle));
     }
 
     .cert-top {
@@ -171,34 +206,39 @@
     }
 
     .cert-code {
-      font-family: 'JetBrains Mono', monospace;
+      font-family: var(--font-mono);
       font-size: 0.78rem;
-      color: var(--text-muted);
-      background: var(--surface-elevated);
+      color: var(--text-secondary);
+      background: var(--bg-surface-subtle);
       padding: 3px 8px;
       border-radius: var(--radius-sm);
+      border: 1px solid var(--border-subtle);
     }
 
     .cert-badge {
       font-size: 0.75rem;
       font-weight: 600;
-      color: var(--success);
-      background: var(--success-bg);
+      color: var(--color-success);
+      background: var(--color-success-bg);
       padding: 3px 10px;
-      border-radius: 999px;
+      border-radius: var(--radius-full);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
     }
 
     .cert-course-title {
-      font-family: 'Newsreader', serif;
+      font-family: var(--font-serif);
       font-size: 1.35rem;
       font-weight: 600;
       line-height: 1.3;
       margin-bottom: 8px;
+      color: var(--text-primary);
     }
 
     .cert-meta {
       font-size: 0.82rem;
-      color: var(--text-muted);
+      color: var(--text-secondary);
       margin-bottom: 20px;
     }
 
@@ -217,34 +257,40 @@
     }
 
     .voucher-card {
-      background: var(--surface);
-      border: 1px dashed var(--border-accent);
+      background: var(--bg-surface);
+      border: 1px dashed var(--border-strong);
       border-radius: var(--radius-md);
       padding: 20px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      background: linear-gradient(135deg, var(--surface) 0%, var(--surface-elevated) 100%);
+      transition: all 0.15s ease-out;
+    }
+
+    .voucher-card:hover {
+      border-color: var(--accent-amber);
+      background: var(--bg-surface-subtle);
     }
 
     .voucher-discount {
-      font-family: 'JetBrains Mono', monospace;
+      font-family: var(--font-mono);
       font-size: 1.8rem;
       font-weight: 700;
-      color: var(--accent-gold);
+      color: var(--accent-amber);
       line-height: 1;
     }
 
     .voucher-code {
-      font-family: 'JetBrains Mono', monospace;
+      font-family: var(--font-mono);
       font-size: 0.88rem;
       font-weight: 600;
-      background: var(--surface);
+      background: var(--bg-surface);
       border: 1px solid var(--border-subtle);
       padding: 4px 10px;
       border-radius: var(--radius-sm);
       display: inline-block;
       margin-top: 6px;
+      color: var(--text-primary);
       user-select: all;
     }
 
@@ -259,28 +305,32 @@
       font-size: 0.82rem;
       cursor: pointer;
       text-decoration: none;
-      transition: all 0.15s ease;
-      min-height: 36px;
+      transition: all 0.15s ease-out;
+      min-height: 40px;
+      box-sizing: border-box;
+      border: 1px solid transparent;
     }
 
     .btn-primary {
-      background: var(--text-main);
-      color: var(--surface);
-      border: 1px solid var(--text-main);
+      background: var(--accent-primary);
+      color: var(--accent-text);
+      border-color: var(--accent-primary);
     }
 
     .btn-primary:hover {
-      opacity: 0.92;
+      background: var(--accent-primary-hover);
+      transform: translateY(-1px);
     }
 
     .btn-outline {
       background: transparent;
-      color: var(--text-main);
-      border: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+      border-color: var(--border-subtle);
     }
 
     .btn-outline:hover {
-      background: var(--surface-elevated);
+      background: var(--bg-surface-subtle);
+      border-color: var(--border-strong);
     }
 
     /* Modal Visualisasi Preview Sertifikat */
@@ -297,7 +347,7 @@
     }
 
     .modal-card {
-      background: var(--surface);
+      background: var(--bg-surface);
       border: 1px solid var(--border-subtle);
       border-radius: var(--radius-lg);
       max-width: 680px;
@@ -321,59 +371,95 @@
     .empty-state {
       text-align: center;
       padding: 48px 20px;
-      background: var(--surface);
+      background: var(--bg-surface);
       border: 1px solid var(--border-subtle);
       border-radius: var(--radius-lg);
-      color: var(--text-muted);
+      color: var(--text-secondary);
+    }
+
+    @media (max-width: 640px) {
+      .navbar {
+        padding: 0 16px;
+      }
+      .nav-links {
+        display: none;
+      }
+      .page-title {
+        font-size: 1.85rem;
+      }
     }
   </style>
 </head>
 <body>
 
   <!-- Top Navigation -->
-  <header class="header-bar">
-    <a href="/dashboard" class="brand-logo">
-      <span class="brand-sparkle">✦</span>
-      <span>SkillSphere AI</span>
-    </a>
-    <a href="/dashboard" class="btn btn-outline">Kembali ke Dashboard</a>
+  <header class="navbar" role="banner">
+    <div style="display: flex; align-items: center; gap: 16px;">
+      <a href="/dashboard" class="brand-logo" aria-label="Ke Dashboard Utama">
+        <i class="fa-solid fa-sparkles" style="color: var(--accent-amber);"></i>
+        <span>SkillSphere AI</span>
+      </a>
+
+      <nav class="nav-links" aria-label="Navigasi Siswa">
+        <a href="/dashboard" class="nav-pill">Dashboard</a>
+        <a href="/catalog" class="nav-pill">Katalog</a>
+        <a href="/certificates" class="nav-pill active" aria-current="page">Sertifikat</a>
+      </nav>
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <button type="button" class="icon-btn" id="themeToggleBtn" onclick="toggleTheme()" aria-label="Ganti Tema Tampilan" title="Ganti Tema">
+        <i class="fa-solid fa-moon" id="themeIcon"></i>
+      </button>
+
+      <a href="/dashboard" class="btn btn-outline" style="min-height: 38px; padding: 4px 12px; font-size: 0.82rem;">
+        <i class="fa-solid fa-house"></i>
+        <span>Dashboard</span>
+      </a>
+    </div>
   </header>
 
-  <main class="container">
+  <main class="container" role="main">
     <div class="page-header">
       <h1 class="page-title">Sertifikat & Pencapaian Belajar</h1>
-      <p class="page-subtitle">Pantau seluruh sertifikat kompetensi resmi dan klaim voucher diskon dari milestone belajar Anda.</p>
+      <p class="page-subtitle">Pantau seluruh sertifikat kompetensi resmi Anda dan klaim voucher diskon unik dari tantangan milestone belajar.</p>
     </div>
 
     <!-- 1. Bagian Sertifikat Kelulusan Resmi -->
-    <h2 class="section-title">
-      <span>✦</span> Sertifikat Kelulusan Resmi
-    </h2>
+    <section aria-labelledby="headingCerts">
+      <h2 class="section-title" id="headingCerts">
+        <i class="fa-solid fa-award" style="color: var(--accent-amber);"></i>
+        <span>Sertifikat Kelulusan Resmi</span>
+      </h2>
 
-    <div class="certs-grid" id="certsContainer">
-      <div class="empty-state" style="grid-column: 1 / -1;">
-        Memuat sertifikat resmi Anda...
+      <div class="certs-grid" id="certsContainer" role="list">
+        <div class="empty-state" style="grid-column: 1 / -1;">
+          Memuat portofolio sertifikat resmi Anda...
+        </div>
       </div>
-    </div>
+    </section>
 
     <!-- 2. Bagian Voucher Diskon Milestone Belajar -->
-    <h2 class="section-title">
-      <span>★</span> Voucher Diskon dari Tantangan Milestone
-    </h2>
+    <section aria-labelledby="headingVouchers">
+      <h2 class="section-title" id="headingVouchers">
+        <i class="fa-solid fa-tags" style="color: var(--accent-amber);"></i>
+        <span>Voucher Diskon dari Milestone Belajar</span>
+      </h2>
 
-    <div class="vouchers-grid" id="vouchersContainer">
-      <div class="empty-state" style="grid-column: 1 / -1;">
-        Memuat voucher diskon Anda...
+      <div class="vouchers-grid" id="vouchersContainer" role="list">
+        <div class="empty-state" style="grid-column: 1 / -1;">
+          Memuat voucher diskon Anda...
+        </div>
       </div>
-    </div>
+    </section>
   </main>
 
   <!-- Modal Preview Sertifikat Interaktif -->
-  <div class="modal-overlay" id="previewModal" onclick="closePreviewModal(event)">
+  <div class="modal-overlay" id="previewModal" onclick="closePreviewModal(event)" role="dialog" aria-modal="true" aria-labelledby="previewModalTitle">
     <div class="modal-card" onclick="event.stopPropagation()">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
-        <h3 style="font-family: 'Newsreader', serif; font-size: 1.4rem;">Pratinjau Kredensial Resmi</h3>
-        <button type="button" class="btn btn-outline" style="padding: 4px 10px;" onclick="document.getElementById('previewModal').style.display='none'">✕</button>
+        <h3 id="previewModalTitle" style="font-family: var(--font-serif); font-size: 1.4rem; color: var(--text-primary);">Pratinjau Kredensial Resmi</h3>
+        <button type="button" class="btn btn-outline" style="padding: 4px 10px; min-height: 32px;" onclick="document.getElementById('previewModal').style.display='none'" aria-label="Tutup Pratinjau">✕</button>
       </div>
 
       <div class="preview-paper">
@@ -391,19 +477,46 @@
 
       <div style="display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap;">
         <button type="button" class="btn btn-outline" id="btnCopyVerify">
-          Salin Tautan Verifikasi
+          <i class="fa-solid fa-link"></i>
+          <span>Salin Tautan Verifikasi</span>
         </button>
         <a href="#" target="_blank" class="btn btn-outline" id="btnOpenVerify">
-          Buka Halaman Verifikasi
+          <i class="fa-solid fa-arrow-up-right-from-square"></i>
+          <span>Buka Verifikasi</span>
         </a>
         <a href="#" target="_blank" class="btn btn-primary" id="btnDownloadPdf">
-          Unduh PDF Resmi
+          <i class="fa-solid fa-file-pdf"></i>
+          <span>Unduh PDF Resmi</span>
         </a>
       </div>
     </div>
   </div>
 
   <script>
+    function toggleTheme() {
+      const current = document.documentElement.getAttribute('data-theme') || 'light';
+      const target = current === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', target);
+      localStorage.setItem('skillsphere_theme', target);
+      localStorage.setItem('theme', target);
+      updateThemeIcon(target);
+    }
+
+    function updateThemeIcon(theme) {
+      const icon = document.getElementById('themeIcon');
+      if (icon) {
+        icon.className = theme === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+      }
+    }
+
+    function notifyUser(msg, type = 'success') {
+      if (typeof window.showToast === 'function') {
+        window.showToast(msg, type);
+      } else {
+        alert(msg);
+      }
+    }
+
     async function loadCertificates() {
       const container = document.getElementById('certsContainer');
       try {
@@ -418,9 +531,12 @@
         if (certs.length === 0) {
           container.innerHTML = `
             <div class="empty-state" style="grid-column: 1 / -1;">
-              <p style="font-size: 1.05rem; font-weight: 600; margin-bottom: 6px;">Belum Ada Sertifikat Kelulusan</p>
+              <p style="font-size: 1.05rem; font-weight: 600; margin-bottom: 6px; color: var(--text-primary);">Belum Ada Sertifikat Kelulusan</p>
               <p style="font-size: 0.88rem;">Selesaikan kursus dan ikuti Ujian Kelulusan Resmi untuk memperoleh sertifikat kompetensi Anda.</p>
-              <a href="/catalog" class="btn btn-primary" style="margin-top: 14px;">Jelajahi Katalog Kursus</a>
+              <a href="/catalog" class="btn btn-primary" style="margin-top: 14px;">
+                <i class="fa-solid fa-compass"></i>
+                <span>Jelajahi Katalog Kursus</span>
+              </a>
             </div>
           `;
           return;
@@ -430,6 +546,7 @@
         certs.forEach(cert => {
           const card = document.createElement('div');
           card.className = 'cert-card';
+          card.setAttribute('role', 'listitem');
 
           const formattedDate = new Date(cert.issue_date || Date.now()).toLocaleDateString('id-ID', {
             year: 'numeric', month: 'long', day: 'numeric'
@@ -439,20 +556,26 @@
             <div>
               <div class="cert-top">
                 <span class="cert-code">${cert.certificate_code}</span>
-                <span class="cert-badge">Terverifikasi (Skor: ${cert.exam_score}%)</span>
+                <span class="cert-badge">
+                  <i class="fa-solid fa-check"></i>
+                  <span>Lulus (Skor: ${cert.exam_score}%)</span>
+                </span>
               </div>
               <h3 class="cert-course-title">${escapeHtml(cert.course_title)}</h3>
               <p class="cert-meta">Instruktur: ${escapeHtml(cert.tutor_name)} • Diterbitkan ${formattedDate}</p>
             </div>
             <div class="cert-actions">
               <button type="button" class="btn btn-outline" onclick="openPreview('${cert.certificate_code}', '${escapeHtml(cert.course_title)}', '${cert.exam_score}%', '${formattedDate}')">
-                Lihat Pratinjau
+                <i class="fa-regular fa-eye"></i>
+                <span>Pratinjau</span>
               </button>
               <a href="/api/certificates/${cert.certificate_code}/pdf" target="_blank" class="btn btn-primary">
-                Unduh PDF
+                <i class="fa-solid fa-file-pdf"></i>
+                <span>Unduh PDF</span>
               </a>
               <button type="button" class="btn btn-outline" onclick="copyVerifyUrl('${cert.certificate_code}')">
-                Bagikan
+                <i class="fa-solid fa-share-nodes"></i>
+                <span>Bagikan</span>
               </button>
             </div>
           `;
@@ -478,8 +601,8 @@
         if (vouchers.length === 0) {
           container.innerHTML = `
             <div class="empty-state" style="grid-column: 1 / -1;">
-              <p style="font-size: 1.05rem; font-weight: 600; margin-bottom: 6px;">Belum Ada Voucher Diskon Aktif</p>
-              <p style="font-size: 0.88rem;">Selesaikan modul kursus tepat waktu untuk memenangkan voucher diskon belanja kursus selanjutnya!</p>
+              <p style="font-size: 1.05rem; font-weight: 600; margin-bottom: 6px; color: var(--text-primary);">Belum Ada Voucher Diskon Aktif</p>
+              <p style="font-size: 0.88rem;">Selesaikan modul kursus tepat waktu untuk membuka voucher potongan harga belanja kursus selanjutnya!</p>
             </div>
           `;
           return;
@@ -489,15 +612,17 @@
         vouchers.forEach(v => {
           const card = document.createElement('div');
           card.className = 'voucher-card';
+          card.setAttribute('role', 'listitem');
           card.innerHTML = `
             <div>
-              <div style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600;">VOUCHER DISKON</div>
+              <div style="font-size: 0.8rem; color: var(--text-secondary); font-weight: 600;">VOUCHER DISKON</div>
               <div class="voucher-discount">${v.discount_pct}% OFF</div>
               <div class="voucher-code">${v.discount_code}</div>
             </div>
             <div>
-              <button type="button" class="btn btn-outline" onclick="copyCode('${v.discount_code}')">
-                Salin Kode
+              <button type="button" class="btn btn-outline" onclick="copyCode('${v.discount_code}')" aria-label="Salin Kode Voucher ${v.discount_code}">
+                <i class="fa-regular fa-copy"></i>
+                <span>Salin</span>
               </button>
             </div>
           `;
@@ -532,13 +657,13 @@
     function copyVerifyUrl(code) {
       const url = window.location.origin + '/verify-cert/' + code;
       navigator.clipboard.writeText(url).then(() => {
-        alert('Tautan verifikasi keaslian sertifikat berhasil disalin:\n' + url);
+        notifyUser('Tautan verifikasi resmi berhasil disalin ke clipboard.', 'success');
       });
     }
 
     function copyCode(code) {
       navigator.clipboard.writeText(code).then(() => {
-        alert('Kode voucher diskon ' + code + ' berhasil disalin ke clipboard!');
+        notifyUser('Kode voucher diskon ' + code + ' berhasil disalin.', 'success');
       });
     }
 
@@ -553,6 +678,8 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
+      const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+      updateThemeIcon(currentTheme);
       loadCertificates();
       loadVouchers();
     });
