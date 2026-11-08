@@ -385,6 +385,7 @@ async function runTests() {
     console.log('\n======================================================');
     console.log('🎉 ALL SPRINT 4 CERTIFICATE & AI READINESS TESTS PASSED (ARJUNA)!');
     console.log('======================================================\n');
+    process.exit(0);
   } finally {
     if (server) {
       server.close();

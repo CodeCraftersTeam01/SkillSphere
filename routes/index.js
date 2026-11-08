@@ -55,6 +55,11 @@ router.get(['/wishlist', '/dashboard/wishlist', '/kursus-favorit'], function(req
   res.render('student/wishlist', { title: 'Wishlist Kursus Favorit | SkillSphere AI' });
 });
 
+/* GET Student Certificates & Milestones Page (Sprint 4 - Fadiyah) */
+router.get(['/certificates', '/dashboard/certificates', '/sertifikat'], function(req, res, next) {
+  res.render('student/certificates', { title: 'Sertifikat & Milestone Belajar | SkillSphere AI' });
+});
+
 
 /* GET Course Catalog Page (Sprint 2 - Fadiyah) */
 router.get(['/courses', '/catalog', '/katalog'], function(req, res, next) {
@@ -82,6 +87,24 @@ router.get(['/courses/:id/learn', '/courses/:id/ruang-belajar'], function(req, r
   res.render('courses/learn', { title: 'Ruang Belajar Interaktif | SkillSphere AI', courseId: req.params.id });
 });
 
+/* GET Interactive Zen Exam Mode Room (Sprint 4 - Bustanul Arifin) */
+router.get(['/exam/:id', '/ujian/:id'], function(req, res, next) {
+  res.render('student/exam', { title: 'Ruang Ujian Zen Mode | SkillSphere AI', examId: req.params.id });
+});
+
+router.get(['/courses/:courseId/exam', '/courses/:courseId/ujian'], async function(req, res, next) {
+  try {
+    const { Exam } = require('../models');
+    const exam = await Exam.findOne({ where: { course_id: req.params.courseId } });
+    if (exam) {
+      return res.redirect(`/exam/${exam.id}`);
+    }
+    return res.redirect(`/courses/${req.params.courseId}`);
+  } catch (err) {
+    next(err);
+  }
+});
+
 /* GET cinematic warp transition page */
 router.get('/warp', function(req, res, next) {
   res.render('warp', { title: 'Memasuki Ruang Belajar | SkillSphere AI' });
@@ -100,6 +123,11 @@ router.get(['/admin', '/admin/dashboard', '/admin/verification'], function(req, 
 /* GET Tutor Material Upload & Management Portal (Sprint 2 - Satrio) */
 router.get('/tutor/materials', function(req, res, next) {
   res.render('tutor/materials', { title: 'Portal Manajemen & Upload Materi | Tutor SkillSphere' });
+});
+
+/* GET Tutor Exam Creator Portal (Sprint 4 - Satrio) */
+router.get(['/tutor/exams', '/tutor/exam-creator', '/dashboard/tutor/exams'], function(req, res, next) {
+  res.render('tutor/exams', { title: 'Pembuat Ujian Kelulusan | Studio Pengajar SkillSphere AI' });
 });
 
 /* GET Tutor Financial Wallet Portal (Sprint 3) */
