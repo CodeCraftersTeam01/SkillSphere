@@ -122,7 +122,7 @@ async function getMaterialById(req, res) {
 async function createMaterial(req, res) {
   try {
     const { section_id, title, duration_minutes, is_preview, order_index } = req.body;
-    let { content_type, file_url } = req.body;
+    let { content_type, file_url, content_text } = req.body;
 
     if (!section_id || !title) {
       return res.status(400).json({
@@ -166,16 +166,23 @@ async function createMaterial(req, res) {
       }
     }
 
+    const hasTextContent = content_text && content_text.trim().length > 0;
+
     if (!file_url) {
-      return res.status(400).json({
-        success: false,
-        message: 'File materi atau file_url wajib disertakan.',
-      });
+      if (hasTextContent) {
+        file_url = `/content/articles/${Date.now()}`;
+        if (!content_type) content_type = 'book';
+      } else {
+        return res.status(400).json({
+          success: false,
+          message: 'Berkas materi atau isi teks modul pelajaran (content_text) wajib disertakan.',
+        });
+      }
     }
 
     const validTypes = ['video', 'ppt', 'pdf', 'doc', 'book'];
     if (!content_type || !validTypes.includes(content_type)) {
-      content_type = 'doc';
+      content_type = hasTextContent ? 'book' : 'doc';
     }
 
     const highestOrder = await CourseMaterial.max('order_index', {
@@ -187,7 +194,7 @@ async function createMaterial(req, res) {
       title: title.trim(),
       content_type,
       file_url,
-      content_text: req.body.content_text || null,
+      content_text: hasTextContent ? content_text.trim() : null,
       duration_minutes: duration_minutes ? parseInt(duration_minutes, 10) : 0,
       is_preview: is_preview === 'true' || is_preview === true || is_preview === 1,
       order_index: order_index ? parseInt(order_index, 10) : highestOrder + 1,
