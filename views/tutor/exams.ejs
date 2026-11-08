@@ -877,10 +877,23 @@
         .replace(/'/g, '&#039;');
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', async () => {
       const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
       updateThemeIcon(currentTheme);
-      loadMyCourses();
+      await loadMyCourses();
+
+      // Check if courseId is passed via URL query params (e.g. /tutor/exams?courseId=123)
+      const urlParams = new URLSearchParams(window.location.search);
+      const preselectedCourseId = urlParams.get('courseId');
+      if (preselectedCourseId) {
+        const select = document.getElementById('courseSelect');
+        if (select) {
+          select.value = preselectedCourseId;
+          if (select.value === preselectedCourseId) {
+            loadCourseExam();
+          }
+        }
+      }
     });
   </script>
 </body>

@@ -1675,6 +1675,10 @@
           <div class="sidebar-divider-line"></div>
 
           <div class="sidebar-nav-group">
+            <a href="/tutor/exams" class="sidebar-nav-pill">
+              <i class="fas fa-file-signature sidebar-nav-icon"></i>
+              <span>Ujian Kelulusan</span>
+            </a>
             <a href="/dashboard" class="sidebar-nav-pill">
               <i class="fas fa-clipboard-check sidebar-nav-icon"></i>
               <span>Periksa Tugas</span>
@@ -1718,6 +1722,12 @@
                 <button type="button" class="banner-edit-btn" onclick="openStudentLearningRoom()" title="Pratinjau Seluruh Kelas di Ruang Belajar Siswa">
                   <i class="fas fa-arrow-up-right-from-square"></i>
                   <span>Lihat Ruang Belajar Siswa</span>
+                </button>
+
+                <!-- Kelola Ujian Kelulusan -->
+                <button type="button" class="banner-edit-btn" onclick="openExamCreator()" title="Kelola Bank Soal & Standar Kelulusan Kelas Ini">
+                  <i class="fas fa-file-signature"></i>
+                  <span>Kelola Ujian</span>
                 </button>
 
                 <!-- WebP Thumbnail Upload Trigger -->
@@ -1770,6 +1780,9 @@
                 </button>
                 <button class="btn btn-primary" style="width:100%; font-size:12px; padding:7px 10px;" onclick="openUploadModal()">
                   <i class="fas fa-cloud-arrow-up"></i> Upload Materi
+                </button>
+                <button class="btn btn-outline" style="width:100%; font-size:12px; padding:7px 10px;" onclick="openExamCreator()">
+                  <i class="fas fa-file-signature"></i> Kelola Ujian Kelulusan
                 </button>
               </div>
             </div>
@@ -2576,6 +2589,14 @@
         ? `/courses/${activeCourse.id}/learn?material_id=${targetId}`
         : `/courses/${activeCourse.id}/learn`;
       window.open(url, '_blank');
+    }
+
+    function openExamCreator() {
+      if (activeCourse && activeCourse.id) {
+        window.location.href = '/tutor/exams?courseId=' + activeCourse.id;
+      } else {
+        window.location.href = '/tutor/exams';
+      }
     }
 
     function switchMaterialCreationMode(mode) {
