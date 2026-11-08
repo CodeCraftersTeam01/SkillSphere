@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const certificateController = require('../../controllers/certificateController');
-const { authenticateJWT } = require('../../middleware/auth');
+const { authenticateJWT, authorizeRoles } = require('../../middleware/auth');
 
 /**
  * Rute API Sertifikasi Resmi SkillSphere AI
@@ -18,5 +18,8 @@ router.get('/download/:code', certificateController.downloadCertificatePdf);
 // 3. Ambil Daftar Sertifikat Milik Siswa
 router.get('/my-certificates', authenticateJWT, certificateController.getMyCertificates);
 router.get('/', authenticateJWT, certificateController.getMyCertificates);
+
+// 4. Ambil Daftar Sertifikat yang Telah Diterbitkan untuk Kelas Pengajar (Tutor Studio)
+router.get('/tutor/issued', authenticateJWT, authorizeRoles('tutor', 'admin'), certificateController.getTutorIssuedCertificates);
 
 module.exports = router;

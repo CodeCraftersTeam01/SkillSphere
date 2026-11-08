@@ -130,6 +130,11 @@ router.get(['/tutor/exams', '/tutor/exam-creator', '/dashboard/tutor/exams'], fu
   res.render('tutor/exams', { title: 'Pembuat Ujian Kelulusan | Studio Pengajar SkillSphere AI' });
 });
 
+/* GET Tutor Certificate Studio (Sprint 4 - Satrio & Arjuna) */
+router.get(['/tutor/certificates', '/tutor/certificate-studio', '/dashboard/tutor/certificates'], function(req, res, next) {
+  res.render('tutor/certificates', { title: 'Studio Sertifikat Pengajar | SkillSphere AI' });
+});
+
 /* GET Tutor Financial Wallet Portal (Sprint 3) */
 router.get(['/tutor/wallet', '/dashboard/wallet'], function(req, res, next) {
   res.render('tutor/wallet', { title: 'Dompet Digital & Pendapatan Pengajar | SkillSphere AI' });

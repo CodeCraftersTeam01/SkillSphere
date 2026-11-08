@@ -66,6 +66,7 @@ async function runQATests() {
     console.log('--- Sub-test 1: EJS View Compilations ---');
     const viewsToTest = [
       { name: 'Tutor Exam Creator (Satrio)', path: 'views/tutor/exams.ejs' },
+      { name: 'Tutor Certificate Studio (Satrio & Arjuna)', path: 'views/tutor/certificates.ejs' },
       { name: 'Student Zen Exam Mode (Bustanul)', path: 'views/student/exam.ejs' },
       { name: 'Student Certificates & Milestones (Fadiyah)', path: 'views/student/certificates.ejs' },
       { name: 'Public Certificate Verification (Arjuna)', path: 'views/certificates/verify.ejs' },
@@ -234,6 +235,31 @@ async function runQATests() {
     assert.strictEqual(verifyApiRes.data.data.is_valid, true);
     assert.strictEqual(verifyApiRes.data.data.exam_score, 100);
     console.log('  ✔ [Tahap 1] Certificate cryptographically verified via public registry API.');
+
+    // Step F: Tutor Memantau Sertifikat Terbit di Studio Sertifikat (Sprint 4 - Satrio & Arjuna)
+    const tutorCertViewRes = await request(server, {
+      hostname: '127.0.0.1',
+      port,
+      path: '/tutor/certificates',
+      method: 'GET',
+    });
+    assert.strictEqual(tutorCertViewRes.status, 200);
+    assert(tutorCertViewRes.data.includes('Studio Sertifikat &amp; Akreditasi') || tutorCertViewRes.data.includes('Studio Sertifikat & Akreditasi'));
+    console.log('  ✔ [Tutor Studio] Tutor Certificate Studio view rendered successfully.');
+
+    const tutorIssuedApiRes = await request(server, {
+      hostname: '127.0.0.1',
+      port,
+      path: '/api/certificates/tutor/issued',
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${tutorToken}`,
+      },
+    });
+    assert.strictEqual(tutorIssuedApiRes.status, 200);
+    assert.strictEqual(tutorIssuedApiRes.data.success, true);
+    assert(tutorIssuedApiRes.data.data.summary.total_issued >= 1);
+    console.log('  ✔ [Tutor Studio] Tutor successfully retrieved issued certificate ledger and statistics.');
 
     console.log('\n======================================================');
     console.log('🎉 ALL SPRINT 4 E2E LIFECYCLE & QA TESTS PASSED 100%!');
