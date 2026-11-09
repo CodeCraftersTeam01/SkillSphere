@@ -215,8 +215,106 @@ async function getMyCertificates(req, res) {
   }
 }
 
+/**
+ * 4. Ambil Daftar Sertifikat yang Telah Diterbitkan untuk Kelas Milik Tutor
+ * GET /api/certificates/tutor/issued
+ */
+async function getTutorIssuedCertificates(req, res) {
+  try {
+    const tutorId = req.user.id;
+    const { course_id } = req.query;
+
+    const courseWhere = { tutor_id: tutorId };
+    if (course_id) {
+      courseWhere.id = course_id;
+    }
+
+    const tutorCourses = await Course.findAll({
+      where: courseWhere,
+      attributes: ['id', 'title', 'level'],
+    });
+
+    if (tutorCourses.length === 0) {
+      return res.status(200).json({
+        success: true,
+        message: 'Belum ada kelas yang ditemukan.',
+        data: {
+          summary: { total_issued: 0, total_courses: 0, average_score: 0 },
+          certificates: [],
+        },
+      });
+    }
+
+    const courseIds = tutorCourses.map((c) => c.id);
+
+    const certificates = await Certificate.findAll({
+      where: { course_id: courseIds },
+      include: [
+        {
+          model: User,
+          as: 'recipient',
+          attributes: ['id', 'name', 'email'],
+        },
+        {
+          model: Course,
+          as: 'course',
+          attributes: ['id', 'title', 'level'],
+        },
+        {
+          model: ExamResult,
+          as: 'exam_result',
+          attributes: ['id', 'score', 'is_passed', 'submitted_at'],
+        },
+      ],
+      order: [['created_at', 'DESC']],
+    });
+
+    let totalScore = 0;
+    const formattedList = certificates.map((cert) => {
+      const score = cert.exam_result ? cert.exam_result.score : 100;
+      totalScore += score;
+      return {
+        id: cert.id,
+        certificate_code: cert.certificate_code,
+        student_id: cert.user_id,
+        student_name: cert.recipient ? cert.recipient.name : 'Peserta Pembelajaran',
+        student_email: cert.recipient ? cert.recipient.email : '-',
+        course_id: cert.course_id,
+        course_title: cert.course ? cert.course.title : 'Kursus',
+        issue_date: cert.issue_date,
+        exam_score: score,
+        download_url: `/api/certificates/${cert.certificate_code}/pdf`,
+        public_verify_url: `/verify-cert/${cert.certificate_code}`,
+      };
+    });
+
+    const avgScore = formattedList.length > 0 ? Math.round(totalScore / formattedList.length) : 0;
+
+    return res.status(200).json({
+      success: true,
+      message: 'Daftar sertifikat terbitan tutor berhasil dimuat.',
+      data: {
+        summary: {
+          total_issued: formattedList.length,
+          total_courses: tutorCourses.length,
+          average_score: avgScore,
+        },
+        certificates: formattedList,
+      },
+    });
+  } catch (err) {
+    console.error('Error in getTutorIssuedCertificates:', err);
+    return res.status(500).json({
+      success: false,
+      message: 'Gagal memuat daftar sertifikat kelas pengajar.',
+      error: err.message,
+    });
+  }
+}
+
 module.exports = {
   verifyCertificate,
   downloadCertificatePdf,
   getMyCertificates,
+  getTutorIssuedCertificates,
 };

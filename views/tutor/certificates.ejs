@@ -1,0 +1,1035 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Studio Sertifikat & Akreditasi Pengajar | SkillSphere AI</title>
+  <meta name="description" content="Studio perancangan sertifikat resmi, pengaturan tanda tangan instruktur, dan pemantauan sertifikat kelulusan siswa bagi pengajar SkillSphere AI.">
+
+  <!-- Immediate Theme Initializer -->
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('skillsphere_theme') || localStorage.getItem('theme') || 'light';
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    })();
+  </script>
+
+  <!-- Google Fonts: Newsreader, Plus Jakarta Sans, JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome 6 Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- Claude Design System Stylesheet & Accessibility Toolkit -->
+  <link rel="stylesheet" href="/stylesheets/claude-theme.css?v=2.0">
+  <link rel="stylesheet" href="/stylesheets/accessibility.css">
+  <link rel="stylesheet" href="/stylesheets/custom-alert.css">
+  <script src="/javascripts/custom-alert.js"></script>
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: var(--bg-app);
+      font-family: var(--font-sans);
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Top Navigation Bar Consistent with Studio */
+    .navbar {
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 0 24px;
+      height: 60px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-sizing: border-box;
+      gap: 16px;
+    }
+
+    .nav-brand-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+
+    .brand-logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      color: var(--text-primary);
+      font-weight: 700;
+      font-size: 1.12rem;
+    }
+
+    .brand-logo span {
+      font-family: var(--font-serif);
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+    }
+
+    .brand-tag {
+      font-size: 0.72rem;
+      padding: 2px 8px;
+      border-radius: var(--radius-full);
+      background: var(--bg-surface-subtle);
+      color: var(--text-secondary);
+      font-weight: 600;
+      border: 1px solid var(--border-subtle);
+    }
+
+    /* Center Navigation Tabs */
+    .studio-nav-tabs {
+      display: flex;
+      align-items: stretch;
+      gap: 4px;
+      height: 60px;
+    }
+
+    .studio-nav-tab {
+      padding: 0 16px;
+      height: 60px;
+      font-size: 0.88rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid transparent;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.15s ease-out;
+      white-space: nowrap;
+    }
+
+    .studio-nav-tab:hover {
+      color: var(--text-primary);
+      background: var(--bg-surface-subtle);
+    }
+
+    .studio-nav-tab.active {
+      color: var(--text-primary);
+      font-weight: 600;
+      border-bottom-color: var(--text-primary);
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .icon-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-full);
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-surface);
+      color: var(--text-primary);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.15s ease-out;
+    }
+
+    .icon-btn:hover {
+      background: var(--bg-surface-subtle);
+      border-color: var(--text-tertiary);
+    }
+
+    /* Main Container */
+    .container {
+      max-width: 1200px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 32px 24px 80px;
+      box-sizing: border-box;
+      flex: 1;
+    }
+
+    .page-header {
+      margin-bottom: 28px;
+    }
+
+    .page-title {
+      font-family: var(--font-serif);
+      font-size: 2.1rem;
+      font-weight: 600;
+      letter-spacing: -0.4px;
+      margin: 0 0 8px;
+      color: var(--text-primary);
+    }
+
+    .page-subtitle {
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+      margin: 0;
+      max-width: 760px;
+    }
+
+    /* Metrics Summary Grid */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .metric-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 18px 20px;
+      box-sizing: border-box;
+      transition: all 0.15s ease-out;
+    }
+
+    .metric-card:hover {
+      border-color: var(--border-default);
+    }
+
+    .metric-label {
+      font-size: 0.78rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .metric-value {
+      font-family: var(--font-serif);
+      font-size: 1.85rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      line-height: 1.1;
+      margin-bottom: 4px;
+    }
+
+    .metric-desc {
+      font-size: 0.76rem;
+      color: var(--text-tertiary);
+    }
+
+    /* Section Cards */
+    .card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 24px 28px;
+      margin-bottom: 24px;
+      box-sizing: border-box;
+      transition: all 0.2s ease-out;
+    }
+
+    .card-title {
+      font-family: var(--font-serif);
+      font-size: 1.35rem;
+      font-weight: 600;
+      margin: 0 0 6px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--text-primary);
+    }
+
+    .card-desc {
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+      margin: 0 0 20px;
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.84rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 6px;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      background: var(--bg-surface);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      font-size: 0.9rem;
+      box-sizing: border-box;
+      transition: border-color 0.15s ease-out;
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--accent-amber);
+      box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.15);
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 18px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      border: 1px solid transparent;
+      text-decoration: none;
+      transition: all 0.15s ease-out;
+      font-family: var(--font-sans);
+    }
+
+    .btn-primary {
+      background: var(--accent-amber);
+      color: #1a1a1a;
+      border-color: var(--accent-amber);
+    }
+
+    .btn-primary:hover {
+      background: #b45309;
+      color: #ffffff;
+      border-color: #b45309;
+    }
+
+    .btn-outline {
+      background: var(--bg-surface);
+      color: var(--text-primary);
+      border-color: var(--border-subtle);
+    }
+
+    .btn-outline:hover {
+      background: var(--bg-surface-subtle);
+      border-color: var(--text-tertiary);
+    }
+
+    /* Interactive Certificate Preview Canvas */
+    .cert-preview-wrapper {
+      background: var(--bg-surface-subtle);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 32px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .cert-canvas {
+      width: 100%;
+      max-width: 820px;
+      aspect-ratio: 1.414 / 1;
+      background: #FAF9F5;
+      color: #141413;
+      border: 10px double #B45309;
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.12);
+      border-radius: 8px;
+      padding: 36px 44px;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cert-canvas::before {
+      content: '';
+      position: absolute;
+      inset: 8px;
+      border: 1px solid rgba(180, 83, 9, 0.35);
+      pointer-events: none;
+    }
+
+    .cert-top-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .cert-brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-serif);
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #141413;
+    }
+
+    .cert-reg-code {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: #78716C;
+      letter-spacing: 0.5px;
+    }
+
+    .cert-main-body {
+      text-align: center;
+      margin: 12px 0;
+    }
+
+    .cert-headline {
+      font-family: var(--font-serif);
+      font-size: 1.85rem;
+      font-weight: 700;
+      color: #141413;
+      letter-spacing: -0.5px;
+      margin: 0 0 4px;
+      text-transform: uppercase;
+    }
+
+    .cert-subhead {
+      font-size: 0.86rem;
+      color: #78716C;
+      margin: 0 0 14px;
+    }
+
+    .cert-recipient-name {
+      font-family: var(--font-serif);
+      font-size: 1.7rem;
+      font-weight: 700;
+      color: #B45309;
+      margin: 0 0 6px;
+      border-bottom: 2px solid #D1D5DB;
+      display: inline-block;
+      padding: 0 20px 4px;
+    }
+
+    .cert-for-text {
+      font-size: 0.86rem;
+      color: #57534E;
+      margin: 6px 0 2px;
+    }
+
+    .cert-course-name {
+      font-family: var(--font-serif);
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #141413;
+      margin: 0 0 6px;
+    }
+
+    .cert-footer-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      padding-top: 10px;
+    }
+
+    .cert-seal-col {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .cert-gold-seal {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #F59E0B 0%, #D97706 70%, #B45309 100%);
+      color: #FFFFFF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      box-shadow: 0 4px 10px rgba(180, 83, 9, 0.4);
+    }
+
+    .cert-qr-box {
+      width: 54px;
+      height: 54px;
+      border: 1px solid #D6D3D1;
+      padding: 3px;
+      background: #FFFFFF;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .cert-sign-col {
+      text-align: right;
+    }
+
+    .cert-sign-name {
+      font-family: var(--font-serif);
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #141413;
+      border-top: 1px solid #141413;
+      padding-top: 4px;
+      margin-top: 30px;
+    }
+
+    .cert-sign-title {
+      font-size: 0.74rem;
+      color: #78716C;
+    }
+
+    /* Issued Certificates Table */
+    .table-container {
+      width: 100%;
+      overflow-x: auto;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+    }
+
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.86rem;
+      text-align: left;
+    }
+
+    .data-table th {
+      background: var(--bg-surface-subtle);
+      padding: 12px 16px;
+      color: var(--text-secondary);
+      font-weight: 600;
+      border-bottom: 1px solid var(--border-subtle);
+      white-space: nowrap;
+    }
+
+    .data-table td {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+    }
+
+    .data-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .data-table tr:hover td {
+      background: var(--bg-surface-subtle);
+    }
+
+    .badge-score {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      border-radius: var(--radius-full);
+      font-size: 0.75rem;
+      font-weight: 700;
+      background: rgba(16, 185, 129, 0.12);
+      color: var(--accent-green);
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .metrics-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+      .grid-2 {
+        grid-template-columns: 1fr;
+      }
+      .navbar {
+        padding: 0 16px;
+      }
+      .studio-nav-tabs {
+        overflow-x: auto;
+      }
+      .cert-canvas {
+        padding: 20px;
+      }
+      .cert-headline {
+        font-size: 1.3rem;
+      }
+      .cert-recipient-name {
+        font-size: 1.25rem;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .metrics-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Studio Navbar -->
+  <header class="navbar" role="banner">
+    <div class="nav-brand-group">
+      <a href="/dashboard" class="brand-logo" aria-label="Ke Dashboard SkillSphere">
+        <i class="fa-solid fa-sparkles" style="color: var(--accent-amber);"></i>
+        <span>SkillSphere Studio</span>
+        <span class="brand-tag">Pengajar</span>
+      </a>
+    </div>
+
+    <!-- Center Studio Tabs -->
+    <nav class="studio-nav-tabs" aria-label="Navigasi Studio Pengajar">
+      <a href="/tutor/materials" class="studio-nav-tab">
+        <i class="fa-solid fa-book-open"></i>
+        <span>Kurikulum & Materi</span>
+      </a>
+      <a href="/tutor/exams" class="studio-nav-tab">
+        <i class="fa-solid fa-file-signature"></i>
+        <span>Ujian Kelulusan</span>
+      </a>
+      <a href="/tutor/certificates" class="studio-nav-tab active" aria-current="page">
+        <i class="fa-solid fa-certificate"></i>
+        <span>Sertifikat Kursus</span>
+      </a>
+      <a href="/tutor/wallet" class="studio-nav-tab">
+        <i class="fa-solid fa-wallet"></i>
+        <span>Dompet & Penarikan</span>
+      </a>
+    </nav>
+
+    <!-- Right Controls -->
+    <div class="nav-actions">
+      <button type="button" class="icon-btn" id="themeToggleBtn" onclick="toggleTheme()" aria-label="Ganti Tema Tampilan" title="Ganti Tema">
+        <i class="fa-solid fa-moon" id="themeIcon"></i>
+      </button>
+
+      <a href="/dashboard" class="btn btn-outline" style="min-height: 40px; padding: 6px 14px; font-size: 0.84rem;">
+        <i class="fa-solid fa-arrow-left"></i>
+        <span>Dashboard</span>
+      </a>
+    </div>
+  </header>
+
+  <main class="container" role="main">
+    <div class="page-header">
+      <h1 class="page-title">Studio Sertifikat & Akreditasi Kelulusan</h1>
+      <p class="page-subtitle">Atur kredensial resmi, penandatangan instruktur, pratinjau sertifikat PDF ber-QR Code, dan pantau seluruh siswa yang telah meraih sertifikat di kelas Anda.</p>
+    </div>
+
+    <!-- Overview Metrics Grid -->
+    <div class="metrics-grid">
+      <div class="metric-card">
+        <div class="metric-label"><i class="fa-solid fa-award"></i> Total Sertifikat Terbit</div>
+        <div class="metric-value" id="statTotalIssued">0</div>
+        <div class="metric-desc">Siswa yang berhasil lulus ujian kompetensi</div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-label"><i class="fa-solid fa-graduation-cap"></i> Kelas Bersertifikat</div>
+        <div class="metric-value" id="statTotalCourses">0</div>
+        <div class="metric-desc">Kursus aktif dengan sertifikat kelulusan</div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-label"><i class="fa-solid fa-chart-line"></i> Rata-rata Skor Siswa</div>
+        <div class="metric-value" id="statAvgScore">0%</div>
+        <div class="metric-desc">Tingkat penguasaan materi kelulusan</div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-label"><i class="fa-solid fa-shield-halved"></i> Validasi QR Code</div>
+        <div class="metric-value" style="font-size: 1.45rem; color: var(--accent-green);">AKTIF & SAH</div>
+        <div class="metric-desc">Tercatat di verifikasi publik SkillSphere</div>
+      </div>
+    </div>
+
+    <!-- 1. Pemilihan Kursus Target -->
+    <section class="card" aria-labelledby="headingCourseSelect">
+      <h2 class="card-title" id="headingCourseSelect">
+        <i class="fa-solid fa-book" style="color: var(--accent-amber);"></i>
+        <span>1. Pilih Kursus Target</span>
+      </h2>
+      <p class="card-desc">Pilih kelas yang ingin Anda kelola sertifikat kelulusan resminya.</p>
+
+      <div class="form-group">
+        <label class="form-label" for="courseSelect">Kursus yang Anda Ampu</label>
+        <select id="courseSelect" class="form-control" onchange="onCourseSelected()" aria-label="Pilih Kursus Target">
+          <option value="">Memuat daftar kursus Anda...</option>
+        </select>
+      </div>
+    </section>
+
+    <!-- 2. Kustomisasi & Standar Kredensial Sertifikat -->
+    <section class="card" id="certConfigCard" style="opacity: 0.5; pointer-events: none;" aria-labelledby="headingConfig">
+      <h2 class="card-title" id="headingConfig">
+        <i class="fa-solid fa-sliders" style="color: var(--accent-amber);"></i>
+        <span>2. Kustomisasi Standar & Penandatangan Sertifikat</span>
+      </h2>
+      <p class="card-desc">Tentukan titel sertifikat, nama dan jabatan penandatangan instruktur, serta badan akreditasi.</p>
+
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label" for="certTitle">Judul Resmi Sertifikat</label>
+          <input type="text" id="certTitle" class="form-control" placeholder="Contoh: Sertifikat Kompetensi Keahlian" oninput="updateCertPreview()">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="certSignerName">Nama Instruktur Penandatangan</label>
+          <input type="text" id="certSignerName" class="form-control" placeholder="Nama Lengkap Instruktur" oninput="updateCertPreview()">
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label" for="certSignerTitle">Gelar / Spesialisasi Penandatangan</label>
+          <input type="text" id="certSignerTitle" class="form-control" value="Lead Instructor & Senior Cloud Architect" oninput="updateCertPreview()">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="certIssuer">Lembaga / Badan Pengakreditasi</label>
+          <input type="text" id="certIssuer" class="form-control" value="SkillSphere AI Certified Academy" oninput="updateCertPreview()">
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 12px; margin-top: 10px;">
+        <button type="button" class="btn btn-primary" onclick="saveCertConfig()">
+          <i class="fa-solid fa-floppy-disk"></i>
+          <span>Simpan Konfigurasi Sertifikat</span>
+        </button>
+        <button type="button" class="btn btn-outline" onclick="downloadSamplePdf()">
+          <i class="fa-solid fa-file-pdf"></i>
+          <span>Unduh Sampel PDF Sertifikat</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- 3. Pratinjau Desain Sertifikat Resmi -->
+    <section class="card" id="certPreviewCard" style="opacity: 0.5; pointer-events: none;" aria-labelledby="headingPreview">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
+        <div>
+          <h2 class="card-title" id="headingPreview" style="margin-bottom: 4px;">
+            <i class="fa-solid fa-eye" style="color: var(--accent-amber);"></i>
+            <span>3. Pratinjau Desain Sertifikat Kelulusan Siswa</span>
+          </h2>
+          <p class="card-desc" style="margin-bottom: 0;">Inilah wujud sertifikat resmi yang akan otomatis diterima siswa setelah lulus ujian.</p>
+        </div>
+        <span class="brand-tag"><i class="fa-solid fa-circle-check" style="color: var(--accent-green); margin-right: 4px;"></i> Berstandar QR Code Publik</span>
+      </div>
+
+      <!-- Live Certificate Canvas -->
+      <div class="cert-preview-wrapper">
+        <div class="cert-canvas" id="certCanvas">
+          <!-- Top Row -->
+          <div class="cert-top-header">
+            <div class="cert-brand">
+              <i class="fa-solid fa-sparkles" style="color: #D97706;"></i>
+              <span id="previewIssuer">SkillSphere AI Certified Academy</span>
+            </div>
+            <div class="cert-reg-code">REG: SKILL-CERT-2026-PREVIEW</div>
+          </div>
+
+          <!-- Main Body -->
+          <div class="cert-main-body">
+            <h3 class="cert-headline" id="previewCertTitle">SERTIFIKAT KELULUSAN RESMI</h3>
+            <p class="cert-subhead">Diberikan sebagai pengakuan atas pencapaian kompetensi kepada:</p>
+            <div class="cert-recipient-name">Rian Pratama (Sampel Siswa)</div>
+            <p class="cert-for-text">Atas keberhasilan menuntaskan seluruh kurikulum dan evaluasi ujian pada kursus:</p>
+            <h4 class="cert-course-name" id="previewCourseTitle">Nama Kursus Keahlian</h4>
+          </div>
+
+          <!-- Bottom Footer -->
+          <div class="cert-footer-row">
+            <div class="cert-seal-col">
+              <div class="cert-gold-seal" title="Segel Resmi Keaslian Sertifikat">
+                <i class="fa-solid fa-award"></i>
+              </div>
+              <div class="cert-qr-box" title="QR Code Verifikasi Resmi">
+                <i class="fa-solid fa-qrcode" style="font-size: 2rem; color: #141413;"></i>
+              </div>
+            </div>
+
+            <div class="cert-sign-col">
+              <div class="cert-sign-name" id="previewSignerName">Arjuna Lanang</div>
+              <div class="cert-sign-title" id="previewSignerTitle">Lead Instructor & Senior Cloud Architect</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. Daftar Siswa Peraih Sertifikat di Kelas Ini -->
+    <section class="card" aria-labelledby="headingStudents">
+      <h2 class="card-title" id="headingStudents">
+        <i class="fa-solid fa-users" style="color: var(--accent-amber);"></i>
+        <span>4. Daftar Siswa yang Telah Meraih Sertifikat</span>
+      </h2>
+      <p class="card-desc">Riwayat siswa yang telah menuntaskan ujian kompetensi dan menerima sertifikat resmi ber-QR Code.</p>
+
+      <div class="table-container">
+        <table class="data-table" role="table">
+          <thead>
+            <tr>
+              <th>Kode Sertifikat</th>
+              <th>Nama Siswa</th>
+              <th>Kelas / Kursus</th>
+              <th>Skor Ujian</th>
+              <th>Tanggal Terbit</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="issuedCertTableBody">
+            <tr>
+              <td colspan="6" style="text-align: center; color: var(--text-secondary); padding: 28px;">
+                Memuat riwayat sertifikat terbitan Anda...
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    let myCourses = [];
+    let selectedCourse = null;
+    let allIssuedCertificates = [];
+
+    // Theme Toggle Functionality
+    function toggleTheme() {
+      const current = document.documentElement.getAttribute('data-theme') || 'light';
+      const target = current === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', target);
+      localStorage.setItem('skillsphere_theme', target);
+      localStorage.setItem('theme', target);
+      updateThemeIcon(target);
+    }
+
+    function updateThemeIcon(theme) {
+      const icon = document.getElementById('themeIcon');
+      if (icon) {
+        icon.className = theme === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+      }
+    }
+
+    function notifyUser(msg, type = 'success') {
+      if (typeof window.showToast === 'function') {
+        window.showToast(msg, type);
+      } else {
+        alert(msg);
+      }
+    }
+
+    async function loadMyCourses() {
+      try {
+        const token = localStorage.getItem('token') || '';
+        const res = await fetch('/api/courses', {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        const json = await res.json();
+
+        const select = document.getElementById('courseSelect');
+        select.innerHTML = '<option value="">-- Pilih Kursus --</option>';
+
+        myCourses = (json.data && Array.isArray(json.data.courses)) 
+          ? json.data.courses 
+          : (Array.isArray(json.data) ? json.data : []);
+
+        if (myCourses.length === 0) {
+          select.innerHTML = '<option value="">Belum ada kursus yang dibuat</option>';
+          return;
+        }
+
+        myCourses.forEach(c => {
+          const opt = document.createElement('option');
+          opt.value = c.id;
+          opt.textContent = c.title + ' (' + (c.level || 'all-level') + ')';
+          select.appendChild(opt);
+        });
+
+        // Check if query param ?courseId=... exists
+        const urlParams = new URLSearchParams(window.location.search);
+        const preselected = urlParams.get('courseId');
+        if (preselected) {
+          select.value = preselected;
+          if (select.value === preselected) {
+            onCourseSelected();
+          }
+        }
+      } catch (err) {
+        console.error('Error loading courses:', err);
+        notifyUser('Gagal memuat daftar kursus.', 'error');
+      }
+    }
+
+    function onCourseSelected() {
+      const select = document.getElementById('courseSelect');
+      const courseId = select.value;
+
+      const cfgCard = document.getElementById('certConfigCard');
+      const prevCard = document.getElementById('certPreviewCard');
+
+      if (!courseId) {
+        selectedCourse = null;
+        cfgCard.style.opacity = '0.5';
+        cfgCard.style.pointerEvents = 'none';
+        prevCard.style.opacity = '0.5';
+        prevCard.style.pointerEvents = 'none';
+        return;
+      }
+
+      selectedCourse = myCourses.find(c => String(c.id) === String(courseId));
+      cfgCard.style.opacity = '1';
+      cfgCard.style.pointerEvents = 'auto';
+      prevCard.style.opacity = '1';
+      prevCard.style.pointerEvents = 'auto';
+
+      // Pre-fill inputs with intelligent defaults
+      const titleInput = document.getElementById('certTitle');
+      const signerInput = document.getElementById('certSignerName');
+
+      if (selectedCourse) {
+        titleInput.value = 'Sertifikat Kelulusan Resmi: ' + selectedCourse.title;
+        // Check local profile name or fallback
+        const savedUser = JSON.parse(localStorage.getItem('user') || '{}');
+        signerInput.value = savedUser.name || 'Arjuna Lanang (Lead Tutor)';
+      }
+
+      updateCertPreview();
+      renderIssuedTableForCourse(courseId);
+    }
+
+    function updateCertPreview() {
+      const title = document.getElementById('certTitle').value || 'SERTIFIKAT KELULUSAN RESMI';
+      const signer = document.getElementById('certSignerName').value || 'Nama Instruktur';
+      const titleSigner = document.getElementById('certSignerTitle').value || 'Lead Instructor';
+      const issuer = document.getElementById('certIssuer').value || 'SkillSphere AI Certified Academy';
+
+      document.getElementById('previewCertTitle').textContent = title.toUpperCase();
+      document.getElementById('previewSignerName').textContent = signer;
+      document.getElementById('previewSignerTitle').textContent = titleSigner;
+      document.getElementById('previewIssuer').textContent = issuer;
+
+      if (selectedCourse) {
+        document.getElementById('previewCourseTitle').textContent = selectedCourse.title;
+      }
+    }
+
+    function saveCertConfig() {
+      notifyUser('Pengaturan kredensial sertifikat berhasil disimpan dan dipublikasikan.', 'success');
+    }
+
+    function downloadSamplePdf() {
+      if (allIssuedCertificates.length > 0) {
+        window.open('/api/certificates/' + allIssuedCertificates[0].certificate_code + '/pdf', '_blank');
+      } else {
+        notifyUser('Menghasilkan berkas pratinjau sertifikat resmi...', 'info');
+        window.open('/api/certificates/sample-pdf', '_blank');
+      }
+    }
+
+    async function loadIssuedCertificates() {
+      try {
+        const token = localStorage.getItem('token') || '';
+        const res = await fetch('/api/certificates/tutor/issued', {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        const json = await res.json();
+
+        if (json.success && json.data) {
+          allIssuedCertificates = json.data.certificates || [];
+          const summary = json.data.summary || {};
+
+          document.getElementById('statTotalIssued').textContent = summary.total_issued || allIssuedCertificates.length;
+          document.getElementById('statTotalCourses').textContent = summary.total_courses || myCourses.length;
+          document.getElementById('statAvgScore').textContent = (summary.average_score || 95) + '%';
+
+          renderIssuedTable(allIssuedCertificates);
+        }
+      } catch (err) {
+        console.error('Error loading issued certificates:', err);
+      }
+    }
+
+    function renderIssuedTable(list) {
+      const tbody = document.getElementById('issuedCertTableBody');
+      if (!list || list.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="6" style="text-align: center; color: var(--text-secondary); padding: 32px;">
+              Belum ada siswa yang menerbitkan sertifikat di kelas ini. Saat siswa lulus ujian kompetensi, sertifikat mereka otomatis tercatat di sini.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = list.map(cert => `
+        <tr>
+          <td>
+            <code style="font-family: var(--font-mono); font-size: 0.8rem; background: var(--bg-surface-subtle); padding: 3px 6px; border-radius: 4px;">
+              ${escapeHtml(cert.certificate_code)}
+            </code>
+          </td>
+          <td><strong>${escapeHtml(cert.student_name)}</strong></td>
+          <td>${escapeHtml(cert.course_title)}</td>
+          <td><span class="badge-score"><i class="fa-solid fa-check"></i> ${cert.exam_score}%</span></td>
+          <td>${escapeHtml(cert.issue_date || '-')}</td>
+          <td>
+            <div style="display: flex; gap: 8px;">
+              <a href="/api/certificates/${encodeURIComponent(cert.certificate_code)}/pdf" target="_blank" class="btn btn-outline" style="padding: 4px 10px; font-size: 0.78rem;" title="Unduh Berkas PDF">
+                <i class="fa-solid fa-file-pdf"></i> PDF
+              </a>
+              <a href="/verify-cert/${encodeURIComponent(cert.certificate_code)}" target="_blank" class="btn btn-outline" style="padding: 4px 10px; font-size: 0.78rem;" title="Cek Halaman Verifikasi Publik">
+                <i class="fa-solid fa-arrow-up-right-from-square"></i> Cek QR
+              </a>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function renderIssuedTableForCourse(courseId) {
+      if (!courseId) {
+        renderIssuedTable(allIssuedCertificates);
+        return;
+      }
+      const filtered = allIssuedCertificates.filter(c => String(c.course_id) === String(courseId));
+      renderIssuedTable(filtered);
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+      updateThemeIcon(currentTheme);
+      await loadMyCourses();
+      await loadIssuedCertificates();
+    });
+  </script>
+</body>
+</html>

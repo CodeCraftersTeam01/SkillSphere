@@ -465,8 +465,6 @@
       flex: 1;
       min-width: 0;
       padding: 24px 32px 80px;
-      max-width: 1180px;
-      margin: 0 auto;
       width: 100%;
       box-sizing: border-box;
     }
@@ -1059,6 +1057,223 @@
       box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.06);
     }
 
+    /* TinyMCE-style Visual Rich Text Editor Tokens */
+    .editor-mode-nav {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 18px;
+      border-bottom: 1px solid var(--border-subtle);
+      padding-bottom: 12px;
+      flex-wrap: wrap;
+    }
+
+    .editor-mode-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 18px;
+      border-radius: var(--radius-md);
+      font-size: 13px;
+      font-weight: 600;
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-surface-subtle);
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .editor-mode-btn:hover {
+      background: var(--bg-surface);
+      color: var(--text-primary);
+      border-color: var(--border-strong);
+    }
+
+    .editor-mode-btn.active {
+      background: var(--accent-primary);
+      color: var(--accent-text);
+      border-color: var(--accent-primary);
+    }
+
+    .tinymce-container {
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      background: var(--bg-surface);
+      margin-bottom: 16px;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .tinymce-container:focus-within {
+      border-color: var(--border-accent);
+      box-shadow: 0 0 0 3px rgba(200, 168, 107, 0.15);
+    }
+
+    .tinymce-toolbar {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 4px;
+      padding: 8px 10px;
+      background: var(--bg-surface-subtle);
+      border-bottom: 1px solid var(--border-subtle);
+      user-select: none;
+    }
+
+    .toolbar-group {
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+    }
+
+    .tb-btn {
+      min-width: 32px;
+      height: 32px;
+      padding: 0 8px;
+      border: 1px solid transparent;
+      background: transparent;
+      border-radius: var(--radius-sm);
+      color: var(--text-primary);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
+    }
+
+    .tb-btn:hover {
+      background: var(--bg-surface);
+      border-color: var(--border-subtle);
+    }
+
+    .tb-btn.active {
+      background: var(--accent-primary);
+      color: var(--accent-text);
+    }
+
+    .tb-divider {
+      width: 1px;
+      height: 20px;
+      background: var(--border-subtle);
+      margin: 0 4px;
+    }
+
+    .tinymce-content-area {
+      min-height: 260px;
+      max-height: 440px;
+      overflow-y: auto;
+      padding: 18px 20px;
+      font-family: var(--font-sans);
+      font-size: 14.5px;
+      line-height: 1.7;
+      color: var(--text-primary);
+      outline: none;
+    }
+
+    .tinymce-content-area:empty:before {
+      content: attr(placeholder);
+      color: var(--text-tertiary);
+      pointer-events: none;
+      display: block;
+    }
+
+    .tinymce-content-area h1,
+    .tinymce-content-area h2,
+    .tinymce-content-area h3,
+    .prose-content h1,
+    .prose-content h2,
+    .prose-content h3 {
+      font-family: var(--font-serif);
+      margin: 20px 0 10px 0;
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    .tinymce-content-area h2,
+    .prose-content h2 {
+      font-size: 21px;
+      border-bottom: 1px solid var(--border-subtle);
+      padding-bottom: 6px;
+    }
+
+    .tinymce-content-area h3,
+    .prose-content h3 {
+      font-size: 17px;
+    }
+
+    .tinymce-content-area p,
+    .prose-content p {
+      margin: 0 0 14px 0;
+    }
+
+    .tinymce-content-area ul,
+    .tinymce-content-area ol,
+    .prose-content ul,
+    .prose-content ol {
+      margin: 0 0 16px 0;
+      padding-left: 24px;
+    }
+
+    .tinymce-content-area li,
+    .prose-content li {
+      margin-bottom: 6px;
+    }
+
+    .tinymce-content-area blockquote,
+    .prose-content blockquote {
+      margin: 16px 0;
+      padding: 12px 18px;
+      border-left: 3px solid var(--border-accent);
+      background: var(--bg-surface-subtle);
+      border-radius: 0 var(--radius-md) var(--radius-md) 0;
+      color: var(--text-secondary);
+      font-style: italic;
+    }
+
+    .tinymce-content-area pre,
+    .prose-content pre {
+      background: #141413;
+      color: #FAF9F5;
+      padding: 14px 18px;
+      border-radius: var(--radius-md);
+      font-family: var(--font-mono);
+      font-size: 13px;
+      overflow-x: auto;
+      margin: 16px 0;
+      line-height: 1.5;
+    }
+
+    .tinymce-content-area code,
+    .prose-content code {
+      background: var(--bg-surface-subtle);
+      color: var(--text-primary);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: var(--font-mono);
+      font-size: 12.5px;
+      border: 1px solid var(--border-subtle);
+    }
+
+    .tinymce-content-area pre code,
+    .prose-content pre code {
+      background: transparent;
+      color: inherit;
+      padding: 0;
+      border: none;
+    }
+
+    .article-reader-preview-box {
+      background: var(--bg-app);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 26px 24px;
+      max-height: 520px;
+      overflow-y: auto;
+      line-height: 1.75;
+      color: var(--text-primary);
+    }
+
     /* Toast System */
     .toast-container {
       position: fixed;
@@ -1335,6 +1550,120 @@
         border: 1.5px solid var(--border-subtle);
       }
     }
+
+    /* Embedded Exam & Certificate Studio Styles */
+    .tab-header-banner {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .question-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 20px;
+      margin-bottom: 18px;
+      transition: border-color 0.15s ease;
+    }
+
+    .question-card:focus-within {
+      border-color: var(--accent-amber);
+    }
+
+    .question-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
+    .question-badge {
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      font-weight: 600;
+      background: var(--bg-surface-subtle);
+      border: 1px solid var(--border-subtle);
+      padding: 4px 10px;
+      border-radius: var(--radius-full);
+      color: var(--text-primary);
+    }
+
+    .btn-delete-q {
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--color-danger, #EF4444);
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      border-radius: var(--radius-sm);
+      transition: all 0.15s ease-out;
+    }
+
+    .btn-delete-q:hover {
+      background: rgba(239, 68, 68, 0.1);
+      border-color: var(--color-danger, #EF4444);
+    }
+
+    .option-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .option-radio {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--accent-amber);
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .cert-preview-card-wrapper {
+      background: var(--bg-surface-subtle);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .portal-cert-canvas {
+      width: 100%;
+      max-width: 650px;
+      aspect-ratio: 1.414 / 1;
+      background: #FAF9F5;
+      color: #141413;
+      border: 8px double #B45309;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+      border-radius: 6px;
+      padding: 24px 30px;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+    }
+
+    .portal-cert-canvas::before {
+      content: '';
+      position: absolute;
+      inset: 6px;
+      border: 1px solid rgba(180, 83, 9, 0.3);
+      pointer-events: none;
+    }
   </style>
 
   <script>
@@ -1383,7 +1712,7 @@
         </a>
       </div>
 
-      <!-- Center Tabs (Google Classroom Standard: Forum, Tugas kelas, Anggota) -->
+      <!-- Center Tabs (Forum, Tugas kelas, Ujian & Kuis, Sertifikat, Anggota) -->
       <nav class="classroom-top-nav-tabs">
         <button class="classroom-nav-tab active" id="tab-btn-forum" onclick="switchClassroomTab('forum')">
           <i class="fas fa-comments"></i>
@@ -1392,6 +1721,14 @@
         <button class="classroom-nav-tab" id="tab-btn-classwork" onclick="switchClassroomTab('classwork')">
           <i class="fas fa-book-open"></i>
           <span>Tugas kelas</span>
+        </button>
+        <button class="classroom-nav-tab" id="tab-btn-exams" onclick="switchClassroomTab('exams')">
+          <i class="fas fa-file-signature"></i>
+          <span>Ujian & Kuis</span>
+        </button>
+        <button class="classroom-nav-tab" id="tab-btn-certificates" onclick="switchClassroomTab('certificates')">
+          <i class="fas fa-certificate"></i>
+          <span>Sertifikat</span>
         </button>
         <button class="classroom-nav-tab" id="tab-btn-people" onclick="switchClassroomTab('people')">
           <i class="fas fa-user-group"></i>
@@ -1458,6 +1795,14 @@
           <div class="sidebar-divider-line"></div>
 
           <div class="sidebar-nav-group">
+            <a href="/tutor/exams" class="sidebar-nav-pill">
+              <i class="fas fa-file-signature sidebar-nav-icon"></i>
+              <span>Ujian Kelulusan</span>
+            </a>
+            <a href="/tutor/certificates" class="sidebar-nav-pill">
+              <i class="fas fa-certificate sidebar-nav-icon"></i>
+              <span>Studio Sertifikat</span>
+            </a>
             <a href="/dashboard" class="sidebar-nav-pill">
               <i class="fas fa-clipboard-check sidebar-nav-icon"></i>
               <span>Periksa Tugas</span>
@@ -1496,12 +1841,32 @@
                 <i class="fas fa-chalkboard-user" style="margin-right:6px;"></i> Pengajar: Tutor SkillSphere
               </div>
 
-              <!-- WebP Thumbnail Upload Trigger -->
-              <label for="thumb-file-input" class="banner-edit-btn">
-                <i class="fas fa-camera"></i>
-                <span>Ubah Sampul (WebP)</span>
-              </label>
-              <input type="file" id="thumb-file-input" accept="image/*" style="display:none;" onchange="handleThumbnailUpload(this)">
+              <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+                <!-- Open Student Learning Room -->
+                <button type="button" class="banner-edit-btn" onclick="openStudentLearningRoom()" title="Pratinjau Seluruh Kelas di Ruang Belajar Siswa">
+                  <i class="fas fa-arrow-up-right-from-square"></i>
+                  <span>Lihat Ruang Belajar Siswa</span>
+                </button>
+
+                <!-- Kelola Ujian Kelulusan -->
+                <button type="button" class="banner-edit-btn" onclick="switchClassroomTab('exams')" title="Kelola Bank Soal & Standar Kelulusan Kelas Ini">
+                  <i class="fas fa-file-signature"></i>
+                  <span>Ujian Kelulusan</span>
+                </button>
+
+                <!-- Kelola Sertifikat -->
+                <button type="button" class="banner-edit-btn" onclick="switchClassroomTab('certificates')" title="Kelola Kredensial & Pratinjau Sertifikat Kelas Ini">
+                  <i class="fas fa-certificate"></i>
+                  <span>Sertifikat</span>
+                </button>
+
+                <!-- WebP Thumbnail Upload Trigger -->
+                <label for="thumb-file-input" class="banner-edit-btn">
+                  <i class="fas fa-camera"></i>
+                  <span>Ubah Sampul (WebP)</span>
+                </label>
+                <input type="file" id="thumb-file-input" accept="image/*" style="display:none;" onchange="handleThumbnailUpload(this)">
+              </div>
             </div>
           </section>
 
@@ -1545,6 +1910,12 @@
                 </button>
                 <button class="btn btn-primary" style="width:100%; font-size:12px; padding:7px 10px;" onclick="openUploadModal()">
                   <i class="fas fa-cloud-arrow-up"></i> Upload Materi
+                </button>
+                <button class="btn btn-outline" style="width:100%; font-size:12px; padding:7px 10px;" onclick="switchClassroomTab('exams')">
+                  <i class="fas fa-file-signature"></i> Kelola Ujian Kelulusan
+                </button>
+                <button class="btn btn-outline" style="width:100%; font-size:12px; padding:7px 10px;" onclick="switchClassroomTab('certificates')">
+                  <i class="fas fa-certificate"></i> Pengaturan Sertifikat
                 </button>
               </div>
             </div>
@@ -1628,6 +1999,190 @@
           </section>
         </div>
 
+        <!-- ========================================================= -->
+        <!-- TAB 3: UJIAN & KUIS KELULUSAN (EXAM CREATOR) ------------ -->
+        <!-- ========================================================= -->
+        <div id="classroom-tab-exams" class="tab-pane-content" style="display:none;">
+          <div class="tab-header-banner">
+            <div>
+              <div style="font-size:12px; font-weight:600; color:var(--accent-amber); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">
+                <i class="fas fa-file-signature"></i> Evaluasi Kompetensi & Kelulusan
+              </div>
+              <h2 style="font-family:var(--font-serif); font-size:24px; font-weight:500; margin:0 0 4px;" id="portal-exam-course-title">Bank Soal & Ujian Kelulusan</h2>
+              <p style="font-size:13px; color:var(--text-secondary); margin:0;">Rancang soal pilihan ganda, tentukan batas waktu pengerjaan dan ambang kelulusan (passing grade) untuk kelas ini.</p>
+            </div>
+
+            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+              <button type="button" class="btn btn-outline" onclick="addPortalQuestion()">
+                <i class="fas fa-plus"></i> Tambah Butir Soal
+              </button>
+              <button type="button" class="btn btn-primary" onclick="savePortalExam()">
+                <i class="fas fa-floppy-disk"></i> Simpan Ujian Kelas
+              </button>
+              <button type="button" class="btn btn-outline" id="btn-preview-exam-zen" onclick="previewPortalExamZen()" title="Pratinjau Ruang Ujian Siswa">
+                <i class="fas fa-arrow-up-right-from-square"></i> Ruang Ujian Siswa
+              </button>
+            </div>
+          </div>
+
+          <!-- Parameter Standar Kelulusan -->
+          <div class="card" style="background:var(--bg-surface); border:1px solid var(--border-subtle); border-radius:var(--radius-lg); padding:20px; margin-bottom:20px;">
+            <div style="display:grid; grid-template-columns: 2fr 1fr 1fr; gap:16px;">
+              <div class="form-group" style="margin-bottom:0;">
+                <label class="form-label" style="font-size:12px; font-weight:600; color:var(--text-secondary); margin-bottom:6px; display:block;">Judul Ujian Kelulusan</label>
+                <input type="text" id="portal-exam-title" class="form-control" style="width:100%; padding:10px 12px; border:1px solid var(--border-subtle); border-radius:var(--radius-md); background:var(--bg-app); color:var(--text-primary);" placeholder="Contoh: Ujian Kompetensi Akhir">
+              </div>
+
+              <div class="form-group" style="margin-bottom:0;">
+                <label class="form-label" style="font-size:12px; font-weight:600; color:var(--text-secondary); margin-bottom:6px; display:block;">Passing Grade (%)</label>
+                <input type="number" id="portal-exam-passing" class="form-control" style="width:100%; padding:10px 12px; border:1px solid var(--border-subtle); border-radius:var(--radius-md); background:var(--bg-app); color:var(--text-primary);" min="10" max="100" value="75">
+              </div>
+
+              <div class="form-group" style="margin-bottom:0;">
+                <label class="form-label" style="font-size:12px; font-weight:600; color:var(--text-secondary); margin-bottom:6px; display:block;">Durasi (Menit)</label>
+                <input type="number" id="portal-exam-duration" class="form-control" style="width:100%; padding:10px 12px; border:1px solid var(--border-subtle); border-radius:var(--radius-md); background:var(--bg-app); color:var(--text-primary);" min="5" max="300" value="60">
+              </div>
+            </div>
+
+            <div style="margin-top:14px;">
+              <label class="form-label" style="font-size:12px; font-weight:600; color:var(--text-secondary); margin-bottom:6px; display:block;">Instruksi Pengerjaan untuk Siswa</label>
+              <textarea id="portal-exam-desc" rows="2" style="width:100%; padding:10px 12px; border:1px solid var(--border-subtle); border-radius:var(--radius-md); background:var(--bg-app); color:var(--text-primary); font-family:inherit; font-size:13px; box-sizing:border-box;" placeholder="Petunjuk singkat sebelum siswa mulai mengerjakan ujian kelulusan..."></textarea>
+            </div>
+          </div>
+
+          <!-- Container Bank Soal -->
+          <div id="portal-questions-container">
+            <!-- Soal dinamis akan dimuat di sini -->
+          </div>
+        </div>
+
+        <!-- ========================================================= -->
+        <!-- TAB 4: SERTIFIKAT KELULUSAN (CERTIFICATE STUDIO) -------- -->
+        <!-- ========================================================= -->
+        <div id="classroom-tab-certificates" class="tab-pane-content" style="display:none;">
+          <div class="tab-header-banner">
+            <div>
+              <div style="font-size:12px; font-weight:600; color:var(--accent-amber); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">
+                <i class="fas fa-certificate"></i> Kredensial & Akreditasi Resmi
+              </div>
+              <h2 style="font-family:var(--font-serif); font-size:24px; font-weight:500; margin:0 0 4px;" id="portal-cert-course-title">Studio Sertifikat Kelulusan Siswa</h2>
+              <p style="font-size:13px; color:var(--text-secondary); margin:0;">Atur penandatangan instruktur, pratinjau sertifikat PDF resmi ber-QR Code, dan tinjau seluruh siswa penerima sertifikat di kelas ini.</p>
+            </div>
+
+            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+              <button type="button" class="btn btn-outline" onclick="downloadPortalSampleCertPdf()">
+                <i class="fas fa-file-pdf"></i> Unduh Sampel PDF
+              </button>
+              <button type="button" class="btn btn-primary" onclick="savePortalCertConfig()">
+                <i class="fas fa-floppy-disk"></i> Simpan Pengaturan
+              </button>
+              <a href="/tutor/certificates" class="btn btn-outline">
+                <i class="fas fa-arrow-up-right-from-square"></i> Buka Studio Sertifikat Penuh
+              </a>
+            </div>
+          </div>
+
+          <!-- Grid 2 Kolom: Kustomisasi & Pratinjau Desain -->
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px; margin-bottom:24px;">
+            <!-- Kolom Kiri: Form Kustomisasi -->
+            <div style="background:var(--bg-surface); border:1px solid var(--border-subtle); border-radius:var(--radius-lg); padding:20px;">
+              <h3 style="font-family:var(--font-serif); font-size:18px; font-weight:600; margin:0 0 16px; color:var(--text-primary); display:flex; align-items:center; gap:8px;">
+                <i class="fas fa-sliders" style="color:var(--accent-amber);"></i> Konfigurasi Kredensial Sertifikat
+              </h3>
+
+              <div style="margin-bottom:14px;">
+                <label style="font-size:12px; font-weight:600; color:var(--text-secondary); margin-bottom:6px; display:block;">Judul Sertifikat</label>
+                <input type="text" id="portal-cert-title" style="width:100%; padding:10px 12px; border:1px solid var(--border-subtle); border-radius:var(--radius-md); background:var(--bg-app); color:var(--text-primary); box-sizing:border-box;" placeholder="Sertifikat Kelulusan Resmi" oninput="updatePortalCertPreview()">
+              </div>
+
+              <div style="margin-bottom:14px;">
+                <label style="font-size:12px; font-weight:600; color:var(--text-secondary); margin-bottom:6px; display:block;">Nama Instruktur Penandatangan</label>
+                <input type="text" id="portal-cert-signer" style="width:100%; padding:10px 12px; border:1px solid var(--border-subtle); border-radius:var(--radius-md); background:var(--bg-app); color:var(--text-primary); box-sizing:border-box;" placeholder="Nama Lengkap Tutor" oninput="updatePortalCertPreview()">
+              </div>
+
+              <div style="margin-bottom:14px;">
+                <label style="font-size:12px; font-weight:600; color:var(--text-secondary); margin-bottom:6px; display:block;">Gelar & Jabatan Instruktur</label>
+                <input type="text" id="portal-cert-signer-title" style="width:100%; padding:10px 12px; border:1px solid var(--border-subtle); border-radius:var(--radius-md); background:var(--bg-app); color:var(--text-primary); box-sizing:border-box;" value="Lead Instructor & Senior Cloud Architect" oninput="updatePortalCertPreview()">
+              </div>
+
+              <div style="margin-bottom:14px;">
+                <label style="font-size:12px; font-weight:600; color:var(--text-secondary); margin-bottom:6px; display:block;">Lembaga Akreditasi</label>
+                <input type="text" id="portal-cert-issuer" style="width:100%; padding:10px 12px; border:1px solid var(--border-subtle); border-radius:var(--radius-md); background:var(--bg-app); color:var(--text-primary); box-sizing:border-box;" value="SkillSphere AI Certified Academy" oninput="updatePortalCertPreview()">
+              </div>
+            </div>
+
+            <!-- Kolom Kanan: Pratinjau Desain Live -->
+            <div style="background:var(--bg-surface); border:1px solid var(--border-subtle); border-radius:var(--radius-lg); padding:20px;">
+              <h3 style="font-family:var(--font-serif); font-size:18px; font-weight:600; margin:0 0 16px; color:var(--text-primary); display:flex; align-items:center; gap:8px;">
+                <i class="fas fa-eye" style="color:var(--accent-amber);"></i> Pratinjau Desain Sertifikat Siswa
+              </h3>
+
+              <div class="cert-preview-card-wrapper">
+                <div class="portal-cert-canvas">
+                  <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <div style="display:flex; align-items:center; gap:6px; font-family:var(--font-serif); font-weight:700; font-size:13px; color:#141413;">
+                      <i class="fas fa-sparkles" style="color:#D97706;"></i>
+                      <span id="portal-preview-issuer">SkillSphere AI Certified Academy</span>
+                    </div>
+                    <div style="font-family:var(--font-mono); font-size:10px; color:#78716C;">REG: SKILL-CERT-2026-PREVIEW</div>
+                  </div>
+
+                  <div style="text-align:center; margin:8px 0;">
+                    <div style="font-family:var(--font-serif); font-size:15px; font-weight:700; color:#141413; text-transform:uppercase; margin-bottom:2px;" id="portal-preview-title">SERTIFIKAT KELULUSAN RESMI</div>
+                    <div style="font-size:10px; color:#78716C; margin-bottom:6px;">Diberikan atas pencapaian kelulusan kepada:</div>
+                    <div style="font-family:var(--font-serif); font-size:15px; font-weight:700; color:#B45309; border-bottom:1.5px solid #D1D5DB; display:inline-block; padding:0 12px 2px;">Rian Pratama (Sampel Siswa)</div>
+                    <div style="font-size:10px; color:#57534E; margin:4px 0 2px;">Telah menuntaskan kurikulum dan ujian kelulusan kelas:</div>
+                    <div style="font-family:var(--font-serif); font-size:12px; font-weight:600; color:#141413;" id="portal-preview-course">Nama Kelas</div>
+                  </div>
+
+                  <div style="display:flex; justify-content:space-between; align-items:flex-end;">
+                    <div style="display:flex; align-items:center; gap:8px;">
+                      <div style="width:36px; height:36px; border-radius:50%; background:radial-gradient(circle, #F59E0B 0%, #B45309 100%); color:#fff; display:flex; align-items:center; justify-content:center; font-size:14px; box-shadow:0 2px 6px rgba(180,83,9,0.3);">
+                        <i class="fas fa-award"></i>
+                      </div>
+                      <div style="width:38px; height:38px; border:1px solid #D6D3D1; padding:2px; background:#fff; border-radius:4px; display:flex; align-items:center; justify-content:center;">
+                        <i class="fas fa-qrcode" style="font-size:24px; color:#141413;"></i>
+                      </div>
+                    </div>
+                    <div style="text-align:right;">
+                      <div style="font-family:var(--font-serif); font-size:11px; font-weight:700; color:#141413; border-top:1px solid #141413; padding-top:2px;" id="portal-preview-signer">Arjuna Lanang</div>
+                      <div style="font-size:9px; color:#78716C;" id="portal-preview-signer-title">Lead Instructor</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tabel Siswa yang Telah Meraih Sertifikat di Kelas Ini -->
+          <div style="background:var(--bg-surface); border:1px solid var(--border-subtle); border-radius:var(--radius-lg); padding:20px;">
+            <h3 style="font-family:var(--font-serif); font-size:18px; font-weight:600; margin:0 0 14px; color:var(--text-primary); display:flex; align-items:center; gap:8px;">
+              <i class="fas fa-user-graduate" style="color:var(--accent-amber);"></i> Siswa yang Telah Menerbitkan Sertifikat di Kelas Ini
+            </h3>
+
+            <div style="overflow-x:auto;">
+              <table style="width:100%; border-collapse:collapse; font-size:13px; text-align:left;">
+                <thead>
+                  <tr style="border-bottom:1px solid var(--border-subtle); color:var(--text-secondary);">
+                    <th style="padding:10px 12px;">Kode Sertifikat</th>
+                    <th style="padding:10px 12px;">Nama Siswa</th>
+                    <th style="padding:10px 12px;">Skor Ujian</th>
+                    <th style="padding:10px 12px;">Tanggal Terbit</th>
+                    <th style="padding:10px 12px;">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="portal-course-certificates-tbody">
+                  <tr>
+                    <td colspan="5" style="text-align:center; padding:24px; color:var(--text-secondary);">
+                      Memuat daftar sertifikat kelas ini...
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
       </main>
     </div>
 
@@ -1635,12 +2190,22 @@
     <!-- MODALS (UPLOAD, CREATE SECTION, LIVE MEDIA PREVIEW) ----- -->
     <!-- ========================================================= -->
 
-    <!-- Upload Multi-Format Material Modal -->
+    <!-- Upload & Buat Materi Pembelajaran Modal -->
     <div class="modal-overlay" id="upload-material-modal">
-      <div class="modal-card">
+      <div class="modal-card" style="max-width: 840px;">
         <div class="modal-header">
-          <h3 class="modal-title"><i class="fas fa-cloud-arrow-up" style="margin-right:8px;"></i> Upload Materi Kursus</h3>
+          <h3 class="modal-title"><i class="fas fa-layer-group" style="margin-right:8px;"></i> Tambah & Buat Materi Pelajaran</h3>
           <button class="modal-close-btn" onclick="closeModal('upload-material-modal')"><i class="fas fa-xmark"></i></button>
+        </div>
+
+        <!-- Mode Switcher Tabs (Tulis Artikel Editor vs Upload File) -->
+        <div class="editor-mode-nav">
+          <button type="button" class="editor-mode-btn active" id="btn-mode-article" onclick="switchMaterialCreationMode('article')">
+            <i class="fas fa-pen-nib"></i> Tulis Artikel / Teks Modul (Editor TinyMCE)
+          </button>
+          <button type="button" class="editor-mode-btn" id="btn-mode-file" onclick="switchMaterialCreationMode('file')">
+            <i class="fas fa-cloud-arrow-up"></i> Upload Berkas (Video / PDF / PPT / Dokumen)
+          </button>
         </div>
 
         <!-- Section Destination -->
@@ -1649,67 +2214,128 @@
           <select id="material-section-select" class="input-field" style="width:100%; font-size:13px;"></select>
         </div>
 
-        <!-- Format Selector -->
-        <label style="display:block; font-size:12px; font-weight:600; color:var(--text-primary); margin-bottom:6px;">Tipe Konten Pembelajaran *</label>
-        <div class="format-selector-grid">
-          <div class="format-card-btn active" data-type="video" onclick="selectFormatType('video')">
-            <i class="fas fa-file-video"></i>
-            <span>Video MP4</span>
-          </div>
-          <div class="format-card-btn" data-type="ppt" onclick="selectFormatType('ppt')">
-            <i class="fas fa-file-powerpoint"></i>
-            <span>Slide PPT</span>
-          </div>
-          <div class="format-card-btn" data-type="pdf" onclick="selectFormatType('pdf')">
-            <i class="fas fa-file-pdf"></i>
-            <span>Dokumen PDF</span>
-          </div>
-          <div class="format-card-btn" data-type="doc" onclick="selectFormatType('doc')">
-            <i class="fas fa-file-word"></i>
-            <span>Word DOC</span>
-          </div>
-          <div class="format-card-btn" data-type="book" onclick="selectFormatType('book')">
-            <i class="fas fa-book-open"></i>
-            <span>Buku Digital</span>
-          </div>
-        </div>
-
-        <!-- Drag and Drop Zone -->
-        <div class="drop-zone" id="material-drop-zone" onclick="document.getElementById('material-file-input').click()">
-          <i class="fas fa-cloud-arrow-up drop-zone-icon" id="drop-icon"></i>
-          <div style="font-weight:600; font-size:14px; color:var(--text-primary);" id="drop-zone-text">Pilih atau Seret Berkas ke Sini</div>
-          <div style="font-size:12px; color:var(--text-secondary); margin-top:4px;" id="drop-zone-sub">Maksimum ukuran file: 250 MB (Video MP4, PPTX, PDF, DOCX, ePUB)</div>
-          <div class="progress-bar-container" id="upload-progress-container">
-            <div class="progress-bar-fill" id="upload-progress-fill"></div>
-          </div>
-        </div>
-        <input type="file" id="material-file-input" style="display:none;" onchange="handleMaterialFileSelected(this)">
-
         <!-- Title & Duration Inputs -->
         <div style="display:grid; grid-template-columns: 2fr 1fr; gap:12px; margin-bottom:16px;">
           <div>
-            <label style="display:block; font-size:12px; font-weight:600; color:var(--text-primary); margin-bottom:6px;">Judul Materi *</label>
-            <input type="text" id="material-title-input" class="input-field" placeholder="Contoh: Arsitektur RESTful API & Keamanan JWT">
+            <label style="display:block; font-size:12px; font-weight:600; color:var(--text-primary); margin-bottom:6px;">Judul Materi Pelajaran *</label>
+            <input type="text" id="material-title-input" class="input-field" placeholder="Contoh: 1.1 Fondasi Normalisasi Data & Mitigasi Tiga Anomali Database">
           </div>
           <div>
-            <label style="display:block; font-size:12px; font-weight:600; color:var(--text-primary); margin-bottom:6px;">Durasi (Menit)</label>
-            <input type="number" id="material-duration-input" class="input-field" value="15" min="1">
+            <label style="display:block; font-size:12px; font-weight:600; color:var(--text-primary); margin-bottom:6px;">Estimasi Belajar (Menit)</label>
+            <input type="number" id="material-duration-input" class="input-field" value="20" min="1">
           </div>
         </div>
 
+        <!-- SECTION A: TULIS ARTIKEL TEKS (TINYMCE-STYLE VISUAL RICH TEXT EDITOR) -->
+        <div id="section-mode-article">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+            <label style="font-size:12px; font-weight:600; color:var(--text-primary);">
+              Isi Materi Pelajaran (Editor Visual & Formatting Toolbar) *
+            </label>
+            <span style="font-size:11.5px; color:var(--text-secondary);" id="editor-word-count">0 kata</span>
+          </div>
+
+          <div class="tinymce-container">
+            <div class="tinymce-toolbar" role="toolbar" aria-label="Toolbar Format TinyMCE">
+              <div class="toolbar-group">
+                <button type="button" class="tb-btn" onclick="execEditorFormat('formatBlock', '<h2>')" title="Heading 2 (H2)">H2</button>
+                <button type="button" class="tb-btn" onclick="execEditorFormat('formatBlock', '<h3>')" title="Heading 3 (H3)">H3</button>
+                <button type="button" class="tb-btn" onclick="execEditorFormat('formatBlock', '<p>')" title="Paragraf Normal">P</button>
+              </div>
+              <div class="tb-divider"></div>
+              <div class="toolbar-group">
+                <button type="button" class="tb-btn" onclick="execEditorFormat('bold')" title="Tebal (Ctrl+B)"><i class="fas fa-bold"></i></button>
+                <button type="button" class="tb-btn" onclick="execEditorFormat('italic')" title="Miring (Ctrl+I)"><i class="fas fa-italic"></i></button>
+                <button type="button" class="tb-btn" onclick="execEditorFormat('underline')" title="Garis Bawah (Ctrl+U)"><i class="fas fa-underline"></i></button>
+                <button type="button" class="tb-btn" onclick="execEditorFormat('strikeThrough')" title="Coret"><i class="fas fa-strikethrough"></i></button>
+              </div>
+              <div class="tb-divider"></div>
+              <div class="toolbar-group">
+                <button type="button" class="tb-btn" onclick="execEditorFormat('insertUnorderedList')" title="Daftar Poin"><i class="fas fa-list-ul"></i></button>
+                <button type="button" class="tb-btn" onclick="execEditorFormat('insertOrderedList')" title="Daftar Bernomor"><i class="fas fa-list-ol"></i></button>
+                <button type="button" class="tb-btn" onclick="insertEditorBlockquote()" title="Kutipan / Catatan Penting"><i class="fas fa-quote-left"></i></button>
+                <button type="button" class="tb-btn" onclick="insertEditorCodeBlock()" title="Blok Kode Pemrograman"><i class="fas fa-code"></i></button>
+              </div>
+              <div class="tb-divider"></div>
+              <div class="toolbar-group">
+                <button type="button" class="tb-btn" onclick="insertEditorLink()" title="Sisipkan Tautan Web"><i class="fas fa-link"></i></button>
+                <button type="button" class="tb-btn" onclick="execEditorFormat('insertHorizontalRule')" title="Garis Pemisah"><i class="fas fa-minus"></i></button>
+                <button type="button" class="tb-btn" onclick="execEditorFormat('removeFormat')" title="Hapus Format"><i class="fas fa-remove-format"></i></button>
+              </div>
+              <div class="tb-divider"></div>
+              <div class="toolbar-group" style="margin-left:auto;">
+                <button type="button" class="tb-btn" id="btn-toggle-editor-preview" onclick="toggleEditorLivePreview()" title="Beralih ke Pratinjau Tampilan Siswa">
+                  <i class="fas fa-eye"></i> <span>Pratinjau Siswa</span>
+                </button>
+                <button type="button" class="tb-btn" onclick="execEditorFormat('undo')" title="Undo"><i class="fas fa-rotate-left"></i></button>
+                <button type="button" class="tb-btn" onclick="execEditorFormat('redo')" title="Redo"><i class="fas fa-rotate-right"></i></button>
+              </div>
+            </div>
+
+            <!-- Content Editable Writer Area -->
+            <div id="editor-write-panel">
+              <div id="material-rich-editor" class="tinymce-content-area" contenteditable="true" spellcheck="false" placeholder="Tuliskan materi pelajaran lengkap di sini... Anda dapat menyusun judul bab, penjelasan teori, studi kasus, analogi, serta blok kode pemrograman secara interaktif."></div>
+            </div>
+            
+            <!-- Live Preview Panel -->
+            <div id="editor-preview-panel" style="display:none; padding:18px 20px; min-height:260px; max-height:440px; overflow-y:auto; background:var(--bg-app);">
+              <div class="prose-content" id="editor-preview-content"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECTION B: UPLOAD FILE MULTIMEDIA -->
+        <div id="section-mode-file" style="display:none;">
+          <!-- Format Selector -->
+          <label style="display:block; font-size:12px; font-weight:600; color:var(--text-primary); margin-bottom:6px;">Tipe Konten Berkas *</label>
+          <div class="format-selector-grid">
+            <div class="format-card-btn active" data-type="video" onclick="selectFormatType('video')">
+              <i class="fas fa-file-video"></i>
+              <span>Video MP4</span>
+            </div>
+            <div class="format-card-btn" data-type="ppt" onclick="selectFormatType('ppt')">
+              <i class="fas fa-file-powerpoint"></i>
+              <span>Slide PPT</span>
+            </div>
+            <div class="format-card-btn" data-type="pdf" onclick="selectFormatType('pdf')">
+              <i class="fas fa-file-pdf"></i>
+              <span>Dokumen PDF</span>
+            </div>
+            <div class="format-card-btn" data-type="doc" onclick="selectFormatType('doc')">
+              <i class="fas fa-file-word"></i>
+              <span>Word DOC</span>
+            </div>
+            <div class="format-card-btn" data-type="book" onclick="selectFormatType('book')">
+              <i class="fas fa-book-open"></i>
+              <span>Buku Digital</span>
+            </div>
+          </div>
+
+          <!-- Drag and Drop Zone -->
+          <div class="drop-zone" id="material-drop-zone" onclick="document.getElementById('material-file-input').click()">
+            <i class="fas fa-cloud-arrow-up drop-zone-icon" id="drop-icon"></i>
+            <div style="font-weight:600; font-size:14px; color:var(--text-primary);" id="drop-zone-text">Pilih atau Seret Berkas ke Sini</div>
+            <div style="font-size:12px; color:var(--text-secondary); margin-top:4px;" id="drop-zone-sub">Maksimum ukuran file: 250 MB (Video MP4, PPTX, PDF, DOCX, ePUB)</div>
+            <div class="progress-bar-container" id="upload-progress-container">
+              <div class="progress-bar-fill" id="upload-progress-fill"></div>
+            </div>
+          </div>
+          <input type="file" id="material-file-input" style="display:none;" onchange="handleMaterialFileSelected(this)">
+        </div>
+
         <!-- Preview Toggle -->
-        <div style="display:flex; align-items:center; gap:10px; margin-bottom:24px; padding:12px; background:var(--bg-surface-subtle); border-radius:var(--radius-md); border:1px solid var(--border-subtle);">
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:20px; padding:12px; background:var(--bg-surface-subtle); border-radius:var(--radius-md); border:1px solid var(--border-subtle);">
           <input type="checkbox" id="material-is-preview" style="width:16px; height:16px; accent-color:var(--accent-primary);">
           <div>
             <label for="material-is-preview" style="font-size:13px; font-weight:600; color:var(--text-primary); cursor:pointer;">Gratis untuk Preview Siswa</label>
-            <div style="font-size:11px; color:var(--text-secondary);">Materi dapat ditonton oleh calon siswa sebelum membeli kursus</div>
+            <div style="font-size:11px; color:var(--text-secondary);">Materi dapat diakses langsung oleh calon siswa sebelum mendaftar</div>
           </div>
         </div>
 
         <div style="display:flex; justify-content:flex-end; gap:10px;">
           <button class="btn btn-outline" onclick="closeModal('upload-material-modal')">Batal</button>
           <button class="btn btn-primary" id="btn-submit-upload" onclick="submitMaterialUpload()">
-            <i class="fas fa-upload"></i> Unggah Materi
+            <i class="fas fa-check"></i> <span id="btn-submit-label">Simpan Materi Pelajaran</span>
           </button>
         </div>
       </div>
@@ -1735,21 +2361,26 @@
       </div>
     </div>
 
-    <!-- Live Media Previewer Modal -->
+    <!-- Live Media & Reader Previewer Modal -->
     <div class="modal-overlay" id="media-preview-modal">
-      <div class="modal-card" style="max-width: 760px;">
+      <div class="modal-card" style="max-width: 820px;">
         <div class="modal-header">
-          <h3 class="modal-title" id="preview-modal-title">Pemutar Materi Pembelajaran</h3>
+          <h3 class="modal-title" id="preview-modal-title">Pratinjau Materi Pembelajaran</h3>
           <button class="modal-close-btn" onclick="closePreviewModal()"><i class="fas fa-xmark"></i></button>
         </div>
         
         <div id="media-player-wrapper">
-          <!-- Populated dynamically: Video / PDF / Doc -->
+          <!-- Populated dynamically: Video / PDF / Article Reader / Doc -->
         </div>
 
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:16px; flex-wrap:wrap; gap:10px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:18px; flex-wrap:wrap; gap:12px; padding-top:14px; border-top:1px solid var(--border-subtle);">
           <div style="font-size:12px; color:var(--text-secondary);" id="preview-file-info">-</div>
-          <button class="btn btn-outline" onclick="closePreviewModal()">Tutup</button>
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <button class="btn btn-primary" id="preview-open-learn-btn" onclick="openStudentLearningRoom()">
+              <i class="fas fa-graduation-cap"></i> Buka di Ruang Belajar Siswa
+            </button>
+            <button class="btn btn-outline" onclick="closePreviewModal()">Tutup</button>
+          </div>
         </div>
       </div>
     </div>
@@ -1820,15 +2451,21 @@
     function openModal(id) { document.getElementById(id).classList.add('active'); }
     function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 
-    // Tab Switcher (Forum, Tugas Kelas, Anggota)
+    // Tab Switcher (Forum, Tugas Kelas, Ujian, Sertifikat, Anggota)
     function switchClassroomTab(tabName) {
-      const tabs = ['forum', 'classwork', 'people'];
+      const tabs = ['forum', 'classwork', 'exams', 'certificates', 'people'];
       tabs.forEach(t => {
         const btn = document.getElementById(`tab-btn-${t}`);
         const pane = document.getElementById(`classroom-tab-${t}`);
         if (btn) btn.classList.toggle('active', t === tabName);
         if (pane) pane.style.display = (t === tabName) ? 'block' : 'none';
       });
+
+      if (tabName === 'exams') {
+        loadPortalExam();
+      } else if (tabName === 'certificates') {
+        loadPortalCertificates();
+      }
     }
 
     // Classroom Sidebar Drawer Toggle
@@ -2015,6 +2652,20 @@
       document.getElementById('banner-status-badge').textContent = (course.status || 'draft').toUpperCase();
       document.getElementById('banner-category-badge').textContent = course.category ? course.category.name : 'Umum';
       document.getElementById('banner-level-badge').textContent = (course.level || 'beginner').toUpperCase();
+
+      // Update embedded exam & certificate course titles
+      const exTitle = document.getElementById('portal-exam-course-title');
+      if (exTitle) exTitle.textContent = 'Bank Soal & Ujian: ' + course.title;
+      const certTitle = document.getElementById('portal-cert-course-title');
+      if (certTitle) certTitle.textContent = 'Sertifikat Kelulusan: ' + course.title;
+      const prevCourse = document.getElementById('portal-preview-course');
+      if (prevCourse) prevCourse.textContent = course.title;
+
+      // If exams or certs tab is currently visible, reload it
+      const examsPane = document.getElementById('classroom-tab-exams');
+      if (examsPane && examsPane.style.display !== 'none') loadPortalExam();
+      const certsPane = document.getElementById('classroom-tab-certificates');
+      if (certsPane && certsPane.style.display !== 'none') loadPortalCertificates();
 
       const bannerImg = document.getElementById('banner-bg-img');
       if (course.thumbnail_url) {
@@ -2262,6 +2913,454 @@
       else if (['epub', 'mobi'].includes(ext)) selectFormatType('book');
     }
 
+    let currentCreationMode = 'article';
+    let currentPreviewMaterialId = null;
+
+    function openStudentLearningRoom(materialId) {
+      if (!activeCourse || !activeCourse.id) {
+        showToast('Pilih kursus terlebih dahulu.', 'error');
+        return;
+      }
+      const targetId = materialId || currentPreviewMaterialId;
+      const url = targetId 
+        ? `/courses/${activeCourse.id}/learn?material_id=${targetId}`
+        : `/courses/${activeCourse.id}/learn`;
+      window.open(url, '_blank');
+    }
+
+    function openExamCreator() {
+      if (activeCourse && activeCourse.id) {
+        window.location.href = '/tutor/exams?courseId=' + activeCourse.id;
+      } else {
+        window.location.href = '/tutor/exams';
+      }
+    }
+
+    // -------------------------------------------------------------
+    // EMBEDDED EXAM CREATOR IN TUTOR PORTAL (SPRINT 4)
+    // -------------------------------------------------------------
+    let portalQuestions = [];
+    let portalExamId = null;
+
+    async function loadPortalExam() {
+      if (!activeCourse || !activeCourse.id) return;
+      const titleEl = document.getElementById('portal-exam-course-title');
+      if (titleEl) titleEl.textContent = 'Bank Soal & Ujian: ' + activeCourse.title;
+
+      try {
+        const res = await fetch('/api/exams/course/' + activeCourse.id, {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        const json = await res.json();
+
+        if (json.success && json.data) {
+          const ex = json.data;
+          portalExamId = ex.id;
+          document.getElementById('portal-exam-title').value = ex.title || ('Ujian Kompetensi Akhir: ' + activeCourse.title);
+          document.getElementById('portal-exam-desc').value = ex.description || '';
+          document.getElementById('portal-exam-passing').value = ex.passing_score || 75;
+          document.getElementById('portal-exam-duration').value = ex.duration_minutes || 60;
+
+          if (Array.isArray(ex.questions) && ex.questions.length > 0) {
+            portalQuestions = ex.questions.map(q => ({
+              question_text: q.question_text || '',
+              options: Array.isArray(q.options) ? q.options : ['', '', '', ''],
+              correct_answer: q.correct_answer || 'A'
+            }));
+          } else {
+            portalQuestions = [createEmptyQuestion(1)];
+          }
+        } else {
+          portalExamId = null;
+          document.getElementById('portal-exam-title').value = 'Ujian Kompetensi Akhir: ' + activeCourse.title;
+          document.getElementById('portal-exam-desc').value = 'Jawab seluruh pertanyaan pilihan ganda dengan teliti. Nilai kelulusan akan langsung menentukan penerbitan sertifikat resmi Anda.';
+          document.getElementById('portal-exam-passing').value = 75;
+          document.getElementById('portal-exam-duration').value = 60;
+          portalQuestions = [createEmptyQuestion(1)];
+        }
+        renderPortalQuestions();
+      } catch (err) {
+        console.error('Error loading portal exam:', err);
+      }
+    }
+
+    function createEmptyQuestion(num) {
+      return {
+        question_text: '',
+        options: ['', '', '', ''],
+        correct_answer: 'A'
+      };
+    }
+
+    function renderPortalQuestions() {
+      const container = document.getElementById('portal-questions-container');
+      if (!container) return;
+
+      if (portalQuestions.length === 0) {
+        container.innerHTML = `
+          <div style="padding:32px; text-align:center; background:var(--bg-surface); border:1px solid var(--border-subtle); border-radius:var(--radius-lg); color:var(--text-secondary);">
+            <i class="fas fa-clipboard-question" style="font-size:32px; margin-bottom:8px; display:block; color:var(--text-tertiary);"></i>
+            Belum ada butir soal. Klik <strong>Tambah Butir Soal</strong> untuk menyusun pertanyaan pertama.
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = portalQuestions.map((q, idx) => `
+        <div class="question-card" id="q-card-${idx}">
+          <div class="question-header">
+            <span class="question-badge">Soal #${idx + 1}</span>
+            <button type="button" class="btn-delete-q" onclick="removePortalQuestion(${idx})">
+              <i class="fas fa-trash-can"></i> Hapus Soal
+            </button>
+          </div>
+
+          <div class="form-group" style="margin-bottom:14px;">
+            <label class="form-label" style="font-size:12px; font-weight:600; color:var(--text-secondary); margin-bottom:6px; display:block;">Pertanyaan</label>
+            <textarea class="form-control" style="width:100%; padding:10px 12px; border:1px solid var(--border-subtle); border-radius:var(--radius-md); background:var(--bg-app); color:var(--text-primary); font-family:inherit; font-size:13px; box-sizing:border-box;" rows="2" placeholder="Tuliskan teks pertanyaan soal pilihan ganda..." oninput="updatePortalQText(${idx}, this.value)">${escapeHtml(q.question_text || '')}</textarea>
+          </div>
+
+          <label class="form-label" style="font-size:12px; font-weight:600; color:var(--text-secondary); margin-bottom:8px; display:block;">Pilihan Jawaban (Pilih Lingkaran untuk Kunci Jawaban Benar)</label>
+          <div class="options-list">
+            ${['A', 'B', 'C', 'D'].map((opt, oIdx) => `
+              <div class="option-row">
+                <input type="radio" class="option-radio" name="portal_correct_${idx}" value="${opt}" ${q.correct_answer === opt ? 'checked' : ''} onchange="updatePortalQAnswer(${idx}, '${opt}')" title="Kunci Jawaban Benar">
+                <strong style="width:20px; font-size:13px; color:var(--text-primary);">${opt}.</strong>
+                <input type="text" class="form-control" style="flex:1; padding:8px 12px; border:1px solid var(--border-subtle); border-radius:var(--radius-md); background:var(--bg-app); color:var(--text-primary); font-size:13px;" placeholder="Isi pilihan jawaban ${opt}" value="${escapeHtml((q.options && q.options[oIdx]) || '')}" oninput="updatePortalQOption(${idx}, ${oIdx}, this.value)">
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function addPortalQuestion() {
+      portalQuestions.push(createEmptyQuestion(portalQuestions.length + 1));
+      renderPortalQuestions();
+    }
+
+    function removePortalQuestion(idx) {
+      if (portalQuestions.length <= 1) {
+        showToast('Minimal harus ada 1 butir soal ujian.', 'error');
+        return;
+      }
+      portalQuestions.splice(idx, 1);
+      renderPortalQuestions();
+    }
+
+    function updatePortalQText(idx, val) {
+      if (portalQuestions[idx]) portalQuestions[idx].question_text = val;
+    }
+
+    function updatePortalQOption(idx, oIdx, val) {
+      if (portalQuestions[idx]) {
+        if (!Array.isArray(portalQuestions[idx].options)) portalQuestions[idx].options = ['', '', '', ''];
+        portalQuestions[idx].options[oIdx] = val;
+      }
+    }
+
+    function updatePortalQAnswer(idx, ans) {
+      if (portalQuestions[idx]) portalQuestions[idx].correct_answer = ans;
+    }
+
+    async function savePortalExam() {
+      if (!activeCourse || !activeCourse.id) {
+        showToast('Pilih kursus terlebih dahulu.', 'error');
+        return;
+      }
+
+      const title = document.getElementById('portal-exam-title').value.trim();
+      const description = document.getElementById('portal-exam-desc').value.trim();
+      const passingScore = parseInt(document.getElementById('portal-exam-passing').value, 10) || 75;
+      const durationMinutes = parseInt(document.getElementById('portal-exam-duration').value, 10) || 60;
+
+      if (!title) {
+        showToast('Judul ujian wajib diisi.', 'error');
+        return;
+      }
+
+      for (let i = 0; i < portalQuestions.length; i++) {
+        const q = portalQuestions[i];
+        if (!q.question_text || !q.question_text.trim()) {
+          showToast(`Pertanyaan pada Soal #${i + 1} belum diisi.`, 'error');
+          return;
+        }
+        for (let j = 0; j < 4; j++) {
+          if (!q.options[j] || !q.options[j].trim()) {
+            showToast(`Pilihan ${['A', 'B', 'C', 'D'][j]} pada Soal #${i + 1} belum diisi.`, 'error');
+            return;
+          }
+        }
+      }
+
+      try {
+        const res = await fetch('/api/exams', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+          body: JSON.stringify({
+            course_id: activeCourse.id,
+            title,
+            description,
+            passing_score: passingScore,
+            duration_minutes: durationMinutes,
+            questions: portalQuestions
+          })
+        });
+
+        const json = await res.json();
+        if (json.success) {
+          if (json.data && json.data.id) portalExamId = json.data.id;
+          showToast('Ujian kelulusan kursus berhasil disimpan dan dipublikasikan.', 'success');
+        } else {
+          showToast(json.message || 'Gagal menyimpan ujian.', 'error');
+        }
+      } catch (err) {
+        console.error('Error saving portal exam:', err);
+        showToast('Terjadi kesalahan jaringan saat menyimpan ujian.', 'error');
+      }
+    }
+
+    function previewPortalExamZen() {
+      if (portalExamId) {
+        window.open('/exam/' + portalExamId, '_blank');
+      } else {
+        showToast('Simpan ujian terlebih dahulu sebelum membuka pratinjau pengerjaan siswa.', 'info');
+      }
+    }
+
+    // -------------------------------------------------------------
+    // EMBEDDED CERTIFICATE STUDIO IN TUTOR PORTAL (SPRINT 4)
+    // -------------------------------------------------------------
+    let portalCourseCertificates = [];
+
+    async function loadPortalCertificates() {
+      if (!activeCourse || !activeCourse.id) return;
+      const titleEl = document.getElementById('portal-cert-course-title');
+      if (titleEl) titleEl.textContent = 'Sertifikat Kelulusan: ' + activeCourse.title;
+
+      const titleInput = document.getElementById('portal-cert-title');
+      const signerInput = document.getElementById('portal-cert-signer');
+
+      if (titleInput && (!titleInput.value || titleInput.value === 'Sertifikat Kelulusan Resmi')) {
+        titleInput.value = 'Sertifikat Kelulusan Resmi: ' + activeCourse.title;
+      }
+      if (signerInput && !signerInput.value) {
+        const savedUser = JSON.parse(localStorage.getItem('user') || '{}');
+        signerInput.value = (activeCourse.tutor && activeCourse.tutor.name) || savedUser.name || 'Arjuna Lanang (Lead Tutor)';
+      }
+
+      updatePortalCertPreview();
+
+      try {
+        const res = await fetch(`/api/certificates/tutor/issued?course_id=${activeCourse.id}`, {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        const json = await res.json();
+
+        if (json.success && json.data) {
+          portalCourseCertificates = json.data.certificates || [];
+          renderPortalCertificatesTable(portalCourseCertificates);
+        }
+      } catch (err) {
+        console.error('Error loading portal certificates:', err);
+      }
+    }
+
+    function updatePortalCertPreview() {
+      const title = document.getElementById('portal-cert-title').value || 'SERTIFIKAT KELULUSAN RESMI';
+      const signer = document.getElementById('portal-cert-signer').value || 'Nama Instruktur';
+      const signerTitle = document.getElementById('portal-cert-signer-title').value || 'Lead Instructor';
+      const issuer = document.getElementById('portal-cert-issuer').value || 'SkillSphere AI Certified Academy';
+
+      document.getElementById('portal-preview-title').textContent = title.toUpperCase();
+      document.getElementById('portal-preview-signer').textContent = signer;
+      document.getElementById('portal-preview-signer-title').textContent = signerTitle;
+      document.getElementById('portal-preview-issuer').textContent = issuer;
+
+      if (activeCourse) {
+        document.getElementById('portal-preview-course').textContent = activeCourse.title;
+      }
+    }
+
+    function savePortalCertConfig() {
+      showToast('Konfigurasi standar kredensial sertifikat berhasil disimpan.', 'success');
+    }
+
+    function downloadPortalSampleCertPdf() {
+      if (portalCourseCertificates.length > 0) {
+        window.open('/api/certificates/' + portalCourseCertificates[0].certificate_code + '/pdf', '_blank');
+      } else {
+        showToast('Mengunduh sampel PDF sertifikat resmi ber-QR Code...', 'info');
+        window.open('/api/certificates/sample-pdf', '_blank');
+      }
+    }
+
+    function renderPortalCertificatesTable(list) {
+      const tbody = document.getElementById('portal-course-certificates-tbody');
+      if (!tbody) return;
+
+      if (!list || list.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="5" style="text-align:center; padding:28px; color:var(--text-secondary);">
+              Belum ada siswa yang menerbitkan sertifikat di kelas ini. Saat siswa lulus ujian kompetensi, sertifikat mereka otomatis tercatat di sini.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = list.map(cert => `
+        <tr style="border-bottom:1px solid var(--border-subtle);">
+          <td style="padding:10px 12px;">
+            <code style="font-family:var(--font-mono); font-size:12px; background:var(--bg-surface-subtle); padding:2px 6px; border-radius:4px;">
+              ${escapeHtml(cert.certificate_code)}
+            </code>
+          </td>
+          <td style="padding:10px 12px; font-weight:600;">${escapeHtml(cert.student_name)}</td>
+          <td style="padding:10px 12px;"><span style="display:inline-flex; align-items:center; gap:4px; padding:2px 8px; border-radius:999px; font-size:11px; font-weight:700; background:rgba(16,185,129,0.12); color:var(--accent-green, #10B981);"><i class="fas fa-check"></i> ${cert.exam_score}%</span></td>
+          <td style="padding:10px 12px; color:var(--text-secondary);">${escapeHtml(cert.issue_date || '-')}</td>
+          <td style="padding:10px 12px;">
+            <div style="display:flex; gap:8px;">
+              <a href="/api/certificates/${encodeURIComponent(cert.certificate_code)}/pdf" target="_blank" class="btn btn-outline" style="padding:3px 8px; font-size:11px;" title="Unduh Berkas PDF">
+                <i class="fas fa-file-pdf"></i> PDF
+              </a>
+              <a href="/verify-cert/${encodeURIComponent(cert.certificate_code)}" target="_blank" class="btn btn-outline" style="padding:3px 8px; font-size:11px;" title="Cek Verifikasi Publik">
+                <i class="fas fa-arrow-up-right-from-square"></i> Cek QR
+              </a>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function switchMaterialCreationMode(mode) {
+      currentCreationMode = mode;
+      const btnArt = document.getElementById('btn-mode-article');
+      const btnFile = document.getElementById('btn-mode-file');
+      const secArt = document.getElementById('section-mode-article');
+      const secFile = document.getElementById('section-mode-file');
+      const submitLabel = document.getElementById('btn-submit-label');
+
+      if (mode === 'article') {
+        if (btnArt) btnArt.classList.add('active');
+        if (btnFile) btnFile.classList.remove('active');
+        if (secArt) secArt.style.display = 'block';
+        if (secFile) secFile.style.display = 'none';
+        if (submitLabel) submitLabel.textContent = 'Simpan Artikel Pelajaran';
+        selectedContentType = 'book';
+      } else {
+        if (btnFile) btnFile.classList.add('active');
+        if (btnArt) btnArt.classList.remove('active');
+        if (secFile) secFile.style.display = 'block';
+        if (secArt) secArt.style.display = 'none';
+        if (submitLabel) submitLabel.textContent = 'Unggah Berkas Materi';
+        if (!['video', 'ppt', 'pdf', 'doc'].includes(selectedContentType)) {
+          selectFormatType('video');
+        }
+      }
+    }
+
+    function execEditorFormat(cmd, val = null) {
+      document.execCommand(cmd, false, val);
+      const editor = document.getElementById('material-rich-editor');
+      if (editor) {
+        editor.focus();
+        updateWordCount();
+      }
+    }
+
+    function insertEditorBlockquote() {
+      const editor = document.getElementById('material-rich-editor');
+      document.execCommand('formatBlock', false, '<blockquote>');
+      if (editor) {
+        editor.focus();
+        updateWordCount();
+      }
+    }
+
+    function insertEditorCodeBlock() {
+      const editor = document.getElementById('material-rich-editor');
+      const code = prompt('Masukkan baris kode pemrograman (opsional):', '');
+      if (code !== null) {
+        const escaped = escapeHtml(code || '// Contoh kode program');
+        document.execCommand('insertHTML', false, `<pre><code>${escaped}</code></pre><p><br></p>`);
+      }
+      if (editor) {
+        editor.focus();
+        updateWordCount();
+      }
+    }
+
+    function insertEditorLink() {
+      const url = prompt('Masukkan tautan URL website (contoh: https://example.com):', 'https://');
+      if (url && url !== 'https://') {
+        document.execCommand('createLink', false, url);
+      }
+    }
+
+    let isEditorInPreview = false;
+    function toggleEditorLivePreview() {
+      const writePanel = document.getElementById('editor-write-panel');
+      const prevPanel = document.getElementById('editor-preview-panel');
+      const prevContent = document.getElementById('editor-preview-content');
+      const editor = document.getElementById('material-rich-editor');
+      const btn = document.getElementById('btn-toggle-editor-preview');
+
+      isEditorInPreview = !isEditorInPreview;
+
+      if (isEditorInPreview) {
+        if (writePanel) writePanel.style.display = 'none';
+        if (prevPanel) prevPanel.style.display = 'block';
+        if (prevContent && editor) {
+          prevContent.innerHTML = renderArticleHtml(editor.innerHTML);
+        }
+        if (btn) {
+          btn.classList.add('active');
+          btn.innerHTML = '<i class="fas fa-pen-to-square"></i> <span>Kembali ke Editor</span>';
+        }
+      } else {
+        if (prevPanel) prevPanel.style.display = 'none';
+        if (writePanel) writePanel.style.display = 'block';
+        if (btn) {
+          btn.classList.remove('active');
+          btn.innerHTML = '<i class="fas fa-eye"></i> <span>Pratinjau Siswa</span>';
+        }
+        if (editor) editor.focus();
+      }
+    }
+
+    function updateWordCount() {
+      const editor = document.getElementById('material-rich-editor');
+      const countEl = document.getElementById('editor-word-count');
+      if (!editor || !countEl) return;
+      const text = (editor.innerText || '').trim();
+      const count = text ? text.split(/\s+/).length : 0;
+      countEl.textContent = `${count} kata`;
+    }
+
+    function renderArticleHtml(text) {
+      if (!text) return '';
+      // If it already contains HTML tags, return directly
+      if (/<(p|h[1-6]|ul|ol|li|blockquote|pre|code|div|strong|em|br|hr|span|a)[^>]*>/i.test(text)) {
+        return text;
+      }
+      let md = text.trim();
+      md = md.replace(/^### (.*$)/gim, '<h3>$1</h3>');
+      md = md.replace(/^## (.*$)/gim, '<h2>$1</h2>');
+      md = md.replace(/^# (.*$)/gim, '<h1>$1</h1>');
+      md = md.replace(/^\> (.*$)/gim, '<blockquote><p>$1</p></blockquote>');
+      md = md.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+      md = md.replace(/\*(.*?)\*/g, '<em>$1</em>');
+      md = md.replace(/`([^`]+)`/g, '<code>$1</code>');
+      md = md.replace(/\n\n/g, '</p><p>');
+      md = '<p>' + md + '</p>';
+      return md;
+    }
+
     function openUploadModal() {
       selectedMaterialFile = null;
       document.getElementById('material-file-input').value = '';
@@ -2270,9 +3369,21 @@
       document.getElementById('drop-icon').className = 'fas fa-cloud-arrow-up drop-zone-icon';
       document.getElementById('drop-icon').style.color = 'var(--text-secondary)';
       document.getElementById('material-title-input').value = '';
-      document.getElementById('material-duration-input').value = '15';
+      document.getElementById('material-duration-input').value = '20';
       document.getElementById('material-is-preview').checked = false;
       document.getElementById('upload-progress-container').style.display = 'none';
+
+      const editor = document.getElementById('material-rich-editor');
+      if (editor) {
+        editor.innerHTML = '';
+        editor.addEventListener('input', updateWordCount);
+      }
+      updateWordCount();
+
+      // Reset to article mode
+      switchMaterialCreationMode('article');
+      if (isEditorInPreview) toggleEditorLivePreview();
+
       openModal('upload-material-modal');
     }
 
@@ -2281,7 +3392,7 @@
       document.getElementById('material-section-select').value = sectionId;
     }
 
-    // Submit Material Upload
+    // Submit Material Upload or Rich Text Creation
     async function submitMaterialUpload() {
       const sectionId = document.getElementById('material-section-select').value;
       const title = document.getElementById('material-title-input').value.trim();
@@ -2293,54 +3404,105 @@
         return;
       }
       if (!title) {
-        showToast('Judul materi wajib diisi.', 'error');
+        showToast('Judul materi pelajaran wajib diisi.', 'error');
         return;
       }
-      if (!selectedMaterialFile) {
-        showToast('Harap pilih berkas materi pembelajaran.', 'error');
-        return;
-      }
-
-      const formData = new FormData();
-      formData.append('section_id', sectionId);
-      formData.append('title', title);
-      formData.append('content_type', selectedContentType);
-      formData.append('duration_minutes', duration);
-      formData.append('is_preview', isPreview ? 'true' : 'false');
-      formData.append('file', selectedMaterialFile);
 
       const btn = document.getElementById('btn-submit-upload');
-      btn.disabled = true;
-      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengunggah...';
+      const submitLabel = document.getElementById('btn-submit-label');
 
-      const progressContainer = document.getElementById('upload-progress-container');
-      const progressFill = document.getElementById('upload-progress-fill');
-      progressContainer.style.display = 'block';
-      progressFill.style.width = '35%';
+      if (currentCreationMode === 'article') {
+        const editor = document.getElementById('material-rich-editor');
+        const editorHtml = editor ? editor.innerHTML.trim() : '';
+        const editorText = editor ? editor.innerText.trim() : '';
 
-      try {
-        progressFill.style.width = '70%';
-        const res = await fetch('/api/materials', {
-          method: 'POST',
-          headers: { 'Authorization': 'Bearer ' + token },
-          body: formData,
-        });
-
-        const json = await res.json();
-        progressFill.style.width = '100%';
-
-        if (res.ok && json.success) {
-          showToast(`Materi "${title}" berhasil diunggah!`, 'success');
-          closeModal('upload-material-modal');
-          changeActiveCourse(activeCourse.id);
-        } else {
-          showToast(json.message || 'Gagal mengunggah materi.', 'error');
+        if (!editorText && !editorHtml) {
+          showToast('Isi materi pelajaran tidak boleh kosong.', 'error');
+          return;
         }
-      } catch (err) {
-        showToast('Terjadi kesalahan jaringan saat upload.', 'error');
-      } finally {
-        btn.disabled = false;
-        btn.innerHTML = '<i class="fas fa-upload"></i> Unggah Materi';
+
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
+
+        try {
+          const res = await fetch('/api/materials', {
+            method: 'POST',
+            headers: { 
+              'Authorization': 'Bearer ' + token,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              section_id: sectionId,
+              title: title,
+              content_type: 'book',
+              content_text: editorHtml,
+              duration_minutes: duration,
+              is_preview: isPreview
+            })
+          });
+
+          const json = await res.json();
+          if (res.ok && json.success) {
+            showToast(`Materi artikel "${title}" berhasil disimpan!`, 'success');
+            closeModal('upload-material-modal');
+            changeActiveCourse(activeCourse.id);
+          } else {
+            showToast(json.message || 'Gagal menyimpan materi.', 'error');
+          }
+        } catch (err) {
+          showToast('Terjadi kesalahan jaringan saat menyimpan artikel.', 'error');
+        } finally {
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fas fa-check"></i> <span id="btn-submit-label">Simpan Materi Pelajaran</span>';
+        }
+
+      } else {
+        // File Upload Mode
+        if (!selectedMaterialFile) {
+          showToast('Harap pilih berkas materi pembelajaran.', 'error');
+          return;
+        }
+
+        const formData = new FormData();
+        formData.append('section_id', sectionId);
+        formData.append('title', title);
+        formData.append('content_type', selectedContentType);
+        formData.append('duration_minutes', duration);
+        formData.append('is_preview', isPreview ? 'true' : 'false');
+        formData.append('file', selectedMaterialFile);
+
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengunggah...';
+
+        const progressContainer = document.getElementById('upload-progress-container');
+        const progressFill = document.getElementById('upload-progress-fill');
+        progressContainer.style.display = 'block';
+        progressFill.style.width = '35%';
+
+        try {
+          progressFill.style.width = '70%';
+          const res = await fetch('/api/materials', {
+            method: 'POST',
+            headers: { 'Authorization': 'Bearer ' + token },
+            body: formData,
+          });
+
+          const json = await res.json();
+          progressFill.style.width = '100%';
+
+          if (res.ok && json.success) {
+            showToast(`Materi berkas "${title}" berhasil diunggah!`, 'success');
+            closeModal('upload-material-modal');
+            changeActiveCourse(activeCourse.id);
+          } else {
+            showToast(json.message || 'Gagal mengunggah materi berkas.', 'error');
+          }
+        } catch (err) {
+          showToast('Terjadi kesalahan jaringan saat upload.', 'error');
+        } finally {
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fas fa-check"></i> <span id="btn-submit-label">Simpan Materi Pelajaran</span>';
+        }
       }
     }
 
@@ -2452,9 +3614,10 @@
       }
     }
 
-    // Live Media Previewer
+    // Live Media & Article Previewer
     async function previewMaterial(materialId) {
       try {
+        currentPreviewMaterialId = materialId;
         const res = await fetch(`/api/materials/${materialId}`, {
           headers: { 'Authorization': 'Bearer ' + token }
         });
@@ -2463,9 +3626,13 @@
 
         const mat = json.data;
         document.getElementById('preview-modal-title').textContent = mat.title;
-        document.getElementById('preview-file-info').textContent = `Tipe: ${mat.content_type.toUpperCase()} • Durasi: ${mat.duration_minutes || 0} Menit • File: ${mat.file_url}`;
+        document.getElementById('preview-file-info').textContent = `Tipe: ${mat.content_type.toUpperCase()} • Durasi: ${mat.duration_minutes || 0} Menit • File: ${mat.file_url || 'Artikel Teks'}`;
 
         const wrapper = document.getElementById('media-player-wrapper');
+        const openLearnBtn = document.getElementById('preview-open-learn-btn');
+        if (openLearnBtn) {
+          openLearnBtn.onclick = () => openStudentLearningRoom(mat.id);
+        }
 
         if (mat.content_type === 'video') {
           wrapper.innerHTML = `
@@ -2478,8 +3645,34 @@
           `;
         } else if (mat.content_type === 'pdf') {
           wrapper.innerHTML = `
-            <div style="width:100%; height:450px; border-radius:var(--radius-lg); overflow:hidden; border:1px solid var(--border-subtle);">
+            <div style="width:100%; height:480px; border-radius:var(--radius-lg); overflow:hidden; border:1px solid var(--border-subtle);">
               <iframe src="${mat.file_url}" style="width:100%; height:100%; border:none;"></iframe>
+            </div>
+          `;
+        } else if (mat.content_text && mat.content_text.trim().length > 0) {
+          // Render rich article reader
+          const parsedHtml = renderArticleHtml(mat.content_text);
+          wrapper.innerHTML = `
+            <div class="article-reader-preview-box">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; padding-bottom:12px; border-bottom:1px solid var(--border-subtle); flex-wrap:wrap; gap:8px;">
+                <div style="font-size:12px; font-weight:600; color:var(--text-secondary); display:flex; align-items:center; gap:6px;">
+                  <i class="fas fa-book-open"></i> Isi Modul Bacaan &amp; Pembelajaran Teks
+                </div>
+                <button class="btn btn-primary" style="padding:6px 14px; font-size:12px;" onclick="openStudentLearningRoom(${mat.id})">
+                  <i class="fas fa-graduation-cap"></i> Buka di Ruang Belajar Siswa
+                </button>
+              </div>
+              <article class="prose-content">
+                ${parsedHtml}
+              </article>
+              ${mat.file_url && mat.file_url.startsWith('/uploads/') ? `
+                <div style="margin-top:20px; padding-top:14px; border-top:1px dashed var(--border-subtle); display:flex; justify-content:space-between; align-items:center;">
+                  <span style="font-size:12px; color:var(--text-secondary);"><i class="fas fa-paperclip"></i> Berkas Lampiran Tersedia</span>
+                  <a href="${mat.file_url}" target="_blank" class="btn btn-outline" style="font-size:12px; padding:6px 12px;">
+                    <i class="fas fa-download"></i> Unduh Lampiran
+                  </a>
+                </div>
+              ` : ''}
             </div>
           `;
         } else {
@@ -2489,13 +3682,20 @@
           if (mat.content_type === 'book') icon = 'fa-book-open';
 
           wrapper.innerHTML = `
-            <div style="background:var(--bg-surface-subtle); border-radius:var(--radius-lg); padding:40px; text-align:center; border:1px solid var(--border-subtle);">
-              <i class="fas ${icon}" style="font-size:48px; color:var(--text-secondary); margin-bottom:14px; display:block;"></i>
+            <div style="background:var(--bg-surface-subtle); border-radius:var(--radius-lg); padding:36px; text-align:center; border:1px solid var(--border-subtle);">
+              <i class="fas ${icon}" style="font-size:46px; color:var(--text-secondary); margin-bottom:14px; display:block;"></i>
               <h4 style="font-family:var(--font-serif); font-size:18px; margin-bottom:8px;">Dokumen Pembelajaran ${mat.content_type.toUpperCase()}</h4>
-              <p style="font-size:13px; color:var(--text-secondary); margin-bottom:18px;">Berkas siap diunduh atau dipelajari.</p>
-              <a href="${mat.file_url}" target="_blank" class="btn btn-primary" style="display:inline-flex; text-decoration:none;">
-                <i class="fas fa-download"></i> Unduh / Buka Dokumen
-              </a>
+              <p style="font-size:13px; color:var(--text-secondary); margin-bottom:20px;">Berkas siap dipelajari siswa di ruang belajar interaktif.</p>
+              <div style="display:flex; justify-content:center; gap:10px; flex-wrap:wrap;">
+                <button class="btn btn-primary" onclick="openStudentLearningRoom(${mat.id})">
+                  <i class="fas fa-graduation-cap"></i> Buka di Ruang Belajar Siswa
+                </button>
+                ${mat.file_url && mat.file_url.startsWith('/uploads/') ? `
+                  <a href="${mat.file_url}" target="_blank" class="btn btn-outline" style="display:inline-flex; text-decoration:none;">
+                    <i class="fas fa-download"></i> Unduh Berkas
+                  </a>
+                ` : ''}
+              </div>
             </div>
           `;
         }
@@ -2511,6 +3711,7 @@
       const video = wrapper.querySelector('video');
       if (video) video.pause();
       wrapper.innerHTML = '';
+      currentPreviewMaterialId = null;
       closeModal('media-preview-modal');
     }
 

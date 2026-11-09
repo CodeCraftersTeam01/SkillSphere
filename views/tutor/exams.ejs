@@ -4,137 +4,166 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Pembuat Ujian Kelulusan | Studio Pengajar SkillSphere AI</title>
+  <meta name="description" content="Studio perancangan bank soal, passing grade kelulusan, dan batas waktu ujian resmi bagi instruktur SkillSphere AI.">
+
+  <!-- Immediate Theme Initializer -->
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('skillsphere_theme') || localStorage.getItem('theme') || 'light';
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    })();
+  </script>
 
   <!-- Google Fonts: Newsreader, Plus Jakarta Sans, JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome 6 Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- Claude Design System Stylesheet & Accessibility Toolkit -->
+  <link rel="stylesheet" href="/stylesheets/claude-theme.css?v=2.0">
+  <link rel="stylesheet" href="/stylesheets/accessibility.css">
+  <link rel="stylesheet" href="/stylesheets/custom-alert.css">
+  <script src="/javascripts/custom-alert.js"></script>
 
   <style>
-    :root {
-      --bg-warm: #FAF9F5;
-      --surface: #FFFFFF;
-      --surface-elevated: #F4F3EE;
-      --border-subtle: #E5E4DE;
-      --border-accent: #C8A86B;
-      --text-main: #141413;
-      --text-muted: #6B6960;
-      --text-subtle: #8F8D83;
-      --primary: #1F1E1B;
-      --primary-hover: #000000;
-      --accent-gold: #C8A86B;
-      --success: #10B981;
-      --success-bg: #ECFDF5;
-      --danger: #EF4444;
-      --danger-bg: #FEF2F2;
-      --radius-sm: 8px;
-      --radius-md: 14px;
-      --radius-lg: 20px;
-      --shadow-sm: 0 1px 3px rgba(0,0,0,0.04);
-      --shadow-md: 0 4px 16px rgba(0,0,0,0.06);
-    }
-
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --bg-warm: #141413;
-        --surface: #1F1E1B;
-        --surface-elevated: #2A2926;
-        --border-subtle: #2F2E2B;
-        --border-accent: #C8A86B;
-        --text-main: #FAF9F5;
-        --text-muted: #A3A196;
-        --text-subtle: #7A7870;
-        --primary: #FAF9F5;
-        --primary-hover: #FFFFFF;
-        --success-bg: #064E3B;
-        --danger-bg: #7F1D1D;
-      }
-    }
-
-    * {
-      box-sizing: border-box;
+    body {
       margin: 0;
       padding: 0;
-    }
-
-    body {
-      background-color: var(--bg-warm);
-      color: var(--text-main);
-      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: var(--bg-app);
+      font-family: var(--font-sans);
+      color: var(--text-primary);
       min-height: 100vh;
       display: flex;
       flex-direction: column;
-      line-height: 1.5;
+      line-height: 1.55;
       -webkit-font-smoothing: antialiased;
     }
 
-    .header-bar {
+    /* Top Navigation Bar Consistent with Studio */
+    .navbar {
+      background: var(--bg-surface);
       border-bottom: 1px solid var(--border-subtle);
-      background: var(--surface);
-      padding: 16px 28px;
+      padding: 0 24px;
+      height: 60px;
       display: flex;
-      align-items: center;
       justify-content: space-between;
+      align-items: center;
       position: sticky;
       top: 0;
-      z-index: 40;
+      z-index: 100;
+      box-sizing: border-box;
+      gap: 16px;
+    }
+
+    .nav-brand-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-shrink: 0;
     }
 
     .brand-logo {
-      display: flex;
+      display: inline-flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
       text-decoration: none;
-      color: var(--text-main);
+      color: var(--text-primary);
       font-weight: 700;
-      font-size: 1.15rem;
+      font-size: 1.12rem;
     }
 
-    .brand-sparkle {
-      color: var(--accent-gold);
-      font-size: 1.3rem;
+    .brand-logo span {
+      font-family: var(--font-serif);
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: -0.3px;
     }
 
     .brand-tag {
-      font-size: 0.75rem;
+      font-size: 0.72rem;
       padding: 2px 8px;
-      border-radius: 999px;
-      background: var(--surface-elevated);
-      color: var(--text-muted);
+      border-radius: var(--radius-full);
+      background: var(--bg-surface-subtle);
+      color: var(--text-secondary);
       font-weight: 600;
+      border: 1px solid var(--border-subtle);
     }
 
-    .nav-links {
+    /* Center Navigation Tabs */
+    .studio-nav-tabs {
       display: flex;
+      align-items: stretch;
+      gap: 4px;
+      height: 60px;
+    }
+
+    .studio-nav-tab {
+      padding: 0 16px;
+      height: 60px;
+      font-size: 0.88rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid transparent;
+      display: inline-flex;
       align-items: center;
       gap: 8px;
-    }
-
-    .nav-pill {
       text-decoration: none;
-      font-size: 0.85rem;
-      font-weight: 500;
-      color: var(--text-muted);
-      padding: 8px 14px;
-      border-radius: var(--radius-sm);
-      transition: all 0.15s ease;
+      cursor: pointer;
+      transition: all 0.15s ease-out;
+      white-space: nowrap;
     }
 
-    .nav-pill:hover {
-      color: var(--text-main);
-      background: var(--surface-elevated);
+    .studio-nav-tab:hover {
+      color: var(--text-primary);
+      background: var(--bg-surface-subtle);
     }
 
-    .nav-pill.active {
-      color: var(--text-main);
-      background: var(--surface-elevated);
+    .studio-nav-tab.active {
+      color: var(--text-primary);
       font-weight: 600;
+      border-bottom-color: var(--text-primary);
     }
 
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .icon-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-full);
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-surface);
+      color: var(--text-primary);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.15s ease-out;
+    }
+
+    .icon-btn:hover {
+      background: var(--bg-surface-subtle);
+      transform: translateY(-1px);
+    }
+
+    .icon-btn:focus-visible {
+      outline: 2px solid var(--text-primary);
+      outline-offset: 2px;
+    }
+
+    /* Main Container */
     .container {
-      max-width: 1040px;
+      max-width: 1020px;
       width: 100%;
-      margin: 36px auto;
+      margin: 32px auto;
       padding: 0 20px;
       flex: 1;
     }
@@ -144,43 +173,49 @@
     }
 
     .page-title {
-      font-family: 'Newsreader', serif;
-      font-size: 2.2rem;
+      font-family: var(--font-serif);
+      font-size: 2.15rem;
       font-weight: 600;
       margin-bottom: 8px;
       letter-spacing: -0.5px;
+      color: var(--text-primary);
     }
 
     .page-subtitle {
-      color: var(--text-muted);
+      color: var(--text-secondary);
       font-size: 0.95rem;
+      max-width: 720px;
     }
 
+    /* Cards */
     .card {
-      background: var(--surface);
+      background: var(--bg-surface);
       border: 1px solid var(--border-subtle);
       border-radius: var(--radius-lg);
-      padding: 28px 24px;
+      padding: 26px 24px;
       box-shadow: var(--shadow-sm);
       margin-bottom: 24px;
+      transition: border-color 0.18s ease-out;
     }
 
     .card-title {
-      font-family: 'Newsreader', serif;
+      font-family: var(--font-serif);
       font-size: 1.35rem;
       font-weight: 600;
       margin-bottom: 6px;
+      color: var(--text-primary);
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
     }
 
     .card-desc {
       font-size: 0.88rem;
-      color: var(--text-muted);
+      color: var(--text-secondary);
       margin-bottom: 20px;
     }
 
+    /* Form Elements */
     .form-group {
       margin-bottom: 18px;
     }
@@ -191,7 +226,7 @@
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.5px;
-      color: var(--text-muted);
+      color: var(--text-secondary);
       margin-bottom: 6px;
     }
 
@@ -200,17 +235,19 @@
       padding: 12px 14px;
       font-size: 0.95rem;
       font-family: inherit;
-      color: var(--text-main);
-      background: var(--bg-warm);
+      color: var(--text-primary);
+      background: var(--bg-app);
       border: 1px solid var(--border-subtle);
       border-radius: var(--radius-md);
+      box-sizing: border-box;
       outline: none;
-      transition: border-color 0.15s ease;
+      transition: border-color 0.15s ease-out, box-shadow 0.15s ease-out;
+      min-height: 44px;
     }
 
     .form-control:focus {
-      border-color: var(--accent-gold);
-      box-shadow: 0 0 0 3px rgba(200, 168, 107, 0.15);
+      border-color: var(--text-primary);
+      box-shadow: 0 0 0 2px var(--border-strong);
     }
 
     .grid-2 {
@@ -219,25 +256,33 @@
       gap: 16px;
     }
 
-    @media (max-width: 680px) {
+    @media (max-width: 768px) {
       .grid-2 {
         grid-template-columns: 1fr;
       }
-      .header-bar {
-        padding: 14px 18px;
+      .studio-nav-tabs {
+        display: none;
+      }
+      .navbar {
+        padding: 0 16px;
       }
       .page-title {
-        font-size: 1.8rem;
+        font-size: 1.75rem;
       }
     }
 
+    /* Question Cards */
     .question-card {
-      background: var(--bg-warm);
+      background: var(--bg-app);
       border: 1px solid var(--border-subtle);
       border-radius: var(--radius-md);
       padding: 20px;
       margin-bottom: 18px;
-      position: relative;
+      transition: border-color 0.15s ease;
+    }
+
+    .question-card:focus-within {
+      border-color: var(--border-strong);
     }
 
     .question-header {
@@ -248,31 +293,35 @@
     }
 
     .question-badge {
-      font-family: 'JetBrains Mono', monospace;
+      font-family: var(--font-mono);
       font-size: 0.82rem;
       font-weight: 600;
-      background: var(--surface);
+      background: var(--bg-surface);
       border: 1px solid var(--border-subtle);
-      padding: 3px 10px;
-      border-radius: 999px;
+      padding: 4px 10px;
+      border-radius: var(--radius-full);
+      color: var(--text-primary);
     }
 
     .btn-delete-q {
       background: transparent;
-      border: none;
-      color: var(--danger);
+      border: 1px solid transparent;
+      color: var(--color-danger);
       font-size: 0.82rem;
       font-weight: 600;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
-      gap: 4px;
-      padding: 4px 8px;
+      gap: 6px;
+      padding: 6px 10px;
       border-radius: var(--radius-sm);
+      min-height: 36px;
+      transition: all 0.15s ease-out;
     }
 
     .btn-delete-q:hover {
-      background: var(--danger-bg);
+      background: var(--color-danger-bg);
+      border-color: rgba(220, 38, 38, 0.2);
     }
 
     .options-grid {
@@ -282,32 +331,35 @@
       margin-top: 14px;
     }
 
-    @media (max-width: 600px) {
+    @media (max-width: 620px) {
       .options-grid {
         grid-template-columns: 1fr;
       }
     }
 
     .option-item {
-      background: var(--surface);
+      background: var(--bg-surface);
       border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-sm);
+      border-radius: var(--radius-md);
       padding: 8px 12px;
       display: flex;
       align-items: center;
       gap: 10px;
+      min-height: 44px;
+      transition: all 0.15s ease-out;
     }
 
     .option-item.correct {
-      border-color: var(--success);
-      background: var(--success-bg);
+      border-color: var(--color-success);
+      background: var(--color-success-bg);
     }
 
     .option-radio {
-      accent-color: var(--accent-gold);
+      accent-color: var(--color-success);
       cursor: pointer;
-      width: 18px;
-      height: 18px;
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
     }
 
     .option-input {
@@ -315,160 +367,157 @@
       background: transparent;
       outline: none;
       width: 100%;
-      font-size: 0.9rem;
+      font-size: 0.92rem;
       font-family: inherit;
-      color: var(--text-main);
+      color: var(--text-primary);
     }
 
+    /* Buttons */
     .btn {
       display: inline-flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
-      padding: 12px 20px;
+      padding: 10px 18px;
       border-radius: var(--radius-md);
       font-weight: 600;
-      font-size: 0.92rem;
+      font-size: 0.9rem;
       text-decoration: none;
       cursor: pointer;
-      border: none;
-      transition: all 0.15s ease;
+      border: 1px solid transparent;
+      transition: all 0.15s ease-out;
       min-height: 44px;
+      box-sizing: border-box;
     }
 
     .btn-primary {
-      background: var(--text-main);
-      color: var(--surface);
+      background: var(--accent-primary);
+      color: var(--accent-text);
+      border-color: var(--accent-primary);
     }
 
     .btn-primary:hover {
-      opacity: 0.92;
+      background: var(--accent-primary-hover);
       transform: translateY(-1px);
     }
 
     .btn-outline {
       background: transparent;
-      color: var(--text-main);
-      border: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+      border-color: var(--border-subtle);
     }
 
     .btn-outline:hover {
-      background: var(--surface-elevated);
+      background: var(--bg-surface-subtle);
+      border-color: var(--border-strong);
     }
 
-    .btn-accent {
-      background: var(--accent-gold);
-      color: #FFFFFF;
-    }
-
-    .btn-accent:hover {
-      opacity: 0.92;
-      transform: translateY(-1px);
-    }
-
+    /* Sticky Footer Action Bar */
     .sticky-footer {
       position: sticky;
       bottom: 0;
-      background: var(--surface);
+      background: var(--bg-surface);
       border-top: 1px solid var(--border-subtle);
-      padding: 16px 28px;
+      padding: 14px 24px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 16px;
-      z-index: 30;
-      box-shadow: 0 -4px 12px rgba(0,0,0,0.03);
+      z-index: 40;
+      box-shadow: 0 -4px 16px rgba(0,0,0,0.04);
+      flex-wrap: wrap;
     }
 
     .stat-pill {
-      font-size: 0.85rem;
-      color: var(--text-muted);
+      font-size: 0.86rem;
+      color: var(--text-secondary);
       display: flex;
       align-items: center;
-      gap: 16px;
+      gap: 18px;
+      flex-wrap: wrap;
     }
 
     .stat-item strong {
-      color: var(--text-main);
-      font-family: 'JetBrains Mono', monospace;
-    }
-
-    .toast {
-      position: fixed;
-      top: 24px;
-      right: 24px;
-      padding: 14px 20px;
-      border-radius: var(--radius-md);
-      font-size: 0.9rem;
-      font-weight: 600;
-      z-index: 9999;
-      display: none;
-      box-shadow: var(--shadow-md);
-    }
-
-    .toast-success {
-      background: var(--success-bg);
-      color: var(--success);
-      border: 1px solid var(--success);
-    }
-
-    .toast-error {
-      background: var(--danger-bg);
-      color: var(--danger);
-      border: 1px solid var(--danger);
+      color: var(--text-primary);
+      font-family: var(--font-mono);
+      font-weight: 700;
     }
   </style>
 </head>
 <body>
 
-  <!-- Top Navigation Bar -->
-  <header class="header-bar">
-    <div style="display: flex; align-items: center; gap: 20px;">
-      <a href="/dashboard" class="brand-logo">
-        <span class="brand-sparkle">✦</span>
+  <!-- Top Studio Header -->
+  <header class="navbar" role="banner">
+    <div class="nav-brand-group">
+      <a href="/dashboard" class="brand-logo" aria-label="Ke Dashboard SkillSphere">
+        <i class="fa-solid fa-sparkles" style="color: var(--accent-amber);"></i>
         <span>SkillSphere Studio</span>
         <span class="brand-tag">Pengajar</span>
       </a>
-
-      <nav class="nav-links">
-        <a href="/tutor/materials" class="nav-pill">Kurikulum & Materi</a>
-        <a href="/tutor/exams" class="nav-pill active">Ujian Kelulusan</a>
-        <a href="/tutor/wallet" class="nav-pill">Dompet & Penarikan</a>
-      </nav>
     </div>
 
-    <div>
-      <a href="/dashboard" class="btn btn-outline" style="min-height: 36px; padding: 6px 14px; font-size: 0.82rem;">
-        Dashboard Utama
+    <!-- Center Studio Tabs -->
+    <nav class="studio-nav-tabs" aria-label="Navigasi Studio Pengajar">
+      <a href="/tutor/materials" class="studio-nav-tab">
+        <i class="fa-solid fa-book-open"></i>
+        <span>Kurikulum & Materi</span>
+      </a>
+      <a href="/tutor/exams" class="studio-nav-tab active" aria-current="page">
+        <i class="fa-solid fa-file-signature"></i>
+        <span>Ujian Kelulusan</span>
+      </a>
+      <a href="/tutor/certificates" class="studio-nav-tab">
+        <i class="fa-solid fa-certificate"></i>
+        <span>Sertifikat Kursus</span>
+      </a>
+      <a href="/tutor/wallet" class="studio-nav-tab">
+        <i class="fa-solid fa-wallet"></i>
+        <span>Dompet & Penarikan</span>
+      </a>
+    </nav>
+
+    <!-- Right Controls -->
+    <div class="nav-actions">
+      <button type="button" class="icon-btn" id="themeToggleBtn" onclick="toggleTheme()" aria-label="Ganti Tema Tampilan" title="Ganti Tema">
+        <i class="fa-solid fa-moon" id="themeIcon"></i>
+      </button>
+
+      <a href="/dashboard" class="btn btn-outline" style="min-height: 40px; padding: 6px 14px; font-size: 0.84rem;">
+        <i class="fa-solid fa-arrow-left"></i>
+        <span>Dashboard</span>
       </a>
     </div>
   </header>
 
-  <div id="toast" class="toast"></div>
-
-  <main class="container">
+  <main class="container" role="main">
     <div class="page-header">
       <h1 class="page-title">Pembuat Ujian Kelulusan Resmi</h1>
-      <p class="page-subtitle">Rancang butir soal, passing grade kelulusan, dan batas waktu pengerjaan untuk sertifikasi siswa.</p>
+      <p class="page-subtitle">Rancang bank soal pilihan ganda, tetapkan standar nilai kelulusan (passing grade), dan durasi pengerjaan untuk sertifikasi siswa.</p>
     </div>
 
-    <!-- 1. Pemilihan Kursus -->
-    <div class="card">
-      <h2 class="card-title">1. Pilih Kursus Target</h2>
+    <!-- 1. Pemilihan Kursus Target -->
+    <section class="card" aria-labelledby="headingCourseSelect">
+      <h2 class="card-title" id="headingCourseSelect">
+        <i class="fa-solid fa-graduation-cap" style="color: var(--accent-amber);"></i>
+        <span>1. Pilih Kursus Target</span>
+      </h2>
       <p class="card-desc">Pilih kelas yang ingin Anda kelola bank soal ujian kelulusannya.</p>
 
       <div class="form-group">
         <label class="form-label" for="courseSelect">Kursus yang Anda Ampu</label>
-        <select id="courseSelect" class="form-control" onchange="loadCourseExam()">
+        <select id="courseSelect" class="form-control" onchange="loadCourseExam()" aria-label="Pilih Kursus Target">
           <option value="">Memuat daftar kursus Anda...</option>
         </select>
       </div>
-    </div>
+    </section>
 
-    <!-- 2. Parameter Utama Ujian -->
-    <div class="card" id="examConfigCard" style="opacity: 0.5; pointer-events: none;">
-      <h2 class="card-title">2. Konfigurasi Standar Kelulusan</h2>
-      <p class="card-desc">Tentukan kriteria kelulusan dan durasi pengerjaan sebelum sertifikat diterbitkan.</p>
+    <!-- 2. Parameter Standar Kelulusan -->
+    <section class="card" id="examConfigCard" style="opacity: 0.5; pointer-events: none;" aria-labelledby="headingConfig">
+      <h2 class="card-title" id="headingConfig">
+        <i class="fa-solid fa-sliders" style="color: var(--accent-amber);"></i>
+        <span>2. Konfigurasi Standar Kelulusan</span>
+      </h2>
+      <p class="card-desc">Tentukan kriteria kelulusan dan durasi pengerjaan sebelum sertifikat diterbitkan secara otomatis.</p>
 
       <div class="form-group">
         <label class="form-label" for="examTitle">Judul Ujian Kelulusan</label>
@@ -476,70 +525,67 @@
       </div>
 
       <div class="form-group">
-        <label class="form-label" for="examDesc">Deskripsi / Instruksi Pengerjaan</label>
-        <textarea id="examDesc" class="form-control" rows="2" placeholder="Instruksi singkat untuk siswa sebelum menekan tombol mulai..."></textarea>
+        <label class="form-label" for="examDesc">Deskripsi atau Instruksi Pengerjaan</label>
+        <textarea id="examDesc" class="form-control" rows="2" placeholder="Instruksi singkat untuk siswa sebelum menekan tombol mulai ujian..."></textarea>
       </div>
 
       <div class="grid-2">
         <div class="form-group">
           <label class="form-label" for="passingScore">Passing Grade Kelulusan (%)</label>
           <input type="number" id="passingScore" class="form-control" min="10" max="100" value="75" oninput="updateStats()">
-          <span style="font-size: 0.78rem; color: var(--text-muted); margin-top: 4px; display: block;">
-            Siswa yang meraih nilai sama atau lebih dari nilai ini akan otomatis memperoleh sertifikat.
+          <span style="font-size: 0.78rem; color: var(--text-secondary); margin-top: 4px; display: block;">
+            Siswa yang meraih skor sama atau lebih besar dari nilai ini akan otomatis diterbitkan sertifikat resminya.
           </span>
         </div>
 
         <div class="form-group">
           <label class="form-label" for="durationMinutes">Batas Waktu Pengerjaan (Menit)</label>
           <input type="number" id="durationMinutes" class="form-control" min="5" max="300" value="60" oninput="updateStats()">
-          <span style="font-size: 0.78rem; color: var(--text-muted); margin-top: 4px; display: block;">
+          <span style="font-size: 0.78rem; color: var(--text-secondary); margin-top: 4px; display: block;">
             Countdown timer di layar siswa akan otomatis mengumpulkan jawaban saat waktu habis.
           </span>
         </div>
       </div>
-    </div>
+    </section>
 
-    <!-- 3. Daftar Butir Pertanyaan -->
-    <div class="card" id="questionsCard" style="opacity: 0.5; pointer-events: none;">
-      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
+    <!-- 3. Bank Soal Pilihan Ganda -->
+    <section class="card" id="questionsCard" style="opacity: 0.5; pointer-events: none;" aria-labelledby="headingQuestions">
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
         <div>
-          <h2 class="card-title">3. Bank Soal Pilihan Ganda</h2>
-          <p class="card-desc" style="margin-bottom: 0;">Buat pertanyaan dengan 4 pilihan jawaban dan pilih 1 kunci jawaban benar.</p>
+          <h2 class="card-title" id="headingQuestions" style="margin-bottom: 4px;">
+            <i class="fa-solid fa-list-check" style="color: var(--accent-amber);"></i>
+            <span>3. Bank Soal Pilihan Ganda</span>
+          </h2>
+          <p class="card-desc" style="margin-bottom: 0;">Buat pertanyaan dengan 4 pilihan jawaban dan tentukan 1 kunci jawaban benar.</p>
         </div>
-        <button type="button" class="btn btn-outline" onclick="addQuestion()">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="12" y1="5" x2="12" y2="19"></line>
-            <line x1="5" y1="12" x2="19" y2="12"></line>
-          </svg>
-          Tambah Butir Soal
+        <button type="button" class="btn btn-outline" onclick="addQuestion()" aria-label="Tambah Butir Soal Baru">
+          <i class="fa-solid fa-plus"></i>
+          <span>Tambah Butir Soal</span>
         </button>
       </div>
 
-      <div id="questionsContainer">
+      <div id="questionsContainer" role="list" aria-label="Daftar Pertanyaan Ujian">
         <!-- Soal dinamis akan di-render di sini -->
       </div>
-    </div>
+    </section>
   </main>
 
-  <!-- Sticky Footer Action -->
-  <footer class="sticky-footer" id="stickyFooter" style="display: none;">
+  <!-- Sticky Footer Action Bar -->
+  <footer class="sticky-footer" id="stickyFooter" style="display: none;" role="contentinfo">
     <div class="stat-pill">
       <div class="stat-item">Total Soal: <strong id="statTotalQ">0</strong> butir</div>
       <div class="stat-item">Passing Grade: <strong id="statPassing">75%</strong></div>
-      <div class="stat-item">Durasi: <strong id="statDuration">60</strong> Menit</div>
+      <div class="stat-item">Batas Waktu: <strong id="statDuration">60</strong> Menit</div>
     </div>
 
-    <div style="display: flex; gap: 12px;">
+    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
       <button type="button" class="btn btn-outline" onclick="addQuestion()">
-        + Tambah Soal
+        <i class="fa-solid fa-plus"></i>
+        <span>Tambah Soal</span>
       </button>
       <button type="button" class="btn btn-primary" onclick="saveExam()">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
-          <polyline points="17 21 17 13 7 13 7 21"></polyline>
-          <polyline points="7 3 7 8 15 8"></polyline>
-        </svg>
-        Simpan & Publikasikan Ujian
+        <i class="fa-solid fa-floppy-disk"></i>
+        <span>Simpan & Publikasikan Ujian</span>
       </button>
     </div>
   </footer>
@@ -548,14 +594,29 @@
     let questions = [];
     let currentCourseId = null;
 
-    function showToast(message, isSuccess = true) {
-      const toast = document.getElementById('toast');
-      toast.textContent = message;
-      toast.className = 'toast ' + (isSuccess ? 'toast-success' : 'toast-error');
-      toast.style.display = 'block';
-      setTimeout(() => {
-        toast.style.display = 'none';
-      }, 4000);
+    // Theme Toggle Functionality
+    function toggleTheme() {
+      const current = document.documentElement.getAttribute('data-theme') || 'light';
+      const target = current === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', target);
+      localStorage.setItem('skillsphere_theme', target);
+      localStorage.setItem('theme', target);
+      updateThemeIcon(target);
+    }
+
+    function updateThemeIcon(theme) {
+      const icon = document.getElementById('themeIcon');
+      if (icon) {
+        icon.className = theme === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+      }
+    }
+
+    function notifyUser(msg, type = 'success') {
+      if (typeof window.showToast === 'function') {
+        window.showToast(msg, type);
+      } else {
+        alert(msg);
+      }
     }
 
     async function loadMyCourses() {
@@ -586,7 +647,7 @@
         });
       } catch (err) {
         console.error('Error loading courses:', err);
-        showToast('Gagal memuat daftar kursus.', false);
+        notifyUser('Gagal memuat daftar kursus pengajar.', 'error');
       }
     }
 
@@ -636,14 +697,14 @@
         }
 
         if (questions.length === 0) {
-          addQuestion(); // Tambah 1 soal default
+          addQuestion();
         } else {
           renderQuestions();
         }
         updateStats();
       } catch (err) {
         console.error('Error fetching exam:', err);
-        showToast('Gagal mengambil data ujian kursus.', false);
+        notifyUser('Gagal mengambil data ujian kursus.', 'error');
       }
     }
 
@@ -662,7 +723,7 @@
 
     function deleteQuestion(index) {
       if (questions.length <= 1) {
-        showToast('Ujian wajib memiliki minimal 1 butir pertanyaan.', false);
+        notifyUser('Ujian wajib memiliki minimal 1 butir pertanyaan.', 'warning');
         return;
       }
       questions.splice(index, 1);
@@ -677,20 +738,18 @@
       questions.forEach((q, idx) => {
         const qCard = document.createElement('div');
         qCard.className = 'question-card';
+        qCard.setAttribute('role', 'listitem');
 
         const qHeader = document.createElement('div');
         qHeader.className = 'question-header';
         qHeader.innerHTML = `
           <div style="display: flex; align-items: center; gap: 8px;">
             <span class="question-badge">Soal #${idx + 1}</span>
-            <span style="font-size: 0.8rem; color: var(--text-muted);">Bobot: 10 Poin</span>
+            <span style="font-size: 0.8rem; color: var(--text-secondary);">Bobot: 10 Poin</span>
           </div>
-          <button type="button" class="btn-delete-q" onclick="deleteQuestion(${idx})">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="3 6 5 6 21 6"></polyline>
-              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-            </svg>
-            Hapus
+          <button type="button" class="btn-delete-q" onclick="deleteQuestion(${idx})" aria-label="Hapus Soal #${idx + 1}">
+            <i class="fa-regular fa-trash-can"></i>
+            <span>Hapus</span>
           </button>
         `;
         qCard.appendChild(qHeader);
@@ -699,8 +758,8 @@
         const textGroup = document.createElement('div');
         textGroup.className = 'form-group';
         textGroup.innerHTML = `
-          <label class="form-label">Teks Pertanyaan</label>
-          <textarea class="form-control" rows="2" placeholder="Tuliskan pertanyaan Anda di sini..." oninput="updateQuestionText(${idx}, this.value)">${escapeHtml(q.question || '')}</textarea>
+          <label class="form-label" for="q_input_${idx}">Teks Pertanyaan</label>
+          <textarea id="q_input_${idx}" class="form-control" rows="2" placeholder="Tuliskan pertanyaan Anda di sini..." oninput="updateQuestionText(${idx}, this.value)">${escapeHtml(q.question || '')}</textarea>
         `;
         qCard.appendChild(textGroup);
 
@@ -716,9 +775,9 @@
           const optItem = document.createElement('div');
           optItem.className = 'option-item ' + (isCorrect ? 'correct' : '');
           optItem.innerHTML = `
-            <input type="radio" name="correct_${q.id}" class="option-radio" ${isCorrect ? 'checked' : ''} onchange="setCorrectAnswer(${idx}, '${label}')" title="Tandai sebagai kunci jawaban benar">
-            <span style="font-weight: 700; font-size: 0.85rem; color: var(--text-muted);">${label}.</span>
-            <input type="text" class="option-input" placeholder="Opsi ${label}" value="${escapeHtml(optVal)}" oninput="updateOptionText(${idx}, ${optIdx}, this.value)">
+            <input type="radio" name="correct_${q.id}" id="radio_${q.id}_${label}" class="option-radio" ${isCorrect ? 'checked' : ''} onchange="setCorrectAnswer(${idx}, '${label}')" aria-label="Kunci jawaban ${label}">
+            <label for="radio_${q.id}_${label}" style="font-weight: 700; font-size: 0.85rem; color: var(--text-secondary); cursor: pointer;">${label}.</label>
+            <input type="text" class="option-input" placeholder="Opsi ${label}" value="${escapeHtml(optVal)}" oninput="updateOptionText(${idx}, ${optIdx}, this.value)" aria-label="Teks Pilihan ${label}">
           `;
           optGrid.appendChild(optItem);
         });
@@ -754,7 +813,7 @@
 
     async function saveExam() {
       if (!currentCourseId) {
-        showToast('Pilih kursus terlebih dahulu.', false);
+        notifyUser('Pilih kursus terlebih dahulu.', 'warning');
         return;
       }
 
@@ -764,20 +823,19 @@
       const durationMinutes = Number(document.getElementById('durationMinutes').value) || 60;
 
       if (!title) {
-        showToast('Judul ujian wajib diisi.', false);
+        notifyUser('Judul ujian wajib diisi.', 'warning');
         return;
       }
 
-      // Validasi kelengkapan soal
       for (let i = 0; i < questions.length; i++) {
         const q = questions[i];
         if (!q.question || q.question.trim().length === 0) {
-          showToast(`Pertanyaan nomor ${i + 1} masih kosong.`, false);
+          notifyUser(`Pertanyaan nomor ${i + 1} masih kosong.`, 'warning');
           return;
         }
         for (let j = 0; j < 4; j++) {
           if (!q.options[j] || q.options[j].trim().length === 0) {
-            showToast(`Opsi ${['A', 'B', 'C', 'D'][j]} pada soal #${i + 1} masih kosong.`, false);
+            notifyUser(`Opsi ${['A', 'B', 'C', 'D'][j]} pada soal #${i + 1} masih kosong.`, 'warning');
             return;
           }
         }
@@ -803,13 +861,13 @@
 
         const json = await res.json();
         if (json.success) {
-          showToast('Ujian kelulusan kursus berhasil disimpan!', true);
+          notifyUser('Ujian kelulusan kursus berhasil disimpan dan dipublikasikan.', 'success');
         } else {
-          showToast(json.message || 'Gagal menyimpan ujian.', false);
+          notifyUser(json.message || 'Gagal menyimpan ujian.', 'error');
         }
       } catch (err) {
         console.error('Error saving exam:', err);
-        showToast('Terjadi kesalahan jaringan saat menyimpan ujian.', false);
+        notifyUser('Terjadi kesalahan jaringan saat menyimpan ujian.', 'error');
       }
     }
 
@@ -823,8 +881,23 @@
         .replace(/'/g, '&#039;');
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
-      loadMyCourses();
+    document.addEventListener('DOMContentLoaded', async () => {
+      const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+      updateThemeIcon(currentTheme);
+      await loadMyCourses();
+
+      // Check if courseId is passed via URL query params (e.g. /tutor/exams?courseId=123)
+      const urlParams = new URLSearchParams(window.location.search);
+      const preselectedCourseId = urlParams.get('courseId');
+      if (preselectedCourseId) {
+        const select = document.getElementById('courseSelect');
+        if (select) {
+          select.value = preselectedCourseId;
+          if (select.value === preselectedCourseId) {
+            loadCourseExam();
+          }
+        }
+      }
     });
   </script>
 </body>
