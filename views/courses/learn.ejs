@@ -1642,8 +1642,8 @@
 </head>
 <body>
 
-  <!-- ==================== AURORA SPHERE OVERLAY (Z-INDEX TERTINGGI, 70% BLACK, HANYA BOLA SAJA) ==================== -->
-  <div id="aurora-orb-overlay" class="aurora-orb-overlay">
+  <!-- ==================== AURORA SPHERE OVERLAY (HANYA AKTIF SAAT PERTAMA KALI SISWA BARU MASUK) ==================== -->
+  <div id="aurora-orb-overlay" class="aurora-orb-overlay" style="display:none;">
     <div class="aurora-orb-center">
       <!-- Animated Blue Sphere with White Aurora Mist & Equalizer Waves -->
       <div class="aurora-sphere-wrapper loading" id="aurora-sphere-wrapper">
@@ -2101,8 +2101,30 @@
 
           selectMaterial(Math.max(0, initialIdx));
 
-          // Trigger instant speech and equalizer animation now that courseData is verified and loaded
-          playOrionWelcomeSpeech();
+          // Verifikasi status penyambutan siswa:
+          // AI hanya menyambut saat pertama kali siswa baru masuk/beli kursus.
+          // Jika siswa datang kembali untuk melanjutkan progres belajarnya, sambutan tidak dimunculkan lagi.
+          const welcomeKey = `skillsphere_ai_welcomed_${courseData.id}`;
+          const hasBeenWelcomed = localStorage.getItem(welcomeKey) === 'true';
+          const hasExistingProgress = completedMaterialIds.size > 0;
+          const isContinuingProgress = hasBeenWelcomed || hasExistingProgress || (initialIdx > 0);
+
+          if (!isContinuingProgress) {
+            // Pertama kali masuk / baru beli: Tampilkan overlay dan mulai sambutan AI Orion
+            const overlay = document.getElementById('aurora-orb-overlay');
+            if (overlay) {
+              overlay.style.display = 'flex';
+              overlay.classList.remove('dismissed');
+            }
+            playOrionWelcomeSpeech();
+          } else {
+            // Melanjutkan belajar: pastikan overlay tetap tersembunyi
+            const overlay = document.getElementById('aurora-orb-overlay');
+            if (overlay) {
+              overlay.classList.add('dismissed');
+              overlay.style.display = 'none';
+            }
+          }
         } else {
           document.getElementById('material-dynamic-content-area').innerHTML = `
             <div style="text-align:center; padding:48px; color:var(--text-secondary);">
@@ -2866,6 +2888,17 @@
     async function playOrionWelcomeSpeech() {
       if (hasAttemptedAutoplay) return;
       hasAttemptedAutoplay = true;
+
+      // Catat status bahwa siswa sudah disambut untuk kursus ini
+      if (courseData && courseData.id) {
+        localStorage.setItem(`skillsphere_ai_welcomed_${courseData.id}`, 'true');
+      }
+
+      const overlay = document.getElementById('aurora-orb-overlay');
+      if (overlay) {
+        overlay.style.display = 'flex';
+        overlay.classList.remove('dismissed');
+      }
 
       const sphereElem = document.getElementById('aurora-sphere-elem');
       const sphereWrapper = document.getElementById('aurora-sphere-wrapper');
@@ -4019,6 +4052,11 @@
     function dismissAuroraOverlay() {
       if (isDismissingAurora) return;
       isDismissingAurora = true;
+
+      // Pastikan status disambut sudah tercatat
+      if (courseData && courseData.id) {
+        localStorage.setItem(`skillsphere_ai_welcomed_${courseData.id}`, 'true');
+      }
 
       if (orionBufferSource) {
         try { orionBufferSource.stop(); } catch(e) {}
