@@ -1408,7 +1408,7 @@
       border-radius: 50%;
       position: relative;
       overflow: hidden;
-      background: radial-gradient(circle at 50% 25%, #4C82FB 0%, #2563EB 40%, #1D4ED8 70%, #0F2D7A 100%);
+      background: radial-gradient(circle at 50% 30%, #172554 0%, #0F172A 55%, #030712 100%);
       box-shadow: 
         0 0 60px rgba(59, 130, 246, 0.65),
         0 0 120px rgba(37, 99, 235, 0.4);
@@ -1440,16 +1440,17 @@
       pointer-events: none;
     }
 
-    /* Animated White Aurora Cloud / Mist Layers */
+    /* Animated White Aurora Cloud / Mist Layers - Gentle Internal Glow */
     .aurora-mist-layer {
       position: absolute;
       border-radius: 50%;
       pointer-events: none;
       transition: filter 0.4s ease, opacity 0.4s ease;
+      z-index: 1;
     }
 
     .aurora-sphere.speaking .aurora-mist-layer {
-      filter: blur(10px) brightness(1.25);
+      filter: blur(14px) brightness(1.25);
     }
 
     /* Mist Layer 1: Undulating Horizontal Wave */
@@ -1458,14 +1459,15 @@
       height: 200px;
       left: -45px;
       top: 45px;
-      background: radial-gradient(ellipse at 50% 50%, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.72) 40%, rgba(191, 219, 254, 0.25) 70%, transparent 85%);
-      filter: blur(14px);
-      opacity: 0.9;
+      background: radial-gradient(ellipse at 50% 50%, rgba(96, 165, 250, 0.4) 0%, rgba(59, 130, 246, 0.2) 40%, rgba(30, 64, 175, 0.1) 70%, transparent 85%);
+      filter: blur(18px);
+      opacity: 0.35;
       animation: auroraWave1 6.5s ease-in-out infinite alternate;
     }
 
     .aurora-sphere.speaking .aurora-mist-1 {
       animation: auroraWave1 2.8s ease-in-out infinite alternate;
+      opacity: 0.5;
     }
 
     /* Mist Layer 2: Swirling Upward Wisps */
@@ -1474,14 +1476,15 @@
       height: 180px;
       left: -20px;
       top: 75px;
-      background: radial-gradient(ellipse at 55% 45%, rgba(255, 255, 255, 0.9) 0%, rgba(224, 242, 254, 0.6) 45%, transparent 75%);
-      filter: blur(16px);
-      opacity: 0.85;
+      background: radial-gradient(ellipse at 55% 45%, rgba(147, 197, 253, 0.35) 0%, rgba(59, 130, 246, 0.15) 45%, transparent 75%);
+      filter: blur(18px);
+      opacity: 0.3;
       animation: auroraWave2 8s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate;
     }
 
     .aurora-sphere.speaking .aurora-mist-2 {
       animation: auroraWave2 3.2s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate;
+      opacity: 0.45;
     }
 
     /* Mist Layer 3: Lower Luminous Base Cloud */
@@ -1490,14 +1493,15 @@
       height: 160px;
       left: -10px;
       bottom: -10px;
-      background: radial-gradient(ellipse at 50% 70%, rgba(200, 225, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 35%, rgba(147, 197, 253, 0.3) 70%, transparent 90%);
-      filter: blur(12px);
-      opacity: 0.92;
+      background: radial-gradient(ellipse at 50% 70%, rgba(96, 165, 250, 0.4) 0%, rgba(37, 99, 235, 0.2) 35%, transparent 85%);
+      filter: blur(16px);
+      opacity: 0.35;
       animation: auroraWave3 5.5s ease-in-out infinite alternate;
     }
 
     .aurora-sphere.speaking .aurora-mist-3 {
       animation: auroraWave3 2.2s ease-in-out infinite alternate;
+      opacity: 0.5;
     }
 
     /* Mist Layer 4: Ambient Floating Wisps */
@@ -1506,9 +1510,9 @@
       height: 140px;
       left: 10px;
       top: 90px;
-      background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.4) 50%, transparent 80%);
-      filter: blur(10px);
-      opacity: 0.75;
+      background: radial-gradient(circle at 50% 50%, rgba(191, 219, 254, 0.3) 0%, rgba(96, 165, 250, 0.1) 50%, transparent 80%);
+      filter: blur(14px);
+      opacity: 0.25;
       animation: auroraDrift 10s ease-in-out infinite alternate;
     }
 
@@ -1638,6 +1642,91 @@
         opacity: 0.95;
       }
     }
+
+    /* ========================================================
+       ORION AI LIVING FACE (PILL EYES & DYNAMIC MOUTH SYSTEM)
+       ======================================================== */
+    .orion-face-container {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+      pointer-events: none;
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), filter 0.3s ease;
+      user-select: none;
+    }
+
+    .orion-eyes-group {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 48px;
+      transition: transform 0.18s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    .orion-eye {
+      width: 36px;
+      height: 68px;
+      border-radius: 20px;
+      background: linear-gradient(180deg, #FFFFFF 0%, #E0F2FE 45%, #93C5FD 100%);
+      box-shadow: 
+        0 0 18px rgba(255, 255, 255, 0.95),
+        0 0 36px rgba(147, 197, 253, 0.9),
+        0 0 58px rgba(59, 130, 246, 0.65);
+      transform-origin: center center;
+      transition: transform 0.08s ease-out, border-radius 0.2s ease, box-shadow 0.2s ease;
+      will-change: transform, box-shadow;
+    }
+
+    .orion-eye.blinking {
+      transform: scaleY(0.06) !important;
+      transition: transform 0.05s ease-in !important;
+    }
+
+    .orion-eye.happy {
+      border-radius: 20px 20px 6px 6px !important;
+      transform: scaleY(0.65) translateY(-4px) !important;
+    }
+
+    .orion-mouth {
+      width: 38px;
+      height: 15px;
+      border-radius: 10px;
+      margin-top: 18px;
+      background: linear-gradient(180deg, #FFFFFF 0%, #E2E8F0 50%, #93C5FD 100%);
+      box-shadow: 
+        0 0 14px rgba(255, 255, 255, 0.95),
+        0 0 26px rgba(147, 197, 253, 0.8),
+        0 0 42px rgba(59, 130, 246, 0.55);
+      transform-origin: center center;
+      transition: height 0.06s ease-out, width 0.06s ease-out, transform 0.06s ease-out, border-radius 0.12s ease, box-shadow 0.15s ease;
+      will-change: height, width, transform, box-shadow;
+    }
+
+    .orion-mouth.happy {
+      width: 44px !important;
+      height: 18px !important;
+      border-radius: 4px 4px 18px 18px !important;
+      transform: scaleY(1.15) !important;
+    }
+
+    .aurora-sphere.speaking .orion-face-container {
+      filter: brightness(1.15);
+    }
+
+    /* Scaling when docked to corner as mini companion orb */
+    .aurora-sphere-wrapper.docked-corner .orion-face-container {
+      transform: translate(-50%, -50%) scale(0.24) !important;
+    }
+
+    .aurora-sphere-wrapper.docked-corner .orion-eyes-group {
+      gap: 36px !important;
+    }
   </style>
 </head>
 <body>
@@ -1645,7 +1734,7 @@
   <!-- ==================== AURORA SPHERE OVERLAY (HANYA AKTIF SAAT PERTAMA KALI SISWA BARU MASUK) ==================== -->
   <div id="aurora-orb-overlay" class="aurora-orb-overlay" style="display:none;">
     <div class="aurora-orb-center">
-      <!-- Animated Blue Sphere with White Aurora Mist & Equalizer Waves -->
+      <!-- Animated Blue Sphere with Living AI Orion Face (Eyes & Mouth) -->
       <div class="aurora-sphere-wrapper loading" id="aurora-sphere-wrapper">
         <div class="aurora-sphere loading" id="aurora-sphere-elem">
           <div class="aurora-atmosphere"></div>
@@ -1654,20 +1743,13 @@
           <div class="aurora-mist-layer aurora-mist-3"></div>
           <div class="aurora-mist-layer aurora-mist-4"></div>
 
-          <!-- Dynamic White Aurora Equalizer Waves inside Sphere (12 Bands) -->
-          <div class="aurora-equalizer-container" id="aurora-eq-container">
-            <div class="aurora-eq-bar"></div>
-            <div class="aurora-eq-bar"></div>
-            <div class="aurora-eq-bar"></div>
-            <div class="aurora-eq-bar"></div>
-            <div class="aurora-eq-bar"></div>
-            <div class="aurora-eq-bar"></div>
-            <div class="aurora-eq-bar"></div>
-            <div class="aurora-eq-bar"></div>
-            <div class="aurora-eq-bar"></div>
-            <div class="aurora-eq-bar"></div>
-            <div class="aurora-eq-bar"></div>
-            <div class="aurora-eq-bar"></div>
+          <!-- Orion AI Expressive Living Face (Pill Eyes & Reactive Mouth) -->
+          <div class="orion-face-container" id="orion-face-container">
+            <div class="orion-eyes-group" id="orion-eyes-group">
+              <div class="orion-eye left-eye" id="orion-eye-left"></div>
+              <div class="orion-eye right-eye" id="orion-eye-right"></div>
+            </div>
+            <div class="orion-mouth" id="orion-mouth"></div>
           </div>
 
           <div class="aurora-sphere-glare"></div>
@@ -3247,6 +3329,10 @@
         card.classList.remove('visible');
       }
 
+      // Orion expresses a warm, welcoming smile when student asks for explanation
+      setOrionFaceExpression('happy');
+      setTimeout(() => setOrionFaceExpression('neutral'), 2400);
+
       // Immediately stop any welcome or question speech so voices never overlap!
       stopAllAudioPlayback();
 
@@ -3833,9 +3919,93 @@
       }
     }
 
+    let orionBlinkTimer = null;
+    let orionGazeTimer = null;
+
+    function scheduleNextOrionBlink() {
+      if (orionBlinkTimer) clearTimeout(orionBlinkTimer);
+      const nextInterval = 2200 + Math.random() * 2600;
+      orionBlinkTimer = setTimeout(() => {
+        triggerOrionBlink();
+        scheduleNextOrionBlink();
+      }, nextInterval);
+    }
+
+    function triggerOrionBlink() {
+      const leftEye = document.getElementById('orion-eye-left');
+      const rightEye = document.getElementById('orion-eye-right');
+      if (!leftEye || !rightEye) return;
+
+      leftEye.classList.add('blinking');
+      rightEye.classList.add('blinking');
+
+      setTimeout(() => {
+        leftEye.classList.remove('blinking');
+        rightEye.classList.remove('blinking');
+
+        // 28% chance of a realistic double blink
+        if (Math.random() < 0.28) {
+          setTimeout(() => {
+            leftEye.classList.add('blinking');
+            rightEye.classList.add('blinking');
+            setTimeout(() => {
+              leftEye.classList.remove('blinking');
+              rightEye.classList.remove('blinking');
+            }, 90);
+          }, 110);
+        }
+      }, 110);
+    }
+
+    function scheduleNextOrionGaze() {
+      if (orionGazeTimer) clearTimeout(orionGazeTimer);
+      const nextInterval = 2800 + Math.random() * 3200;
+      orionGazeTimer = setTimeout(() => {
+        shiftOrionGaze();
+        scheduleNextOrionGaze();
+      }, nextInterval);
+    }
+
+    function shiftOrionGaze() {
+      const eyesGroup = document.getElementById('orion-eyes-group');
+      if (!eyesGroup) return;
+      if (Math.random() < 0.38) {
+        eyesGroup.style.transform = 'translate(0px, 0px)';
+      } else {
+        const dx = (Math.random() * 8 - 4).toFixed(1);
+        const dy = (Math.random() * 4 - 2).toFixed(1);
+        eyesGroup.style.transform = `translate(${dx}px, ${dy}px)`;
+      }
+    }
+
+    function setOrionFaceExpression(mood = 'neutral') {
+      const leftEye = document.getElementById('orion-eye-left');
+      const rightEye = document.getElementById('orion-eye-right');
+      const mouth = document.getElementById('orion-mouth');
+      if (!leftEye || !rightEye || !mouth) return;
+
+      if (mood === 'happy') {
+        leftEye.classList.add('happy');
+        rightEye.classList.add('happy');
+        mouth.classList.add('happy');
+      } else {
+        leftEye.classList.remove('happy');
+        rightEye.classList.remove('happy');
+        mouth.classList.remove('happy');
+      }
+    }
+
+    function startOrionLifeMotions() {
+      scheduleNextOrionBlink();
+      scheduleNextOrionGaze();
+    }
+
     function startAudioVisualizerLoop() {
       const sphereElem = document.getElementById('aurora-sphere-elem');
       const sphereWrapper = document.getElementById('aurora-sphere-wrapper');
+      const leftEye = document.getElementById('orion-eye-left');
+      const rightEye = document.getElementById('orion-eye-right');
+      const mouth = document.getElementById('orion-mouth');
       const eqBars = document.querySelectorAll('.aurora-eq-bar');
       if (!orionAnalyser) return;
 
@@ -3855,34 +4025,58 @@
         const bassVal = ((dataArray[1] || 0) * 1.3 + (dataArray[2] || 0) * 1.4 + (dataArray[3] || 0) * 1.1 + (dataArray[4] || 0) * 0.9) / 4;
         const bassEnergy = Math.min(1.0, bassVal / 220);
 
-        // Overall voice speech energy across the 12 equalizer bars
-        let totalEnergy = 0;
-        eqBars.forEach((bar, index) => {
-          const freqBin = Math.min(bufferLength - 1, Math.floor(1 + index * 1.8));
-          const rawVal = dataArray[freqBin] || 0;
-          const boost = (freqBin <= 4) ? 1.4 : (freqBin <= 10 ? 1.2 : 0.9);
-          const val = Math.min(255, rawVal * boost);
-          totalEnergy += val;
+        // Speech vocal energy across middle voice bands
+        let speechSum = 0;
+        const checkBands = Math.min(16, bufferLength);
+        for (let i = 1; i < checkBands; i++) {
+          speechSum += (dataArray[i] || 0);
+        }
+        const speechEnergy = Math.min(1.0, speechSum / ((checkBands - 1) * 175));
+        const mouthIntensity = Math.min(1.0, speechEnergy * 0.65 + bassEnergy * 0.45);
 
-          const percent = val / 255;
-          if (isDocked) {
-            // Mini equalizer bar height (2px to 14px)
-            const targetHeight = Math.max(2, Math.min(14, Math.round(2 + percent * 12)));
-            bar.style.height = `${targetHeight}px`;
-          } else {
-            // Full-size equalizer bar height (6px to 74px)
-            const targetHeight = Math.max(6, Math.min(74, Math.round(6 + percent * 68)));
-            bar.style.height = `${targetHeight}px`;
-          }
-          bar.style.opacity = (0.5 + percent * 0.5).toFixed(2);
-        });
+        // Animate Orion living mouth (dynamic lip-sync expansion, shape, and glowing pulse)
+        if (mouth) {
+          const mouthOpen = mouthIntensity;
+          const targetHeight = Math.max(13, Math.min(36, Math.round(13 + mouthOpen * 22)));
+          const targetWidth = Math.max(30, Math.min(42, Math.round(34 + Math.sin(performance.now() * 0.015) * (mouthOpen * 6))));
+          mouth.style.height = `${targetHeight}px`;
+          mouth.style.width = `${targetWidth}px`;
+          mouth.style.borderRadius = `${Math.round(10 + mouthOpen * 8)}px`;
+          const mouthGlowSpread = Math.round(12 + mouthOpen * 16);
+          mouth.style.boxShadow = `0 0 ${mouthGlowSpread}px rgba(255, 255, 255, 0.95), 0 0 ${mouthGlowSpread + 10}px rgba(147, 197, 253, 0.85), 0 0 45px rgba(59, 130, 246, 0.5)`;
+        }
 
-        const avgEnergy = Math.min(1.0, totalEnergy / (numBars * 180));
+        // Dynamic expressive eye squish during energetic vocal emphasis
+        const eyeSquish = (1.0 - mouthIntensity * 0.12).toFixed(3);
+        if (leftEye && !leftEye.classList.contains('blinking') && !leftEye.classList.contains('happy')) {
+          leftEye.style.transform = `scaleY(${eyeSquish})`;
+        }
+        if (rightEye && !rightEye.classList.contains('blinking') && !rightEye.classList.contains('happy')) {
+          rightEye.style.transform = `scaleY(${eyeSquish})`;
+        }
 
-        // Dynamic Bass Scale & Glow Pulsing
+        // Animate any optional legacy eq bars if present
+        if (numBars > 0) {
+          eqBars.forEach((bar, index) => {
+            const freqBin = Math.min(bufferLength - 1, Math.floor(1 + index * 1.8));
+            const rawVal = dataArray[freqBin] || 0;
+            const boost = (freqBin <= 4) ? 1.4 : (freqBin <= 10 ? 1.2 : 0.9);
+            const val = Math.min(255, rawVal * boost);
+            const percent = val / 255;
+            if (isDocked) {
+              const targetHeight = Math.max(2, Math.min(14, Math.round(2 + percent * 12)));
+              bar.style.height = `${targetHeight}px`;
+            } else {
+              const targetHeight = Math.max(6, Math.min(74, Math.round(6 + percent * 68)));
+              bar.style.height = `${targetHeight}px`;
+            }
+            bar.style.opacity = (0.5 + percent * 0.5).toFixed(2);
+          });
+        }
+
+        // Dynamic Bass Scale & Glow Pulsing for the Sphere
         if (isDocked && sphereWrapper) {
-          // Dynamic scale pulse on the mini floating orb while speaking
-          const targetScale = 1.0 + (bassEnergy * 0.15) + (avgEnergy * 0.08);
+          const targetScale = 1.0 + (bassEnergy * 0.15) + (mouthIntensity * 0.08);
           visualizerCurrentScale += (targetScale - visualizerCurrentScale) * 0.5;
           sphereWrapper.style.transform = `scale(${visualizerCurrentScale.toFixed(3)})`;
 
@@ -3892,7 +4086,7 @@
             sphereElem.style.boxShadow = `0 4px 20px rgba(37, 99, 235, 0.7), 0 0 ${glowSpread}px rgba(147, 197, 253, ${glowOpacity})`;
           }
         } else if (sphereElem) {
-          const targetScale = 1.0 + (bassEnergy * 0.085) + (avgEnergy * 0.04);
+          const targetScale = 1.0 + (bassEnergy * 0.085) + (mouthIntensity * 0.04);
           visualizerCurrentScale += (targetScale - visualizerCurrentScale) * 0.45;
           sphereElem.style.transform = `scale(${visualizerCurrentScale.toFixed(3)})`;
 
@@ -3910,6 +4104,23 @@
       visualizerCurrentScale = 1.0;
       const sphereElem = document.getElementById('aurora-sphere-elem');
       const sphereWrapper = document.getElementById('aurora-sphere-wrapper');
+      const mouth = document.getElementById('orion-mouth');
+      const leftEye = document.getElementById('orion-eye-left');
+      const rightEye = document.getElementById('orion-eye-right');
+
+      if (mouth) {
+        mouth.style.height = '13px';
+        mouth.style.width = '34px';
+        mouth.style.borderRadius = '10px';
+        mouth.style.boxShadow = '';
+      }
+      if (leftEye && !leftEye.classList.contains('blinking') && !leftEye.classList.contains('happy')) {
+        leftEye.style.transform = 'scaleY(1)';
+      }
+      if (rightEye && !rightEye.classList.contains('blinking') && !rightEye.classList.contains('happy')) {
+        rightEye.style.transform = 'scaleY(1)';
+      }
+
       if (sphereElem) {
         sphereElem.classList.remove('speaking');
         sphereElem.style.transform = 'scale(1)';
@@ -3936,6 +4147,9 @@
     function runSimulatedSpeechVisualizer() {
       const sphereElem = document.getElementById('aurora-sphere-elem');
       const sphereWrapper = document.getElementById('aurora-sphere-wrapper');
+      const leftEye = document.getElementById('orion-eye-left');
+      const rightEye = document.getElementById('orion-eye-right');
+      const mouth = document.getElementById('orion-mouth');
       const eqBars = document.querySelectorAll('.aurora-eq-bar');
       let simTime = 0;
 
@@ -3946,9 +4160,28 @@
 
         const isDocked = sphereWrapper && (sphereWrapper.classList.contains('docked-corner') || sphereWrapper.parentElement === document.body);
 
-        // Simulated vocal cadence with bass transients
+        // Simulated vocal cadence with speech rhythmic pulses
         const bassBeat = Math.max(0, Math.sin(simTime * 3.2) * 0.7 + Math.sin(simTime * 6.5) * 0.35);
         const speechLoudness = Math.min(1.0, bassBeat);
+
+        // Animate Orion living mouth in simulated speech
+        if (mouth) {
+          const targetHeight = Math.max(13, Math.min(34, Math.round(13 + speechLoudness * 20)));
+          const targetWidth = Math.max(30, Math.min(40, Math.round(34 + Math.sin(simTime * 5.2) * (speechLoudness * 5))));
+          mouth.style.height = `${targetHeight}px`;
+          mouth.style.width = `${targetWidth}px`;
+          mouth.style.borderRadius = `${Math.round(10 + speechLoudness * 7)}px`;
+          const glow = Math.round(12 + speechLoudness * 14);
+          mouth.style.boxShadow = `0 0 ${glow}px rgba(255, 255, 255, 0.95), 0 0 ${glow + 8}px rgba(147, 197, 253, 0.8)`;
+        }
+
+        const eyeSquish = (1.0 - speechLoudness * 0.12).toFixed(3);
+        if (leftEye && !leftEye.classList.contains('blinking') && !leftEye.classList.contains('happy')) {
+          leftEye.style.transform = `scaleY(${eyeSquish})`;
+        }
+        if (rightEye && !rightEye.classList.contains('blinking') && !rightEye.classList.contains('happy')) {
+          rightEye.style.transform = `scaleY(${eyeSquish})`;
+        }
 
         eqBars.forEach((bar, index) => {
           const centerDist = Math.abs(index - (eqBars.length - 1) / 2);
@@ -4148,6 +4381,7 @@
 
     document.addEventListener('DOMContentLoaded', () => {
       loadClassroom();
+      startOrionLifeMotions();
     });
   </script>
 
