@@ -511,17 +511,35 @@
       </div>
     </section>
 
-    <!-- 2. Parameter Standar Kelulusan -->
+    <!-- 2. Parameter Standar Kelulusan & Kuis -->
     <section class="card" id="examConfigCard" style="opacity: 0.5; pointer-events: none;" aria-labelledby="headingConfig">
       <h2 class="card-title" id="headingConfig">
         <i class="fa-solid fa-sliders" style="color: var(--accent-amber);"></i>
-        <span>2. Konfigurasi Standar Kelulusan</span>
+        <span>2. Konfigurasi Evaluasi & Kuis</span>
       </h2>
-      <p class="card-desc">Tentukan kriteria kelulusan dan durasi pengerjaan sebelum sertifikat diterbitkan secara otomatis.</p>
+      <p class="card-desc">Tentukan tipe evaluasi, target bab/modul, kriteria kelulusan, dan durasi pengerjaan.</p>
+
+      <div class="grid-2" style="margin-bottom: 16px;">
+        <div class="form-group" style="margin-bottom: 0;">
+          <label class="form-label" for="examTitle">Judul Evaluasi / Kuis (Custom Name)</label>
+          <input type="text" id="examTitle" class="form-control" placeholder="Contoh: Kuis Bab 1: Normalisasi Relasional">
+        </div>
+
+        <div class="form-group" style="margin-bottom: 0;">
+          <label class="form-label" for="examType">Tipe Evaluasi</label>
+          <select id="examType" class="form-control" onchange="onExamTypeChanged()">
+            <option value="quiz">Kuis Singkat Bab (Tanpa Sertifikat)</option>
+            <option value="chapter_exam">Ujian Evaluasi Bab (Tanpa Sertifikat)</option>
+            <option value="final">Ujian Akhir Kelulusan Resmi (Sertifikat)</option>
+          </select>
+        </div>
+      </div>
 
       <div class="form-group">
-        <label class="form-label" for="examTitle">Judul Ujian Kelulusan</label>
-        <input type="text" id="examTitle" class="form-control" placeholder="Contoh: Ujian Kompetensi Akhir: Fullstack Next.js">
+        <label class="form-label" for="examSection">Target Bab Terkait</label>
+        <select id="examSection" class="form-control">
+          <option value="">-- Seluruh Kursus / Ujian Akhir Kelulusan --</option>
+        </select>
       </div>
 
       <div class="form-group">
@@ -534,7 +552,7 @@
           <label class="form-label" for="passingScore">Passing Grade Kelulusan (%)</label>
           <input type="number" id="passingScore" class="form-control" min="10" max="100" value="75" oninput="updateStats()">
           <span style="font-size: 0.78rem; color: var(--text-secondary); margin-top: 4px; display: block;">
-            Siswa yang meraih skor sama atau lebih besar dari nilai ini akan otomatis diterbitkan sertifikat resminya.
+            Ambang skor minimum bagi siswa untuk dinyatakan lulus evaluasi ini.
           </span>
         </div>
 
@@ -651,6 +669,52 @@
       }
     }
 
+    function onExamTypeChanged() {
+      const type = document.getElementById('examType').value;
+      const durationInput = document.getElementById('durationMinutes');
+      const titleInput = document.getElementById('examTitle');
+
+      if (type === 'quiz') {
+        if (!titleInput.value || titleInput.value.includes('Ujian Kelulusan')) {
+          titleInput.value = 'Kuis Singkat Modul';
+        }
+        durationInput.value = 20;
+      } else if (type === 'chapter_exam') {
+        if (!titleInput.value || titleInput.value.includes('Kuis')) {
+          titleInput.value = 'Ujian Evaluasi Bab';
+        }
+        durationInput.value = 45;
+      } else if (type === 'final') {
+        if (!titleInput.value || titleInput.value.includes('Kuis')) {
+          titleInput.value = 'Ujian Akhir Kelulusan Resmi';
+        }
+        durationInput.value = 60;
+        document.getElementById('examSection').value = '';
+      }
+      updateStats();
+    }
+
+    async function populateCourseSections(courseId) {
+      const secSelect = document.getElementById('examSection');
+      if (!secSelect) return;
+      secSelect.innerHTML = '<option value="">-- Seluruh Kursus / Ujian Akhir Kelulusan --</option>';
+
+      try {
+        const res = await fetch('/api/courses/' + courseId);
+        const json = await res.json();
+        if (json.success && json.data && Array.isArray(json.data.sections)) {
+          json.data.sections.forEach((sec, idx) => {
+            const opt = document.createElement('option');
+            opt.value = sec.id;
+            opt.textContent = `Bab ${idx + 1}: ${sec.title}`;
+            secSelect.appendChild(opt);
+          });
+        }
+      } catch (e) {
+        console.error('Error fetching course sections:', e);
+      }
+    }
+
     async function loadCourseExam() {
       const select = document.getElementById('courseSelect');
       currentCourseId = select.value;
@@ -668,6 +732,8 @@
         return;
       }
 
+      await populateCourseSections(currentCourseId);
+
       examCard.style.opacity = '1';
       examCard.style.pointerEvents = 'auto';
       qCard.style.opacity = '1';
@@ -684,12 +750,16 @@
         if (json.success && json.data) {
           const ex = json.data;
           document.getElementById('examTitle').value = ex.title || '';
+          document.getElementById('examType').value = ex.exam_type || 'final';
+          document.getElementById('examSection').value = ex.section_id || '';
           document.getElementById('examDesc').value = ex.description || '';
           document.getElementById('passingScore').value = ex.passing_score || 75;
           document.getElementById('durationMinutes').value = ex.duration_minutes || 60;
           questions = Array.isArray(ex.questions) && ex.questions.length > 0 ? ex.questions : [];
         } else {
           document.getElementById('examTitle').value = 'Ujian Kelulusan Resmi';
+          document.getElementById('examType').value = 'final';
+          document.getElementById('examSection').value = '';
           document.getElementById('examDesc').value = 'Ujian kompetensi kelulusan standar industri.';
           document.getElementById('passingScore').value = 75;
           document.getElementById('durationMinutes').value = 60;
@@ -818,12 +888,14 @@
       }
 
       const title = document.getElementById('examTitle').value.trim();
+      const examType = document.getElementById('examType').value;
+      const sectionIdVal = document.getElementById('examSection').value;
       const description = document.getElementById('examDesc').value.trim();
       const passingScore = Number(document.getElementById('passingScore').value) || 75;
       const durationMinutes = Number(document.getElementById('durationMinutes').value) || 60;
 
       if (!title) {
-        notifyUser('Judul ujian wajib diisi.', 'warning');
+        notifyUser('Judul evaluasi/kuis wajib diisi.', 'warning');
         return;
       }
 
@@ -852,6 +924,8 @@
           body: JSON.stringify({
             course_id: currentCourseId,
             title,
+            exam_type: examType,
+            section_id: sectionIdVal ? Number(sectionIdVal) : null,
             description,
             passing_score: passingScore,
             duration_minutes: durationMinutes,
@@ -861,7 +935,7 @@
 
         const json = await res.json();
         if (json.success) {
-          notifyUser('Ujian kelulusan kursus berhasil disimpan dan dipublikasikan.', 'success');
+          notifyUser(json.message || 'Evaluasi kursus berhasil disimpan dan dipublikasikan.', 'success');
         } else {
           notifyUser(json.message || 'Gagal menyimpan ujian.', 'error');
         }

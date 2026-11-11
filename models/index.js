@@ -66,9 +66,11 @@ CourseMilestone.belongsTo(Course, { foreignKey: 'course_id', as: 'course' });
 CourseSection.hasMany(CourseMilestone, { foreignKey: 'section_id', as: 'milestones' });
 CourseMilestone.belongsTo(CourseSection, { foreignKey: 'section_id', as: 'section' });
 
-// 11. Course <-> Exam (1:N)
+// 11. Course & CourseSection <-> Exam (1:N)
 Course.hasMany(Exam, { foreignKey: 'course_id', as: 'exams', onDelete: 'CASCADE' });
 Exam.belongsTo(Course, { foreignKey: 'course_id', as: 'course' });
+CourseSection.hasMany(Exam, { foreignKey: 'section_id', as: 'exams', onDelete: 'SET NULL' });
+Exam.belongsTo(CourseSection, { foreignKey: 'section_id', as: 'section' });
 
 // 12. Exam <-> ExamResult (1:N)
 Exam.hasMany(ExamResult, { foreignKey: 'exam_id', as: 'results', onDelete: 'CASCADE' });

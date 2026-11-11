@@ -12,6 +12,9 @@ const optionalAuth = (req, res, next) => {
   return authenticateJWT(req, res, next);
 };
 
+// 1a. Ambil seluruh daftar ujian & kuis untuk suatu kursus
+router.get('/course/:course_id/all', optionalAuth, examController.getCourseExams);
+
 // 1. Ambil data ujian untuk kursus (siswa melihat soal tersanitasi tanpa kunci jawaban, tutor melihat lengkap)
 router.get('/course/:course_id', optionalAuth, examController.getCourseExam);
 
@@ -27,6 +30,12 @@ router.post(
 );
 router.post(
   '/',
+  authenticateJWT,
+  authorizeRoles('tutor', 'admin'),
+  examController.createOrUpdateExam
+);
+router.put(
+  '/:id',
   authenticateJWT,
   authorizeRoles('tutor', 'admin'),
   examController.createOrUpdateExam

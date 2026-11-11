@@ -11,6 +11,15 @@ const Exam = sequelize.define('Exam', {
     type: DataTypes.INTEGER,
     allowNull: false,
   },
+  section_id: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+  },
+  exam_type: {
+    type: DataTypes.STRING(50),
+    defaultValue: 'final',
+    allowNull: false,
+  },
   title: {
     type: DataTypes.STRING(200),
     allowNull: false,

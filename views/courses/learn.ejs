@@ -1903,6 +1903,7 @@
 
     let courseData = null;
     let flatMaterials = [];
+    let courseExams = [];
     let currentMaterialIndex = 0;
     let completedMaterialIds = new Set();
     let isAIPanelOpen = false;
@@ -2042,6 +2043,20 @@
           saved.forEach(id => completedMaterialIds.add(id));
         } catch (e) {}
 
+        // Fetch all course exams & chapter quizzes
+        try {
+          const token = localStorage.getItem('token') || '';
+          const exRes = await fetch(`/api/exams/course/${courseData.id}/all`, {
+            headers: token ? { 'Authorization': 'Bearer ' + token } : {}
+          });
+          const exJson = await exRes.json();
+          if (exJson.success && exJson.data) {
+            courseExams = Array.isArray(exJson.data) ? exJson.data : (exJson.data.all_exams || []);
+          }
+        } catch (exErr) {
+          console.error('Error fetching course exams for curriculum:', exErr);
+        }
+
         renderCurriculumTree();
         updateProgressUI();
 
@@ -2109,7 +2124,7 @@
       }
 
       let globalIdx = 0;
-      container.innerHTML = courseData.sections.map((sec, sIdx) => {
+      const sectionsHtml = courseData.sections.map((sec, sIdx) => {
         const materials = sec.materials || [];
         const completedInSec = materials.filter(m => completedMaterialIds.has(m.id)).length;
 
@@ -2138,6 +2153,20 @@
           `;
         }).join('');
 
+        // Find quizzes or exams tied to this section
+        const secExams = courseExams.filter(e => Number(e.section_id) === Number(sec.id));
+        const examsHtml = secExams.map(ex => `
+          <a href="/exam/${ex.id}" target="_blank" class="module-item-btn" style="background:rgba(217, 119, 6, 0.08); border:1px solid rgba(217, 119, 6, 0.25); margin-top:4px; text-decoration:none;">
+            <div style="display:flex; align-items:center; gap:8px; overflow:hidden;">
+              <i class="fas fa-file-pen module-status-icon" style="color:var(--accent-amber);"></i>
+              <span class="module-title-truncate" style="font-weight:600; color:var(--text-primary);">${escapeHtml(ex.title)}</span>
+            </div>
+            <span class="module-format-badge" style="background:var(--accent-amber); color:#fff; font-size:10px; font-weight:700;">
+              ${ex.exam_type === 'quiz' ? 'KUIS' : 'UJIAN BAB'}
+            </span>
+          </a>
+        `).join('');
+
         return `
           <div class="chapter-group">
             <div class="chapter-header" onclick="toggleChapterAccordion(this)">
@@ -2149,10 +2178,39 @@
             </div>
             <div class="chapter-body" style="padding-left:4px; margin-top:2px;">
               ${itemsHtml}
+              ${examsHtml}
             </div>
           </div>
         `;
       }).join('');
+
+      // Find final graduation exams (not tied to a section or exam_type === 'final')
+      const finalExams = courseExams.filter(e => (!e.section_id || e.exam_type === 'final'));
+      let finalExamsHtml = '';
+      if (finalExams.length > 0) {
+        finalExamsHtml = finalExams.map(ex => `
+          <div class="chapter-group final-exam-group" style="margin-top:14px; border-top:1px dashed var(--border-subtle); padding-top:10px;">
+            <div class="chapter-header" style="background:rgba(16, 185, 129, 0.08); border-radius:var(--radius-md);">
+              <div class="chapter-title-text" style="color:var(--color-success); font-weight:700;">
+                <i class="fas fa-award"></i>
+                <span>${escapeHtml(ex.title || 'Ujian Akhir Kelulusan')}</span>
+              </div>
+              <span class="chapter-meta-count" style="background:var(--color-success); color:#fff; font-size:10px; font-weight:700;">SERTIFIKAT</span>
+            </div>
+            <div class="chapter-body" style="padding-left:4px; margin-top:4px;">
+              <a href="/exam/${ex.id}" target="_blank" class="module-item-btn" style="background:rgba(16, 185, 129, 0.1); border:1px solid rgba(16, 185, 129, 0.3); text-decoration:none;">
+                <div style="display:flex; align-items:center; gap:8px; overflow:hidden;">
+                  <i class="fas fa-file-signature" style="color:var(--color-success); font-size:13px;"></i>
+                  <span class="module-title-truncate" style="font-weight:600; color:var(--text-primary);">Mulai Pengerjaan Ujian Kelulusan</span>
+                </div>
+                <span class="module-format-badge" style="background:var(--color-success); color:#fff; font-weight:700;">MULAI</span>
+              </a>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      container.innerHTML = sectionsHtml + finalExamsHtml;
     }
 
     function toggleChapterAccordion(el) {
