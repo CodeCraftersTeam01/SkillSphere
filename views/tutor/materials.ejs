@@ -1899,6 +1899,11 @@
                 <span class="info-metric-val" id="stream-stat-price">Rp 0</span>
               </div>
 
+              <div class="info-metric-item">
+                <span class="info-metric-label">Ujian & Kuis</span>
+                <span class="info-metric-val" id="stream-stat-exams" style="color:var(--accent-amber); font-weight:600;">0 Evaluasi</span>
+              </div>
+
               <button class="btn-stream-link" onclick="switchClassroomTab('classwork')">
                 <span>Buka Tugas Kelas</span>
                 <i class="fas fa-arrow-right" style="font-size:11px;"></i>
@@ -2560,10 +2565,15 @@
     let currentCourses = [];
     let activeCourse = null;
     let currentUser = null;
+    let currentMaterialsFlat = [];
     let selectedContentType = 'video';
     let selectedMaterialFile = null;
 
-    const token = localStorage.getItem('skillsphere_access_token') || localStorage.getItem('accessToken') || localStorage.getItem('token');
+    function getAuthToken() {
+      return localStorage.getItem('skillsphere_access_token') || localStorage.getItem('accessToken') || localStorage.getItem('token') || '';
+    }
+
+    const token = getAuthToken();
     if (!token) {
       window.location.href = '/login?redirect=/tutor/materials';
     } else {
@@ -2727,9 +2737,11 @@
       const prevCourse = document.getElementById('portal-preview-course');
       if (prevCourse) prevCourse.textContent = course.title;
 
-      // If exams or certs tab is currently visible, reload it
-      const examsPane = document.getElementById('classroom-tab-exams');
-      if (examsPane && examsPane.style.display !== 'none') loadPortalExam();
+      currentMaterialsFlat = allMaterialsFlat;
+
+      // Always proactively load exams so metrics, forum feed, and curriculum tree reflect exams
+      loadPortalExam();
+
       const certsPane = document.getElementById('classroom-tab-certificates');
       if (certsPane && certsPane.style.display !== 'none') loadPortalCertificates();
 
@@ -2755,12 +2767,15 @@
           allMaterialsFlat.push({ ...m, section_title: s.title, section_id: s.id });
         });
       });
+      currentMaterialsFlat = allMaterialsFlat;
 
       // Stream Metrics
       document.getElementById('stream-stat-sections').textContent = `${sections.length} Bab`;
       document.getElementById('stream-stat-materials').textContent = `${totalMaterials} Unit`;
       document.getElementById('stream-stat-duration').textContent = `${totalDuration} Menit`;
       document.getElementById('stream-stat-price').textContent = rupiah.format(course.price || 0);
+      const streamExamsEl = document.getElementById('stream-stat-exams');
+      if (streamExamsEl) streamExamsEl.textContent = `${portalCourseExams.length} Evaluasi`;
 
       // Render Upload Modal Section Selector
       const sectionSelect = document.getElementById('material-section-select');
@@ -2778,18 +2793,23 @@
     // Render Forum Stream Feed Items
     function renderForumFeed(materialsList) {
       const feedContainer = document.getElementById('forum-materials-feed');
-      if (!materialsList.length) {
+      const examsList = Array.isArray(portalCourseExams) ? portalCourseExams : [];
+      const hasMaterials = materialsList && materialsList.length > 0;
+      const hasExams = examsList.length > 0;
+
+      if (!hasMaterials && !hasExams) {
         feedContainer.innerHTML = `
           <div style="background:var(--bg-surface); border:1px dashed var(--border-subtle); border-radius:var(--radius-lg); padding:36px 20px; text-align:center; color:var(--text-secondary);">
             <i class="fas fa-clipboard-list" style="font-size:32px; color:var(--text-tertiary); margin-bottom:10px; display:block;"></i>
-            <div style="font-weight:600; font-size:14px; color:var(--text-primary); margin-bottom:4px;">Belum Ada Materi Diumumkan</div>
-            <div style="font-size:12.5px;">Klik "Upload Materi" untuk memposting video, slide, atau modul pembelajaran ke kelas ini.</div>
+            <div style="font-weight:600; font-size:14px; color:var(--text-primary); margin-bottom:4px;">Belum Ada Materi atau Evaluasi Diumumkan</div>
+            <div style="font-size:12.5px;">Klik "Upload Materi" atau kelola "Ujian & Kuis" untuk menambahkan konten pembelajaran dan evaluasi ke kelas ini.</div>
           </div>
         `;
         return;
       }
 
-      feedContainer.innerHTML = materialsList.map(mat => {
+      // Render Materials
+      const materialsHtml = hasMaterials ? materialsList.map(mat => {
         let icon = 'fa-file-video';
         if (mat.content_type === 'ppt') icon = 'fa-file-powerpoint';
         if (mat.content_type === 'pdf') icon = 'fa-file-pdf';
@@ -2826,7 +2846,69 @@
             </div>
           </div>
         `;
-      }).join('');
+      }).join('') : '';
+
+      // Render Exams & Quizzes in Forum Feed
+      const examsHtml = hasExams ? examsList.map(ex => {
+        let icon = 'fa-file-signature';
+        let badgeStyle = 'background:rgba(217,119,6,0.12); color:#D97706;';
+        let badgeText = 'EVALUASI BAB';
+        let borderAccent = 'rgba(217,119,6,0.5)';
+
+        if (ex.exam_type === 'quiz') {
+          icon = 'fa-lightbulb';
+          badgeStyle = 'background:rgba(59,130,246,0.12); color:#2563EB;';
+          badgeText = 'KUIS BAB';
+          borderAccent = 'rgba(59,130,246,0.5)';
+        } else if (ex.exam_type === 'final') {
+          icon = 'fa-award';
+          badgeStyle = 'background:rgba(16,185,129,0.12); color:#059669;';
+          badgeText = 'UJIAN KELULUSAN RESMI';
+          borderAccent = 'rgba(16,185,129,0.5)';
+        }
+
+        const sectionName = ex.section ? ex.section.title : (ex.section_id ? `Bab ID #${ex.section_id}` : 'Seluruh Materi Kelas');
+        const qCount = Array.isArray(ex.questions) ? ex.questions.length : (ex.total_questions || 0);
+
+        return `
+          <div class="stream-post-item" id="stream-exam-${ex.id}" style="border-left: 3px solid ${borderAccent};">
+            <div style="display:flex; align-items:center; gap:16px; flex:1; min-width:0;">
+              <div class="post-icon-circle" style="${badgeStyle}">
+                <i class="fas ${icon}"></i>
+              </div>
+              <div class="post-main-content">
+                <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px; flex-wrap:wrap;">
+                  <span class="status-pill" style="${badgeStyle} font-size:11px; font-weight:700;">${badgeText}</span>
+                  <div class="post-title" style="margin:0;">${escapeHtml(ex.title)}</div>
+                </div>
+                <div class="post-date-meta">
+                  <span><i class="fas fa-folder-tree" style="font-size:11px;"></i> ${escapeHtml(sectionName)}</span>
+                  <span>•</span>
+                  <span><i class="fas fa-clock" style="font-size:11px;"></i> ${ex.duration_minutes || 0} Menit</span>
+                  <span>•</span>
+                  <span><i class="fas fa-bullseye" style="font-size:11px;"></i> Passing: ${ex.passing_score || 75}%</span>
+                  <span>•</span>
+                  <span><i class="fas fa-circle-question" style="font-size:11px;"></i> ${qCount} Soal</span>
+                </div>
+              </div>
+            </div>
+
+            <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+              <button class="btn btn-outline" style="padding:6px 12px; font-size:12px;" onclick="window.open('/exam/${ex.id}', '_blank')">
+                <i class="fas fa-play"></i> Mulai / Pratinjau
+              </button>
+              <button class="btn btn-primary" style="padding:6px 12px; font-size:12px;" onclick="editPortalExamFromFeed(${ex.id})">
+                <i class="fas fa-pen-to-square"></i> Edit
+              </button>
+              <button class="logout-btn" style="padding:6px 10px; font-size:12px;" onclick="deletePortalExam(${ex.id}, '${escapeHtml(ex.title)}')" title="Hapus Ujian">
+                <i class="fas fa-trash-can"></i>
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('') : '';
+
+      feedContainer.innerHTML = materialsHtml + examsHtml;
     }
 
     // Render Tab 2: Tugas Kelas Accordion
@@ -2846,15 +2928,103 @@
         return;
       }
 
-      container.innerHTML = sections.map(sec => {
+      const sectionsHtml = sections.map(sec => {
         const materials = sec.materials || [];
+        const chapterExams = Array.isArray(portalCourseExams) ? portalCourseExams.filter(ex => Number(ex.section_id) === Number(sec.id)) : [];
+        const totalItemsInSec = materials.length + chapterExams.length;
+
+        const materialsListHtml = materials.map((mat, index) => {
+          let typeIcon = 'fa-video';
+          if (mat.content_type === 'ppt') typeIcon = 'fa-file-powerpoint';
+          if (mat.content_type === 'pdf') typeIcon = 'fa-file-pdf';
+          if (mat.content_type === 'doc') typeIcon = 'fa-file-lines';
+          if (mat.content_type === 'book') typeIcon = 'fa-book-open';
+
+          return `
+            <div class="material-item-row" id="material-row-${mat.id}">
+              <div style="display:flex; align-items:center; gap:14px; flex:1; min-width:0;">
+                <div class="material-icon-box">
+                  <i class="fas ${typeIcon}"></i>
+                </div>
+                <div class="material-info">
+                  <div class="material-title-text">${escapeHtml(mat.title)}</div>
+                  <div class="material-meta-row">
+                    <span><i class="fas fa-clock" style="font-size:11px;"></i> ${mat.duration_minutes || 0} Menit</span>
+                    <span>•</span>
+                    <span>Tipe: ${mat.content_type.toUpperCase()}</span>
+                    <span>•</span>
+                    ${mat.is_preview ? '<span class="status-pill status-active"><i class="fas fa-unlock"></i> Gratis Preview</span>' : '<span class="status-pill status-locked"><i class="fas fa-lock"></i> Terkunci</span>'}
+                  </div>
+                </div>
+              </div>
+
+              <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+                <button class="btn btn-outline" style="padding:6px 12px; font-size:12px;" onclick="previewMaterial(${mat.id})">
+                  <i class="fas fa-play"></i> Putar / Lihat
+                </button>
+                
+                <!-- Reorder Buttons -->
+                <button class="btn btn-outline" style="padding:6px 10px; font-size:11px;" onclick="moveMaterialOrder(${sec.id}, ${mat.id}, 'up')" title="Pindah ke Atas" ${index === 0 ? 'disabled style="opacity:0.35;"' : ''}>
+                  <i class="fas fa-arrow-up"></i>
+                </button>
+                <button class="btn btn-outline" style="padding:6px 10px; font-size:11px;" onclick="moveMaterialOrder(${sec.id}, ${mat.id}, 'down')" title="Pindah ke Bawah" ${index === materials.length - 1 ? 'disabled style="opacity:0.35;"' : ''}>
+                  <i class="fas fa-arrow-down"></i>
+                </button>
+
+                <button class="logout-btn" style="padding:6px 10px; font-size:12px;" onclick="deleteMaterial(${mat.id}, '${escapeHtml(mat.title)}')" title="Hapus Materi">
+                  <i class="fas fa-trash-can"></i>
+                </button>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        const chapterExamsHtml = chapterExams.map(ex => {
+          const qCount = Array.isArray(ex.questions) ? ex.questions.length : (ex.total_questions || 0);
+          return `
+            <div class="material-item-row" id="material-exam-row-${ex.id}" style="border-left:3px solid var(--accent-amber); background:rgba(217,119,6,0.03);">
+              <div style="display:flex; align-items:center; gap:14px; flex:1; min-width:0;">
+                <div class="material-icon-box" style="background:rgba(217,119,6,0.12); color:#D97706;">
+                  <i class="fas ${ex.exam_type === 'quiz' ? 'fa-lightbulb' : 'fa-book-bookmark'}"></i>
+                </div>
+                <div class="material-info">
+                  <div class="material-title-text" style="font-weight:600; color:var(--text-primary);">${escapeHtml(ex.title)}</div>
+                  <div class="material-meta-row">
+                    <span class="status-pill" style="background:rgba(217,119,6,0.12); color:#D97706; font-size:10.5px; font-weight:700;">
+                      ${ex.exam_type === 'quiz' ? 'KUIS BAB' : 'EVALUASI BAB'}
+                    </span>
+                    <span>•</span>
+                    <span><i class="fas fa-clock" style="font-size:11px;"></i> ${ex.duration_minutes || 0} Menit</span>
+                    <span>•</span>
+                    <span><i class="fas fa-bullseye" style="font-size:11px;"></i> Passing: ${ex.passing_score || 75}%</span>
+                    <span>•</span>
+                    <span>${qCount} Soal</span>
+                  </div>
+                </div>
+              </div>
+
+              <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+                <button class="btn btn-outline" style="padding:6px 12px; font-size:12px;" onclick="window.open('/exam/${ex.id}', '_blank')">
+                  <i class="fas fa-play"></i> Mulai / Pratinjau
+                </button>
+                <button class="btn btn-primary" style="padding:6px 12px; font-size:12px;" onclick="editPortalExamFromFeed(${ex.id})">
+                  <i class="fas fa-pen-to-square"></i> Edit
+                </button>
+                <button class="logout-btn" style="padding:6px 10px; font-size:12px;" onclick="deletePortalExam(${ex.id}, '${escapeHtml(ex.title)}')" title="Hapus Evaluasi">
+                  <i class="fas fa-trash-can"></i>
+                </button>
+              </div>
+            </div>
+          `;
+        }).join('');
+
         return `
           <div class="section-box" id="section-box-${sec.id}">
             <div class="section-header-bar">
               <div class="section-title-text">
                 <i class="fas fa-folder" style="color:var(--text-secondary);"></i>
                 <span>${escapeHtml(sec.title)}</span>
-                <span style="font-family:var(--font-sans); font-size:12px; color:var(--text-secondary); font-weight:500;">(${materials.length} Materi)</span>
+                <span style="font-family:var(--font-sans); font-size:12px; color:var(--text-secondary); font-weight:500;">(${materials.length} Materi, ${chapterExams.length} Evaluasi)</span>
               </div>
               <div style="display:flex; align-items:center; gap:8px;">
                 <button class="btn btn-outline" style="padding:6px 12px; font-size:12px;" onclick="openUploadModalForSection(${sec.id})">
@@ -2867,49 +3037,67 @@
             </div>
 
             <div class="material-list">
-              ${!materials.length ? `
+              ${!totalItemsInSec ? `
                 <div style="padding:24px; text-align:center; font-size:13px; color:var(--text-tertiary);">
-                  Belum ada materi di bab ini. Klik "Tambah Materi" untuk mengunggah.
+                  Belum ada materi atau kuis di bab ini. Klik "Tambah Materi" untuk mengunggah.
                 </div>
-              ` : materials.map((mat, index) => {
-                let typeIcon = 'fa-video';
-                if (mat.content_type === 'ppt') typeIcon = 'fa-file-powerpoint';
-                if (mat.content_type === 'pdf') typeIcon = 'fa-file-pdf';
-                if (mat.content_type === 'doc') typeIcon = 'fa-file-lines';
-                if (mat.content_type === 'book') typeIcon = 'fa-book-open';
+              ` : (materialsListHtml + chapterExamsHtml)}
+            </div>
+          </div>
+        `;
+      }).join('');
 
+      // Final Exam Section at the bottom of Curriculum Tree
+      const finalExams = Array.isArray(portalCourseExams) ? portalCourseExams.filter(ex => !ex.section_id || ex.exam_type === 'final') : [];
+      let finalExamsBoxHtml = '';
+      if (finalExams.length > 0) {
+        finalExamsBoxHtml = `
+          <div class="section-box" style="border:1px solid rgba(16,185,129,0.35); background:rgba(16,185,129,0.02); margin-top:20px;">
+            <div class="section-header-bar" style="border-bottom:1px solid rgba(16,185,129,0.2);">
+              <div class="section-title-text" style="color:var(--color-success); font-weight:600;">
+                <i class="fas fa-award"></i>
+                <span>Ujian Akhir Kelulusan Resmi & Sertifikasi</span>
+                <span style="font-family:var(--font-sans); font-size:12px; color:var(--text-secondary); font-weight:500;">(${finalExams.length} Ujian Kelulusan)</span>
+              </div>
+              <div style="display:flex; align-items:center; gap:8px;">
+                <button class="btn btn-outline" style="padding:6px 12px; font-size:12px;" onclick="switchClassroomTab('exams')">
+                  <i class="fas fa-sliders"></i> Kelola Bank Soal
+                </button>
+              </div>
+            </div>
+            <div class="material-list">
+              ${finalExams.map(ex => {
+                const qCount = Array.isArray(ex.questions) ? ex.questions.length : (ex.total_questions || 0);
                 return `
-                  <div class="material-item-row" id="material-row-${mat.id}">
+                  <div class="material-item-row" id="material-exam-row-${ex.id}" style="border-left:3px solid var(--color-success);">
                     <div style="display:flex; align-items:center; gap:14px; flex:1; min-width:0;">
-                      <div class="material-icon-box">
-                        <i class="fas ${typeIcon}"></i>
+                      <div class="material-icon-box" style="background:rgba(16,185,129,0.12); color:#059669;">
+                        <i class="fas fa-award"></i>
                       </div>
                       <div class="material-info">
-                        <div class="material-title-text">${escapeHtml(mat.title)}</div>
+                        <div class="material-title-text" style="font-weight:600; color:var(--text-primary);">${escapeHtml(ex.title)}</div>
                         <div class="material-meta-row">
-                          <span><i class="fas fa-clock" style="font-size:11px;"></i> ${mat.duration_minutes || 0} Menit</span>
+                          <span class="status-pill" style="background:rgba(16,185,129,0.12); color:#059669; font-size:10.5px; font-weight:700;">
+                            UJIAN KELULUSAN RESMI
+                          </span>
                           <span>•</span>
-                          <span>Tipe: ${mat.content_type.toUpperCase()}</span>
+                          <span><i class="fas fa-clock" style="font-size:11px;"></i> ${ex.duration_minutes || 0} Menit</span>
                           <span>•</span>
-                          ${mat.is_preview ? '<span class="status-pill status-active"><i class="fas fa-unlock"></i> Gratis Preview</span>' : '<span class="status-pill status-locked"><i class="fas fa-lock"></i> Terkunci</span>'}
+                          <span><i class="fas fa-bullseye" style="font-size:11px;"></i> Passing: ${ex.passing_score || 75}%</span>
+                          <span>•</span>
+                          <span>${qCount} Soal</span>
                         </div>
                       </div>
                     </div>
 
                     <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
-                      <button class="btn btn-outline" style="padding:6px 12px; font-size:12px;" onclick="previewMaterial(${mat.id})">
-                        <i class="fas fa-play"></i> Putar / Lihat
+                      <button class="btn btn-outline" style="padding:6px 12px; font-size:12px;" onclick="window.open('/exam/${ex.id}', '_blank')">
+                        <i class="fas fa-play"></i> Mulai / Pratinjau
                       </button>
-                      
-                      <!-- Reorder Buttons -->
-                      <button class="btn btn-outline" style="padding:6px 10px; font-size:11px;" onclick="moveMaterialOrder(${sec.id}, ${mat.id}, 'up')" title="Pindah ke Atas" ${index === 0 ? 'disabled style="opacity:0.35;"' : ''}>
-                        <i class="fas fa-arrow-up"></i>
+                      <button class="btn btn-primary" style="padding:6px 12px; font-size:12px;" onclick="editPortalExamFromFeed(${ex.id})">
+                        <i class="fas fa-pen-to-square"></i> Edit
                       </button>
-                      <button class="btn btn-outline" style="padding:6px 10px; font-size:11px;" onclick="moveMaterialOrder(${sec.id}, ${mat.id}, 'down')" title="Pindah ke Bawah" ${index === materials.length - 1 ? 'disabled style="opacity:0.35;"' : ''}>
-                        <i class="fas fa-arrow-down"></i>
-                      </button>
-
-                      <button class="logout-btn" style="padding:6px 10px; font-size:12px;" onclick="deleteMaterial(${mat.id}, '${escapeHtml(mat.title)}')" title="Hapus Materi">
+                      <button class="logout-btn" style="padding:6px 10px; font-size:12px;" onclick="deletePortalExam(${ex.id}, '${escapeHtml(ex.title)}')" title="Hapus Ujian">
                         <i class="fas fa-trash-can"></i>
                       </button>
                     </div>
@@ -2919,7 +3107,9 @@
             </div>
           </div>
         `;
-      }).join('');
+      }
+
+      container.innerHTML = sectionsHtml + finalExamsBoxHtml;
     }
 
     // Format Selector in Upload Modal
@@ -3017,8 +3207,13 @@
       populatePortalSectionSelect();
 
       try {
+        const authToken = getAuthToken();
+        const headers = { 'Accept': 'application/json' };
+        if (authToken) headers['Authorization'] = 'Bearer ' + authToken;
+
         const res = await fetch('/api/exams/course/' + activeCourse.id + '/all', {
-          headers: { 'Authorization': 'Bearer ' + token }
+          headers: headers,
+          credentials: 'include'
         });
         const json = await res.json();
 
@@ -3028,11 +3223,26 @@
           portalCourseExams = [];
         }
         renderPortalExamsList();
+
+        // Update Ringkasan Kelas & refresh forum feed & classwork
+        const streamExamsEl = document.getElementById('stream-stat-exams');
+        if (streamExamsEl) streamExamsEl.textContent = `${portalCourseExams.length} Evaluasi`;
+        if (typeof currentMaterialsFlat !== 'undefined') {
+          renderForumFeed(currentMaterialsFlat);
+        }
+        if (activeCourse && activeCourse.sections) {
+          renderClassworkSections(activeCourse.sections);
+        }
       } catch (err) {
         console.error('Error loading portal exams:', err);
         portalCourseExams = [];
         renderPortalExamsList();
       }
+    }
+
+    function editPortalExamFromFeed(examId) {
+      switchClassroomTab('exams');
+      editPortalExam(examId);
     }
 
     function populatePortalSectionSelect() {
@@ -3171,8 +3381,13 @@
       populatePortalSectionSelect();
 
       try {
+        const authToken = getAuthToken();
+        const headers = { 'Accept': 'application/json' };
+        if (authToken) headers['Authorization'] = 'Bearer ' + authToken;
+
         const res = await fetch('/api/exams/' + examId, {
-          headers: { 'Authorization': 'Bearer ' + token }
+          headers: headers,
+          credentials: 'include'
         });
         const json = await res.json();
 
@@ -3224,9 +3439,14 @@
       }
 
       try {
+        const authToken = getAuthToken();
+        const headers = { 'Accept': 'application/json' };
+        if (authToken) headers['Authorization'] = 'Bearer ' + authToken;
+
         const res = await fetch('/api/exams/' + examId, {
           method: 'DELETE',
-          headers: { 'Authorization': 'Bearer ' + token }
+          headers: headers,
+          credentials: 'include'
         });
         const json = await res.json();
 
@@ -3377,12 +3597,17 @@
           questions: formattedQuestions
         };
 
+        const authToken = getAuthToken();
+        const headers = {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        };
+        if (authToken) headers['Authorization'] = 'Bearer ' + authToken;
+
         const res = await fetch('/api/exams', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + token
-          },
+          headers: headers,
+          credentials: 'include',
           body: JSON.stringify(payload)
         });
 

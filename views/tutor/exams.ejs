@@ -629,6 +629,10 @@
       }
     }
 
+    function getAuthToken() {
+      return localStorage.getItem('skillsphere_access_token') || localStorage.getItem('accessToken') || localStorage.getItem('token') || '';
+    }
+
     function notifyUser(msg, type = 'success') {
       if (typeof window.showToast === 'function') {
         window.showToast(msg, type);
@@ -639,9 +643,13 @@
 
     async function loadMyCourses() {
       try {
-        const token = localStorage.getItem('token') || '';
+        const token = getAuthToken();
+        const headers = { 'Accept': 'application/json' };
+        if (token) headers['Authorization'] = 'Bearer ' + token;
+
         const res = await fetch('/api/courses', {
-          headers: { 'Authorization': 'Bearer ' + token }
+          headers: headers,
+          credentials: 'include'
         });
         const json = await res.json();
 
@@ -741,9 +749,13 @@
       footer.style.display = 'flex';
 
       try {
-        const token = localStorage.getItem('token') || '';
+        const token = getAuthToken();
+        const headers = { 'Accept': 'application/json' };
+        if (token) headers['Authorization'] = 'Bearer ' + token;
+
         const res = await fetch('/api/exams/course/' + currentCourseId, {
-          headers: { 'Authorization': 'Bearer ' + token }
+          headers: headers,
+          credentials: 'include'
         });
         const json = await res.json();
 
@@ -923,13 +935,17 @@
       }));
 
       try {
-        const token = localStorage.getItem('token') || '';
+        const token = getAuthToken();
+        const headers = {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        };
+        if (token) headers['Authorization'] = 'Bearer ' + token;
+
         const res = await fetch('/api/exams', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + token
-          },
+          headers: headers,
+          credentials: 'include',
           body: JSON.stringify({
             course_id: currentCourseId,
             title,
