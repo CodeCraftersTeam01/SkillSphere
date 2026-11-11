@@ -1848,10 +1848,10 @@
                   <span>Lihat Ruang Belajar Siswa</span>
                 </button>
 
-                <!-- Kelola Ujian Kelulusan -->
-                <button type="button" class="banner-edit-btn" onclick="switchClassroomTab('exams')" title="Kelola Bank Soal & Standar Kelulusan Kelas Ini">
+                <!-- Kelola Ujian & Kuis -->
+                <button type="button" class="banner-edit-btn" onclick="switchClassroomTab('exams')" title="Kelola Bank Soal, Kuis Bab & Standar Kelulusan Kelas Ini">
                   <i class="fas fa-file-signature"></i>
-                  <span>Ujian Kelulusan</span>
+                  <span>Ujian & Kuis</span>
                 </button>
 
                 <!-- Kelola Sertifikat -->
@@ -1912,7 +1912,7 @@
                   <i class="fas fa-cloud-arrow-up"></i> Upload Materi
                 </button>
                 <button class="btn btn-outline" style="width:100%; font-size:12px; padding:7px 10px;" onclick="switchClassroomTab('exams')">
-                  <i class="fas fa-file-signature"></i> Kelola Ujian Kelulusan
+                  <i class="fas fa-file-signature"></i> Kelola Ujian & Kuis
                 </button>
                 <button class="btn btn-outline" style="width:100%; font-size:12px; padding:7px 10px;" onclick="switchClassroomTab('certificates')">
                   <i class="fas fa-certificate"></i> Pengaturan Sertifikat
@@ -2000,59 +2000,125 @@
         </div>
 
         <!-- ========================================================= -->
-        <!-- TAB 3: UJIAN & KUIS KELULUSAN (EXAM CREATOR) ------------ -->
+        <!-- TAB 3: UJIAN & KUIS KELULUSAN (EXAM & QUIZ CREATOR) ----- -->
         <!-- ========================================================= -->
         <div id="classroom-tab-exams" class="tab-pane-content" style="display:none;">
           <div class="tab-header-banner">
             <div>
               <div style="font-size:12px; font-weight:600; color:var(--accent-amber); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">
-                <i class="fas fa-file-signature"></i> Evaluasi Kompetensi & Kelulusan
+                <i class="fas fa-file-signature"></i> Evaluasi Kompetensi & Kuis Kelas
               </div>
-              <h2 style="font-family:var(--font-serif); font-size:24px; font-weight:500; margin:0 0 4px;" id="portal-exam-course-title">Bank Soal & Ujian Kelulusan</h2>
-              <p style="font-size:13px; color:var(--text-secondary); margin:0;">Rancang soal pilihan ganda, tentukan batas waktu pengerjaan dan ambang kelulusan (passing grade) untuk kelas ini.</p>
+              <h2 style="font-family:var(--font-serif); font-size:24px; font-weight:500; margin:0 0 4px;" id="portal-exam-course-title">Bank Soal, Kuis & Ujian Kelas</h2>
+              <p style="font-size:13px; color:var(--text-secondary); margin:0;">Kelola kuis per bab, ujian evaluasi materi, dan ujian akhir kelulusan ber-sertifikat resmi.</p>
             </div>
 
             <div style="display:flex; gap:10px; flex-wrap:wrap;">
-              <button type="button" class="btn btn-outline" onclick="addPortalQuestion()">
-                <i class="fas fa-plus"></i> Tambah Butir Soal
+              <button type="button" class="btn btn-primary" onclick="openNewExamForm()">
+                <i class="fas fa-plus"></i> Buat Kuis / Ujian Baru
               </button>
-              <button type="button" class="btn btn-primary" onclick="savePortalExam()">
-                <i class="fas fa-floppy-disk"></i> Simpan Ujian Kelas
-              </button>
-              <button type="button" class="btn btn-outline" id="btn-preview-exam-zen" onclick="previewPortalExamZen()" title="Pratinjau Ruang Ujian Siswa">
-                <i class="fas fa-arrow-up-right-from-square"></i> Ruang Ujian Siswa
+              <button type="button" class="btn btn-outline" onclick="openExamCreator()" title="Buka Studio Ujian Mandiri">
+                <i class="fas fa-arrow-up-right-from-square"></i> Studio Ujian Penuh
               </button>
             </div>
           </div>
 
-          <!-- Parameter Standar Kelulusan -->
-          <div class="card" style="background:var(--bg-surface); border:1px solid var(--border-subtle); border-radius:var(--radius-lg); padding:20px; margin-bottom:20px;">
-            <div style="display:grid; grid-template-columns: 2fr 1fr 1fr; gap:16px;">
+          <!-- Section 1: Daftar Seluruh Kuis & Ujian Kelas Ini -->
+          <div style="margin-bottom:24px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+              <h3 style="font-family:var(--font-serif); font-size:18px; font-weight:600; margin:0; color:var(--text-primary); display:flex; align-items:center; gap:8px;">
+                <i class="fas fa-list-check" style="color:var(--accent-amber);"></i> Daftar Evaluasi & Kuis di Kelas Ini
+              </h3>
+              <span id="portal-exams-count-badge" style="font-size:12px; font-weight:600; padding:3px 10px; border-radius:12px; background:var(--bg-surface); border:1px solid var(--border-subtle); color:var(--text-secondary);">
+                0 Evaluasi
+              </span>
+            </div>
+
+            <!-- List Grid of Exams -->
+            <div id="portal-exams-list-container" style="display:flex; flex-direction:column; gap:12px;">
+              <!-- Akan di-render dinamis oleh renderPortalExamsList() -->
+            </div>
+          </div>
+
+          <!-- Section 2: Form Editor Bank Soal & Ujian (Bisa Buka/Tutup) -->
+          <div id="portal-exam-editor-card" class="card" style="background:var(--bg-surface); border:1px solid var(--border-subtle); border-radius:var(--radius-lg); padding:20px; margin-bottom:20px; display:none;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid var(--border-subtle); flex-wrap:wrap; gap:10px;">
+              <div>
+                <h4 id="portal-editor-mode-title" style="font-family:var(--font-serif); font-size:18px; font-weight:600; margin:0 0 4px; color:var(--text-primary);">
+                  Buat Ujian / Kuis Baru
+                </h4>
+                <p style="font-size:12px; color:var(--text-secondary); margin:0;">Isi konfigurasi kuis/ujian dan susun pertanyaan pilihan ganda.</p>
+              </div>
+              <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                <button type="button" class="btn btn-outline" style="font-size:12px; padding:6px 12px;" onclick="closeExamEditor()">
+                  <i class="fas fa-xmark"></i> Tutup Editor
+                </button>
+                <button type="button" class="btn btn-outline" style="font-size:12px; padding:6px 12px;" onclick="addPortalQuestion()">
+                  <i class="fas fa-plus"></i> Tambah Soal
+                </button>
+                <button type="button" class="btn btn-primary" style="font-size:12px; padding:6px 14px;" onclick="savePortalExam()">
+                  <i class="fas fa-floppy-disk"></i> Simpan Evaluasi
+                </button>
+              </div>
+            </div>
+
+            <div style="display:grid; grid-template-columns: 2fr 1fr 1fr; gap:16px; margin-bottom:14px;">
               <div class="form-group" style="margin-bottom:0;">
-                <label class="form-label" style="font-size:12px; font-weight:600; color:var(--text-secondary); margin-bottom:6px; display:block;">Judul Ujian Kelulusan</label>
-                <input type="text" id="portal-exam-title" class="form-control" style="width:100%; padding:10px 12px; border:1px solid var(--border-subtle); border-radius:var(--radius-md); background:var(--bg-app); color:var(--text-primary);" placeholder="Contoh: Ujian Kompetensi Akhir">
+                <label class="form-label" style="font-size:12px; font-weight:600; color:var(--text-secondary); margin-bottom:6px; display:block;">Judul Evaluasi / Kuis (Custom Name)</label>
+                <input type="text" id="portal-exam-title" class="form-control" style="width:100%; padding:10px 12px; border:1px solid var(--border-subtle); border-radius:var(--radius-md); background:var(--bg-app); color:var(--text-primary); box-sizing:border-box;" placeholder="Contoh: Kuis Bab 1: Normalisasi Relasional">
               </div>
 
+              <div class="form-group" style="margin-bottom:0;">
+                <label class="form-label" style="font-size:12px; font-weight:600; color:var(--text-secondary); margin-bottom:6px; display:block;">Tipe Evaluasi</label>
+                <select id="portal-exam-type" class="form-control" style="width:100%; padding:10px 12px; border:1px solid var(--border-subtle); border-radius:var(--radius-md); background:var(--bg-app); color:var(--text-primary); box-sizing:border-box;" onchange="onPortalExamTypeChange()">
+                  <option value="quiz">Kuis Singkat Bab (Tanpa Sertifikat)</option>
+                  <option value="chapter_exam">Ujian Evaluasi Bab (Tanpa Sertifikat)</option>
+                  <option value="final">Ujian Akhir Kelulusan Resmi (Sertifikat)</option>
+                </select>
+              </div>
+
+              <div class="form-group" style="margin-bottom:0;">
+                <label class="form-label" style="font-size:12px; font-weight:600; color:var(--text-secondary); margin-bottom:6px; display:block;">Target Bab Terkait</label>
+                <select id="portal-exam-section-select" class="form-control" style="width:100%; padding:10px 12px; border:1px solid var(--border-subtle); border-radius:var(--radius-md); background:var(--bg-app); color:var(--text-primary); box-sizing:border-box;">
+                  <option value="">-- Seluruh Kursus / Ujian Akhir --</option>
+                </select>
+              </div>
+            </div>
+
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px; margin-bottom:14px;">
               <div class="form-group" style="margin-bottom:0;">
                 <label class="form-label" style="font-size:12px; font-weight:600; color:var(--text-secondary); margin-bottom:6px; display:block;">Passing Grade (%)</label>
-                <input type="number" id="portal-exam-passing" class="form-control" style="width:100%; padding:10px 12px; border:1px solid var(--border-subtle); border-radius:var(--radius-md); background:var(--bg-app); color:var(--text-primary);" min="10" max="100" value="75">
+                <input type="number" id="portal-exam-passing" class="form-control" style="width:100%; padding:10px 12px; border:1px solid var(--border-subtle); border-radius:var(--radius-md); background:var(--bg-app); color:var(--text-primary); box-sizing:border-box;" min="10" max="100" value="75">
               </div>
 
               <div class="form-group" style="margin-bottom:0;">
-                <label class="form-label" style="font-size:12px; font-weight:600; color:var(--text-secondary); margin-bottom:6px; display:block;">Durasi (Menit)</label>
-                <input type="number" id="portal-exam-duration" class="form-control" style="width:100%; padding:10px 12px; border:1px solid var(--border-subtle); border-radius:var(--radius-md); background:var(--bg-app); color:var(--text-primary);" min="5" max="300" value="60">
+                <label class="form-label" style="font-size:12px; font-weight:600; color:var(--text-secondary); margin-bottom:6px; display:block;">Durasi Pengerjaan (Menit)</label>
+                <input type="number" id="portal-exam-duration" class="form-control" style="width:100%; padding:10px 12px; border:1px solid var(--border-subtle); border-radius:var(--radius-md); background:var(--bg-app); color:var(--text-primary); box-sizing:border-box;" min="5" max="300" value="30">
               </div>
             </div>
 
-            <div style="margin-top:14px;">
-              <label class="form-label" style="font-size:12px; font-weight:600; color:var(--text-secondary); margin-bottom:6px; display:block;">Instruksi Pengerjaan untuk Siswa</label>
-              <textarea id="portal-exam-desc" rows="2" style="width:100%; padding:10px 12px; border:1px solid var(--border-subtle); border-radius:var(--radius-md); background:var(--bg-app); color:var(--text-primary); font-family:inherit; font-size:13px; box-sizing:border-box;" placeholder="Petunjuk singkat sebelum siswa mulai mengerjakan ujian kelulusan..."></textarea>
+            <div style="margin-bottom:20px;">
+              <label class="form-label" style="font-size:12px; font-weight:600; color:var(--text-secondary); margin-bottom:6px; display:block;">Petunjuk / Instruksi untuk Siswa</label>
+              <textarea id="portal-exam-desc" rows="2" style="width:100%; padding:10px 12px; border:1px solid var(--border-subtle); border-radius:var(--radius-md); background:var(--bg-app); color:var(--text-primary); font-family:inherit; font-size:13px; box-sizing:border-box;" placeholder="Petunjuk pengerjaan bagi siswa sebelum memulai kuis atau ujian ini..."></textarea>
             </div>
-          </div>
 
-          <!-- Container Bank Soal -->
-          <div id="portal-questions-container">
-            <!-- Soal dinamis akan dimuat di sini -->
+            <!-- Container Bank Soal -->
+            <div id="portal-questions-container">
+              <!-- Soal dinamis akan dimuat di sini -->
+            </div>
+
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:20px; padding-top:16px; border-top:1px solid var(--border-subtle); flex-wrap:wrap; gap:10px;">
+              <button type="button" class="btn btn-outline" onclick="addPortalQuestion()">
+                <i class="fas fa-plus"></i> Tambah Butir Soal Baru
+              </button>
+              <div style="display:flex; gap:10px;">
+                <button type="button" class="btn btn-outline" onclick="closeExamEditor()">
+                  Batal
+                </button>
+                <button type="button" class="btn btn-primary" onclick="savePortalExam()">
+                  <i class="fas fa-floppy-disk"></i> Simpan Evaluasi Ini
+                </button>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -2937,50 +3003,243 @@
     }
 
     // -------------------------------------------------------------
-    // EMBEDDED EXAM CREATOR IN TUTOR PORTAL (SPRINT 4)
+    // EMBEDDED EXAM & QUIZ CREATOR IN TUTOR PORTAL (SPRINT 4)
     // -------------------------------------------------------------
+    let portalCourseExams = [];
     let portalQuestions = [];
-    let portalExamId = null;
+    let portalEditingExamId = null;
 
     async function loadPortalExam() {
       if (!activeCourse || !activeCourse.id) return;
       const titleEl = document.getElementById('portal-exam-course-title');
-      if (titleEl) titleEl.textContent = 'Bank Soal & Ujian: ' + activeCourse.title;
+      if (titleEl) titleEl.textContent = 'Bank Soal, Kuis & Ujian: ' + activeCourse.title;
+
+      populatePortalSectionSelect();
 
       try {
-        const res = await fetch('/api/exams/course/' + activeCourse.id, {
+        const res = await fetch('/api/exams/course/' + activeCourse.id + '/all', {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        const json = await res.json();
+
+        if (json.success && json.data) {
+          portalCourseExams = Array.isArray(json.data) ? json.data : (json.data.all_exams || []);
+        } else {
+          portalCourseExams = [];
+        }
+        renderPortalExamsList();
+      } catch (err) {
+        console.error('Error loading portal exams:', err);
+        portalCourseExams = [];
+        renderPortalExamsList();
+      }
+    }
+
+    function populatePortalSectionSelect() {
+      const select = document.getElementById('portal-exam-section-select');
+      if (!select) return;
+
+      const currentVal = select.value;
+      let opts = '<option value="">-- Seluruh Kursus / Ujian Akhir Kelulusan --</option>';
+
+      if (activeCourse && Array.isArray(activeCourse.sections)) {
+        activeCourse.sections.forEach((sec, idx) => {
+          opts += `<option value="${sec.id}">Bab ${idx + 1}: ${escapeHtml(sec.title)}</option>`;
+        });
+      }
+      select.innerHTML = opts;
+      if (currentVal) select.value = currentVal;
+    }
+
+    function renderPortalExamsList() {
+      const container = document.getElementById('portal-exams-list-container');
+      const badgeCount = document.getElementById('portal-exams-count-badge');
+      if (badgeCount) badgeCount.textContent = `${portalCourseExams.length} Evaluasi Terdaftar`;
+      if (!container) return;
+
+      if (portalCourseExams.length === 0) {
+        container.innerHTML = `
+          <div style="padding:36px; text-align:center; background:var(--bg-surface); border:1px dashed var(--border-subtle); border-radius:var(--radius-lg); color:var(--text-secondary);">
+            <i class="fas fa-file-circle-question" style="font-size:36px; margin-bottom:12px; display:block; color:var(--text-tertiary);"></i>
+            <div style="font-weight:600; font-size:15px; margin-bottom:4px; color:var(--text-primary);">Belum Ada Kuis atau Ujian di Kelas Ini</div>
+            <p style="font-size:13px; margin:0 0 16px;">Buat kuis per bab atau ujian kelulusan akhir agar pemahaman siswa teruji secara interaktif.</p>
+            <button type="button" class="btn btn-primary" onclick="openNewExamForm()">
+              <i class="fas fa-plus"></i> Buat Kuis / Ujian Pertama
+            </button>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = portalCourseExams.map((ex, idx) => {
+        let typeBadge = '';
+        if (ex.exam_type === 'quiz') {
+          typeBadge = '<span style="font-size:11px; font-weight:700; padding:3px 8px; border-radius:4px; background:rgba(59, 130, 246, 0.12); color:#2563EB;"><i class="fas fa-lightbulb"></i> KUIS BAB</span>';
+        } else if (ex.exam_type === 'chapter_exam') {
+          typeBadge = '<span style="font-size:11px; font-weight:700; padding:3px 8px; border-radius:4px; background:rgba(217, 119, 6, 0.12); color:#D97706;"><i class="fas fa-book-bookmark"></i> UJIAN BAB</span>';
+        } else {
+          typeBadge = '<span style="font-size:11px; font-weight:700; padding:3px 8px; border-radius:4px; background:rgba(16, 185, 129, 0.12); color:#059669;"><i class="fas fa-award"></i> UJIAN KELULUSAN RESMI</span>';
+        }
+
+        const sectionName = ex.section 
+          ? `Bab Terkait: ${escapeHtml(ex.section.title)}`
+          : 'Cakupan: Seluruh Materi Kelas';
+
+        const questionsCount = Array.isArray(ex.questions) ? ex.questions.length : (ex.total_questions || 0);
+
+        return `
+          <div class="card" style="background:var(--bg-surface); border:1px solid var(--border-subtle); border-radius:var(--radius-lg); padding:16px 20px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;">
+            <div style="flex:1; min-width:260px;">
+              <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px; flex-wrap:wrap;">
+                ${typeBadge}
+                <span style="font-size:11px; color:var(--text-tertiary); font-family:var(--font-mono);"><i class="fas fa-folder-tree"></i> ${sectionName}</span>
+              </div>
+              <h4 style="font-family:var(--font-serif); font-size:17px; font-weight:600; margin:0 0 6px; color:var(--text-primary);">
+                ${escapeHtml(ex.title)}
+              </h4>
+              <div style="display:flex; gap:14px; font-size:12px; color:var(--text-secondary); flex-wrap:wrap;">
+                <span><i class="fas fa-bullseye" style="color:var(--accent-amber);"></i> Passing Grade: <strong>${ex.passing_score}%</strong></span>
+                <span><i class="fas fa-clock" style="color:var(--accent-amber);"></i> Durasi: <strong>${ex.duration_minutes} Menit</strong></span>
+                <span><i class="fas fa-circle-question" style="color:var(--accent-amber);"></i> Total: <strong>${questionsCount} Soal</strong></span>
+              </div>
+              ${ex.description ? `<p style="font-size:12px; color:var(--text-secondary); margin:6px 0 0; line-height:1.4;">${escapeHtml(ex.description)}</p>` : ''}
+            </div>
+
+            <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+              <button type="button" class="btn btn-primary" style="font-size:12px; padding:7px 12px;" onclick="editPortalExam(${ex.id})">
+                <i class="fas fa-pen-to-square"></i> Edit Soal
+              </button>
+              <button type="button" class="btn btn-outline" style="font-size:12px; padding:7px 12px;" onclick="window.open('/exam/' + ${ex.id}, '_blank')" title="Buka Ruang Ujian Siswa">
+                <i class="fas fa-arrow-up-right-from-square"></i> Ruang Siswa
+              </button>
+              <button type="button" class="btn btn-outline" style="font-size:12px; padding:7px 12px; color:var(--color-danger); border-color:rgba(239, 68, 68, 0.3);" onclick="deletePortalExam(${ex.id}, '${escapeHtml(ex.title)}')" title="Hapus Ujian">
+                <i class="fas fa-trash-can"></i>
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function onPortalExamTypeChange() {
+      const type = document.getElementById('portal-exam-type').value;
+      const durationInput = document.getElementById('portal-exam-duration');
+      const titleInput = document.getElementById('portal-exam-title');
+
+      if (type === 'quiz') {
+        if (!titleInput.value || titleInput.value.includes('Ujian')) {
+          titleInput.value = 'Kuis Singkat: ' + (activeCourse ? activeCourse.title : '');
+        }
+        durationInput.value = 20;
+      } else if (type === 'chapter_exam') {
+        if (!titleInput.value || titleInput.value.includes('Kuis')) {
+          titleInput.value = 'Ujian Evaluasi Bab: ' + (activeCourse ? activeCourse.title : '');
+        }
+        durationInput.value = 45;
+      } else if (type === 'final') {
+        if (!titleInput.value || titleInput.value.includes('Kuis')) {
+          titleInput.value = 'Ujian Kelulusan Resmi: ' + (activeCourse ? activeCourse.title : '');
+        }
+        durationInput.value = 60;
+        document.getElementById('portal-exam-section-select').value = '';
+      }
+    }
+
+    function openNewExamForm() {
+      portalEditingExamId = null;
+      populatePortalSectionSelect();
+
+      document.getElementById('portal-editor-mode-title').textContent = 'Buat Ujian / Kuis Baru';
+      document.getElementById('portal-exam-title').value = 'Kuis Bab 1: ' + (activeCourse ? activeCourse.title : '');
+      document.getElementById('portal-exam-type').value = 'quiz';
+      document.getElementById('portal-exam-passing').value = 75;
+      document.getElementById('portal-exam-duration').value = 25;
+      document.getElementById('portal-exam-desc').value = 'Jawab pertanyaan pilihan ganda berikut untuk menguji pemahaman materi ini.';
+
+      portalQuestions = [createEmptyQuestion(1)];
+      renderPortalQuestions();
+
+      const editorCard = document.getElementById('portal-exam-editor-card');
+      if (editorCard) {
+        editorCard.style.display = 'block';
+        editorCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+
+    async function editPortalExam(examId) {
+      portalEditingExamId = examId;
+      populatePortalSectionSelect();
+
+      try {
+        const res = await fetch('/api/exams/' + examId, {
           headers: { 'Authorization': 'Bearer ' + token }
         });
         const json = await res.json();
 
         if (json.success && json.data) {
           const ex = json.data;
-          portalExamId = ex.id;
-          document.getElementById('portal-exam-title').value = ex.title || ('Ujian Kompetensi Akhir: ' + activeCourse.title);
-          document.getElementById('portal-exam-desc').value = ex.description || '';
+          document.getElementById('portal-editor-mode-title').textContent = 'Edit Evaluasi: ' + ex.title;
+          document.getElementById('portal-exam-title').value = ex.title || '';
+          document.getElementById('portal-exam-type').value = ex.exam_type || 'final';
+          document.getElementById('portal-exam-section-select').value = ex.section_id || '';
           document.getElementById('portal-exam-passing').value = ex.passing_score || 75;
           document.getElementById('portal-exam-duration').value = ex.duration_minutes || 60;
+          document.getElementById('portal-exam-desc').value = ex.description || '';
 
           if (Array.isArray(ex.questions) && ex.questions.length > 0) {
             portalQuestions = ex.questions.map(q => ({
-              question_text: q.question_text || '',
+              question_text: q.question_text || q.question || '',
               options: Array.isArray(q.options) ? q.options : ['', '', '', ''],
               correct_answer: q.correct_answer || 'A'
             }));
           } else {
             portalQuestions = [createEmptyQuestion(1)];
           }
+
+          renderPortalQuestions();
+
+          const editorCard = document.getElementById('portal-exam-editor-card');
+          if (editorCard) {
+            editorCard.style.display = 'block';
+            editorCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
         } else {
-          portalExamId = null;
-          document.getElementById('portal-exam-title').value = 'Ujian Kompetensi Akhir: ' + activeCourse.title;
-          document.getElementById('portal-exam-desc').value = 'Jawab seluruh pertanyaan pilihan ganda dengan teliti. Nilai kelulusan akan langsung menentukan penerbitan sertifikat resmi Anda.';
-          document.getElementById('portal-exam-passing').value = 75;
-          document.getElementById('portal-exam-duration').value = 60;
-          portalQuestions = [createEmptyQuestion(1)];
+          showToast('Gagal memuat detail ujian.', 'error');
         }
-        renderPortalQuestions();
       } catch (err) {
-        console.error('Error loading portal exam:', err);
+        console.error('Error edit portal exam:', err);
+        showToast('Terjadi kesalahan jaringan saat memuat detail ujian.', 'error');
+      }
+    }
+
+    function closeExamEditor() {
+      const editorCard = document.getElementById('portal-exam-editor-card');
+      if (editorCard) editorCard.style.display = 'none';
+      portalEditingExamId = null;
+    }
+
+    async function deletePortalExam(examId, title) {
+      if (!confirm(`Apakah Anda yakin ingin menghapus ujian/kuis "${title}"? Data hasil pengerjaan terkait juga akan terhapus.`)) {
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/exams/' + examId, {
+          method: 'DELETE',
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        const json = await res.json();
+
+        if (json.success) {
+          showToast('Ujian/Kuis berhasil dihapus.', 'success');
+          if (portalEditingExamId === examId) closeExamEditor();
+          await loadPortalExam();
+        } else {
+          showToast(json.message || 'Gagal menghapus ujian.', 'error');
+        }
+      } catch (err) {
+        console.error('Error delete exam:', err);
+        showToast('Terjadi kesalahan jaringan saat menghapus ujian.', 'error');
       }
     }
 
@@ -2998,7 +3257,7 @@
 
       if (portalQuestions.length === 0) {
         container.innerHTML = `
-          <div style="padding:32px; text-align:center; background:var(--bg-surface); border:1px solid var(--border-subtle); border-radius:var(--radius-lg); color:var(--text-secondary);">
+          <div style="padding:32px; text-align:center; background:var(--bg-app); border:1px solid var(--border-subtle); border-radius:var(--radius-lg); color:var(--text-secondary);">
             <i class="fas fa-clipboard-question" style="font-size:32px; margin-bottom:8px; display:block; color:var(--text-tertiary);"></i>
             Belum ada butir soal. Klik <strong>Tambah Butir Soal</strong> untuk menyusun pertanyaan pertama.
           </div>
@@ -3070,64 +3329,84 @@
       }
 
       const title = document.getElementById('portal-exam-title').value.trim();
+      const examType = document.getElementById('portal-exam-type').value;
+      const sectionIdVal = document.getElementById('portal-exam-section-select').value;
       const description = document.getElementById('portal-exam-desc').value.trim();
       const passingScore = parseInt(document.getElementById('portal-exam-passing').value, 10) || 75;
-      const durationMinutes = parseInt(document.getElementById('portal-exam-duration').value, 10) || 60;
+      const durationMinutes = parseInt(document.getElementById('portal-exam-duration').value, 10) || 30;
 
       if (!title) {
-        showToast('Judul ujian wajib diisi.', 'error');
+        showToast('Judul ujian/kuis wajib diisi.', 'error');
         return;
       }
 
       for (let i = 0; i < portalQuestions.length; i++) {
         const q = portalQuestions[i];
-        if (!q.question_text || !q.question_text.trim()) {
+        const qText = (q.question_text || q.question || '').trim();
+        if (!qText) {
           showToast(`Pertanyaan pada Soal #${i + 1} belum diisi.`, 'error');
           return;
         }
         for (let j = 0; j < 4; j++) {
-          if (!q.options[j] || !q.options[j].trim()) {
+          if (!q.options[j] || !String(q.options[j]).trim()) {
             showToast(`Pilihan ${['A', 'B', 'C', 'D'][j]} pada Soal #${i + 1} belum diisi.`, 'error');
             return;
           }
         }
       }
 
+      const formattedQuestions = portalQuestions.map((q, idx) => ({
+        id: String(idx + 1),
+        question: (q.question_text || q.question || '').trim(),
+        question_text: (q.question_text || q.question || '').trim(),
+        options: (q.options || []).map(o => String(o || '').trim()),
+        correct_answer: String(q.correct_answer || 'A').trim().toUpperCase(),
+        points: 10
+      }));
+
       try {
+        const payload = {
+          id: portalEditingExamId,
+          course_id: activeCourse.id,
+          title,
+          exam_type: examType,
+          section_id: sectionIdVal ? Number(sectionIdVal) : null,
+          description,
+          passing_score: passingScore,
+          duration_minutes: durationMinutes,
+          questions: formattedQuestions
+        };
+
         const res = await fetch('/api/exams', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             'Authorization': 'Bearer ' + token
           },
-          body: JSON.stringify({
-            course_id: activeCourse.id,
-            title,
-            description,
-            passing_score: passingScore,
-            duration_minutes: durationMinutes,
-            questions: portalQuestions
-          })
+          body: JSON.stringify(payload)
         });
 
         const json = await res.json();
         if (json.success) {
-          if (json.data && json.data.id) portalExamId = json.data.id;
-          showToast('Ujian kelulusan kursus berhasil disimpan dan dipublikasikan.', 'success');
+          showToast(json.message || 'Evaluasi berhasil disimpan dan dipublikasikan.', 'success');
+          closeExamEditor();
+          await loadPortalExam();
         } else {
-          showToast(json.message || 'Gagal menyimpan ujian.', 'error');
+          showToast(json.message || 'Gagal menyimpan ujian/kuis.', 'error');
         }
       } catch (err) {
         console.error('Error saving portal exam:', err);
-        showToast('Terjadi kesalahan jaringan saat menyimpan ujian.', 'error');
+        showToast('Terjadi kesalahan jaringan saat menyimpan evaluasi.', 'error');
       }
     }
 
     function previewPortalExamZen() {
-      if (portalExamId) {
-        window.open('/exam/' + portalExamId, '_blank');
+      if (portalEditingExamId) {
+        window.open('/exam/' + portalEditingExamId, '_blank');
+      } else if (portalCourseExams.length > 0) {
+        window.open('/exam/' + portalCourseExams[0].id, '_blank');
       } else {
-        showToast('Simpan ujian terlebih dahulu sebelum membuka pratinjau pengerjaan siswa.', 'info');
+        showToast('Simpan kuis/ujian terlebih dahulu sebelum membuka pratinjau pengerjaan siswa.', 'info');
       }
     }
 

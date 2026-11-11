@@ -654,9 +654,10 @@
           return;
         }
 
-        if (examData.course && examData.course.title) {
-          document.getElementById('headerCourseTitle').textContent = examData.course.title;
-        }
+        const courseTitle = examData.course_title || (examData.course && examData.course.title) || 'Kelas SkillSphere';
+        const sectionInfo = examData.section_title ? ` • ${examData.section_title}` : '';
+        const typeBadge = examData.exam_type === 'quiz' ? '[Kuis]' : (examData.exam_type === 'chapter_exam' ? '[Ujian Bab]' : '[Ujian Kelulusan]');
+        document.getElementById('headerCourseTitle').textContent = `${typeBadge} ${examData.title} • ${courseTitle}${sectionInfo}`;
 
         remainingSeconds = (examData.duration_minutes || 60) * 60;
         startTimer();
@@ -877,12 +878,24 @@
       if (data.is_passed) {
         icon.className = 'modal-icon pass';
         icon.innerHTML = `<i class="fa-solid fa-award"></i>`;
-        title.textContent = 'Selamat! Anda Dinyatakan Lulus';
-        desc.textContent = 'Kompetensi teknis Anda telah terverifikasi secara resmi. Sertifikat kelulusan digital Anda telah diterbitkan secara otomatis oleh sistem.';
+        
+        const isGraduation = data.is_graduation_exam || !!data.certificate;
+        if (isGraduation) {
+          title.textContent = 'Selamat! Anda Dinyatakan Lulus Ujian Akhir';
+          desc.textContent = 'Kompetensi teknis Anda telah terverifikasi secara resmi. Sertifikat kelulusan digital Anda telah diterbitkan secara otomatis oleh sistem.';
+        } else if (data.exam_type === 'quiz') {
+          title.textContent = 'Selamat! Kuis Berhasil Diselesaikan';
+          desc.textContent = 'Pemahaman Anda pada modul ini sangat baik. Terus pertahankan ritme belajar Anda.';
+        } else {
+          title.textContent = 'Selamat! Anda Lulus Ujian Bab Ini';
+          desc.textContent = 'Evaluasi materi modul ini berhasil Anda selesaikan dengan nilai memuaskan.';
+        }
 
         score.className = 'score-circle pass';
 
         const certCode = data.certificate ? data.certificate.certificate_code : '';
+        const courseLearnUrl = data.course_id ? `/courses/${data.course_id}/learn` : '/dashboard';
+
         actions.innerHTML = `
           ${certCode ? `
             <a href="/verify-cert/${certCode}" class="btn btn-primary" target="_blank">
@@ -893,7 +906,12 @@
               <i class="fa-solid fa-file-pdf"></i>
               <span>Unduh PDF</span>
             </a>
-          ` : ''}
+          ` : `
+            <a href="${courseLearnUrl}" class="btn btn-primary">
+              <i class="fa-solid fa-book-open"></i>
+              <span>Lanjut Belajar Materi</span>
+            </a>
+          `}
           <a href="/dashboard" class="btn btn-outline">
             <i class="fa-solid fa-house"></i>
             <span>Kembali ke Dashboard</span>
