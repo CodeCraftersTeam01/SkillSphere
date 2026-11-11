@@ -360,16 +360,38 @@ async function createOrUpdateExam(req, res) {
       });
     }
 
-    // Validasi struktur setiap butir pertanyaan
+    // Validasi struktur setiap butir pertanyaan (mendukung format 'question' maupun 'question_text')
     for (let i = 0; i < questions.length; i++) {
       const q = questions[i];
-      if (!q.question || !Array.isArray(q.options) || q.options.length < 2 || !q.correct_answer) {
+      const qText = (q.question || q.question_text || '').trim();
+      const validOptions = Array.isArray(q.options) 
+        ? q.options.filter(o => String(o !== undefined && o !== null ? o : '').trim().length > 0)
+        : [];
+
+      if (!qText || validOptions.length < 2 || !q.correct_answer) {
         return res.status(400).json({
           success: false,
           message: `Pertanyaan nomor ${i + 1} tidak valid. Pastikan pertanyaan, minimal 2 opsi jawaban, dan kunci jawaban terisi.`,
         });
       }
     }
+
+    // Normalisasi struktur butir pertanyaan agar selalu memuat 'question' & 'question_text'
+    const normalizedQuestions = questions.map((q, idx) => {
+      const qText = (q.question || q.question_text || '').trim();
+      const rawOptions = Array.isArray(q.options) ? q.options : [];
+      const sanitizedOptions = rawOptions.map(opt => String(opt !== undefined && opt !== null ? opt : '').trim());
+      const correctAns = String(q.correct_answer || 'A').trim().toUpperCase();
+
+      return {
+        id: q.id || String(idx + 1),
+        question: qText,
+        question_text: qText,
+        options: sanitizedOptions,
+        correct_answer: correctAns,
+        points: Number(q.points) || 10,
+      };
+    });
 
     const sanitizedPassingScore = Math.max(10, Math.min(100, Number(passing_score) || 70));
     const sanitizedDuration = Math.max(5, Number(duration_minutes) || 60);
@@ -396,7 +418,7 @@ async function createOrUpdateExam(req, res) {
         section_id: parsedSectionId,
         passing_score: sanitizedPassingScore,
         duration_minutes: sanitizedDuration,
-        questions,
+        questions: normalizedQuestions,
       });
     }
     // B. Jika membuat ujian kelulusan akhir utama (single final exam fallback)
@@ -411,7 +433,7 @@ async function createOrUpdateExam(req, res) {
           description: description ? description.trim() : '',
           passing_score: sanitizedPassingScore,
           duration_minutes: sanitizedDuration,
-          questions,
+          questions: normalizedQuestions,
         },
       });
 
@@ -421,7 +443,7 @@ async function createOrUpdateExam(req, res) {
           description: description ? description.trim() : exam.description,
           passing_score: sanitizedPassingScore,
           duration_minutes: sanitizedDuration,
-          questions,
+          questions: normalizedQuestions,
         });
       }
     }
@@ -435,7 +457,7 @@ async function createOrUpdateExam(req, res) {
         description: description ? description.trim() : '',
         passing_score: sanitizedPassingScore,
         duration_minutes: sanitizedDuration,
-        questions,
+        questions: normalizedQuestions,
       });
       created = true;
     }

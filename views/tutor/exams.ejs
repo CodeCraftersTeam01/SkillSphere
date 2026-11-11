@@ -913,6 +913,15 @@
         }
       }
 
+      const formattedQuestions = questions.map((q, idx) => ({
+        id: q.id || String(idx + 1),
+        question: (q.question || q.question_text || '').trim(),
+        question_text: (q.question || q.question_text || '').trim(),
+        options: (q.options || []).map(o => String(o || '').trim()),
+        correct_answer: String(q.correct_answer || 'A').trim().toUpperCase(),
+        points: Number(q.points) || 10
+      }));
+
       try {
         const token = localStorage.getItem('token') || '';
         const res = await fetch('/api/exams', {
@@ -929,7 +938,7 @@
             description,
             passing_score: passingScore,
             duration_minutes: durationMinutes,
-            questions
+            questions: formattedQuestions
           })
         });
 

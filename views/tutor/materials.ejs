@@ -3342,17 +3342,27 @@
 
       for (let i = 0; i < portalQuestions.length; i++) {
         const q = portalQuestions[i];
-        if (!q.question_text || !q.question_text.trim()) {
+        const qText = (q.question_text || q.question || '').trim();
+        if (!qText) {
           showToast(`Pertanyaan pada Soal #${i + 1} belum diisi.`, 'error');
           return;
         }
         for (let j = 0; j < 4; j++) {
-          if (!q.options[j] || !q.options[j].trim()) {
+          if (!q.options[j] || !String(q.options[j]).trim()) {
             showToast(`Pilihan ${['A', 'B', 'C', 'D'][j]} pada Soal #${i + 1} belum diisi.`, 'error');
             return;
           }
         }
       }
+
+      const formattedQuestions = portalQuestions.map((q, idx) => ({
+        id: String(idx + 1),
+        question: (q.question_text || q.question || '').trim(),
+        question_text: (q.question_text || q.question || '').trim(),
+        options: (q.options || []).map(o => String(o || '').trim()),
+        correct_answer: String(q.correct_answer || 'A').trim().toUpperCase(),
+        points: 10
+      }));
 
       try {
         const payload = {
@@ -3364,7 +3374,7 @@
           description,
           passing_score: passingScore,
           duration_minutes: durationMinutes,
-          questions: portalQuestions
+          questions: formattedQuestions
         };
 
         const res = await fetch('/api/exams', {
