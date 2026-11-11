@@ -709,11 +709,62 @@
       align-items: center;
       justify-content: center;
       font-size: 12px;
-      transition: transform 0.15s ease;
+      transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), background 0.25s ease, box-shadow 0.25s ease;
+      position: relative;
+      flex-shrink: 0;
     }
 
     .ai-panel-send-btn:hover {
-      transform: scale(1.05);
+      transform: scale(1.08);
+    }
+
+    /* AI Assistant Mode (Equalizer Soundwave Style) */
+    .ai-panel-send-btn.assistant-mode {
+      background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
+      color: #FFFFFF;
+      box-shadow: 0 0 10px rgba(37, 99, 235, 0.45);
+    }
+
+    .ai-panel-send-btn.assistant-mode:hover {
+      background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%);
+      box-shadow: 0 0 16px rgba(59, 130, 246, 0.65);
+    }
+
+    .ai-panel-eq-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 2.2px;
+      height: 14px;
+      pointer-events: none;
+    }
+
+    .ai-panel-eq-bar {
+      width: 2.2px;
+      background: #FFFFFF;
+      border-radius: 999px;
+      animation: aiPanelEqWave 1.1s ease-in-out infinite alternate;
+      will-change: height, transform;
+    }
+
+    .ai-panel-eq-bar:nth-child(1) { height: 6px; animation-delay: 0.05s; }
+    .ai-panel-eq-bar:nth-child(2) { height: 13px; animation-delay: 0.3s; }
+    .ai-panel-eq-bar:nth-child(3) { height: 8px; animation-delay: 0.18s; }
+    .ai-panel-eq-bar:nth-child(4) { height: 12px; animation-delay: 0.45s; }
+
+    @keyframes aiPanelEqWave {
+      0% {
+        transform: scaleY(0.55);
+        opacity: 0.7;
+      }
+      50% {
+        transform: scaleY(1.15);
+        opacity: 1;
+      }
+      100% {
+        transform: scaleY(0.4);
+        opacity: 0.6;
+      }
     }
 
     /* Rich Prose Content & Supporting Media Components */
@@ -1946,9 +1997,15 @@
 
           <div class="ai-panel-footer">
             <div class="ai-panel-input-box">
-              <input type="text" id="ai-chat-input" class="ai-panel-input" placeholder="Tanyakan apa saja kepada Orion..." onkeypress="if(event.key==='Enter') sendAIChatMessage()">
-              <button class="ai-panel-send-btn" onclick="sendAIChatMessage()" title="Kirim Pesan ke Orion">
-                <i class="fas fa-paper-plane"></i>
+              <input type="text" id="ai-chat-input" class="ai-panel-input" placeholder="Tanyakan apa saja kepada Orion..." oninput="updateAIChatButtonState()" onkeypress="if(event.key==='Enter') handleAIChatInputSubmit()">
+              <button type="button" id="ai-panel-action-btn" class="ai-panel-send-btn assistant-mode" onclick="handleAIChatActionClick()" title="Mode Asisten AI: Jelaskan Materi Ini">
+                <div class="ai-panel-eq-icon" id="ai-panel-eq-icon">
+                  <span class="ai-panel-eq-bar"></span>
+                  <span class="ai-panel-eq-bar"></span>
+                  <span class="ai-panel-eq-bar"></span>
+                  <span class="ai-panel-eq-bar"></span>
+                </div>
+                <i class="fas fa-paper-plane" id="ai-panel-send-icon" style="display:none;"></i>
               </button>
             </div>
             <div style="display:flex; justify-content:space-between; align-items:center; font-size:10.5px; color:var(--text-tertiary); padding:0 4px;">
@@ -2777,12 +2834,50 @@
       return text;
     }
 
+    function updateAIChatButtonState() {
+      const input = document.getElementById('ai-chat-input');
+      const btn = document.getElementById('ai-panel-action-btn');
+      const eqIcon = document.getElementById('ai-panel-eq-icon');
+      const sendIcon = document.getElementById('ai-panel-send-icon');
+      if (!input || !btn) return;
+
+      const hasText = input.value.trim().length > 0;
+      if (hasText) {
+        btn.classList.remove('assistant-mode');
+        btn.title = 'Kirim Pesan ke Orion';
+        if (eqIcon) eqIcon.style.display = 'none';
+        if (sendIcon) sendIcon.style.display = 'inline-block';
+      } else {
+        btn.classList.add('assistant-mode');
+        btn.title = 'Mode Asisten AI: Jelaskan Materi Ini';
+        if (eqIcon) eqIcon.style.display = 'inline-flex';
+        if (sendIcon) sendIcon.style.display = 'none';
+      }
+    }
+
+    function handleAIChatActionClick() {
+      const input = document.getElementById('ai-chat-input');
+      if (input && input.value.trim().length > 0) {
+        sendAIChatMessage();
+      } else {
+        triggerAIAssistantExplanation();
+      }
+    }
+
+    function handleAIChatInputSubmit() {
+      const input = document.getElementById('ai-chat-input');
+      if (input && input.value.trim().length > 0) {
+        sendAIChatMessage();
+      }
+    }
+
     // Quick AI prompt trigger
     function quickAskAI(promptText) {
       toggleAISplitPanel(true);
       const input = document.getElementById('ai-chat-input');
       if (input) {
         input.value = promptText;
+        updateAIChatButtonState();
         sendAIChatMessage();
       }
     }
@@ -2802,6 +2897,7 @@
         </div>
       `;
       input.value = '';
+      updateAIChatButtonState();
       history.scrollTop = history.scrollHeight;
 
       // Add to conversation history
@@ -3220,6 +3316,97 @@
       }
     }
 
+    async function triggerAIAssistantExplanation() {
+      // 1. Reset dismissal flags
+      isDismissingAurora = false;
+
+      // 2. Stop any existing voice playback
+      stopAllAudioPlayback();
+
+      const overlay = document.getElementById('aurora-orb-overlay');
+      const sphereWrapper = document.getElementById('aurora-sphere-wrapper');
+      const sphereElem = document.getElementById('aurora-sphere-elem');
+      const choiceCard = document.getElementById('aurora-choice-card');
+
+      if (!overlay) return;
+
+      // Ensure sphereWrapper is restored into the center container inside overlay
+      const orbCenter = overlay.querySelector('.aurora-orb-center');
+      if (orbCenter && sphereWrapper && sphereWrapper.parentElement !== orbCenter) {
+        orbCenter.prepend(sphereWrapper);
+      }
+
+      // Reset sphereWrapper styling and transform
+      if (sphereWrapper) {
+        sphereWrapper.classList.remove('docked-corner', 'flying-to-target', 'loading');
+        sphereWrapper.style.transition = 'none';
+        sphereWrapper.style.transform = 'scale(1)';
+        sphereWrapper.style.opacity = '1';
+        sphereWrapper.style.animation = '';
+        void sphereWrapper.offsetWidth; // Reflow
+        sphereWrapper.style.transition = 'transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease';
+      }
+
+      // Reset sphereElem styling and classes
+      if (sphereElem) {
+        sphereElem.classList.remove('loading', 'speaking');
+        sphereElem.style.transition = 'none';
+        sphereElem.style.transform = 'scale(1)';
+        sphereElem.style.filter = '';
+        sphereElem.style.boxShadow = '';
+        sphereElem.style.animation = '';
+      }
+
+      // Reset face expression to neutral
+      setOrionFaceExpression('neutral');
+
+      // Unhide and reveal overlay
+      overlay.classList.remove('dismissed', 'fading-backdrop', 'docked-mode');
+      overlay.style.display = 'flex';
+      overlay.style.opacity = '1';
+      overlay.style.visibility = 'visible';
+
+      if (choiceCard) {
+        choiceCard.classList.remove('visible');
+      }
+
+      // Prepare greeting & question speech
+      const currentMat = (flatMaterials && flatMaterials[currentMaterialIndex]) ? flatMaterials[currentMaterialIndex] : null;
+      const courseTitle = (courseData && courseData.title) ? courseData.title : 'kursus ini';
+      const matTitle = (currentMat && currentMat.title) ? currentMat.title : courseTitle;
+
+      const lang = detectLanguage(matTitle);
+      const chosenVoice = getA11ySelectedVoice(lang);
+
+      let speechText = '';
+      if (lang === 'en' || chosenVoice.startsWith('en-')) {
+        speechText = `Hello! I am Orion. Would you like me to help explain "${matTitle}"?`;
+      } else {
+        speechText = `Halo! Saya Orion. Apakah Anda ingin saya bantu jelaskan materi "${matTitle}" ini?`;
+      }
+
+      // Update question text on choice card
+      const questionEl = overlay.querySelector('.aurora-choice-question');
+      if (questionEl) {
+        questionEl.textContent = `Sebelum memulai, apakah Anda ingin saya bantu jelaskan materi "${matTitle}" ini?`;
+      }
+
+      activePlaybackSessionId = Date.now();
+      const currentSessionId = activePlaybackSessionId;
+
+      // Play Orion speech with visualizer
+      try {
+        await playOrionSpeechText(speechText, lang, chosenVoice, false, currentSessionId);
+      } catch (err) {
+        fallbackSpeechSynthesis(speechText, lang, chosenVoice, false);
+      }
+
+      // Reveal choice card
+      if (choiceCard && currentSessionId === activePlaybackSessionId) {
+        choiceCard.classList.add('visible');
+      }
+    }
+
     function handleChoiceNo() {
       const card = document.getElementById('aurora-choice-card');
       if (card) {
@@ -3239,7 +3426,8 @@
       if (overlay) {
         overlay.classList.add('fading-backdrop');
         setTimeout(() => {
-          if (overlay.parentElement) overlay.remove();
+          overlay.classList.add('docked-mode', 'dismissed');
+          overlay.style.display = 'none';
         }, 600);
       }
 
@@ -4382,6 +4570,7 @@
     document.addEventListener('DOMContentLoaded', () => {
       loadClassroom();
       startOrionLifeMotions();
+      updateAIChatButtonState();
     });
   </script>
 
