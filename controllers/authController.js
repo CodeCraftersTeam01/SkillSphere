@@ -5,11 +5,47 @@ const { User, UserProfile, TutorWallet, TutorApplication, TutorCertification, Us
 const { sendOTPEmail } = require('../config/mailer');
 const { sendWhatsAppOTP, maskPhoneNumber } = require('../services/whatsappService');
 const { processAndConvertToWebP } = require('../utils/imageHelper');
+const { getCache, setCache } = require('../config/redis');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'skillsphere_super_secret_jwt_key_2026_production_ready';
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '24h';
 const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || 'skillsphere_super_secret_refresh_jwt_key_2026';
 const JWT_REFRESH_EXPIRES_IN = process.env.JWT_REFRESH_EXPIRES_IN || '7d';
+
+const OTP_COOLDOWN_SECONDS = 60;
+
+/**
+ * Anti-Spam: Check if user is on OTP cooldown.
+ * Returns remaining seconds if active, or 0 if allowed.
+ */
+const checkOtpCooldown = async (userIdOrEmail) => {
+  // Enforce in production/development, or in test when TEST_COOLDOWN flag is enabled
+  if (process.env.NODE_ENV === 'test' && process.env.TEST_COOLDOWN !== 'true') {
+    return 0;
+  }
+  try {
+    const key = `otp_cooldown:${userIdOrEmail}`;
+    const expiry = await getCache(key);
+    if (expiry && typeof expiry === 'number') {
+      const remainingMs = expiry - Date.now();
+      if (remainingMs > 0) {
+        return Math.ceil(remainingMs / 1000);
+      }
+    }
+  } catch (_) {}
+  return 0;
+};
+
+/**
+ * Set OTP cooldown for a user/email (defaults to 60 seconds)
+ */
+const setOtpCooldown = async (userIdOrEmail, seconds = OTP_COOLDOWN_SECONDS) => {
+  try {
+    const key = `otp_cooldown:${userIdOrEmail}`;
+    const expiryTimestamp = Date.now() + (seconds * 1000);
+    await setCache(key, expiryTimestamp, seconds);
+  } catch (_) {}
+};
 
 /**
  * Helper to parse browser and OS info from User-Agent
@@ -180,6 +216,7 @@ const register = async (req, res) => {
     if (!mailResult.success && phone_number) {
       try {
         const waResult = await sendWhatsAppOTP(phone_number, otpCode, newUser.name);
+        await setOtpCooldown(newUser.id);
         return res.status(201).json({
           success: true,
           requireOtp: true,
@@ -198,6 +235,7 @@ const register = async (req, res) => {
       }
     }
 
+    await setOtpCooldown(newUser.id);
     return res.status(201).json({
       success: true,
       requireOtp: true,
@@ -376,6 +414,16 @@ const resendOTP = async (req, res) => {
       });
     }
 
+    // Anti-Spam: Check 60-second OTP request cooldown
+    const cooldownRemaining = await checkOtpCooldown(user.id);
+    if (cooldownRemaining > 0) {
+      return res.status(429).json({
+        success: false,
+        retryAfter: cooldownRemaining,
+        message: `Mohon tunggu ${cooldownRemaining} detik sebelum meminta kode OTP kembali.`,
+      });
+    }
+
     const newOtp = Math.floor(100000 + Math.random() * 900000).toString();
     const otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
 
@@ -401,6 +449,7 @@ const resendOTP = async (req, res) => {
       }
 
       const waResult = await sendWhatsAppOTP(targetPhone, newOtp, user.name);
+      await setOtpCooldown(user.id);
 
       return res.status(200).json({
         success: true,
@@ -416,6 +465,7 @@ const resendOTP = async (req, res) => {
 
     // Default: Email (SMTP)
     const mailResult = await sendOTPEmail(normalizedEmail, newOtp, user.name);
+    await setOtpCooldown(user.id);
 
     // If SMTP mailer fails and user has phone_number, auto-fallback to WhatsApp!
     if (!mailResult.success && targetPhone) {
@@ -490,6 +540,16 @@ const sendOtpWhatsApp = async (req, res) => {
       });
     }
 
+    // Anti-Spam: Check 60-second OTP request cooldown
+    const cooldownRemaining = await checkOtpCooldown(user.id);
+    if (cooldownRemaining > 0) {
+      return res.status(429).json({
+        success: false,
+        retryAfter: cooldownRemaining,
+        message: `Mohon tunggu ${cooldownRemaining} detik sebelum meminta kode OTP kembali.`,
+      });
+    }
+
     const targetPhone = phone_number || (user.profile && user.profile.phone_number);
     if (!targetPhone) {
       return res.status(400).json({
@@ -518,6 +578,7 @@ const sendOtpWhatsApp = async (req, res) => {
     }
 
     const waResult = await sendWhatsAppOTP(targetPhone, activeOtp, user.name);
+    await setOtpCooldown(user.id);
 
     return res.status(200).json({
       success: true,

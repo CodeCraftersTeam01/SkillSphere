@@ -8,6 +8,10 @@ const {
   buildOtpMessage,
   sendWhatsAppOTP,
 } = require('../services/whatsappService');
+const { deleteCache } = require('../config/redis');
+
+process.env.NODE_ENV = 'test';
+process.env.TEST_COOLDOWN = 'true';
 
 /**
  * Helper to make HTTP JSON requests against test server
@@ -73,16 +77,16 @@ const runWhatsAppOtpTestSuite = async () => {
     console.log('  ✔ normalizePhoneNumber rejects invalid or truncated phone numbers.');
 
     // Masking test
-    const masked = maskPhoneNumber('085648077829');
-    assert.strictEqual(masked, '+6285****829');
-    console.log('  ✔ maskPhoneNumber masks middle digits properly (+6285****829).');
+    const masked = maskPhoneNumber('080001234567');
+    assert.strictEqual(masked, '+6280****567');
+    console.log('  ✔ maskPhoneNumber masks middle digits properly (+6280****567).');
 
     // Message building test (no em-dash)
     const msg = buildOtpMessage('123456', 'Lanvry');
     assert(msg.includes('SkillSphere AI'));
     assert(msg.includes('123456'));
     assert(msg.includes('Lanvry'));
-    assert(!msg.includes('—'), 'Message must not contain em-dash per project anti-slop rules.');
+    assert(!msg.includes('\u2014'), 'Message must not contain em-dash per project anti-slop rules.');
     console.log('  ✔ buildOtpMessage contains OTP, user name, and strictly avoids em-dash.');
 
     // 2. Integration Tests with Test HTTP Server
@@ -91,8 +95,9 @@ const runWhatsAppOtpTestSuite = async () => {
 
     // Clean up test user
     const testEmail = 'wa_tester@skillsphere.id';
-    const testPhone = '085648077829';
+    const testPhone = '080001234567';
     await User.destroy({ where: { email: testEmail } }).catch(() => {});
+    await deleteCache('otp_cooldown:*');
 
     server = app.listen(0);
     port = server.address().port;
@@ -126,7 +131,23 @@ const runWhatsAppOtpTestSuite = async () => {
     assert.strictEqual(user.profile.phone_number, testPhone);
     console.log('  ✔ DB Verification: UserProfile correctly stored phone_number.');
 
-    // Test B: Send OTP to WhatsApp via POST /api/auth/send-otp-whatsapp
+    // Anti-Spam Check: Calling send-otp-whatsapp immediately should be rejected with 429
+    const spamCheckRes = await request(port, {
+      path: '/api/auth/send-otp-whatsapp',
+      method: 'POST',
+    }, {
+      email: testEmail,
+      phone_number: testPhone,
+    });
+    assert.strictEqual(spamCheckRes.status, 429, 'Immediate OTP request should be blocked by 60s anti-spam cooldown');
+    assert.strictEqual(spamCheckRes.body.success, false);
+    assert(spamCheckRes.body.retryAfter > 0);
+    console.log(`  ✔ Anti-Spam Rate Limit: Rapid repeated OTP requests properly blocked with HTTP 429 (retryAfter: ${spamCheckRes.body.retryAfter}s).`);
+
+    // Simulate cooldown expiration
+    await deleteCache('otp_cooldown:*');
+
+    // Test B: Send OTP to WhatsApp via POST /api/auth/send-otp-whatsapp after cooldown
     const sendWaRes = await request(port, {
       path: '/api/auth/send-otp-whatsapp',
       method: 'POST',
@@ -141,7 +162,21 @@ const runWhatsAppOtpTestSuite = async () => {
     assert(sendWaRes.body.data.phone);
     console.log(`  ✔ POST /api/auth/send-otp-whatsapp: Successfully dispatched WhatsApp OTP (${sendWaRes.body.data.phone}).`);
 
-    // Test C: Resend OTP specifically via channel "whatsapp"
+    // Anti-Spam Check: Resend OTP immediately should also be blocked with 429
+    const spamResendCheck = await request(port, {
+      path: '/api/auth/resend-otp',
+      method: 'POST',
+    }, {
+      email: testEmail,
+      channel: 'whatsapp',
+    });
+    assert.strictEqual(spamResendCheck.status, 429, 'Immediate resend-otp should be blocked by 60s cooldown');
+    console.log('  ✔ Anti-Spam Rate Limit: Rapid repeated resend-otp properly blocked with HTTP 429.');
+
+    // Simulate cooldown expiration again
+    await deleteCache('otp_cooldown:*');
+
+    // Test C: Resend OTP specifically via channel "whatsapp" after cooldown
     const resendWaRes = await request(port, {
       path: '/api/auth/resend-otp',
       method: 'POST',

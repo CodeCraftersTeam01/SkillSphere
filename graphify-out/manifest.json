@@ -137,12 +137,6 @@
     "ast_hash": "58d717ed58f82be567350aa6edc9b98d",
     "semantic_hash": ""
   },
-  ".gemini/settings.json": {
-    "mtime": 1794366930.3247192,
-    "seen": 1794367136.87845,
-    "ast_hash": "3103f8db9faa64b359385ece926b7514",
-    "semantic_hash": ""
-  },
   "app.js": {
     "mtime": 1794577061.0545554,
     "seen": 1794577198.924312,
@@ -186,9 +180,9 @@
     "semantic_hash": ""
   },
   "controllers/authController.js": {
-    "mtime": 1794574234.8648095,
-    "seen": 1794574749.328695,
-    "ast_hash": "745363e5adc89fe27c7070b290cefe04",
+    "mtime": 1794578566.2397501,
+    "seen": 1794578746.2509298,
+    "ast_hash": "f3a49c88a7d084bca587497fa6cee17b",
     "semantic_hash": ""
   },
   "controllers/certificateController.js": {
@@ -750,9 +744,9 @@
     "semantic_hash": ""
   },
   "views/login.ejs": {
-    "mtime": 1794574537.7612445,
-    "seen": 1794574749.3288262,
-    "ast_hash": "df5959e94bff2b85f8e3018c2d3ce6bd",
+    "mtime": 1794578396.6010406,
+    "seen": 1794578746.251063,
+    "ast_hash": "d901df9f23018927dd3d718748c3811f",
     "semantic_hash": ""
   },
   "views/onboarding.ejs": {
@@ -774,9 +768,9 @@
     "semantic_hash": ""
   },
   "views/register.ejs": {
-    "mtime": 1794574400.2649884,
-    "seen": 1794574749.328832,
-    "ast_hash": "22a64f123882521e31e5503f1facfdaa",
+    "mtime": 1794578367.044581,
+    "seen": 1794578746.2510679,
+    "ast_hash": "62bcc83fea2f892103edf4940e33341f",
     "semantic_hash": ""
   },
   "views/roadmap.ejs": {
@@ -1067,12 +1061,6 @@
     "ast_hash": "37ceaffd29fc4307802456177c5fd6bd",
     "semantic_hash": ""
   },
-  ".user_uploaded/scaled_88984.jpg": {
-    "mtime": 1794365072.9552104,
-    "seen": 1794367136.878641,
-    "ast_hash": "4882894956c9f81bb04c8be35b2545a8",
-    "semantic_hash": ""
-  },
   "docs/screenshots/01_login_page.png": {
     "mtime": 1791171946.0,
     "seen": 1794367136.878643,
@@ -1170,15 +1158,15 @@
     "semantic_hash": ""
   },
   "services/whatsappService.js": {
-    "mtime": 1794574626.5695324,
-    "seen": 1794574749.328784,
-    "ast_hash": "6f7d86c07b3a6a635c69b59804ba430b",
+    "mtime": 1794578139.7425845,
+    "seen": 1794578746.25102,
+    "ast_hash": "4fa5937db91fa5d02efb87f58477071f",
     "semantic_hash": ""
   },
   "tests/whatsappOtp.test.js": {
-    "mtime": 1794574557.839707,
-    "seen": 1794574749.328809,
-    "ast_hash": "abec7f91b8395ec2247021609f9a88fe",
+    "mtime": 1794578734.0577588,
+    "seen": 1794578746.2510452,
+    "ast_hash": "b6617ade39f22391b1e00f7b9c8ffd01",
     "semantic_hash": ""
   },
   "tests/courseEditPublish.test.js": {

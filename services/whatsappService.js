@@ -74,6 +74,19 @@ Kode ini berlaku selama 10 menit. Jangan bagikan kode ini kepada siapapun demi k
  * @returns {Promise<{success: boolean, messageId?: string, phone: string}>}
  */
 const sendWhatsAppOTP = async (phone, otpCode, userName = 'Pengguna') => {
+  const normalizedPhone = normalizePhoneNumber(phone);
+
+  // If in automated test environment or dummy test number, simulate delivery without calling external gateway
+  if (process.env.NODE_ENV === 'test' || normalizedPhone.startsWith('628000') || normalizedPhone.startsWith('08000')) {
+    return {
+      success: true,
+      simulated: true,
+      messageId: `simulated-test-wa-${Date.now()}`,
+      phone: normalizedPhone,
+      maskedPhone: maskPhoneNumber(normalizedPhone),
+    };
+  }
+
   const gatewayUrl = process.env.WA_GATEWAY_URL || 'https://ubuntu.leopard-gila.ts.net/api/whatsapp/send';
   const apiKey = process.env.WA_API_KEY;
 
@@ -82,7 +95,6 @@ const sendWhatsAppOTP = async (phone, otpCode, userName = 'Pengguna') => {
     throw new Error('Konfigurasi API WhatsApp belum lengkap di server.');
   }
 
-  const normalizedPhone = normalizePhoneNumber(phone);
   const message = buildOtpMessage(otpCode, userName);
 
   try {
