@@ -93,7 +93,7 @@ if (process.env.NODE_ENV !== 'test') {
         await sequelize.query('SET FOREIGN_KEY_CHECKS = 0;');
         await sequelize.sync();
         try {
-          await sequelize.query("ALTER TABLE `courses` MODIFY COLUMN `status` ENUM('draft', 'published', 'archived', 'suspended') NOT NULL DEFAULT 'draft';");
+          await sequelize.query("ALTER TABLE `courses` MODIFY COLUMN `status` ENUM('draft', 'published', 'private', 'archived', 'suspended') NOT NULL DEFAULT 'draft';");
         } catch (_) {}
         await sequelize.query('SET FOREIGN_KEY_CHECKS = 1;');
       } else {

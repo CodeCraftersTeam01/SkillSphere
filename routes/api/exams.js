@@ -1,15 +1,43 @@
 const express = require('express');
 const router = express.Router();
+const jwt = require('jsonwebtoken');
+const { User, UserProfile } = require('../../models');
 const examController = require('../../controllers/examController');
 const { authenticateJWT, authorizeRoles } = require('../../middleware/auth');
 
-// Optional auth middleware agar siswa bisa load soal atau tutor load dengan kunci jawaban
-const optionalAuth = (req, res, next) => {
-  const authHeader = req.headers.authorization;
-  if (!authHeader) {
+const JWT_SECRET = process.env.JWT_SECRET || 'skillsphere_super_secret_jwt_key_2026_production_ready';
+
+// Optional auth middleware agar siswa & tutor bisa load soal tanpa terblokir jika token kedaluwarsa
+const optionalAuth = async (req, res, next) => {
+  try {
+    let token = null;
+    if (req.headers.authorization && req.headers.authorization.startsWith('Bearer ')) {
+      token = req.headers.authorization.split(' ')[1];
+    } else if (req.cookies && req.cookies.token) {
+      token = req.cookies.token;
+    }
+
+    if (!token || token === 'undefined' || token === 'null') {
+      req.user = null;
+      return next();
+    }
+
+    const decoded = jwt.verify(token, JWT_SECRET);
+    const user = await User.findByPk(decoded.id, {
+      include: [{ model: UserProfile, as: 'profile' }],
+      attributes: { exclude: ['password', 'refresh_token'] },
+    });
+
+    if (user && user.is_active) {
+      req.user = user;
+    } else {
+      req.user = null;
+    }
+    return next();
+  } catch (err) {
+    req.user = null;
     return next();
   }
-  return authenticateJWT(req, res, next);
 };
 
 // 1a. Ambil seluruh daftar ujian & kuis untuk suatu kursus

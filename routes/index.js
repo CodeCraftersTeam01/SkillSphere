@@ -125,6 +125,11 @@ router.get('/tutor/materials', function(req, res, next) {
   res.render('tutor/materials', { title: 'Portal Manajemen & Upload Materi | Tutor SkillSphere' });
 });
 
+/* GET Tutor Course Settings & Edit Portal */
+router.get(['/tutor/courses/edit', '/tutor/course/edit', '/tutor/edit-course', '/dashboard/tutor/courses/edit'], function(req, res, next) {
+  res.render('tutor/course-edit', { title: 'Edit & Pengaturan Kelas | Studio Pengajar SkillSphere AI' });
+});
+
 /* GET Tutor Exam Creator Portal (Sprint 4 - Satrio) */
 router.get(['/tutor/exams', '/tutor/exam-creator', '/dashboard/tutor/exams'], function(req, res, next) {
   res.render('tutor/exams', { title: 'Pembuat Ujian Kelulusan | Studio Pengajar SkillSphere AI' });

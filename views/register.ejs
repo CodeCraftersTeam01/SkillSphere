@@ -871,6 +871,23 @@
             </div>
 
             <div class="form-group">
+              <label for="reg-phone" class="form-label">
+                Nomor WhatsApp <span style="font-size: 11.5px; color: var(--text-tertiary); font-weight: normal;">(Opsional - alternatif jika email OTP terkendala)</span>
+              </label>
+              <div class="input-container">
+                <i class="fab fa-whatsapp input-icon-left" style="color: #25D366;"></i>
+                <input 
+                  type="tel" 
+                  id="reg-phone" 
+                  name="phone_number" 
+                  class="form-input has-icon-left" 
+                  placeholder="Contoh: 085648077829" 
+                  autocomplete="tel"
+                >
+              </div>
+            </div>
+
+            <div class="form-group">
               <label for="reg-password" class="form-label">Kata Sandi</label>
               <div class="input-container">
                 <i class="fas fa-lock input-icon-left"></i>
@@ -992,11 +1009,29 @@
           </div>
 
           <div class="resend-section">
-            <span>Tidak menerima email?</span>
+            <span id="resend-label">Tidak menerima email?</span>
             <button type="button" class="resend-btn" id="resend-otp-btn">
               <i class="fas fa-rotate-right" style="font-size: 11px;"></i>
               <span>Kirim Ulang (<span id="resend-timer">60</span>s)</span>
             </button>
+          </div>
+
+          <!-- Alternative WhatsApp OTP Fallback Option -->
+          <div class="otp-wa-fallback-box" id="otp-wa-fallback-box" style="margin-top: 14px; padding: 12px 14px; background: var(--bg-surface-subtle); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); text-align: center;">
+            <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">
+              <i class="fab fa-whatsapp" style="color: #25D366; font-size: 13px; margin-right: 4px;"></i> Email terkendala atau tidak masuk?
+            </div>
+            <button type="button" class="wa-action-btn" id="btn-switch-wa-otp" style="background: rgba(37, 211, 102, 0.12); color: #15803d; border: 1px solid rgba(37, 211, 102, 0.35); border-radius: var(--radius-full); padding: 7px 16px; font-size: 12.5px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s;">
+              <i class="fab fa-whatsapp" style="font-size: 14px; color: #25D366;"></i>
+              <span id="btn-switch-wa-text">Kirim Kode OTP via WhatsApp</span>
+            </button>
+            <div id="wa-phone-prompt" style="display: none; margin-top: 12px; text-align: left; background: var(--bg-surface); padding: 10px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
+              <label for="input-wa-prompt" style="display: block; font-size: 11.5px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px;">Nomor WhatsApp Tujuan:</label>
+              <div style="display: flex; gap: 6px;">
+                <input type="tel" id="input-wa-prompt" class="form-input" placeholder="Contoh: 085648077829" style="font-size: 12.5px; padding: 6px 10px; height: 36px;">
+                <button type="button" id="btn-submit-wa-prompt" class="submit-btn" style="width: auto; padding: 0 14px; font-size: 12px; height: 36px; white-space: nowrap; margin: 0;">Kirim OTP</button>
+              </div>
+            </div>
           </div>
 
           <div style="margin-top: 20px; text-align: center;">
@@ -1327,6 +1362,38 @@
 
     let registeredEmail = '';
     let registeredPassword = '';
+    let registeredPhone = '';
+    let activeOtpChannel = 'email';
+
+    function updateOtpScreenToWhatsApp(phoneNum) {
+      activeOtpChannel = 'whatsapp';
+      const claudeSymbol = document.querySelector('#step-otp .claude-symbol');
+      if (claudeSymbol) claudeSymbol.innerHTML = '<i class="fab fa-whatsapp" style="font-size: 20px; color: #25D366;"></i>';
+      const title = document.querySelector('#step-otp .login-title');
+      if (title) title.textContent = 'Verifikasi WhatsApp';
+      const sub = document.querySelector('#step-otp .login-subtitle');
+      if (sub) sub.textContent = 'Masukkan 6 digit kode OTP yang kami kirimkan ke WhatsApp Anda.';
+      targetEmailDisplay.textContent = phoneNum || registeredPhone || registeredEmail;
+      const hint = document.getElementById('otp-status-content');
+      if (hint) hint.innerHTML = '<span class="otp-hint-text"><i class="fab fa-whatsapp" style="color: #25D366;"></i> Masukkan 6 digit kode dari WhatsApp</span>';
+      const resendLbl = document.getElementById('resend-label');
+      if (resendLbl) resendLbl.textContent = 'Tidak menerima pesan WhatsApp?';
+    }
+
+    function updateOtpScreenToEmail(emailAddr) {
+      activeOtpChannel = 'email';
+      const claudeSymbol = document.querySelector('#step-otp .claude-symbol');
+      if (claudeSymbol) claudeSymbol.innerHTML = '<i class="fas fa-envelope-open-text" style="font-size: 18px;"></i>';
+      const title = document.querySelector('#step-otp .login-title');
+      if (title) title.textContent = 'Verifikasi Email';
+      const sub = document.querySelector('#step-otp .login-subtitle');
+      if (sub) sub.textContent = 'Masukkan 6 digit kode OTP yang kami kirimkan ke email Anda.';
+      targetEmailDisplay.textContent = emailAddr || registeredEmail;
+      const hint = document.getElementById('otp-status-content');
+      if (hint) hint.innerHTML = '<span class="otp-hint-text"><i class="fas fa-shield-halved"></i> Masukkan 6 digit kode dari email</span>';
+      const resendLbl = document.getElementById('resend-label');
+      if (resendLbl) resendLbl.textContent = 'Tidak menerima email?';
+    }
 
     registerForm.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -1334,6 +1401,7 @@
 
       const name = document.getElementById('reg-name').value.trim();
       const email = document.getElementById('reg-email').value.trim();
+      const phone = (document.getElementById('reg-phone')?.value || '').trim();
       const password = document.getElementById('reg-password').value;
       const role = roleInput.value;
 
@@ -1362,7 +1430,7 @@
         const response = await fetch('/api/auth/register', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name, email, password, role }),
+          body: JSON.stringify({ name, email, password, role, phone_number: phone }),
         });
 
         const result = await response.json();
@@ -1370,7 +1438,8 @@
         if (response.ok && result.success) {
           registeredEmail = email;
           registeredPassword = password;
-          targetEmailDisplay.textContent = email;
+          registeredPhone = phone;
+          activeOtpChannel = result.channel || 'email';
 
           // Pre-save basic registration credentials in localStorage
           localStorage.setItem('skillsphere_last_registered_email', email);
@@ -1381,7 +1450,14 @@
             stepRegister.style.display = 'none';
             stepOtp.style.display = 'block';
             stepOtp.className = 'framer-enter-up';
-            showAlert('alert-banner-otp', 'success', result.message || 'Kode OTP telah dikirim ke email Anda.');
+
+            if (activeOtpChannel === 'whatsapp') {
+              updateOtpScreenToWhatsApp(result.data?.phone_number || phone);
+            } else {
+              updateOtpScreenToEmail(email);
+            }
+
+            showAlert('alert-banner-otp', 'success', result.message || 'Kode OTP telah dikirimkan.');
             startResendCountdown();
             resetOtpDeck();
             setTimeout(() => otpBoxes[0].focus(), 300);
@@ -1654,11 +1730,20 @@
         const res = await fetch('/api/auth/resend-otp', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: registeredEmail }),
+          body: JSON.stringify({
+            email: registeredEmail,
+            channel: activeOtpChannel,
+            phone_number: registeredPhone,
+          }),
         });
         const result = await res.json();
         if (res.ok && result.success) {
-          showAlert('alert-banner-otp', 'success', 'Kode OTP baru telah dikirim ke email.');
+          if (result.channel === 'whatsapp') {
+            updateOtpScreenToWhatsApp(result.data?.phone || registeredPhone);
+          } else {
+            updateOtpScreenToEmail(registeredEmail);
+          }
+          showAlert('alert-banner-otp', 'success', result.message || 'Kode OTP baru telah dikirim.');
           resetOtpDeck();
           startResendCountdown();
           otpBoxes[0].focus();
@@ -1671,6 +1756,75 @@
         resendOtpBtn.disabled = false;
       }
     });
+
+    // --- WhatsApp OTP Fallback Interaction ---
+    const btnSwitchWaOtp = document.getElementById('btn-switch-wa-otp');
+    const waPhonePrompt = document.getElementById('wa-phone-prompt');
+    const inputWaPrompt = document.getElementById('input-wa-prompt');
+    const btnSubmitWaPrompt = document.getElementById('btn-submit-wa-prompt');
+
+    async function requestWhatsAppOtp(phone) {
+      try {
+        if (btnSwitchWaOtp) btnSwitchWaOtp.disabled = true;
+        if (btnSubmitWaPrompt) btnSubmitWaPrompt.disabled = true;
+        const btnText = document.getElementById('btn-switch-wa-text');
+        if (btnText) btnText.textContent = 'Mengirim via WhatsApp...';
+
+        const res = await fetch('/api/auth/send-otp-whatsapp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: registeredEmail, phone_number: phone }),
+        });
+
+        const result = await res.json();
+        if (res.ok && result.success) {
+          registeredPhone = phone;
+          updateOtpScreenToWhatsApp(result.data?.phone || phone);
+          showAlert('alert-banner-otp', 'success', result.message || 'Kode OTP telah berhasil dikirim ke nomor WhatsApp Anda.');
+          if (waPhonePrompt) waPhonePrompt.style.display = 'none';
+          resetOtpDeck();
+          startResendCountdown();
+          setTimeout(() => otpBoxes[0].focus(), 300);
+        } else {
+          showAlert('alert-banner-otp', 'danger', result.message || 'Gagal mengirim OTP via WhatsApp.');
+        }
+      } catch (err) {
+        showAlert('alert-banner-otp', 'danger', 'Gagal terhubung ke layanan WhatsApp gateway.');
+      } finally {
+        if (btnSwitchWaOtp) btnSwitchWaOtp.disabled = false;
+        if (btnSubmitWaPrompt) btnSubmitWaPrompt.disabled = false;
+        const btnText = document.getElementById('btn-switch-wa-text');
+        if (btnText) btnText.textContent = 'Kirim Ulang via WhatsApp';
+      }
+    }
+
+    if (btnSwitchWaOtp) {
+      btnSwitchWaOtp.addEventListener('click', async () => {
+        if (registeredPhone && registeredPhone.length >= 10) {
+          await requestWhatsAppOtp(registeredPhone);
+        } else {
+          // Toggle input prompt
+          if (waPhonePrompt) {
+            const isHidden = waPhonePrompt.style.display === 'none';
+            waPhonePrompt.style.display = isHidden ? 'block' : 'none';
+            if (isHidden && inputWaPrompt) {
+              inputWaPrompt.focus();
+            }
+          }
+        }
+      });
+    }
+
+    if (btnSubmitWaPrompt) {
+      btnSubmitWaPrompt.addEventListener('click', async () => {
+        const enteredPhone = (inputWaPrompt ? inputWaPrompt.value : '').trim();
+        if (!enteredPhone || enteredPhone.length < 10) {
+          showAlert('alert-banner-otp', 'danger', 'Harap masukkan nomor WhatsApp yang valid (minimal 10 digit).');
+          return;
+        }
+        await requestWhatsAppOtp(enteredPhone);
+      });
+    }
 
     // Back to registration form
     document.getElementById('back-to-reg-btn').addEventListener('click', () => {

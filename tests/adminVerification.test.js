@@ -72,7 +72,7 @@ async function runAdminVerificationTests() {
     await sequelize.sync();
     if (sequelize.getDialect() === 'mysql') {
       try {
-        await sequelize.query("ALTER TABLE `courses` MODIFY COLUMN `status` ENUM('draft', 'published', 'archived', 'suspended') NOT NULL DEFAULT 'draft';");
+        await sequelize.query("ALTER TABLE `courses` MODIFY COLUMN `status` ENUM('draft', 'published', 'private', 'archived', 'suspended') NOT NULL DEFAULT 'draft';");
       } catch (_) {}
     }
 
