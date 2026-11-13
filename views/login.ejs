@@ -698,11 +698,29 @@
           </div>
 
           <div class="resend-section">
-            <span>Tidak menerima kode?</span>
+            <span id="login-resend-label">Tidak menerima kode?</span>
             <button type="button" class="resend-btn" id="login-resend-otp-btn">
               <i class="fas fa-rotate-right" style="font-size: 11px;"></i>
               <span>Kirim Ulang (<span id="login-resend-timer">60</span>s)</span>
             </button>
+          </div>
+
+          <!-- Alternative WhatsApp OTP Fallback Option for Login -->
+          <div class="otp-wa-fallback-box" id="login-otp-wa-fallback-box" style="margin-top: 14px; padding: 12px 14px; background: var(--bg-surface-subtle); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); text-align: center;">
+            <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">
+              <i class="fab fa-whatsapp" style="color: #25D366; font-size: 13px; margin-right: 4px;"></i> Email terkendala atau tidak masuk?
+            </div>
+            <button type="button" class="wa-action-btn" id="login-btn-switch-wa-otp" style="background: rgba(37, 211, 102, 0.12); color: #15803d; border: 1px solid rgba(37, 211, 102, 0.35); border-radius: var(--radius-full); padding: 7px 16px; font-size: 12.5px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s;">
+              <i class="fab fa-whatsapp" style="font-size: 14px; color: #25D366;"></i>
+              <span id="login-btn-switch-wa-text">Kirim Kode OTP via WhatsApp</span>
+            </button>
+            <div id="login-wa-phone-prompt" style="display: none; margin-top: 12px; text-align: left; background: var(--bg-surface); padding: 10px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
+              <label for="login-input-wa-prompt" style="display: block; font-size: 11.5px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px;">Nomor WhatsApp Tujuan:</label>
+              <div style="display: flex; gap: 6px;">
+                <input type="tel" id="login-input-wa-prompt" class="form-input" placeholder="Contoh: 085648077829" style="font-size: 12.5px; padding: 6px 10px; height: 36px;">
+                <button type="button" id="login-btn-submit-wa-prompt" class="submit-btn" style="width: auto; padding: 0 14px; font-size: 12px; height: 36px; white-space: nowrap; margin: 0;">Kirim OTP</button>
+              </div>
+            </div>
           </div>
 
           <div style="margin-top: 20px; text-align: center;">
@@ -996,6 +1014,43 @@
       alertBanner.style.display = 'none';
     }
 
+    let activeLoginOtpEmail = '';
+    let activeLoginPassword = '';
+    let activeLoginOtpChannel = 'email';
+    let activeLoginPhone = '';
+
+    function updateLoginOtpScreenToWhatsApp(phoneNum) {
+      activeLoginOtpChannel = 'whatsapp';
+      const claudeSymbol = document.querySelector('#step-login-otp .claude-symbol');
+      if (claudeSymbol) claudeSymbol.innerHTML = '<i class="fab fa-whatsapp" style="font-size: 20px; color: #25D366;"></i>';
+      const title = document.querySelector('#step-login-otp .login-title');
+      if (title) title.textContent = 'Verifikasi WhatsApp';
+      const sub = document.querySelector('#step-login-otp .login-subtitle');
+      if (sub) sub.textContent = 'Masukkan 6 digit kode OTP yang kami kirimkan ke WhatsApp Anda.';
+      const targetDisplay = document.getElementById('target-otp-email');
+      if (targetDisplay) targetDisplay.textContent = phoneNum || activeLoginPhone || activeLoginOtpEmail;
+      const hint = document.getElementById('login-otp-status-content');
+      if (hint) hint.innerHTML = '<span class="otp-hint-text"><i class="fab fa-whatsapp" style="color: #25D366;"></i> Masukkan 6 digit kode dari WhatsApp</span>';
+      const resendLbl = document.getElementById('login-resend-label');
+      if (resendLbl) resendLbl.textContent = 'Tidak menerima pesan WhatsApp?';
+    }
+
+    function updateLoginOtpScreenToEmail(emailAddr) {
+      activeLoginOtpChannel = 'email';
+      const claudeSymbol = document.querySelector('#step-login-otp .claude-symbol');
+      if (claudeSymbol) claudeSymbol.innerHTML = '<i class="fas fa-shield-halved" style="font-size: 18px;"></i>';
+      const title = document.querySelector('#step-login-otp .login-title');
+      if (title) title.textContent = 'Verifikasi Keamanan';
+      const sub = document.querySelector('#step-login-otp .login-subtitle');
+      if (sub) sub.textContent = 'Konfirmasi perangkat baru dengan 6 digit kode OTP.';
+      const targetDisplay = document.getElementById('target-otp-email');
+      if (targetDisplay) targetDisplay.textContent = emailAddr || activeLoginOtpEmail;
+      const hint = document.getElementById('login-otp-status-content');
+      if (hint) hint.innerHTML = '<span class="otp-hint-text"><i class="fas fa-shield-halved"></i> Masukkan 6 digit kode dari email</span>';
+      const resendLbl = document.getElementById('login-resend-label');
+      if (resendLbl) resendLbl.textContent = 'Tidak menerima kode?';
+    }
+
     async function submitLoginForm() {
       hideAlert();
 
@@ -1028,6 +1083,8 @@
         if (result.requireOtp || result.require_otp) {
           activeLoginOtpEmail = result.email || email;
           activeLoginPassword = password;
+          activeLoginOtpChannel = result.channel || 'email';
+          activeLoginPhone = result.phone || '';
           submitBtn.disabled = false;
           btnSpinner.style.display = 'none';
           btnText.innerHTML = '<i class="fas fa-right-to-bracket" style="margin-right: 6px;"></i> Masuk ke SkillSphere';
@@ -1040,8 +1097,14 @@
             stepLogin.style.display = 'none';
             stepLoginOtp.style.display = 'block';
             stepLoginOtp.className = 'framer-enter-up';
-            document.getElementById('target-otp-email').textContent = activeLoginOtpEmail;
-            showLoginOtpAlert('success', result.message || 'Masukkan kode OTP 6-digit yang dikirim ke email.');
+
+            if (activeLoginOtpChannel === 'whatsapp') {
+              updateLoginOtpScreenToWhatsApp(result.phone);
+            } else {
+              updateLoginOtpScreenToEmail(activeLoginOtpEmail);
+            }
+
+            showLoginOtpAlert('success', result.message || 'Masukkan kode OTP 6-digit.');
             startLoginOtpResendCountdown();
             resetLoginOtpDeck();
             setTimeout(() => loginOtpBoxes[0].focus(), 300);
@@ -1122,8 +1185,6 @@
     // =========================================================
     // --- 5. Pending OTP Card Deck Verification Logic ---
     // =========================================================
-    let activeLoginOtpEmail = '';
-    let activeLoginPassword = '';
     let isLoginVerifying = false;
 
     const loginOtpContainer = document.getElementById('login-otp-container');
@@ -1389,11 +1450,20 @@
         const res = await fetch('/api/auth/resend-otp', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: activeLoginOtpEmail }),
+          body: JSON.stringify({
+            email: activeLoginOtpEmail,
+            channel: activeLoginOtpChannel,
+            phone_number: activeLoginPhone,
+          }),
         });
         const result = await res.json();
         if (res.ok && result.success) {
-          showLoginOtpAlert('success', 'Kode OTP baru telah dikirim ke email.');
+          if (result.channel === 'whatsapp') {
+            updateLoginOtpScreenToWhatsApp(result.data?.phone || activeLoginPhone);
+          } else {
+            updateLoginOtpScreenToEmail(activeLoginOtpEmail);
+          }
+          showLoginOtpAlert('success', result.message || 'Kode OTP baru telah berhasil dikirim.');
           resetLoginOtpDeck();
           startLoginOtpResendCountdown();
           loginOtpBoxes[0].focus();
@@ -1406,6 +1476,72 @@
         loginResendBtn.disabled = false;
       }
     });
+
+    // --- WhatsApp OTP Fallback for Login ---
+    const loginBtnSwitchWa = document.getElementById('login-btn-switch-wa-otp');
+    const loginWaPrompt = document.getElementById('login-wa-phone-prompt');
+    const loginInputWa = document.getElementById('login-input-wa-prompt');
+    const loginBtnSubmitWa = document.getElementById('login-btn-submit-wa-prompt');
+
+    async function requestLoginWhatsAppOtp(phone) {
+      try {
+        if (loginBtnSwitchWa) loginBtnSwitchWa.disabled = true;
+        if (loginBtnSubmitWa) loginBtnSubmitWa.disabled = true;
+        const btnText = document.getElementById('login-btn-switch-wa-text');
+        if (btnText) btnText.textContent = 'Mengirim via WhatsApp...';
+
+        const res = await fetch('/api/auth/send-otp-whatsapp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: activeLoginOtpEmail, phone_number: phone }),
+        });
+
+        const result = await res.json();
+        if (res.ok && result.success) {
+          activeLoginPhone = phone;
+          updateLoginOtpScreenToWhatsApp(result.data?.phone || phone);
+          showLoginOtpAlert('success', result.message || 'Kode OTP telah berhasil dikirim ke nomor WhatsApp Anda.');
+          if (loginWaPrompt) loginWaPrompt.style.display = 'none';
+          resetLoginOtpDeck();
+          startLoginOtpResendCountdown();
+          setTimeout(() => loginOtpBoxes[0].focus(), 300);
+        } else {
+          showLoginOtpAlert('danger', result.message || 'Gagal mengirim OTP via WhatsApp.');
+        }
+      } catch (err) {
+        showLoginOtpAlert('danger', 'Gagal terhubung ke layanan WhatsApp gateway.');
+      } finally {
+        if (loginBtnSwitchWa) loginBtnSwitchWa.disabled = false;
+        if (loginBtnSubmitWa) loginBtnSubmitWa.disabled = false;
+        const btnText = document.getElementById('login-btn-switch-wa-text');
+        if (btnText) btnText.textContent = 'Kirim Ulang via WhatsApp';
+      }
+    }
+
+    if (loginBtnSwitchWa) {
+      loginBtnSwitchWa.addEventListener('click', async () => {
+        if (activeLoginPhone && activeLoginPhone.length >= 10) {
+          await requestLoginWhatsAppOtp(activeLoginPhone);
+        } else {
+          if (loginWaPrompt) {
+            const isHidden = loginWaPrompt.style.display === 'none';
+            loginWaPrompt.style.display = isHidden ? 'block' : 'none';
+            if (isHidden && loginInputWa) loginInputWa.focus();
+          }
+        }
+      });
+    }
+
+    if (loginBtnSubmitWa) {
+      loginBtnSubmitWa.addEventListener('click', async () => {
+        const enteredPhone = (loginInputWa ? loginInputWa.value : '').trim();
+        if (!enteredPhone || enteredPhone.length < 10) {
+          showLoginOtpAlert('danger', 'Harap masukkan nomor WhatsApp yang valid (minimal 10 digit).');
+          return;
+        }
+        await requestLoginWhatsAppOtp(enteredPhone);
+      });
+    }
 
     // Back to Login Form
     document.getElementById('back-to-login-form-btn').addEventListener('click', () => {

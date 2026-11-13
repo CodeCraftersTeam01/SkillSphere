@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const { Op } = require('sequelize');
 const { User, UserProfile, TutorWallet, TutorApplication, TutorCertification, UserDevice, sequelize } = require('../models');
 const { sendOTPEmail } = require('../config/mailer');
+const { sendWhatsAppOTP, maskPhoneNumber } = require('../services/whatsappService');
 const { processAndConvertToWebP } = require('../utils/imageHelper');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'skillsphere_super_secret_jwt_key_2026_production_ready';
@@ -74,7 +75,10 @@ const register = async (req, res) => {
     const normalizedEmail = (email || '').trim().toLowerCase();
 
     // 1. Check duplicate email
-    const existingUser = await User.findOne({ where: { email: normalizedEmail } });
+    const existingUser = await User.findOne({
+      where: { email: normalizedEmail },
+      include: [{ model: UserProfile, as: 'profile' }],
+    });
     if (existingUser) {
       await t.rollback();
       // If user registered but not verified yet, resend OTP
@@ -82,13 +86,31 @@ const register = async (req, res) => {
         const newOtp = Math.floor(100000 + Math.random() * 900000).toString();
         const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
         await existingUser.update({ otp_code: newOtp, otp_expires_at: expiresAt });
-        await sendOTPEmail(normalizedEmail, newOtp, existingUser.name);
+
+        const targetPhone = phone_number || (existingUser.profile && existingUser.profile.phone_number);
+        const mailResult = await sendOTPEmail(normalizedEmail, newOtp, existingUser.name);
+
+        if (!mailResult.success && targetPhone) {
+          try {
+            const waRes = await sendWhatsAppOTP(targetPhone, newOtp, existingUser.name);
+            return res.status(200).json({
+              success: true,
+              requireOtp: true,
+              channel: 'whatsapp',
+              message: `Akun Anda belum diverifikasi. Karena pengiriman email via SMTP terkendala, kode OTP baru telah dikirim ke WhatsApp Anda (${waRes.maskedPhone}).`,
+              data: { email: normalizedEmail, channel: 'whatsapp', phone: waRes.maskedPhone },
+            });
+          } catch (waErr) {
+            console.error('WhatsApp fallback error on re-register:', waErr.message);
+          }
+        }
 
         return res.status(200).json({
           success: true,
           requireOtp: true,
+          channel: 'email',
           message: 'Akun Anda belum diverifikasi. Kode OTP baru telah dikirim ke email Anda.',
-          data: { email: normalizedEmail },
+          data: { email: normalizedEmail, channel: 'email' },
         });
       }
 
@@ -151,16 +173,41 @@ const register = async (req, res) => {
 
     await t.commit();
 
-    // Send OTP via SMTP
-    await sendOTPEmail(normalizedEmail, otpCode, newUser.name);
+    // Primary: Send OTP via SMTP (email)
+    const mailResult = await sendOTPEmail(normalizedEmail, otpCode, newUser.name);
+
+    // Fallback: If SMTP fails and user provided phone_number, auto-fallback to WhatsApp!
+    if (!mailResult.success && phone_number) {
+      try {
+        const waResult = await sendWhatsAppOTP(phone_number, otpCode, newUser.name);
+        return res.status(201).json({
+          success: true,
+          requireOtp: true,
+          channel: 'whatsapp',
+          fallbackTriggered: true,
+          message: `Pendaftaran berhasil. Karena pengiriman email via SMTP mengalami kendala, kode OTP telah dikirimkan ke WhatsApp Anda (${waResult.maskedPhone}).`,
+          data: {
+            email: normalizedEmail,
+            name: newUser.name,
+            phone_number: waResult.maskedPhone,
+            channel: 'whatsapp',
+          },
+        });
+      } catch (waErr) {
+        console.error('❌ [WhatsApp Fallback Error]:', waErr.message);
+      }
+    }
 
     return res.status(201).json({
       success: true,
       requireOtp: true,
+      channel: 'email',
       message: 'Pendaftaran berhasil! Kode verifikasi OTP telah dikirimkan ke email Anda.',
       data: {
         email: normalizedEmail,
         name: newUser.name,
+        phone_number: phone_number ? maskPhoneNumber(phone_number) : null,
+        channel: 'email',
       },
     });
   } catch (error) {
@@ -296,11 +343,11 @@ const verifyOTP = async (req, res) => {
 };
 
 /**
- * Resend OTP Code
+ * Resend OTP Code (Supports Email SMTP and WhatsApp Gateway)
  */
 const resendOTP = async (req, res) => {
   try {
-    const { email } = req.body;
+    const { email, channel = 'email', phone_number } = req.body;
 
     if (!email) {
       return res.status(400).json({
@@ -310,7 +357,10 @@ const resendOTP = async (req, res) => {
     }
 
     const normalizedEmail = email.trim().toLowerCase();
-    const user = await User.findOne({ where: { email: normalizedEmail } });
+    const user = await User.findOne({
+      where: { email: normalizedEmail },
+      include: [{ model: UserProfile, as: 'profile' }],
+    });
 
     if (!user) {
       return res.status(404).json({
@@ -334,17 +384,156 @@ const resendOTP = async (req, res) => {
       otp_expires_at: otpExpiresAt,
     });
 
-    await sendOTPEmail(normalizedEmail, newOtp, user.name);
+    const targetPhone = phone_number || (user.profile && user.profile.phone_number);
+
+    // If channel is explicitly whatsapp
+    if (channel === 'whatsapp') {
+      if (!targetPhone) {
+        return res.status(400).json({
+          success: false,
+          requirePhone: true,
+          message: 'Nomor WhatsApp belum terdaftar. Silakan masukkan nomor WhatsApp Anda.',
+        });
+      }
+
+      if (phone_number && user.profile && user.profile.phone_number !== phone_number.trim()) {
+        await user.profile.update({ phone_number: phone_number.trim() });
+      }
+
+      const waResult = await sendWhatsAppOTP(targetPhone, newOtp, user.name);
+
+      return res.status(200).json({
+        success: true,
+        channel: 'whatsapp',
+        message: `Kode OTP baru telah berhasil dikirim ke nomor WhatsApp Anda (${waResult.maskedPhone}).`,
+        data: {
+          email: normalizedEmail,
+          channel: 'whatsapp',
+          phone: waResult.maskedPhone,
+        },
+      });
+    }
+
+    // Default: Email (SMTP)
+    const mailResult = await sendOTPEmail(normalizedEmail, newOtp, user.name);
+
+    // If SMTP mailer fails and user has phone_number, auto-fallback to WhatsApp!
+    if (!mailResult.success && targetPhone) {
+      try {
+        const waResult = await sendWhatsAppOTP(targetPhone, newOtp, user.name);
+        return res.status(200).json({
+          success: true,
+          channel: 'whatsapp',
+          fallbackTriggered: true,
+          message: `Pengiriman email via SMTP mengalami kendala. Kode OTP baru telah otomatis dikirim ke nomor WhatsApp Anda (${waResult.maskedPhone}).`,
+          data: {
+            email: normalizedEmail,
+            channel: 'whatsapp',
+            phone: waResult.maskedPhone,
+          },
+        });
+      } catch (waErr) {
+        console.error('WhatsApp fallback also failed during resend:', waErr.message);
+      }
+    }
 
     return res.status(200).json({
       success: true,
+      channel: 'email',
       message: 'Kode OTP baru telah berhasil dikirim ke email Anda.',
+      data: {
+        email: normalizedEmail,
+        channel: 'email',
+      },
     });
   } catch (error) {
     console.error('Error resending OTP:', error);
     return res.status(500).json({
       success: false,
-      message: 'Gagal mengirim ulang kode OTP.',
+      message: error.message || 'Gagal mengirim ulang kode OTP.',
+      error: error.message,
+    });
+  }
+};
+
+/**
+ * Send / Switch OTP directly to WhatsApp
+ */
+const sendOtpWhatsApp = async (req, res) => {
+  try {
+    const { email, phone_number } = req.body;
+
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email wajib diisi.',
+      });
+    }
+
+    const normalizedEmail = email.trim().toLowerCase();
+    const user = await User.findOne({
+      where: { email: normalizedEmail },
+      include: [{ model: UserProfile, as: 'profile' }],
+    });
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'Akun dengan email tersebut tidak ditemukan.',
+      });
+    }
+
+    if (user.is_verified && !user.two_factor_enabled) {
+      return res.status(400).json({
+        success: false,
+        message: 'Akun sudah terverifikasi. Silakan langsung login.',
+      });
+    }
+
+    const targetPhone = phone_number || (user.profile && user.profile.phone_number);
+    if (!targetPhone) {
+      return res.status(400).json({
+        success: false,
+        requirePhone: true,
+        message: 'Nomor WhatsApp wajib diisi.',
+      });
+    }
+
+    let activeOtp = user.otp_code;
+    const isExpired = !user.otp_expires_at || new Date() > new Date(user.otp_expires_at);
+    if (!activeOtp || isExpired) {
+      activeOtp = Math.floor(100000 + Math.random() * 900000).toString();
+      const otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000);
+      await user.update({ otp_code: activeOtp, otp_expires_at: otpExpiresAt });
+    }
+
+    if (phone_number && user.profile) {
+      await user.profile.update({ phone_number: phone_number.trim() });
+    } else if (phone_number && !user.profile) {
+      await UserProfile.create({
+        user_id: user.id,
+        full_name: user.name,
+        phone_number: phone_number.trim(),
+      });
+    }
+
+    const waResult = await sendWhatsAppOTP(targetPhone, activeOtp, user.name);
+
+    return res.status(200).json({
+      success: true,
+      channel: 'whatsapp',
+      message: `Kode verifikasi OTP telah berhasil dikirim ke nomor WhatsApp Anda (${waResult.maskedPhone}).`,
+      data: {
+        email: normalizedEmail,
+        channel: 'whatsapp',
+        phone: waResult.maskedPhone,
+      },
+    });
+  } catch (error) {
+    console.error('Error sending WhatsApp OTP:', error);
+    return res.status(500).json({
+      success: false,
+      message: error.message || 'Gagal mengirim kode OTP ke WhatsApp.',
       error: error.message,
     });
   }
@@ -383,20 +572,39 @@ const login = async (req, res) => {
 
     if (!user.is_verified) {
       let activeOtp = user.otp_code;
+      let channelUsed = 'email';
+      let phoneDisplay = null;
+
       if (!activeOtp || (user.otp_expires_at && new Date() > new Date(user.otp_expires_at))) {
         activeOtp = Math.floor(100000 + Math.random() * 900000).toString();
         const otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000);
         await user.update({ otp_code: activeOtp, otp_expires_at: otpExpiresAt });
-        await sendOTPEmail(normalizedEmail, activeOtp, user.name);
+
+        const mailResult = await sendOTPEmail(normalizedEmail, activeOtp, user.name);
+        const userPhone = user.profile && user.profile.phone_number;
+
+        if (!mailResult.success && userPhone) {
+          try {
+            const waRes = await sendWhatsAppOTP(userPhone, activeOtp, user.name);
+            channelUsed = 'whatsapp';
+            phoneDisplay = waRes.maskedPhone;
+          } catch (waErr) {
+            console.error('WhatsApp fallback error in login:', waErr.message);
+          }
+        }
       }
 
       return res.status(403).json({
         success: false,
         requireOtp: true,
+        channel: channelUsed,
         email: normalizedEmail,
         name: user.name,
         role: user.role,
-        message: 'Akun Anda belum menyelesaikan verifikasi OTP. Silakan masukkan 6 digit kode OTP yang telah dikirim ke email.',
+        phone: phoneDisplay,
+        message: channelUsed === 'whatsapp'
+          ? `Akun Anda belum menyelesaikan verifikasi OTP. Kode OTP telah dikirimkan ke nomor WhatsApp Anda (${phoneDisplay}).`
+          : 'Akun Anda belum menyelesaikan verifikasi OTP. Silakan masukkan 6 digit kode OTP yang telah dikirim ke email.',
       });
     }
 
@@ -440,18 +648,36 @@ const login = async (req, res) => {
         const activeOtp = Math.floor(100000 + Math.random() * 900000).toString();
         const otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000);
         await user.update({ otp_code: activeOtp, otp_expires_at: otpExpiresAt });
-        await sendOTPEmail(normalizedEmail, activeOtp, user.name);
+
+        let channelUsed = 'email';
+        let phoneDisplay = null;
+        const mailResult = await sendOTPEmail(normalizedEmail, activeOtp, user.name);
+        const userPhone = user.profile && user.profile.phone_number;
+
+        if (!mailResult.success && userPhone) {
+          try {
+            const waRes = await sendWhatsAppOTP(userPhone, activeOtp, user.name);
+            channelUsed = 'whatsapp';
+            phoneDisplay = waRes.maskedPhone;
+          } catch (waErr) {
+            console.error('WhatsApp fallback error in 2FA:', waErr.message);
+          }
+        }
 
         return res.status(200).json({
           success: true,
           requireOtp: true,
           isTwoFactor: true,
           isNewDevice: true,
+          channel: channelUsed,
+          phone: phoneDisplay,
           deviceId: rawDeviceId,
           email: normalizedEmail,
           name: user.name,
           role: user.role,
-          message: 'Perangkat baru terdeteksi. Silakan masukkan kode verifikasi OTP 6 digit yang dikirim ke email Anda untuk mengonfirmasi perangkat ini.',
+          message: channelUsed === 'whatsapp'
+            ? `Perangkat baru terdeteksi. Kode verifikasi OTP 6 digit telah dikirim ke nomor WhatsApp Anda (${phoneDisplay}).`
+            : 'Perangkat baru terdeteksi. Silakan masukkan kode verifikasi OTP 6 digit yang dikirim ke email Anda untuk mengonfirmasi perangkat ini.',
         });
       }
     } else {
@@ -1227,6 +1453,7 @@ module.exports = {
   register,
   verifyOTP,
   resendOTP,
+  sendOtpWhatsApp,
   login,
   getProfile,
   updateProfile,

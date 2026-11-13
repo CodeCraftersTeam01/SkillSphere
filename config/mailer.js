@@ -112,7 +112,7 @@ const sendOTPEmail = async (toEmail, otpCode, userName = 'Pengguna') => {
   } catch (error) {
     console.error('❌ [SMTP Mailer Error]:', error);
     console.log(`🔑 [DEV OTP FALLBACK] Kode OTP untuk ${toEmail}: ${otpCode}`);
-    return { success: true, isFallback: true };
+    return { success: false, isFallback: true, error: error.message };
   }
 };
 

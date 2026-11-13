@@ -13,6 +13,7 @@ const {
 router.post('/register', validateRegister, authController.register);
 router.post('/verify-otp', authController.verifyOTP);
 router.post('/resend-otp', authController.resendOTP);
+router.post('/send-otp-whatsapp', authController.sendOtpWhatsApp);
 router.post('/login', validateLogin, authController.login);
 router.post('/refresh', authController.refreshToken);
 router.get('/oauth/:provider', authController.oauthRedirect);
