@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <meta name="description" content="Edit nama, deskripsi, harga, sampul WebP, dan status publikasi kelas di Studio Pengajar SkillSphere AI.">
+
+  <!-- Immediate Theme Initializer -->
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('skillsphere_theme') || localStorage.getItem('theme') || 'light';
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    })();
+  </script>
+
+  <!-- Google Fonts: Newsreader, Plus Jakarta Sans, JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome 6 Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- Claude Design System Stylesheet & Accessibility Toolkit -->
+  <link rel="stylesheet" href="/stylesheets/claude-theme.css?v=2.0">
+  <link rel="stylesheet" href="/stylesheets/accessibility.css">
+  <link rel="stylesheet" href="/stylesheets/custom-alert.css">
+  <script src="/javascripts/custom-alert.js"></script>
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: var(--bg-app);
+      font-family: var(--font-sans);
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Top Navigation Bar */
+    .navbar {
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 0 24px;
+      height: 60px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-sizing: border-box;
+      gap: 16px;
+    }
+
+    .nav-brand-group {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-shrink: 0;
+    }
+
+    .brand-logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      color: var(--text-primary);
+      font-weight: 700;
+      font-size: 1.12rem;
+    }
+
+    .brand-logo span {
+      font-family: var(--font-serif);
+      font-size: 1.25rem;
+      letter-spacing: -0.01em;
+    }
+
+    .role-badge {
+      background: var(--bg-surface-subtle);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-full);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 10px;
+      color: var(--accent-primary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .nav-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 6px 14px;
+      border-radius: var(--radius-full);
+      font-size: 12.5px;
+      font-weight: 600;
+      text-decoration: none;
+      color: var(--text-secondary);
+      background: var(--bg-surface-subtle);
+      border: 1px solid var(--border-subtle);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .nav-btn:hover {
+      color: var(--text-primary);
+      border-color: var(--border-strong);
+      background: var(--bg-surface);
+    }
+
+    .theme-toggle-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-full);
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-surface-subtle);
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+
+    .theme-toggle-btn:hover {
+      color: var(--text-primary);
+      border-color: var(--border-strong);
+    }
+
+    /* Main Container */
+    .edit-course-layout {
+      max-width: 1080px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 28px 20px 80px;
+      box-sizing: border-box;
+    }
+
+    .page-header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .page-titles h1 {
+      font-family: var(--font-serif);
+      font-size: 1.85rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin: 0 0 6px;
+      letter-spacing: -0.01em;
+    }
+
+    .page-titles p {
+      font-size: 13.5px;
+      color: var(--text-secondary);
+      margin: 0;
+    }
+
+    .course-switch-box {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      padding: 6px 14px;
+      border-radius: var(--radius-md);
+    }
+
+    .course-switch-select {
+      background: transparent;
+      border: none;
+      font-family: var(--font-sans);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+      cursor: pointer;
+      outline: none;
+      max-width: 260px;
+    }
+
+    /* Form Layout Grid */
+    .edit-form-grid {
+      display: grid;
+      grid-template-columns: 2fr 1.2fr;
+      gap: 24px;
+    }
+
+    @media (max-width: 860px) {
+      .edit-form-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .edit-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      margin-bottom: 24px;
+      box-sizing: border-box;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+    }
+
+    .edit-card-title {
+      font-family: var(--font-serif);
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin: 0 0 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .edit-card-title i {
+      color: var(--accent-primary);
+      font-size: 1rem;
+    }
+
+    /* Form Controls */
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 6px;
+    }
+
+    .form-hint {
+      font-size: 11.5px;
+      color: var(--text-tertiary);
+      margin-top: 4px;
+    }
+
+    .form-input, .form-select, .form-textarea {
+      width: 100%;
+      box-sizing: border-box;
+      background: var(--bg-surface-subtle);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 10px 12px;
+      font-family: var(--font-sans);
+      font-size: 13.5px;
+      color: var(--text-primary);
+      outline: none;
+      transition: border-color 0.2s, background-color 0.2s;
+    }
+
+    .form-input:focus, .form-select:focus, .form-textarea:focus {
+      border-color: var(--accent-primary);
+      background: var(--bg-surface);
+    }
+
+    .form-textarea {
+      min-height: 120px;
+      resize: vertical;
+      line-height: 1.5;
+    }
+
+    /* Status Selector Cards (Published vs Private) */
+    .status-picker-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 6px;
+    }
+
+    .status-card-option {
+      border: 2px solid var(--border-subtle);
+      background: var(--bg-surface-subtle);
+      border-radius: var(--radius-md);
+      padding: 14px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+
+    .status-card-option:hover {
+      border-color: var(--border-strong);
+      background: var(--bg-surface);
+    }
+
+    .status-card-option.active-published {
+      border-color: #10B981;
+      background: rgba(16, 185, 129, 0.06);
+    }
+
+    .status-card-option.active-private {
+      border-color: #F59E0B;
+      background: rgba(245, 158, 11, 0.06);
+    }
+
+    .status-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .status-badge-pill {
+      font-size: 10.5px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: var(--radius-full);
+      letter-spacing: 0.04em;
+    }
+
+    .badge-published {
+      background: rgba(16, 185, 129, 0.15);
+      color: #059669;
+    }
+
+    .badge-private {
+      background: rgba(245, 158, 11, 0.15);
+      color: #D97706;
+    }
+
+    .status-title {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .status-desc {
+      font-size: 11.5px;
+      color: var(--text-secondary);
+      line-height: 1.45;
+      margin: 0;
+    }
+
+    /* Thumbnail Preview and Upload Area */
+    .thumb-preview-container {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      background: var(--bg-surface-subtle);
+      border: 1px dashed var(--border-subtle);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .thumb-preview-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .thumb-upload-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.45);
+      backdrop-filter: blur(2px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.2s;
+      cursor: pointer;
+    }
+
+    .thumb-preview-container:hover .thumb-upload-overlay {
+      opacity: 1;
+    }
+
+    .thumb-overlay-btn {
+      background: var(--bg-surface);
+      color: var(--text-primary);
+      border: none;
+      padding: 8px 16px;
+      border-radius: var(--radius-full);
+      font-size: 12px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      pointer-events: none;
+    }
+
+    /* Revenue Split Calculator Box */
+    .revenue-calculator-box {
+      background: var(--bg-surface-subtle);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 14px;
+      margin-top: 10px;
+    }
+
+    .revenue-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12.5px;
+      padding: 4px 0;
+    }
+
+    .revenue-row.total {
+      border-top: 1px dashed var(--border-subtle);
+      margin-top: 6px;
+      padding-top: 8px;
+      font-weight: 700;
+    }
+
+    .revenue-val {
+      font-family: var(--font-mono, monospace);
+      font-weight: 600;
+    }
+
+    /* Submit Bottom Sticky Bar */
+    .sticky-bottom-bar {
+      position: sticky;
+      bottom: 0;
+      background: var(--bg-surface);
+      border-top: 1px solid var(--border-subtle);
+      padding: 14px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 90;
+      box-shadow: 0 -4px 12px rgba(0,0,0,0.04);
+      margin-top: 24px;
+      border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    }
+
+    .btn-save-course {
+      background: var(--accent-primary);
+      color: #FFFFFF;
+      border: none;
+      padding: 10px 24px;
+      border-radius: var(--radius-full);
+      font-size: 13.5px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: background-color 0.2s, opacity 0.2s;
+    }
+
+    .btn-save-course:hover:not(:disabled) {
+      filter: brightness(1.08);
+    }
+
+    .btn-save-course:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+    }
+
+    .spinner {
+      width: 14px;
+      height: 14px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: #FFFFFF;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      display: none;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navbar -->
+  <header class="navbar">
+    <div class="nav-brand-group">
+      <a href="/dashboard" class="brand-logo" title="Kembali ke Dashboard Studio">
+        <i class="fas fa-sparkles" style="color:var(--accent-primary);"></i>
+        <span>SkillSphere AI</span>
+      </a>
+      <span class="role-badge">Tutor Studio</span>
+    </div>
+
+    <div class="nav-actions">
+      <a href="/dashboard" class="nav-btn" title="Kembali ke Dashboard Studio">
+        <i class="fas fa-arrow-left"></i>
+        <span>Dashboard</span>
+      </a>
+      <a href="javascript:void(0)" id="link-to-materials" class="nav-btn" title="Buka Ruang Belajar & Modul Kelas">
+        <i class="fas fa-folder-open"></i>
+        <span>Buka Kelas</span>
+      </a>
+      <button class="theme-toggle-btn" id="theme-toggle-btn" type="button" aria-label="Toggle theme">
+        <i class="fas fa-moon" id="theme-icon-moon"></i>
+        <i class="fas fa-sun" id="theme-icon-sun" style="display:none;"></i>
+      </button>
+      <button class="nav-btn" id="logout-btn" type="button" title="Keluar">
+        <i class="fas fa-right-from-bracket"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Layout -->
+  <main class="edit-course-layout">
+    
+    <!-- Page Header & Course Selector -->
+    <div class="page-header-row">
+      <div class="page-titles">
+        <h1>Pengaturan & Edit Kelas</h1>
+        <p>Perbarui informasi kelas, sampul WebP, nominal harga, dan sifat publikasi agar siswa dapat belajar.</p>
+      </div>
+
+      <div class="course-switch-box">
+        <i class="fas fa-book-bookmark" style="color:var(--accent-primary); font-size:13px;"></i>
+        <select id="course-selector-dropdown" class="course-switch-select" title="Pilih kelas yang ingin diedit">
+          <option value="" disabled selected>Memuat daftar kelas...</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Edit Course Form -->
+    <form id="edit-course-form">
+      <div class="edit-form-grid">
+        
+        <!-- Left Column: Primary Details & Status -->
+        <div class="left-col">
+          
+          <!-- Card 1: Sifat / Status Publikasi (Published vs Private) -->
+          <div class="edit-card">
+            <h2 class="edit-card-title">
+              <i class="fas fa-tower-broadcast"></i> Sifat & Status Publikasi Kelas
+            </h2>
+            <p style="font-size:12.5px; color:var(--text-secondary); margin:0 0 14px;">
+              Tentukan apakah kelas ini aktif dapat ditemukan siswa di katalog publik atau disembunyikan (privat).
+            </p>
+
+            <div class="status-picker-grid">
+              <!-- Option: Published -->
+              <div class="status-card-option" id="status-card-published" onclick="selectCourseStatus('published')">
+                <div class="status-header-row">
+                  <span class="status-title"><i class="fas fa-globe" style="color:#10B981; margin-right:6px;"></i> Publik (Published)</span>
+                  <span class="status-badge-pill badge-published">PUBLIK</span>
+                </div>
+                <p class="status-desc">
+                  Kelas tampil di Katalog Kursus Publik dan dapat ditemukan serta didaftar oleh seluruh siswa.
+                </p>
+              </div>
+
+              <!-- Option: Private -->
+              <div class="status-card-option" id="status-card-private" onclick="selectCourseStatus('private')">
+                <div class="status-header-row">
+                  <span class="status-title"><i class="fas fa-lock" style="color:#F59E0B; margin-right:6px;"></i> Privat (Private)</span>
+                  <span class="status-badge-pill badge-private">PRIVAT</span>
+                </div>
+                <p class="status-desc">
+                  Kelas disembunyikan dari katalog kursus. Siswa tidak akan dapat menemukan atau mendaftar kelas ini.
+                </p>
+              </div>
+            </div>
+            <input type="hidden" id="input-course-status" name="status" value="published">
+          </div>
+
+          <!-- Card 2: Identitas & Informasi Utama -->
+          <div class="edit-card">
+            <h2 class="edit-card-title">
+              <i class="fas fa-pen-nib"></i> Identitas & Kurikulum Kelas
+            </h2>
+
+            <div class="form-group">
+              <label for="input-course-title" class="form-label">Nama / Judul Kelas <span style="color:#EF4444;">*</span></label>
+              <input type="text" id="input-course-title" name="title" class="form-input" placeholder="Contoh: Basis Data Lanjut: Arsitektur Skema & Normalisasi Relasional" required maxlength="200">
+              <div class="form-hint">Gunakan nama yang jelas dan mendeskripsikan kompetensi yang dipelajari.</div>
+            </div>
+
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px;">
+              <div class="form-group">
+                <label for="input-course-category" class="form-label">Kategori Pembelajaran <span style="color:#EF4444;">*</span></label>
+                <select id="input-course-category" name="category_id" class="form-select" required>
+                  <option value="" disabled selected>Pilih Kategori</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="input-course-level" class="form-label">Tingkat Kesulitan</label>
+                <select id="input-course-level" name="level" class="form-select">
+                  <option value="beginner">Pemula (Beginner)</option>
+                  <option value="intermediate">Menengah (Intermediate)</option>
+                  <option value="advanced">Mahir (Advanced)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="input-course-desc" class="form-label">Deskripsi Lengkap Kelas</label>
+              <textarea id="input-course-desc" name="description" class="form-textarea" placeholder="Jelaskan silabus, materi inti, prasyarat, serta manfaat yang didapat siswa setelah lulus kelas ini..."></textarea>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Right Column: Thumbnail WebP & Pricing -->
+        <div class="right-col">
+          
+          <!-- Card 3: Sampul Kelas (WebP Storage Optimized) -->
+          <div class="edit-card">
+            <h2 class="edit-card-title">
+              <i class="fas fa-image"></i> Sampul Kelas (WebP)
+            </h2>
+
+            <div class="thumb-preview-container" id="thumb-preview-container">
+              <img src="/icons/icon-512.png" id="thumb-preview-img" class="thumb-preview-img" alt="Sampul Kursus">
+              <label for="input-thumb-file" class="thumb-upload-overlay" title="Klik untuk mengunggah gambar baru">
+                <span class="thumb-overlay-btn">
+                  <i class="fas fa-camera"></i> Ganti Sampul
+                </span>
+              </label>
+            </div>
+
+            <input type="file" id="input-thumb-file" accept="image/*" style="display:none;" onchange="handleThumbnailFileChange(this)">
+            <input type="hidden" id="input-thumbnail-url" name="thumbnail_url" value="">
+
+            <div style="display:flex; gap:8px;">
+              <label for="input-thumb-file" class="nav-btn" style="flex:1; justify-content:center; cursor:pointer;">
+                <i class="fas fa-cloud-arrow-up"></i>
+                <span id="btn-upload-thumb-text">Unggah Gambar</span>
+              </label>
+              <button type="button" class="nav-btn" id="btn-reset-thumb" style="color:var(--text-tertiary);" title="Hapus sampul kustom" onclick="resetThumbnail()">
+                <i class="fas fa-trash"></i>
+              </button>
+            </div>
+            <div class="form-hint" style="text-align:center; margin-top:8px;" id="thumb-compression-hint">
+              Gambar otomatis dikonversi dan dikompresi ke WebP hemat kuota.
+            </div>
+          </div>
+
+          <!-- Card 4: Harga & Bagi Hasil Tutor (80% / 20%) -->
+          <div class="edit-card">
+            <h2 class="edit-card-title">
+              <i class="fas fa-tag"></i> Harga & Pendapatan
+            </h2>
+
+            <div class="form-group">
+              <label for="input-course-price" class="form-label">Harga Pendaftaran Siswa (Rp)</label>
+              <input type="number" id="input-course-price" name="price" class="form-input" placeholder="0" min="0" step="5000" value="0" oninput="calculateRevenueSplit()">
+              <div class="form-hint">Isi 0 untuk menjadikan kelas ini gratis.</div>
+            </div>
+
+            <!-- Revenue Split Real-time Calculator -->
+            <div class="revenue-calculator-box">
+              <div class="revenue-row">
+                <span style="color:var(--text-secondary);">Harga Siswa:</span>
+                <span class="revenue-val" id="calc-student-price">Rp 0 (Gratis)</span>
+              </div>
+              <div class="revenue-row" style="color:#059669;">
+                <span><i class="fas fa-wallet" style="margin-right:4px;"></i> Hasil Tutor (80%):</span>
+                <span class="revenue-val" id="calc-tutor-share">Rp 0</span>
+              </div>
+              <div class="revenue-row" style="color:var(--text-tertiary); font-size:11.5px;">
+                <span>Biaya Platform (20%):</span>
+                <span class="revenue-val" id="calc-platform-fee">Rp 0</span>
+              </div>
+              <div class="revenue-row total">
+                <span>Estimasi Masuk Dompet:</span>
+                <span class="revenue-val" id="calc-net-display" style="color:var(--accent-primary);">Rp 0</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- Sticky Bottom Action Bar -->
+      <div class="sticky-bottom-bar">
+        <div style="display:flex; align-items:center; gap:12px;">
+          <a href="/dashboard" class="nav-btn">
+            <i class="fas fa-xmark"></i> Batal
+          </a>
+          <a href="javascript:void(0)" id="btn-preview-public" class="nav-btn" target="_blank" title="Lihat tampilan kelas seperti yang dilihat siswa">
+            <i class="fas fa-eye"></i> Pratinjau Publik
+          </a>
+        </div>
+
+        <button type="submit" class="btn-save-course" id="btn-save-course">
+          <span class="spinner" id="btn-save-spinner"></span>
+          <i class="fas fa-floppy-disk" id="btn-save-icon"></i>
+          <span id="btn-save-text">Simpan Perubahan</span>
+        </button>
+      </div>
+    </form>
+
+  </main>
+
+  <script>
+    const token = localStorage.getItem('skillsphere_access_token') || localStorage.getItem('accessToken') || localStorage.getItem('token');
+    if (!token) {
+      window.location.href = '/login?redirect=' + encodeURIComponent(window.location.pathname + window.location.search);
+    }
+
+    // --- State Variables ---
+    let myCoursesList = [];
+    let currentCourse = null;
+    let categoriesList = [];
+
+    // --- DOM Elements ---
+    const courseSelector = document.getElementById('course-selector-dropdown');
+    const inputTitle = document.getElementById('input-course-title');
+    const inputCategory = document.getElementById('input-course-category');
+    const inputLevel = document.getElementById('input-course-level');
+    const inputDesc = document.getElementById('input-course-desc');
+    const inputPrice = document.getElementById('input-course-price');
+    const inputStatus = document.getElementById('input-course-status');
+    const inputThumbUrl = document.getElementById('input-thumbnail-url');
+    const thumbImg = document.getElementById('thumb-preview-img');
+    const linkToMaterials = document.getElementById('link-to-materials');
+    const btnPreviewPublic = document.getElementById('btn-preview-public');
+
+    // Status cards
+    const cardPublished = document.getElementById('status-card-published');
+    const cardPrivate = document.getElementById('status-card-private');
+
+    // Save button
+    const btnSave = document.getElementById('btn-save-course');
+    const btnSaveText = document.getElementById('btn-save-text');
+    const btnSaveIcon = document.getElementById('btn-save-icon');
+    const btnSaveSpinner = document.getElementById('btn-save-spinner');
+
+    // --- 1. Theme Switcher Logic ---
+    const themeToggleBtn = document.getElementById('theme-toggle-btn');
+    const themeIconMoon = document.getElementById('theme-icon-moon');
+    const themeIconSun = document.getElementById('theme-icon-sun');
+
+    function syncThemeIcons() {
+      const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+      if (currentTheme === 'dark') {
+        themeIconMoon.style.display = 'none';
+        themeIconSun.style.display = 'inline-block';
+      } else {
+        themeIconMoon.style.display = 'inline-block';
+        themeIconSun.style.display = 'none';
+      }
+    }
+
+    if (themeToggleBtn) {
+      themeToggleBtn.addEventListener('click', () => {
+        const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', newTheme);
+        localStorage.setItem('skillsphere_theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+        syncThemeIcons();
+      });
+      syncThemeIcons();
+    }
+
+    // --- 2. Logout Handler ---
+    const logoutBtn = document.getElementById('logout-btn');
+    if (logoutBtn) {
+      logoutBtn.addEventListener('click', async () => {
+        try {
+          await fetch('/api/auth/logout', {
+            method: 'POST',
+            headers: { 'Authorization': 'Bearer ' + token },
+          });
+        } catch (e) {}
+        localStorage.clear();
+        window.location.href = '/login';
+      });
+    }
+
+    // --- 3. Status Selector Handler ---
+    function selectCourseStatus(status) {
+      inputStatus.value = status;
+      if (status === 'published') {
+        cardPublished.classList.add('active-published');
+        cardPrivate.classList.remove('active-private');
+      } else {
+        cardPrivate.classList.add('active-private');
+        cardPublished.classList.remove('active-published');
+      }
+    }
+
+    // --- 4. Revenue Calculator ---
+    function calculateRevenueSplit() {
+      const priceVal = Math.max(parseFloat(inputPrice.value) || 0, 0);
+      const tutorShare = priceVal * 0.8;
+      const platformFee = priceVal * 0.2;
+
+      const studentPriceStr = priceVal > 0 ? 'Rp ' + Number(priceVal).toLocaleString('id-ID') : 'Rp 0 (Gratis)';
+      const tutorShareStr = priceVal > 0 ? 'Rp ' + Math.round(tutorShare).toLocaleString('id-ID') : 'Rp 0';
+      const platformFeeStr = priceVal > 0 ? 'Rp ' + Math.round(platformFee).toLocaleString('id-ID') : 'Rp 0';
+
+      document.getElementById('calc-student-price').textContent = studentPriceStr;
+      document.getElementById('calc-tutor-share').textContent = tutorShareStr;
+      document.getElementById('calc-platform-fee').textContent = platformFeeStr;
+      document.getElementById('calc-net-display').textContent = tutorShareStr;
+    }
+
+    // --- 5. Thumbnail Upload via Sharp WebP API ---
+    async function handleThumbnailFileChange(input) {
+      if (!input.files || !input.files.length) return;
+      const file = input.files[0];
+
+      const formData = new FormData();
+      formData.append('thumbnail', file);
+      formData.append('quality', '85');
+      formData.append('max_width', '1280');
+
+      const btnUploadText = document.getElementById('btn-upload-thumb-text');
+      const compressionHint = document.getElementById('thumb-compression-hint');
+      if (btnUploadText) btnUploadText.textContent = 'Mengompresi...';
+
+      try {
+        const uploadRes = await fetch('/api/media/upload/thumbnail', {
+          method: 'POST',
+          headers: { 'Authorization': 'Bearer ' + token },
+          body: formData,
+        });
+        const uploadJson = await uploadRes.json();
+
+        if (uploadRes.ok && uploadJson.success) {
+          const webpUrl = uploadJson.data.relativeUrl;
+          inputThumbUrl.value = webpUrl;
+          thumbImg.src = webpUrl;
+          if (compressionHint) {
+            compressionHint.innerHTML = `<span style="color:#059669; font-weight:600;"><i class="fas fa-check-circle"></i> Berhasil dikonversi ke WebP (${uploadJson.data.savingsPercent} lebih hemat)!</span>`;
+          }
+          if (btnUploadText) btnUploadText.textContent = 'Ganti Sampul';
+          if (typeof showToast === 'function') {
+            showToast(`Sampul berhasil dikonversi ke WebP (${uploadJson.data.savingsPercent} lebih ringan)!`, 'success');
+          }
+        } else {
+          alert(uploadJson.message || 'Gagal mengunggah thumbnail.');
+          if (btnUploadText) btnUploadText.textContent = 'Unggah Gambar';
+        }
+      } catch (err) {
+        console.error('Thumbnail upload error:', err);
+        alert('Gagal memproses thumbnail.');
+        if (btnUploadText) btnUploadText.textContent = 'Unggah Gambar';
+      }
+    }
+
+    function resetThumbnail() {
+      inputThumbUrl.value = '';
+      thumbImg.src = '/icons/icon-512.png';
+      const compressionHint = document.getElementById('thumb-compression-hint');
+      if (compressionHint) {
+        compressionHint.textContent = 'Sampul diatur kembali ke default.';
+      }
+    }
+
+    // --- 6. Populate Form with Active Course ---
+    function populateForm(course) {
+      if (!course) return;
+      currentCourse = course;
+
+      inputTitle.value = course.title || '';
+      inputCategory.value = course.category_id || '';
+      inputLevel.value = course.level || 'beginner';
+      inputDesc.value = course.description || '';
+      inputPrice.value = course.price !== undefined ? parseFloat(course.price) : 0;
+      inputThumbUrl.value = course.thumbnail_url || '';
+
+      if (course.thumbnail_url) {
+        thumbImg.src = course.thumbnail_url;
+      } else {
+        thumbImg.src = '/icons/icon-512.png';
+      }
+
+      // Status selector
+      const courseStatus = (course.status === 'published') ? 'published' : 'private';
+      selectCourseStatus(courseStatus);
+
+      // Recalculate revenue preview
+      calculateRevenueSplit();
+
+      // Update helper links
+      linkToMaterials.href = `/tutor/materials?courseId=${course.id}`;
+      btnPreviewPublic.href = `/courses/${course.id}`;
+
+      // Update URL without page reload
+      const newUrl = new URL(window.location.href);
+      newUrl.searchParams.set('courseId', course.id);
+      window.history.replaceState({}, '', newUrl.toString());
+    }
+
+    // --- 7. Load Categories & Courses on Init ---
+    async function loadCategories() {
+      try {
+        const res = await fetch('/api/courses/categories');
+        const json = await res.json();
+        if (res.ok && json.success) {
+          categoriesList = Array.isArray(json.data) ? json.data : [];
+          inputCategory.innerHTML = '<option value="" disabled selected>Pilih Kategori</option>' +
+            categoriesList.map(cat => `<option value="${cat.id}">${cat.name}</option>`).join('');
+        }
+      } catch (err) {
+        console.warn('Failed to load categories:', err);
+      }
+    }
+
+    async function loadTutorCourses() {
+      try {
+        const res = await fetch('/api/courses/tutor/my-courses', {
+          headers: { 'Authorization': 'Bearer ' + token },
+        });
+        const json = await res.json();
+
+        if (res.ok && json.success) {
+          myCoursesList = Array.isArray(json.data) ? json.data : [];
+          if (myCoursesList.length === 0) {
+            courseSelector.innerHTML = '<option value="" disabled selected>Anda belum memiliki kelas</option>';
+            alert('Anda belum memiliki kelas. Silakan buat kelas baru terlebih dahulu melalui Dashboard.');
+            window.location.href = '/dashboard';
+            return;
+          }
+
+          courseSelector.innerHTML = myCoursesList.map(c => {
+            const isPub = (c.status === 'published') ? '[Publik]' : '[Privat]';
+            return `<option value="${c.id}">${isPub} ${c.title}</option>`;
+          }).join('');
+
+          // Determine which course to select based on query param ?courseId
+          const urlParams = new URLSearchParams(window.location.search);
+          const requestedCourseId = parseInt(urlParams.get('courseId'), 10);
+
+          let selected = myCoursesList.find(c => c.id === requestedCourseId);
+          if (!selected) {
+            selected = myCoursesList[0];
+          }
+
+          courseSelector.value = selected.id;
+          populateForm(selected);
+        } else {
+          alert('Gagal memuat kelas Anda. Periksa kembali sesi login.');
+        }
+      } catch (err) {
+        console.error('Failed to load tutor courses:', err);
+      }
+    }
+
+    courseSelector.addEventListener('change', (e) => {
+      const selectedId = parseInt(e.target.value, 10);
+      const found = myCoursesList.find(c => c.id === selectedId);
+      if (found) {
+        populateForm(found);
+      }
+    });
+
+    // --- 8. Save Form Handler (PUT /api/courses/:id) ---
+    const editForm = document.getElementById('edit-course-form');
+    editForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!currentCourse) return;
+
+      const title = inputTitle.value.trim();
+      const category_id = parseInt(inputCategory.value, 10);
+      const level = inputLevel.value;
+      const description = inputDesc.value.trim();
+      const price = Math.max(parseFloat(inputPrice.value) || 0, 0);
+      const status = inputStatus.value;
+      const thumbnail_url = inputThumbUrl.value.trim() || null;
+
+      if (!title) {
+        alert('Judul kelas wajib diisi.');
+        return;
+      }
+      if (!category_id) {
+        alert('Kategori pembelajaran wajib dipilih.');
+        return;
+      }
+
+      // UI loading state
+      btnSave.disabled = true;
+      btnSaveText.textContent = 'Menyimpan...';
+      btnSaveIcon.style.display = 'none';
+      btnSaveSpinner.style.display = 'inline-block';
+
+      try {
+        const response = await fetch(`/api/courses/${currentCourse.id}`, {
+          method: 'PUT',
+          headers: {
+            'Authorization': 'Bearer ' + token,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            title,
+            category_id,
+            level,
+            description,
+            price,
+            status,
+            thumbnail_url,
+          }),
+        });
+
+        const result = await response.json();
+
+        if (response.ok && result.success) {
+          // Update in-memory list
+          Object.assign(currentCourse, result.data);
+          const foundInList = myCoursesList.find(c => c.id === currentCourse.id);
+          if (foundInList) Object.assign(foundInList, result.data);
+
+          // Update selector label
+          const isPub = (status === 'published') ? '[Publik]' : '[Privat]';
+          const optionEl = courseSelector.querySelector(`option[value="${currentCourse.id}"]`);
+          if (optionEl) optionEl.textContent = `${isPub} ${title}`;
+
+          if (typeof showToast === 'function') {
+            showToast('Informasi kelas berhasil diperbarui!', 'success');
+          } else {
+            alert('Informasi kelas berhasil diperbarui!');
+          }
+        } else {
+          alert(result.message || 'Gagal menyimpan perubahan.');
+        }
+      } catch (err) {
+        console.error('Error updating course:', err);
+        alert('Terjadi kesalahan jaringan saat menyimpan data kelas.');
+      } finally {
+        btnSave.disabled = false;
+        btnSaveText.textContent = 'Simpan Perubahan';
+        btnSaveIcon.style.display = 'inline-block';
+        btnSaveSpinner.style.display = 'none';
+      }
+    });
+
+    // --- Init Execution ---
+    (async () => {
+      await loadCategories();
+      await loadTutorCourses();
+    })();
+  </script>
+</body>
+</html>

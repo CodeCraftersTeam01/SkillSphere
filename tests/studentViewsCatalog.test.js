@@ -15,6 +15,8 @@ async function runStudentViewsCatalogTests() {
     { name: 'Course Catalog & Search Page', file: 'views/courses/index.ejs', data: { title: 'Katalog Kursus & Kurikulum | SkillSphere AI' } },
     { name: 'Course Detail & Syllabus Page', file: 'views/courses/detail.ejs', data: { title: 'Detail Kursus | SkillSphere AI', courseId: '1' } },
     { name: 'Admin Verification & User Management Dashboard', file: 'views/admin/verification.ejs', data: { title: 'Admin Panel | SkillSphere AI' } },
+    { name: 'Tutor Classroom Materials Portal', file: 'views/tutor/materials.ejs', data: { title: 'Portal Modul & Kurikulum Kelas | SkillSphere AI', courseId: '1' } },
+    { name: 'Tutor Course Edit & Settings Page', file: 'views/tutor/course-edit.ejs', data: { title: 'Pengaturan & Edit Kelas | SkillSphere AI', courseId: '1' } },
   ];
 
   for (const item of viewsToTest) {

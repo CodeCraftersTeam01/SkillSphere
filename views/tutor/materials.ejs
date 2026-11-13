@@ -1744,6 +1744,11 @@
           <span>Dashboard</span>
         </a>
 
+        <!-- Course Settings / Edit Quick Link -->
+        <button type="button" class="btn-dashboard-back" onclick="openEditCoursePage()" title="Pengaturan & Edit Kelas" style="padding: 6px 12px; cursor: pointer;">
+          <i class="fas fa-gear"></i>
+        </button>
+
         <!-- Theme Toggle -->
         <button class="theme-toggle-btn" id="theme-toggle-btn" type="button" aria-label="Toggle dark/light mode" title="Ganti Mode Tampilan">
           <i class="fas fa-sun" id="theme-icon-sun" style="display:none;"></i>
@@ -1842,6 +1847,12 @@
               </div>
 
               <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+                <!-- Edit Detail Kelas -->
+                <button type="button" class="banner-edit-btn" onclick="openEditCoursePage()" title="Edit Nama, Kategori, Harga, Sampul, dan Sifat Publikasi Kelas">
+                  <i class="fas fa-pen-to-square"></i>
+                  <span>Edit Kelas</span>
+                </button>
+
                 <!-- Open Student Learning Room -->
                 <button type="button" class="banner-edit-btn" onclick="openStudentLearningRoom()" title="Pratinjau Seluruh Kelas di Ruang Belajar Siswa">
                   <i class="fas fa-arrow-up-right-from-square"></i>
@@ -2725,7 +2736,17 @@
       if (crumbTitle) crumbTitle.textContent = course.title;
       document.getElementById('banner-course-title').textContent = course.title;
       document.getElementById('banner-course-desc').textContent = course.description || 'Tidak ada deskripsi tambahan.';
-      document.getElementById('banner-status-badge').textContent = (course.status || 'draft').toUpperCase();
+
+      const isPublished = (course.status === 'published');
+      const statusBadge = document.getElementById('banner-status-badge');
+      if (statusBadge) {
+        statusBadge.textContent = isPublished ? 'PUBLISHED' : 'PRIVATE';
+        statusBadge.className = isPublished ? 'status-pill status-active' : 'status-pill status-locked';
+        statusBadge.style.background = isPublished ? 'rgba(16, 185, 129, 0.2)' : 'rgba(245, 158, 11, 0.25)';
+        statusBadge.style.color = isPublished ? '#10B981' : '#F59E0B';
+        statusBadge.style.border = isPublished ? '1px solid rgba(16, 185, 129, 0.4)' : '1px solid rgba(245, 158, 11, 0.4)';
+      }
+
       document.getElementById('banner-category-badge').textContent = course.category ? course.category.name : 'Umum';
       document.getElementById('banner-level-badge').textContent = (course.level || 'beginner').toUpperCase();
 
@@ -3171,6 +3192,14 @@
 
     let currentCreationMode = 'article';
     let currentPreviewMaterialId = null;
+
+    function openEditCoursePage() {
+      if (activeCourse && activeCourse.id) {
+        window.location.href = `/tutor/courses/edit?courseId=${activeCourse.id}`;
+      } else {
+        window.location.href = '/tutor/courses/edit';
+      }
+    }
 
     function openStudentLearningRoom(materialId) {
       if (!activeCourse || !activeCourse.id) {

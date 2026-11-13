@@ -125,6 +125,14 @@ exports.getCourseById = async (req, res) => {
       }
     }
 
+    // Protection for private / draft courses: Only tutor owner, admin, or enrolled students can view
+    if (course.status !== 'published' && !courseData.is_owner && !courseData.is_enrolled) {
+      return res.status(404).json({
+        success: false,
+        message: 'Kursus tidak ditemukan atau sedang diatur sebagai privat oleh pengajar.',
+      });
+    }
+
     return res.status(200).json({
       success: true,
       data: courseData,
@@ -240,13 +248,29 @@ exports.updateCourse = async (req, res) => {
       tutor_id,
     } = req.body;
 
-    if (title) course.title = title.trim();
-    if (category_id) course.category_id = category_id;
+    if (title && title.trim() && title.trim() !== course.title) {
+      course.title = title.trim();
+      let baseSlug = title.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+      if (!baseSlug) baseSlug = 'kursus';
+      const existingSlug = await Course.findOne({
+        where: {
+          slug: baseSlug,
+          id: { [Op.ne]: course.id },
+        },
+      });
+      course.slug = existingSlug ? `${baseSlug}-${course.id}` : baseSlug;
+    }
+    if (category_id) course.category_id = parseInt(category_id, 10);
     if (description !== undefined) course.description = description ? description.trim() : null;
-    if (price !== undefined) course.price = parseFloat(price);
-    if (level) course.level = level;
+    if (price !== undefined) course.price = Math.max(parseFloat(price) || 0, 0);
+    if (level && ['beginner', 'intermediate', 'advanced'].includes(level)) course.level = level;
     if (thumbnail_url !== undefined) course.thumbnail_url = thumbnail_url;
-    if (status) course.status = status;
+    if (status) {
+      const validStatuses = ['published', 'private', 'draft', 'archived', 'suspended'];
+      if (validStatuses.includes(status)) {
+        course.status = status;
+      }
+    }
     if (req.user.role === 'admin' && tutor_id) {
       course.tutor_id = parseInt(tutor_id, 10);
     }
@@ -481,7 +505,7 @@ exports.getAllCourses = async (req, res) => {
     const offset = (parsedPage - 1) * parsedLimit;
 
     const where = {};
-    if (status) {
+    if (status && req.user && (req.user.role === 'admin' || req.user.role === 'tutor')) {
       where.status = status;
     } else {
       where.status = 'published';
@@ -609,6 +633,16 @@ exports.enrollCourse = async (req, res) => {
         success: false,
         message: 'Kursus tidak ditemukan.',
       });
+    }
+
+    if (course.status !== 'published') {
+      const isOwnerOrAdmin = req.user && (req.user.role === 'admin' || req.user.id === course.tutor_id);
+      if (!isOwnerOrAdmin) {
+        return res.status(403).json({
+          success: false,
+          message: 'Kelas ini berstatus privat dan tidak menerima pendaftaran siswa baru.',
+        });
+      }
     }
 
     const [enrollment, created] = await Enrollment.findOrCreate({
