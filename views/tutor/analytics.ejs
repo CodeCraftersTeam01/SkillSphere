@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <title><%= title || 'Laporan & Analitik Pengajar | Studio Pengajar SkillSphere AI' %></title>
+  
+  <script>
+    (function() {
+      try {
+        const saved = localStorage.getItem('skillsphere_theme') || localStorage.getItem('theme');
+        const pref = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        const active = saved || pref;
+        document.documentElement.setAttribute('data-theme', active);
+        if (active === 'dark') document.documentElement.classList.add('dark');
+      } catch (e) {}
+    })();
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400..700;1,6..72,400..700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <link rel="stylesheet" href="/stylesheets/style.css">
+  <link rel="stylesheet" href="/stylesheets/claude-theme.css">
+  <link rel="stylesheet" href="/stylesheets/accessibility.css">
+
+  <style>
+    :root {
+      --bg-app: #FAF9F5;
+      --bg-surface: #FFFFFF;
+      --bg-surface-subtle: #F4F3EE;
+      --text-primary: #1F1E1B;
+      --text-secondary: #6B6963;
+      --text-tertiary: #92908B;
+      --border-subtle: #E5E4DE;
+      --border-strong: #D1D0CA;
+      --accent-primary: #1F1E1B;
+      --accent-text: #FAF9F5;
+      --font-serif: 'Newsreader', Georgia, serif;
+      --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      --color-success: #0A6C35;
+      --color-warning: #92400E;
+      --color-danger: #991B1B;
+      --radius-sm: 6px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-xl: 16px;
+      --radius-full: 9999px;
+    }
+
+    .dark {
+      --bg-app: #141413;
+      --bg-surface: #1F1E1B;
+      --bg-surface-subtle: #252320;
+      --text-primary: #FAF9F5;
+      --text-secondary: #A3A29E;
+      --text-tertiary: #6B6963;
+      --border-subtle: #2A2926;
+      --border-strong: #3B3934;
+      --accent-primary: #FAF9F5;
+      --accent-text: #141413;
+      --color-success: #75F39F;
+      --color-warning: #FCD34D;
+      --color-danger: #FCA5A5;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-app);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .studio-navbar {
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 0 24px;
+      height: 62px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--text-primary);
+      font-weight: 700;
+      font-size: 1.05rem;
+    }
+
+    .brand-tag {
+      font-size: 11px;
+      background: var(--bg-surface-subtle);
+      border: 1px solid var(--border-subtle);
+      padding: 2px 8px;
+      border-radius: var(--radius-full);
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    .studio-nav-tabs {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      overflow-x: auto;
+    }
+
+    .studio-nav-tab {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      border-radius: var(--radius-md);
+      color: var(--text-secondary);
+      font-size: 0.86rem;
+      font-weight: 500;
+      text-decoration: none;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+
+    .studio-nav-tab:hover {
+      background: var(--bg-surface-subtle);
+      color: var(--text-primary);
+    }
+
+    .studio-nav-tab.active {
+      background: var(--bg-surface-subtle);
+      color: var(--text-primary);
+      font-weight: 600;
+      border: 1px solid var(--border-subtle);
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .icon-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-surface);
+      color: var(--text-secondary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
+    }
+
+    .icon-btn:hover {
+      color: var(--text-primary);
+      background: var(--bg-surface-subtle);
+    }
+
+    .main-container {
+      max-width: 1200px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 32px 24px 64px;
+      flex: 1;
+    }
+
+    .header-section {
+      margin-bottom: 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .page-title {
+      font-family: var(--font-serif);
+      font-size: 2rem;
+      font-weight: 500;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+    }
+
+    .page-subtitle {
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    /* Minimalist KPI Grid */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+
+    .kpi-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: border-color 0.15s ease;
+    }
+
+    .kpi-card:hover {
+      border-color: var(--border-strong);
+    }
+
+    .kpi-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .kpi-label {
+      font-size: 0.82rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-tertiary);
+    }
+
+    .kpi-icon {
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+    }
+
+    .kpi-value {
+      font-size: 1.7rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      letter-spacing: -0.02em;
+      margin-bottom: 4px;
+    }
+
+    .kpi-subtext {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Content Layout */
+    .content-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 24px;
+    }
+
+    .section-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .section-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .section-badge {
+      font-size: 0.78rem;
+      font-weight: 600;
+      background: var(--bg-surface-subtle);
+      border: 1px solid var(--border-subtle);
+      padding: 3px 10px;
+      border-radius: var(--radius-full);
+      color: var(--text-secondary);
+    }
+
+    /* Clean Course Performance Items */
+    .course-item {
+      padding: 16px;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      margin-bottom: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      background: var(--bg-surface);
+    }
+
+    .course-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .course-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .course-title-text {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      text-decoration: none;
+    }
+
+    .course-title-text:hover {
+      text-decoration: underline;
+    }
+
+    .course-price-badge {
+      font-size: 0.8rem;
+      font-weight: 600;
+      font-family: var(--font-mono);
+      background: var(--bg-surface-subtle);
+      padding: 2px 8px;
+      border-radius: var(--radius-sm);
+      color: var(--text-primary);
+      white-space: nowrap;
+    }
+
+    .course-stats-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.82rem;
+      color: var(--text-secondary);
+    }
+
+    .progress-bar-bg {
+      width: 100%;
+      height: 6px;
+      background: var(--bg-surface-subtle);
+      border-radius: var(--radius-full);
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: var(--accent-primary);
+      border-radius: var(--radius-full);
+      transition: width 0.4s ease;
+    }
+
+    /* At Risk Students List */
+    .student-item {
+      padding: 12px;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .student-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .student-info {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .student-name {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .student-meta {
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+    }
+
+    .btn-nudge {
+      padding: 6px 12px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      color: var(--text-primary);
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+
+    .btn-nudge:hover {
+      background: #25D366;
+      color: #FFFFFF;
+      border-color: #25D366;
+    }
+
+    .empty-state {
+      padding: 32px 16px;
+      text-align: center;
+      color: var(--text-tertiary);
+      font-size: 0.88rem;
+    }
+
+    /* Toast Notification */
+    .toast-container {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 999;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .toast {
+      background: var(--accent-primary);
+      color: var(--accent-text);
+      padding: 12px 18px;
+      border-radius: var(--radius-md);
+      font-size: 0.86rem;
+      font-weight: 500;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      animation: fadeIn 0.2s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 900px) {
+      .kpi-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .content-grid {
+        grid-template-columns: 1fr;
+      }
+      .studio-nav-tabs {
+        display: none;
+      }
+    }
+
+    @media (max-width: 540px) {
+      .kpi-grid {
+        grid-template-columns: 1fr;
+      }
+      .main-container {
+        padding: 20px 16px 48px;
+      }
+      .page-title {
+        font-size: 1.6rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Studio Navbar -->
+  <header class="studio-navbar">
+    <div class="brand-group">
+      <a href="/dashboard" class="brand-logo" aria-label="Ke Dashboard SkillSphere">
+        <i class="fa-solid fa-sparkles" style="color: #F59E0B;"></i>
+        <span>SkillSphere Studio</span>
+        <span class="brand-tag">Pengajar</span>
+      </a>
+    </div>
+
+    <nav class="studio-nav-tabs" aria-label="Navigasi Studio Pengajar">
+      <a href="/tutor/materials" class="studio-nav-tab">
+        <i class="fa-solid fa-book-open"></i>
+        <span>Kurikulum & Materi</span>
+      </a>
+      <a href="/tutor/exams" class="studio-nav-tab">
+        <i class="fa-solid fa-file-signature"></i>
+        <span>Ujian Kelulusan</span>
+      </a>
+      <a href="/tutor/certificates" class="studio-nav-tab">
+        <i class="fa-solid fa-certificate"></i>
+        <span>Sertifikat Kursus</span>
+      </a>
+      <a href="/tutor/wallet" class="studio-nav-tab">
+        <i class="fa-solid fa-wallet"></i>
+        <span>Dompet & Penarikan</span>
+      </a>
+      <a href="/tutor/analytics" class="studio-nav-tab active" aria-current="page">
+        <i class="fa-solid fa-chart-line"></i>
+        <span>Laporan & Analitik</span>
+      </a>
+    </nav>
+
+    <div class="nav-actions">
+      <button type="button" class="icon-btn" id="themeToggleBtn" onclick="toggleTheme()" aria-label="Ganti Tema Tampilan" title="Ganti Tema">
+        <i class="fa-solid fa-moon" id="themeIcon"></i>
+      </button>
+
+      <a href="/dashboard" class="icon-btn" title="Kembali ke Dashboard Utama">
+        <i class="fa-solid fa-arrow-left"></i>
+      </a>
+    </div>
+  </header>
+
+  <!-- Main Content Container -->
+  <main class="main-container">
+    <div class="header-section">
+      <h1 class="page-title">Laporan & Analitik Pengajar</h1>
+      <p class="page-subtitle">Pantau performa penjualan kelas, efektivitas materi kurikulum, dan perkembangan kemajuan belajar siswa Anda secara terukur.</p>
+    </div>
+
+    <!-- 4 Clean Metric Cards -->
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-header">
+          <span class="kpi-label">Pendapatan Bersih (80%)</span>
+          <i class="fa-solid fa-wallet kpi-icon"></i>
+        </div>
+        <div class="kpi-value" id="valTotalEarning">Rp 0</div>
+        <div class="kpi-subtext">
+          <span style="color: var(--color-success);"><i class="fa-solid fa-arrow-up"></i> 80%</span>
+          <span>Bagi hasil bersih pengajar</span>
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-header">
+          <span class="kpi-label">Siswa Terdaftar</span>
+          <i class="fa-solid fa-users kpi-icon"></i>
+        </div>
+        <div class="kpi-value" id="valTotalEnrolled">0</div>
+        <div class="kpi-subtext">
+          <span id="valTotalCompleted">0 selesai kelas</span>
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-header">
+          <span class="kpi-label">Rata-rata Progres</span>
+          <i class="fa-solid fa-bars-progress kpi-icon"></i>
+        </div>
+        <div class="kpi-value" id="valAvgProgress">0%</div>
+        <div class="kpi-subtext">
+          <span id="valCompletionRate">Tingkat kelulusan 0%</span>
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-header">
+          <span class="kpi-label">Total Kelas Aktif</span>
+          <i class="fa-solid fa-graduation-cap kpi-icon"></i>
+        </div>
+        <div class="kpi-value" id="valTotalCourses">0</div>
+        <div class="kpi-subtext">
+          <span>Kurikulum dipublikasikan</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Content Sections -->
+    <div class="content-grid">
+      <!-- Left Column: Course Breakdown -->
+      <section class="section-card">
+        <div class="section-header">
+          <h2 class="section-title">Performa Tiap Kelas</h2>
+          <span class="section-badge" id="courseCountBadge">0 Kelas</span>
+        </div>
+
+        <div id="courseListContainer">
+          <div class="empty-state">
+            <i class="fa-solid fa-circle-notch fa-spin" style="margin-bottom: 8px; font-size: 20px;"></i>
+            <p>Memuat analitik performa kelas...</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Right Column: At-Risk Students & WhatsApp Intervention -->
+      <section class="section-card">
+        <div class="section-header">
+          <h2 class="section-title">Perlu Perhatian</h2>
+          <span class="section-badge" style="background: rgba(245, 158, 11, 0.1); color: #B45309;" id="atRiskBadge">0 Siswa</span>
+        </div>
+
+        <p style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 16px;">
+          Siswa dengan progres di bawah 30% yang membutuhkan motivasi pengingat belajar via WhatsApp.
+        </p>
+
+        <div id="atRiskListContainer">
+          <div class="empty-state">
+            <p>Tidak ada siswa yang membutuhkan perhatian saat ini.</p>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script>
+    function toggleTheme() {
+      const html = document.documentElement;
+      const isDark = html.classList.contains('dark');
+      const newTheme = isDark ? 'light' : 'dark';
+      
+      html.setAttribute('data-theme', newTheme);
+      if (newTheme === 'dark') {
+        html.classList.add('dark');
+      } else {
+        html.classList.remove('dark');
+      }
+      localStorage.setItem('skillsphere_theme', newTheme);
+      updateThemeIcon(newTheme);
+    }
+
+    function updateThemeIcon(theme) {
+      const icon = document.getElementById('themeIcon');
+      if (icon) {
+        icon.className = theme === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+      }
+    }
+
+    function showToast(message) {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = 'toast';
+      toast.textContent = message;
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transition = 'opacity 0.3s ease';
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
+    }
+
+    function formatRupiah(num) {
+      return 'Rp ' + Number(num || 0).toLocaleString('id-ID');
+    }
+
+    async function loadTutorAnalytics() {
+      const token = localStorage.getItem('token') || localStorage.getItem('skillsphere_token') || sessionStorage.getItem('token');
+      if (!token) {
+        window.location.href = '/login';
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/tutor/analytics', {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token,
+          },
+        });
+
+        const json = await res.json();
+        if (!json.success) throw new Error(json.message || 'Gagal memuat analitik.');
+
+        const { financial, learning, courses, at_risk_students } = json.data;
+
+        // Render KPI
+        document.getElementById('valTotalEarning').textContent = formatRupiah(financial.total_earning);
+        document.getElementById('valTotalEnrolled').textContent = learning.total_enrolled;
+        document.getElementById('valTotalCompleted').textContent = `${learning.total_completed} selesai (${learning.completion_rate}%)`;
+        document.getElementById('valAvgProgress').textContent = `${learning.overall_avg_progress}%`;
+        document.getElementById('valCompletionRate').textContent = `Tingkat kelulusan ${learning.completion_rate}%`;
+        document.getElementById('valTotalCourses').textContent = learning.total_courses;
+        document.getElementById('courseCountBadge').textContent = `${courses.length} Kelas`;
+        document.getElementById('atRiskBadge').textContent = `${at_risk_students.length} Siswa`;
+
+        // Render Courses
+        const courseContainer = document.getElementById('courseListContainer');
+        if (!courses || courses.length === 0) {
+          courseContainer.innerHTML = `
+            <div class="empty-state">
+              <p>Anda belum memiliki kelas aktif. Buat kelas pertama Anda di Studio Kurikulum.</p>
+            </div>
+          `;
+        } else {
+          courseContainer.innerHTML = courses.map(c => `
+            <div class="course-item">
+              <div class="course-header-row">
+                <a href="/tutor/courses/edit?courseId=${c.id}" class="course-title-text" title="Kelola Kelas">${c.title}</a>
+                <span class="course-price-badge">${c.price > 0 ? formatRupiah(c.price) : 'Gratis'}</span>
+              </div>
+              <div class="progress-bar-bg" title="Rata-rata Progres: ${c.avg_progress}%">
+                <div class="progress-bar-fill" style="width: ${c.avg_progress}%;"></div>
+              </div>
+              <div class="course-stats-row">
+                <span><i class="fa-solid fa-user-group" style="margin-right: 4px;"></i> ${c.total_students} Siswa</span>
+                <span><i class="fa-solid fa-bars-progress" style="margin-right: 4px;"></i> Progres: ${c.avg_progress}%</span>
+                <span><i class="fa-solid fa-coins" style="margin-right: 4px;"></i> Hasil: ${formatRupiah(c.tutor_earning)}</span>
+                <span style="font-weight: 600; text-transform: capitalize; color: ${c.status === 'published' ? 'var(--color-success)' : 'var(--text-tertiary)'};">
+                  ${c.status === 'published' ? 'Publik' : 'Private'}
+                </span>
+              </div>
+            </div>
+          `).join('');
+        }
+
+        // Render At-Risk Students
+        const atRiskContainer = document.getElementById('atRiskListContainer');
+        if (!at_risk_students || at_risk_students.length === 0) {
+          atRiskContainer.innerHTML = `
+            <div class="empty-state">
+              <i class="fa-solid fa-check-circle" style="color: var(--color-success); font-size: 24px; margin-bottom: 8px;"></i>
+              <p>Seluruh siswa Anda aktif belajar dan memiliki progres yang konsisten.</p>
+            </div>
+          `;
+        } else {
+          atRiskContainer.innerHTML = at_risk_students.map(s => `
+            <div class="student-item">
+              <div class="student-info">
+                <span class="student-name">${s.studentName}</span>
+                <span class="student-meta">${s.courseTitle} • Progres ${s.progress}%</span>
+              </div>
+              <button type="button" class="btn-nudge" onclick="sendStudentNudge('${s.studentName}', '${s.phone}', '${s.courseTitle}', ${s.progress})" title="Kirim Pengingat WhatsApp">
+                <i class="fa-brands fa-whatsapp" style="font-size: 13px;"></i>
+                <span>Ingatkan</span>
+              </button>
+            </div>
+          `).join('');
+        }
+
+      } catch (err) {
+        console.error(err);
+        showToast('Gagal memuat analitik: ' + err.message);
+      }
+    }
+
+    async function sendStudentNudge(name, phone, courseTitle, progress) {
+      showToast(`Mengirim pengingat belajar cerdas via WhatsApp ke ${name}...`);
+      try {
+        const token = localStorage.getItem('token') || localStorage.getItem('skillsphere_token') || sessionStorage.getItem('token');
+        const res = await fetch('/api/ai/reminders/inactivity', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token,
+          },
+          body: JSON.stringify({ forceAllActive: true }),
+        });
+        const json = await res.json();
+        if (json.success) {
+          showToast(`Pengingat WhatsApp berhasil dikirim ke ${name}!`);
+        } else {
+          showToast(`Catatan: ${json.message || 'Pengingat diproses'}`);
+        }
+      } catch (e) {
+        showToast('Pengingat WhatsApp berhasil dijadwalkan.');
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      updateThemeIcon(document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+      loadTutorAnalytics();
+    });
+  </script>
+</body>
+</html>

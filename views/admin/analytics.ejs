@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title || 'Laporan & Analitik Platform | Admin SkillSphere AI' %></title>
+  
+  <script>
+    (function() {
+      try {
+        const saved = localStorage.getItem('skillsphere_theme') || localStorage.getItem('theme');
+        const pref = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        const active = saved || pref;
+        document.documentElement.setAttribute('data-theme', active);
+        if (active === 'dark') document.documentElement.classList.add('dark');
+      } catch (e) {}
+    })();
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <link rel="stylesheet" href="/stylesheets/style.css">
+  <link rel="stylesheet" href="/stylesheets/claude-theme.css">
+  <link rel="stylesheet" href="/stylesheets/accessibility.css">
+
+  <style>
+    :root {
+      --bg-app: #FAF9F5;
+      --bg-surface: #FFFFFF;
+      --bg-surface-subtle: #F4F3EE;
+      --text-primary: #1F1E1B;
+      --text-secondary: #6B6963;
+      --text-tertiary: #92908B;
+      --border-subtle: #E5E4DE;
+      --border-strong: #D1D0CA;
+      --accent-primary: #1F1E1B;
+      --accent-text: #FAF9F5;
+      --font-serif: 'Newsreader', Georgia, serif;
+      --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      --color-success: #0A6C35;
+      --color-warning: #92400E;
+      --color-danger: #991B1B;
+      --radius-sm: 6px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-xl: 16px;
+      --radius-full: 9999px;
+    }
+
+    .dark {
+      --bg-app: #141413;
+      --bg-surface: #1F1E1B;
+      --bg-surface-subtle: #252320;
+      --text-primary: #FAF9F5;
+      --text-secondary: #A3A29E;
+      --text-tertiary: #6B6963;
+      --border-subtle: #2A2926;
+      --border-strong: #3B3934;
+      --accent-primary: #FAF9F5;
+      --accent-text: #141413;
+      --color-success: #75F39F;
+      --color-warning: #FCD34D;
+      --color-danger: #FCA5A5;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-app);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      min-height: 100vh;
+      display: flex;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Fixed Left Sidebar */
+    .admin-sidebar {
+      width: 260px;
+      background: var(--bg-surface);
+      border-right: 1px solid var(--border-subtle);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      z-index: 150;
+    }
+
+    .sidebar-brand {
+      padding: 20px 20px;
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .sidebar-brand a {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--text-primary);
+      font-weight: 700;
+      font-size: 1.02rem;
+    }
+
+    .admin-badge-tag {
+      background: var(--accent-primary);
+      color: var(--accent-text);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 3px 7px;
+      border-radius: var(--radius-sm);
+    }
+
+    .sidebar-nav-container {
+      flex: 1;
+      padding: 16px 12px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .nav-group-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-tertiary);
+      padding: 12px 12px 6px;
+    }
+
+    .sidebar-nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border-radius: var(--radius-md);
+      color: var(--text-secondary);
+      font-size: 0.88rem;
+      font-weight: 500;
+      text-decoration: none;
+      transition: all 0.15s ease;
+    }
+
+    .sidebar-nav-item:hover {
+      background: var(--bg-surface-subtle);
+      color: var(--text-primary);
+    }
+
+    .sidebar-nav-item.active {
+      background: var(--bg-surface-subtle);
+      color: var(--text-primary);
+      font-weight: 600;
+      border: 1px solid var(--border-subtle);
+    }
+
+    .sidebar-nav-item i {
+      width: 18px;
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+
+    .sidebar-nav-item.active i {
+      color: var(--text-primary);
+    }
+
+    /* Main Area Layout */
+    .admin-main {
+      margin-left: 260px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .top-header {
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border-subtle);
+      height: 62px;
+      padding: 0 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .header-breadcrumb {
+      font-size: 0.86rem;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .icon-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-surface);
+      color: var(--text-secondary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
+    }
+
+    .icon-btn:hover {
+      color: var(--text-primary);
+      background: var(--bg-surface-subtle);
+    }
+
+    .admin-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 12px;
+      border-radius: var(--radius-full);
+      background: var(--bg-surface-subtle);
+      border: 1px solid var(--border-subtle);
+      font-size: 0.84rem;
+      font-weight: 600;
+    }
+
+    .content-wrapper {
+      padding: 32px;
+      max-width: 1200px;
+      width: 100%;
+    }
+
+    .page-title {
+      font-family: var(--font-serif);
+      font-size: 2rem;
+      font-weight: 500;
+      letter-spacing: -0.02em;
+      margin-bottom: 6px;
+    }
+
+    .page-subtitle {
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+      margin-bottom: 28px;
+    }
+
+    /* Minimalist KPI Grid */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+
+    .kpi-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .kpi-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .kpi-label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-tertiary);
+    }
+
+    .kpi-value {
+      font-size: 1.65rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: -0.02em;
+      margin-bottom: 4px;
+    }
+
+    .kpi-subtext {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+    }
+
+    /* Content Layout */
+    .content-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 24px;
+    }
+
+    .section-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+
+    .section-card:last-child {
+      margin-bottom: 0;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .section-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .rank-item {
+      padding: 14px 16px;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      margin-bottom: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .rank-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .rank-top-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .rank-title {
+      font-size: 0.92rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .rank-badge {
+      font-size: 0.8rem;
+      font-weight: 600;
+      font-family: var(--font-mono);
+      background: var(--bg-surface-subtle);
+      padding: 2px 8px;
+      border-radius: var(--radius-sm);
+    }
+
+    .progress-bar-bg {
+      width: 100%;
+      height: 6px;
+      background: var(--bg-surface-subtle);
+      border-radius: var(--radius-full);
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: var(--accent-primary);
+      border-radius: var(--radius-full);
+    }
+
+    .rank-meta-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.82rem;
+      color: var(--text-secondary);
+    }
+
+    .stat-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border-subtle);
+      font-size: 0.88rem;
+    }
+
+    .stat-row:last-child {
+      border-bottom: none;
+    }
+
+    .stat-label {
+      color: var(--text-secondary);
+    }
+
+    .stat-val {
+      font-weight: 600;
+      color: var(--text-primary);
+      font-family: var(--font-mono);
+    }
+
+    @media (max-width: 900px) {
+      .admin-sidebar {
+        display: none;
+      }
+      .admin-main {
+        margin-left: 0;
+      }
+      .kpi-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .content-grid {
+        grid-template-columns: 1fr;
+      }
+      .content-wrapper {
+        padding: 20px 16px;
+      }
+    }
+
+    @media (max-width: 540px) {
+      .kpi-grid {
+        grid-template-columns: 1fr;
+      }
+      .page-title {
+        font-size: 1.6rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Fixed Left Sidebar -->
+  <aside class="admin-sidebar">
+    <div class="sidebar-brand">
+      <a href="/admin">
+        <i class="fa-solid fa-sparkles" style="color: #F59E0B;"></i>
+        <span>SkillSphere</span>
+      </a>
+      <span class="admin-badge-tag">Admin</span>
+    </div>
+
+    <div class="sidebar-nav-container">
+      <span class="nav-group-label">Navigasi Utama</span>
+      <a href="/admin" class="sidebar-nav-item">
+        <i class="fa-solid fa-house"></i>
+        <span>Dashboard Utama</span>
+      </a>
+      <a href="/admin/analytics" class="sidebar-nav-item active">
+        <i class="fa-solid fa-chart-line"></i>
+        <span>Laporan & Analitik</span>
+      </a>
+
+      <span class="nav-group-label">Manajemen</span>
+      <a href="/admin#users" class="sidebar-nav-item">
+        <i class="fa-solid fa-users"></i>
+        <span>Manajemen Pengguna</span>
+      </a>
+      <a href="/admin#courses" class="sidebar-nav-item">
+        <i class="fa-solid fa-book-bookmark"></i>
+        <span>Katalog Kursus</span>
+      </a>
+      <a href="/admin#financial" class="sidebar-nav-item">
+        <i class="fa-solid fa-wallet"></i>
+        <span>Arsitektur Finansial</span>
+      </a>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <div class="admin-main">
+    <header class="top-header">
+      <div class="header-left">
+        <div class="header-breadcrumb">
+          <span>Admin</span>
+          <i class="fa-solid fa-chevron-right" style="font-size: 10px;"></i>
+          <span style="font-weight: 600; color: var(--text-primary);">Laporan & Analitik Platform</span>
+        </div>
+      </div>
+
+      <div class="header-right">
+        <button type="button" class="icon-btn" onclick="toggleTheme()" title="Ganti Tema">
+          <i class="fa-solid fa-moon" id="themeIcon"></i>
+        </button>
+
+        <div class="admin-pill">
+          <i class="fa-solid fa-shield-halved" style="color: #F59E0B;"></i>
+          <span>Administrator</span>
+        </div>
+
+        <a href="/login" class="icon-btn" title="Keluar">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i>
+        </a>
+      </div>
+    </header>
+
+    <main class="content-wrapper">
+      <h1 class="page-title">Laporan & Analitik Platform</h1>
+      <p class="page-subtitle">Ringkasan performa finansial, pertumbuhan pengguna, efisiensi kurikulum, dan operasional pencairan dana platform secara real-time.</p>
+
+      <!-- 4 KPI Cards -->
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-header">
+            <span class="kpi-label">Total Omzet (GMV)</span>
+            <i class="fa-solid fa-coins kpi-icon"></i>
+          </div>
+          <div class="kpi-value" id="valTotalGMV">Rp 0</div>
+          <div class="kpi-subtext">
+            <span>Biaya Platform (20%): <strong id="valPlatformFee">Rp 0</strong></span>
+          </div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-header">
+            <span class="kpi-label">Tingkat Keberhasilan</span>
+            <i class="fa-solid fa-circle-check kpi-icon"></i>
+          </div>
+          <div class="kpi-value" id="valSuccessRate">100%</div>
+          <div class="kpi-subtext">
+            <span id="valSettledCount">0 transaksi sukses</span>
+          </div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-header">
+            <span class="kpi-label">Ekosistem Pengguna</span>
+            <i class="fa-solid fa-users kpi-icon"></i>
+          </div>
+          <div class="kpi-value" id="valTotalStudents">0</div>
+          <div class="kpi-subtext">
+            <span id="valTotalTutors">0 pengajar resmi aktif</span>
+          </div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-header">
+            <span class="kpi-label">Sertifikat Resmi</span>
+            <i class="fa-solid fa-certificate kpi-icon"></i>
+          </div>
+          <div class="kpi-value" id="valCertificatesIssued">0</div>
+          <div class="kpi-subtext">
+            <span id="valExamPassRate">Kelulusan ujian: 0%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Content Grid -->
+      <div class="content-grid">
+        <!-- Left: Top Courses -->
+        <div>
+          <section class="section-card">
+            <div class="section-header">
+              <h2 class="section-title">5 Kursus Terlaris & Kontribusi Omzet</h2>
+              <span class="section-badge" style="font-size: 0.8rem; color: var(--text-secondary);">Berdasarkan Total Pendapatan</span>
+            </div>
+
+            <div id="topCoursesList">
+              <div style="padding: 24px; text-align: center; color: var(--text-tertiary);">
+                <i class="fa-solid fa-circle-notch fa-spin" style="margin-bottom: 8px;"></i>
+                <p>Memuat data kursus...</p>
+              </div>
+            </div>
+          </section>
+
+          <section class="section-card">
+            <div class="section-header">
+              <h2 class="section-title">Distribusi Kursus & Konten</h2>
+            </div>
+
+            <div class="stat-row">
+              <span class="stat-label">Total Kursus Terdaftar</span>
+              <span class="stat-val" id="valTotalCourses">0</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-label">Kursus Berstatus Publik</span>
+              <span class="stat-val" id="valPublishedCourses">0</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-label">Kursus Berstatus Private / Draft</span>
+              <span class="stat-val" id="valPrivateCourses">0</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-label">Kursus Berbayar vs Gratis</span>
+              <span class="stat-val" id="valPaidFreeRatio">0 Berbayar / 0 Gratis</span>
+            </div>
+          </section>
+        </div>
+
+        <!-- Right: Payout Operations & Learning Stats -->
+        <div>
+          <section class="section-card">
+            <div class="section-header">
+              <h2 class="section-title">Operasional Finansial & Payout</h2>
+            </div>
+
+            <div class="stat-row">
+              <span class="stat-label">Hak Tutor Terkredit (80%)</span>
+              <span class="stat-val" id="valTutorShare">Rp 0</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-label">Pencairan Dana Ditransfer</span>
+              <span class="stat-val" id="valCompletedPayouts">Rp 0</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-label">Permintaan Payout Pending</span>
+              <span class="stat-val" style="color: #B45309;" id="valPendingPayouts">0 Permintaan</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-label">Nominal Payout Menunggu</span>
+              <span class="stat-val" style="color: #B45309;" id="valPendingPayoutAmount">Rp 0</span>
+            </div>
+          </section>
+
+          <section class="section-card">
+            <div class="section-header">
+              <h2 class="section-title">Efisiensi Belajar & Kelulusan</h2>
+            </div>
+
+            <div class="stat-row">
+              <span class="stat-label">Pendaftaran Kelas Aktif</span>
+              <span class="stat-val" id="valActiveEnrollments">0</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-label">Total Ujian Dikerjakan</span>
+              <span class="stat-val" id="valExamAttempts">0</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-label">Ujian Dinyatakan Lulus</span>
+              <span class="stat-val" style="color: var(--color-success);" id="valPassedExams">0</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-label">Total Sertifikat Diterbitkan</span>
+              <span class="stat-val" id="valCertificatesTotal">0</span>
+            </div>
+          </section>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    function toggleTheme() {
+      const html = document.documentElement;
+      const isDark = html.classList.contains('dark');
+      const newTheme = isDark ? 'light' : 'dark';
+      
+      html.setAttribute('data-theme', newTheme);
+      if (newTheme === 'dark') {
+        html.classList.add('dark');
+      } else {
+        html.classList.remove('dark');
+      }
+      localStorage.setItem('skillsphere_theme', newTheme);
+      updateThemeIcon(newTheme);
+    }
+
+    function updateThemeIcon(theme) {
+      const icon = document.getElementById('themeIcon');
+      if (icon) {
+        icon.className = theme === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+      }
+    }
+
+    function formatRupiah(num) {
+      return 'Rp ' + Number(num || 0).toLocaleString('id-ID');
+    }
+
+    async function loadAdminAnalytics() {
+      const token = localStorage.getItem('token') || localStorage.getItem('skillsphere_token') || sessionStorage.getItem('token');
+      if (!token) {
+        window.location.href = '/login';
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/admin/analytics', {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token,
+          },
+        });
+
+        const json = await res.json();
+        if (!json.success) throw new Error(json.message || 'Gagal memuat analitik.');
+
+        const { financial, users, courses, learning, payouts } = json.data;
+
+        // Render KPI
+        document.getElementById('valTotalGMV').textContent = formatRupiah(financial.total_gmv);
+        document.getElementById('valPlatformFee').textContent = formatRupiah(financial.total_platform_fee);
+        document.getElementById('valSuccessRate').textContent = `${financial.success_rate}%`;
+        document.getElementById('valSettledCount').textContent = `${financial.settled_count} dari ${financial.total_transactions} transaksi`;
+
+        document.getElementById('valTotalStudents').textContent = `${users.total_students} Siswa`;
+        document.getElementById('valTotalTutors').textContent = `${users.total_tutors} pengajar resmi aktif`;
+
+        document.getElementById('valCertificatesIssued').textContent = learning.certificates_issued;
+        document.getElementById('valExamPassRate').textContent = `Kelulusan ujian: ${learning.exam_pass_rate}% (${learning.passed_exams} lulus)`;
+
+        // Render Courses
+        document.getElementById('valTotalCourses').textContent = courses.total;
+        document.getElementById('valPublishedCourses').textContent = `${courses.published} Kelas`;
+        document.getElementById('valPrivateCourses').textContent = `${courses.private} Kelas`;
+        document.getElementById('valPaidFreeRatio').textContent = `${courses.paid} Berbayar / ${courses.free} Gratis`;
+
+        // Render Payouts
+        document.getElementById('valTutorShare').textContent = formatRupiah(financial.total_tutor_share);
+        document.getElementById('valCompletedPayouts').textContent = formatRupiah(payouts.completed_amount);
+        document.getElementById('valPendingPayouts').textContent = `${payouts.pending_count} Permintaan`;
+        document.getElementById('valPendingPayoutAmount').textContent = formatRupiah(payouts.pending_amount);
+
+        // Render Learning Stats
+        document.getElementById('valActiveEnrollments').textContent = users.active_enrollments;
+        document.getElementById('valExamAttempts').textContent = learning.exam_attempts;
+        document.getElementById('valPassedExams').textContent = learning.passed_exams;
+        document.getElementById('valCertificatesTotal').textContent = learning.certificates_issued;
+
+        // Render Top Courses
+        const topList = document.getElementById('topCoursesList');
+        if (!courses.top_courses || courses.top_courses.length === 0) {
+          topList.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--text-tertiary);">Belum ada data transaksi kursus.</div>';
+        } else {
+          topList.innerHTML = courses.top_courses.map((c, idx) => `
+            <div class="rank-item">
+              <div class="rank-top-row">
+                <span class="rank-title">#${idx + 1} ${c.title}</span>
+                <span class="rank-badge">${formatRupiah(c.total_revenue)}</span>
+              </div>
+              <div class="progress-bar-bg" title="Rata-rata Progres: ${c.avg_progress}%">
+                <div class="progress-bar-fill" style="width: ${c.avg_progress}%;"></div>
+              </div>
+              <div class="rank-meta-row">
+                <span>Pengajar: ${c.tutor_name}</span>
+                <span>${c.total_students} Siswa</span>
+                <span>Platform (20%): ${formatRupiah(c.platform_fee_earned)}</span>
+              </div>
+            </div>
+          `).join('');
+        }
+
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      updateThemeIcon(document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+      loadAdminAnalytics();
+    });
+  </script>
+</body>
+</html>
