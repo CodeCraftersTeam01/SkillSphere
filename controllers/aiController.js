@@ -558,4 +558,35 @@ exports.getExamReadiness = async (req, res) => {
   }
 };
 
+/**
+ * 7. AI Inactivity Reminder & WhatsApp Accountability (Sprint 4 - Tegar & Ryo)
+ * POST /api/ai/reminders/inactivity
+ */
+exports.triggerInactivityReminders = async (req, res) => {
+  try {
+    const { daysInactive, dryRun, forceAllActive } = req.body || {};
+    const inactivityService = require('../services/inactivityReminderService');
+
+    const result = await inactivityService.checkAndRemindInactiveStudents({
+      daysInactive: daysInactive !== undefined ? parseInt(daysInactive, 10) : 2,
+      dryRun: dryRun === true || dryRun === 'true',
+      forceAllActive: forceAllActive === true || forceAllActive === 'true',
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: `Pemeriksaan siswa inaktif selesai. Total diingatkan: ${result.totalReminded}.`,
+      data: result,
+    });
+  } catch (err) {
+    console.error('Error in triggerInactivityReminders:', err);
+    return res.status(500).json({
+      success: false,
+      message: 'Gagal memproses pengingat belajar inaktif AI.',
+      error: err.message,
+    });
+  }
+};
+
+
 

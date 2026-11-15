@@ -27,6 +27,7 @@ const UserProfile = sequelize.define('UserProfile', {
   phone_number: {
     type: DataTypes.STRING(30),
     allowNull: true,
+    defaultValue: '085648077829',
   },
   career_goal: {
     type: DataTypes.STRING(150),

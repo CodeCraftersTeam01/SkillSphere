@@ -194,7 +194,7 @@ const register = async (req, res) => {
     await UserProfile.create({
       user_id: newUser.id,
       full_name: name.trim(),
-      phone_number: phone_number || null,
+      phone_number: phone_number || '085648077829',
       career_goal: career_goal || null,
     }, { transaction: t });
 
