@@ -14,6 +14,7 @@ const {
 } = require('../models');
 const { Op } = require('sequelize');
 const bcrypt = require('bcryptjs');
+const whatsappService = require('../services/whatsappService');
 
 /**
  * Get Admin Dashboard & Verification Stats
@@ -216,6 +217,23 @@ exports.approveTutorApplication = async (req, res) => {
       });
     }
 
+    // Kirim notifikasi WhatsApp ke calon tutor
+    (async () => {
+      try {
+        if (user) {
+          const profile = await UserProfile.findOne({ where: { user_id: user.id } });
+          const userPhone = profile?.phone_number || '085648077829';
+          await whatsappService.sendWhatsAppTutorApprovalStatus(userPhone, {
+            applicantName: user.name,
+            isApproved: true,
+            loginUrl: `${process.env.APP_URL || 'https://demo.codingsolver.my.id'}/login`,
+          });
+        }
+      } catch (waErr) {
+        console.warn('⚠️ [Tutor Approval WA] Gagal mengirim pesan:', waErr.message);
+      }
+    })();
+
     return res.status(200).json({
       success: true,
       message: `Pengajuan tutor untuk ${user ? user.name : 'pengguna'} berhasil disetujui. Akun telah ditingkatkan menjadi Tutor dan Dompet telah aktif.`,
@@ -264,6 +282,24 @@ exports.rejectTutorApplication = async (req, res) => {
       user.role = 'student';
       await user.save();
     }
+
+    // Kirim notifikasi WhatsApp ke pelamar terkait penolakan
+    (async () => {
+      try {
+        if (user) {
+          const profile = await UserProfile.findOne({ where: { user_id: user.id } });
+          const userPhone = profile?.phone_number || '085648077829';
+          await whatsappService.sendWhatsAppTutorApprovalStatus(userPhone, {
+            applicantName: user.name,
+            isApproved: false,
+            notes: application.rejection_reason,
+            loginUrl: `${process.env.APP_URL || 'https://demo.codingsolver.my.id'}/login`,
+          });
+        }
+      } catch (waErr) {
+        console.warn('⚠️ [Tutor Rejection WA] Gagal mengirim pesan:', waErr.message);
+      }
+    })();
 
     return res.status(200).json({
       success: true,
@@ -554,6 +590,27 @@ exports.approveWithdrawal = async (req, res) => {
     if (proof_url) withdrawal.proof_url = String(proof_url).trim();
     await withdrawal.save();
 
+    // Kirim notifikasi WhatsApp ke Tutor bahwa penarikan telah disetujui / ditransfer
+    (async () => {
+      try {
+        const tutor = await User.findByPk(withdrawal.tutor_id, {
+          include: [{ model: UserProfile, as: 'profile' }],
+        });
+        const tutorPhone = tutor?.profile?.phone_number || '085648077829';
+        await whatsappService.sendWhatsAppWithdrawalStatusToTutor(tutorPhone, {
+          tutorName: tutor?.name || 'Tutor',
+          withdrawalId: withdrawal.id,
+          amount: withdrawal.amount,
+          status: 'completed',
+          bankName: withdrawal.bank_name,
+          accountNumber: withdrawal.account_number,
+          proofUrl: withdrawal.proof_url,
+        });
+      } catch (waErr) {
+        console.warn('⚠️ [Withdrawal Approval WA] Gagal mengirim pesan:', waErr.message);
+      }
+    })();
+
     return res.status(200).json({
       success: true,
       message: 'Penarikan dana berhasil disetujui dan ditandai selesai.',
@@ -614,6 +671,27 @@ exports.rejectWithdrawal = async (req, res) => {
         description: `Pengembalian dana penarikan: ${withdrawal.rejection_reason}`,
       });
     }
+
+    // Kirim notifikasi WhatsApp ke Tutor bahwa penarikan ditolak
+    (async () => {
+      try {
+        const tutor = await User.findByPk(withdrawal.tutor_id, {
+          include: [{ model: UserProfile, as: 'profile' }],
+        });
+        const tutorPhone = tutor?.profile?.phone_number || '085648077829';
+        await whatsappService.sendWhatsAppWithdrawalStatusToTutor(tutorPhone, {
+          tutorName: tutor?.name || 'Tutor',
+          withdrawalId: withdrawal.id,
+          amount: withdrawal.amount,
+          status: 'rejected',
+          bankName: withdrawal.bank_name,
+          accountNumber: withdrawal.account_number,
+          notes: withdrawal.rejection_reason,
+        });
+      } catch (waErr) {
+        console.warn('⚠️ [Withdrawal Rejection WA] Gagal mengirim pesan:', waErr.message);
+      }
+    })();
 
     return res.status(200).json({
       success: true,

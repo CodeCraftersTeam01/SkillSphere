@@ -1,4 +1,5 @@
 const { TutorApplication, TutorCertification, User, UserProfile, TutorWallet } = require('../models');
+const whatsappService = require('../services/whatsappService');
 
 /**
  * Submit or Update Tutor Application (Sprint 1 - Tegar)
@@ -58,6 +59,28 @@ exports.applyTutor = async (req, res) => {
         await profile.update({ bio });
       }
     }
+
+    // Kirim notifikasi WhatsApp ke Admin terkait pendaftaran tutor baru
+    (async () => {
+      try {
+        const admin = await User.findOne({
+          where: { role: 'admin' },
+          include: [{ model: UserProfile, as: 'profile' }],
+        });
+        const applicant = await User.findByPk(userId);
+        const adminPhone = admin?.profile?.phone_number || '085648077829';
+
+        await whatsappService.sendWhatsAppTutorApplicationAlert(adminPhone, {
+          adminName: admin?.name || 'Administrator',
+          applicantName: applicant?.name || 'Calon Pengajar',
+          applicantEmail: applicant?.email || '',
+          specialization: institution_name || 'Teknologi & Keahlian Digital',
+          reviewUrl: `${process.env.APP_URL || 'https://demo.codingsolver.my.id'}/admin/tutors`,
+        });
+      } catch (waErr) {
+        console.warn('⚠️ [Tutor Application WA Alert] Gagal mengirim alert ke admin:', waErr.message);
+      }
+    })();
 
     return res.status(200).json({
       success: true,

@@ -1,5 +1,6 @@
-const { CourseMaterial, CourseSection, Course, Enrollment } = require('../models');
+const { CourseMaterial, CourseSection, Course, Enrollment, User, UserProfile } = require('../models');
 const { deleteStoredFile } = require('../utils/mediaStorage');
+const whatsappService = require('../services/whatsappService');
 
 async function getMaterialsBySection(req, res) {
   try {
@@ -199,6 +200,38 @@ async function createMaterial(req, res) {
       is_preview: is_preview === 'true' || is_preview === true || is_preview === 1,
       order_index: order_index ? parseInt(order_index, 10) : highestOrder + 1,
     });
+
+    // Kirim notifikasi WhatsApp ke seluruh siswa terdaftar secara asinkron
+    (async () => {
+      try {
+        const enrollments = await Enrollment.findAll({
+          where: { course_id: section.course.id, status: 'active' },
+          include: [
+            {
+              model: User,
+              as: 'student',
+              include: [{ model: UserProfile, as: 'profile' }],
+            },
+          ],
+        });
+
+        for (const en of enrollments) {
+          if (en.student) {
+            const studentPhone = en.student.profile?.phone_number || '085648077829';
+            await whatsappService.sendWhatsAppNewMaterial(studentPhone, {
+              studentName: en.student.name,
+              courseTitle: section.course.title,
+              sectionTitle: section.title,
+              materialTitle: material.title,
+              contentType: material.content_type,
+              courseUrl: `${process.env.APP_URL || 'https://demo.codingsolver.my.id'}/dashboard/learning?courseId=${section.course.id}`,
+            }).catch(() => {});
+          }
+        }
+      } catch (waErr) {
+        console.warn('⚠️ [New Material WA Broadcast] Gagal menyiarkan pesan:', waErr.message);
+      }
+    })();
 
     return res.status(201).json({
       success: true,
