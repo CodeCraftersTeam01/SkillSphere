@@ -168,9 +168,9 @@
     "semantic_hash": ""
   },
   "controllers/adminController.js": {
-    "mtime": 1794747693.9404228,
-    "seen": 1794748264.543529,
-    "ast_hash": "4c9b3d9b048aff5c388ba36170b4dca3",
+    "mtime": 1794748909.8767142,
+    "seen": 1794749459.2013152,
+    "ast_hash": "b3b12cddf6b7d25603d7a2e6d8279679",
     "semantic_hash": ""
   },
   "controllers/aiController.js": {
@@ -228,9 +228,9 @@
     "semantic_hash": ""
   },
   "controllers/tutorController.js": {
-    "mtime": 1794747829.141001,
-    "seen": 1794748264.543539,
-    "ast_hash": "4b5e728d6af2686e577f8addf4b36754",
+    "mtime": 1794749409.5898883,
+    "seen": 1794749459.201324,
+    "ast_hash": "20fc02cb233470a8ae6863204e55c3a1",
     "semantic_hash": ""
   },
   "middleware/auth.js": {
@@ -384,9 +384,9 @@
     "semantic_hash": ""
   },
   "package.json": {
-    "mtime": 1794748220.7309835,
-    "seen": 1794748264.543561,
-    "ast_hash": "98e44a0cab095b5b9d9a9e62cc643507",
+    "mtime": 1794749444.8592277,
+    "seen": 1794749459.2013462,
+    "ast_hash": "803d351b67d8c7fc901020d70b170f6e",
     "semantic_hash": ""
   },
   "public/javascripts/accessibility.js": {
@@ -420,9 +420,9 @@
     "semantic_hash": ""
   },
   "routes/api/admin.js": {
-    "mtime": 1793545927.0449932,
-    "seen": 1794367136.878509,
-    "ast_hash": "98dfbaf7a38dfd4b696e1de6535a5a99",
+    "mtime": 1794748929.0321362,
+    "seen": 1794749459.201351,
+    "ast_hash": "a2f16bde6ff20d69050453c0720950e4",
     "semantic_hash": ""
   },
   "routes/api/ai.js": {
@@ -492,15 +492,15 @@
     "semantic_hash": ""
   },
   "routes/api/tutor.js": {
-    "mtime": 1793545601.7107916,
-    "seen": 1794367136.8785229,
-    "ast_hash": "7c31c250110f402307e13f1d66a43dc6",
+    "mtime": 1794749050.733876,
+    "seen": 1794749459.201362,
+    "ast_hash": "9b72bc0ef00299d08a30b39523c09b66",
     "semantic_hash": ""
   },
   "routes/index.js": {
-    "mtime": 1794575900.6062908,
-    "seen": 1794577198.924433,
-    "ast_hash": "6f3b00fe00831abd7a53a75f8e9897d7",
+    "mtime": 1794749076.9815571,
+    "seen": 1794749459.201362,
+    "ast_hash": "b9eadd37d99d800837def3ae8732a5fe",
     "semantic_hash": ""
   },
   "routes/users.js": {
@@ -690,9 +690,9 @@
     "semantic_hash": ""
   },
   "views/admin/verification.ejs": {
-    "mtime": 1793550858.3803432,
-    "seen": 1794367136.8785641,
-    "ast_hash": "70bbe8f04cdd5513d91edd4f88885e45",
+    "mtime": 1794749211.261398,
+    "seen": 1794749459.201397,
+    "ast_hash": "d95a8e26aecfc95e64764b5b39dc67c9",
     "semantic_hash": ""
   },
   "views/certificates/verify.ejs": {
@@ -810,15 +810,15 @@
     "semantic_hash": ""
   },
   "views/tutor/certificates.ejs": {
-    "mtime": 1794160574.8368518,
-    "seen": 1794367136.8785899,
-    "ast_hash": "c01193e3bf509de4c19a1153013a8e52",
+    "mtime": 1794749227.305359,
+    "seen": 1794749459.2014139,
+    "ast_hash": "7dbc7dcffc619cb7f18d0523c7487bc4",
     "semantic_hash": ""
   },
   "views/tutor/exams.ejs": {
-    "mtime": 1794368561.4595125,
-    "seen": 1794368591.5322602,
-    "ast_hash": "d581c37e1caafd8407d664994595ac6a",
+    "mtime": 1794749243.5084717,
+    "seen": 1794749459.2014148,
+    "ast_hash": "43af558cd6da464175ae6849100ec25b",
     "semantic_hash": ""
   },
   "views/tutor/materials.ejs": {
@@ -834,15 +834,15 @@
     "semantic_hash": ""
   },
   "views/tutor/wallet.ejs": {
-    "mtime": 1794160549.872639,
-    "seen": 1794367136.878595,
-    "ast_hash": "d00199f0478a9745726e6ea88a7b1646",
+    "mtime": 1794749262.5559711,
+    "seen": 1794749459.201418,
+    "ast_hash": "9b94e41e883059c0c4d0e733f97ebaf7",
     "semantic_hash": ""
   },
   "views/tutor/withdrawal.ejs": {
-    "mtime": 1794160549.8728642,
-    "seen": 1794367136.878596,
-    "ast_hash": "f8b430bd37e17904423773c9d764342e",
+    "mtime": 1794749291.171916,
+    "seen": 1794749459.201418,
+    "ast_hash": "f856faed2a277875c3397b77a3f985e2",
     "semantic_hash": ""
   },
   "views/warp.ejs": {
@@ -1197,6 +1197,24 @@
     "mtime": 1794747959.3240376,
     "seen": 1794748264.543608,
     "ast_hash": "37ccc04d347312a2ee095005eab3a872",
+    "semantic_hash": ""
+  },
+  "tests/analyticsDashboard.test.js": {
+    "mtime": 1794749350.9516716,
+    "seen": 1794749459.201378,
+    "ast_hash": "1345e071c5c3f4570023de08d47634ab",
+    "semantic_hash": ""
+  },
+  "views/admin/analytics.ejs": {
+    "mtime": 1794749191.1034777,
+    "seen": 1794749459.201396,
+    "ast_hash": "24809c3200c874808b19f722334412ab",
+    "semantic_hash": ""
+  },
+  "views/tutor/analytics.ejs": {
+    "mtime": 1794749141.044357,
+    "seen": 1794749459.2014132,
+    "ast_hash": "214b4f0c05f2efc925125725fa2c6d37",
     "semantic_hash": ""
   },
   "package-lock.json": {
