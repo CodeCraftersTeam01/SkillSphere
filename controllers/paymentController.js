@@ -7,8 +7,10 @@ const {
   Course,
   Enrollment,
   User,
+  UserProfile,
 } = require('../models');
 const midtransService = require('../services/midtransService');
+const whatsappService = require('../services/whatsappService');
 
 const PLATFORM_FEE_PERCENTAGE = Number(process.env.PLATFORM_FEE_PERCENTAGE || 20);
 const TUTOR_SHARE_PERCENTAGE = Number(process.env.TUTOR_SHARE_PERCENTAGE || 80);
@@ -266,6 +268,43 @@ async function handleNotification(req, res) {
         },
       });
 
+      // 4. Kirim notifikasi WhatsApp ke Siswa (Nota Pembayaran) & Tutor (Penjualan Kelas)
+      (async () => {
+        try {
+          const student = await User.findByPk(transaction.user_id, {
+            include: [{ model: UserProfile, as: 'profile' }],
+          });
+          const tutor = course ? await User.findByPk(course.tutor_id, {
+            include: [{ model: UserProfile, as: 'profile' }],
+          }) : null;
+
+          const studentPhone = student?.profile?.phone_number || '085648077829';
+          await whatsappService.sendWhatsAppPaymentReceipt(studentPhone, {
+            studentName: student?.name || 'Pelajar',
+            courseTitle: course?.title || 'Kelas SkillSphere',
+            orderId: transaction.transaction_code,
+            amount: transaction.amount,
+            paymentMethod: transaction.payment_method || 'Midtrans',
+            paidAt: transaction.paid_at || new Date(),
+            courseUrl: `${process.env.APP_URL || 'https://demo.codingsolver.my.id'}/dashboard/learning?courseId=${transaction.course_id}`,
+          });
+
+          if (tutor) {
+            const tutorPhone = tutor?.profile?.phone_number || '085648077829';
+            await whatsappService.sendWhatsAppCourseSaleToTutor(tutorPhone, {
+              tutorName: tutor?.name || 'Instruktur',
+              studentName: student?.name || 'Siswa',
+              courseTitle: course?.title || 'Kelas SkillSphere',
+              orderId: transaction.transaction_code,
+              tutorEarning: transaction.tutor_earning,
+              dashboardUrl: `${process.env.APP_URL || 'https://demo.codingsolver.my.id'}/dashboard`,
+            });
+          }
+        } catch (waErr) {
+          console.warn('⚠️ [Payment WA Notification] Gagal mengirim pesan:', waErr.message);
+        }
+      })();
+
       return res.status(200).json({
         success: true,
         message: 'Pembayaran berhasil diselesaikan, bagi hasil dicatat, dan kelas diaktifkan.',
@@ -449,6 +488,30 @@ async function requestWithdrawal(req, res) {
       reference_type: 'withdrawal',
       description: `Pengajuan penarikan dana ke rekening ${bank_name} ${account_number} a.n ${finalAccountHolder}`,
     });
+
+    // Kirim notifikasi WhatsApp ke Admin
+    (async () => {
+      try {
+        const admin = await User.findOne({
+          where: { role: 'admin' },
+          include: [{ model: UserProfile, as: 'profile' }],
+        });
+        const tutor = await User.findByPk(tutorId);
+        const adminPhone = admin?.profile?.phone_number || '085648077829';
+
+        await whatsappService.sendWhatsAppWithdrawalAlertToAdmin(adminPhone, {
+          adminName: admin?.name || 'Administrator',
+          tutorName: tutor?.name || 'Tutor',
+          amount: withdrawAmount,
+          bankName: bank_name,
+          accountNumber: account_number,
+          accountHolder: finalAccountHolder,
+          adminWdUrl: `${process.env.APP_URL || 'https://demo.codingsolver.my.id'}/admin`,
+        });
+      } catch (waErr) {
+        console.warn('⚠️ [Withdrawal WA Notification] Gagal mengirim alert ke admin:', waErr.message);
+      }
+    })();
 
     return res.status(201).json({
       success: true,

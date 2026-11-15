@@ -1,4 +1,17 @@
-const { TutorApplication, TutorCertification, User, UserProfile, TutorWallet } = require('../models');
+const {
+  TutorApplication,
+  TutorCertification,
+  User,
+  UserProfile,
+  TutorWallet,
+  Course,
+  Enrollment,
+  Transaction,
+  Exam,
+  ExamResult,
+  Certificate,
+} = require('../models');
+const whatsappService = require('../services/whatsappService');
 
 /**
  * Submit or Update Tutor Application (Sprint 1 - Tegar)
@@ -58,6 +71,28 @@ exports.applyTutor = async (req, res) => {
         await profile.update({ bio });
       }
     }
+
+    // Kirim notifikasi WhatsApp ke Admin terkait pendaftaran tutor baru
+    (async () => {
+      try {
+        const admin = await User.findOne({
+          where: { role: 'admin' },
+          include: [{ model: UserProfile, as: 'profile' }],
+        });
+        const applicant = await User.findByPk(userId);
+        const adminPhone = admin?.profile?.phone_number || '085648077829';
+
+        await whatsappService.sendWhatsAppTutorApplicationAlert(adminPhone, {
+          adminName: admin?.name || 'Administrator',
+          applicantName: applicant?.name || 'Calon Pengajar',
+          applicantEmail: applicant?.email || '',
+          specialization: institution_name || 'Teknologi & Keahlian Digital',
+          reviewUrl: `${process.env.APP_URL || 'https://demo.codingsolver.my.id'}/admin/tutors`,
+        });
+      } catch (waErr) {
+        console.warn('⚠️ [Tutor Application WA Alert] Gagal mengirim alert ke admin:', waErr.message);
+      }
+    })();
 
     return res.status(200).json({
       success: true,
@@ -227,6 +262,152 @@ exports.deleteCertification = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: 'Gagal menghapus sertifikasi.',
+      error: err.message,
+    });
+  }
+};
+
+/**
+ * Tutor Teaching Performance & Course Analytics (Clean & Minimalist)
+ * GET /api/tutor/analytics
+ */
+exports.getTutorAnalytics = async (req, res) => {
+  try {
+    const tutorId = req.user.id;
+
+    // 1. Tutor Wallet & Sales Summary
+    const [wallet] = await TutorWallet.findOrCreate({
+      where: { tutor_id: tutorId },
+      defaults: { balance: 0.00, pending_balance: 0.00 },
+    });
+
+    // 2. Courses owned by tutor
+    const courses = await Course.findAll({
+      where: { tutor_id: tutorId },
+      include: [
+        {
+          model: Enrollment,
+          as: 'enrollments',
+          include: [
+            {
+              model: User,
+              as: 'student',
+              attributes: ['id', 'name', 'email'],
+              include: [{ model: UserProfile, as: 'profile', attributes: ['phone_number', 'avatar_url'] }],
+            },
+          ],
+        },
+        {
+          model: Exam,
+          as: 'exams',
+          include: [
+            { model: ExamResult, as: 'results' },
+          ],
+        },
+      ],
+    });
+
+    const courseIds = courses.map(c => c.id);
+
+    // Total sales transactions for this tutor's courses
+    const salesTransactions = courseIds.length > 0 ? await Transaction.findAll({
+      where: {
+        course_id: courseIds,
+        payment_status: 'settlement',
+      },
+      attributes: ['course_id', 'amount', 'tutor_earning', 'created_at'],
+    }) : [];
+
+    const totalEarning = salesTransactions.reduce((acc, t) => acc + Number(t.tutor_earning || 0), 0);
+    const totalGrossRevenue = salesTransactions.reduce((acc, t) => acc + Number(t.amount || 0), 0);
+
+    // 3. Students & Progress Calculation
+    let totalEnrolledStudents = 0;
+    let totalCompletedStudents = 0;
+    let sumProgress = 0;
+    const atRiskStudents = [];
+
+    const courseBreakdown = courses.map(c => {
+      const enrollments = c.enrollments || [];
+      const studentCount = enrollments.length;
+      totalEnrolledStudents += studentCount;
+
+      let courseSumProgress = 0;
+      let courseCompleted = 0;
+
+      for (const en of enrollments) {
+        const prog = Number(en.progress_percentage || 0);
+        courseSumProgress += prog;
+        sumProgress += prog;
+        if (prog >= 100) {
+          courseCompleted++;
+          totalCompletedStudents++;
+        } else if (prog < 30 && en.student) {
+          atRiskStudents.push({
+            studentId: en.student.id,
+            studentName: en.student.name,
+            studentEmail: en.student.email,
+            phone: en.student.profile?.phone_number || '085648077829',
+            courseId: c.id,
+            courseTitle: c.title,
+            progress: prog,
+            enrolledAt: en.created_at,
+          });
+        }
+      }
+
+      const avgCourseProgress = studentCount > 0 ? Math.round(courseSumProgress / studentCount) : 0;
+      const courseSales = salesTransactions.filter(t => t.course_id === c.id);
+      const courseEarning = courseSales.reduce((acc, t) => acc + Number(t.tutor_earning || 0), 0);
+
+      // Exam stats for this course
+      const examResults = (c.exams || []).flatMap(e => e.results || []);
+      const examPassCount = examResults.filter(r => r.is_passed).length;
+      const examPassRate = examResults.length > 0 ? Math.round((examPassCount / examResults.length) * 100) : 0;
+
+      return {
+        id: c.id,
+        title: c.title,
+        price: Number(c.price || 0),
+        status: c.status,
+        total_students: studentCount,
+        tutor_earning: courseEarning,
+        avg_progress: avgCourseProgress,
+        completed_count: courseCompleted,
+        exam_pass_rate: examPassRate,
+      };
+    });
+
+    const overallAvgProgress = totalEnrolledStudents > 0 ? Math.round(sumProgress / totalEnrolledStudents) : 0;
+    const completionRate = totalEnrolledStudents > 0 ? Math.round((totalCompletedStudents / totalEnrolledStudents) * 100) : 0;
+
+    return res.status(200).json({
+      success: true,
+      message: 'Data analitik performa pengajar berhasil dimuat.',
+      data: {
+        financial: {
+          total_earning: totalEarning,
+          total_gross_revenue: totalGrossRevenue,
+          wallet_balance: Number(wallet.balance || 0),
+          pending_balance: Number(wallet.pending_balance || 0),
+          total_withdrawn: Number(wallet.total_withdrawn || 0),
+        },
+        learning: {
+          total_courses: courses.length,
+          total_enrolled: totalEnrolledStudents,
+          total_completed: totalCompletedStudents,
+          overall_avg_progress: overallAvgProgress,
+          completion_rate: completionRate,
+        },
+        courses: courseBreakdown,
+        at_risk_students: atRiskStudents.slice(0, 10),
+      },
+    });
+  } catch (err) {
+    console.error('Error in getTutorAnalytics:', err);
+    return res.status(500).json({
+      success: false,
+      message: 'Gagal memuat analitik pengajar.',
       error: err.message,
     });
   }

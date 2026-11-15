@@ -25,5 +25,8 @@ router.get('/recommendations', authenticateJWT, aiController.getAdaptiveCourseRe
 router.get('/exam-readiness/:courseId', authenticateJWT, aiController.getExamReadiness);
 router.post('/exam-readiness/:courseId', authenticateJWT, aiController.getExamReadiness);
 
+// 7. AI Inactivity Reminder & WhatsApp Accountability (Sprint 4 - Tegar & Ryo)
+router.post('/reminders/inactivity', authenticateJWT, aiController.triggerInactivityReminders);
+
 module.exports = router;
 

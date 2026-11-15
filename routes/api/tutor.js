@@ -20,4 +20,7 @@ const paymentController = require('../../controllers/paymentController');
 router.get('/wallet', paymentController.getTutorWallet);
 router.post('/withdraw', paymentController.requestWithdrawal);
 
+// Tutor Teaching & Course Performance Analytics (Sprint 4)
+router.get('/analytics', tutorController.getTutorAnalytics);
+
 module.exports = router;

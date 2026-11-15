@@ -1425,26 +1425,55 @@
     // Resend OTP in Login
     const loginResendBtn = document.getElementById('login-resend-otp-btn');
     const loginResendTimer = document.getElementById('login-resend-timer');
+    const loginBtnSwitchWa = document.getElementById('login-btn-switch-wa-otp');
+    const loginWaPrompt = document.getElementById('login-wa-phone-prompt');
+    const loginInputWa = document.getElementById('login-input-wa-prompt');
+    const loginBtnSubmitWa = document.getElementById('login-btn-submit-wa-prompt');
     let loginTimerInterval = null;
+    let isLoginCooldownActive = false;
 
-    function startLoginOtpResendCountdown() {
-      let seconds = 60;
+    function startLoginOtpResendCountdown(duration = 60) {
+      let seconds = Math.max(1, parseInt(duration, 10) || 60);
+      isLoginCooldownActive = true;
       loginResendBtn.disabled = true;
       loginResendTimer.textContent = seconds;
+
+      if (loginBtnSwitchWa) {
+        loginBtnSwitchWa.disabled = true;
+        loginBtnSwitchWa.style.opacity = '0.6';
+        loginBtnSwitchWa.style.pointerEvents = 'none';
+        const waText = document.getElementById('login-btn-switch-wa-text');
+        if (waText) waText.textContent = `Tunggu (${seconds}s)...`;
+      }
 
       clearInterval(loginTimerInterval);
       loginTimerInterval = setInterval(() => {
         seconds--;
         loginResendTimer.textContent = seconds;
+        if (loginBtnSwitchWa) {
+          const waText = document.getElementById('login-btn-switch-wa-text');
+          if (waText) waText.textContent = `Tunggu (${seconds}s)...`;
+        }
+
         if (seconds <= 0) {
           clearInterval(loginTimerInterval);
+          isLoginCooldownActive = false;
           loginResendBtn.disabled = false;
           loginResendBtn.innerHTML = '<i class="fas fa-rotate-right" style="font-size: 11px;"></i> Kirim Ulang Kode';
+
+          if (loginBtnSwitchWa) {
+            loginBtnSwitchWa.disabled = false;
+            loginBtnSwitchWa.style.opacity = '1';
+            loginBtnSwitchWa.style.pointerEvents = 'auto';
+            const waText = document.getElementById('login-btn-switch-wa-text');
+            if (waText) waText.textContent = 'Kirim Ulang via WhatsApp';
+          }
         }
       }, 1000);
     }
 
     loginResendBtn.addEventListener('click', async () => {
+      if (isLoginCooldownActive) return;
       try {
         loginResendBtn.disabled = true;
         const res = await fetch('/api/auth/resend-otp', {
@@ -1457,6 +1486,13 @@
           }),
         });
         const result = await res.json();
+
+        if (res.status === 429) {
+          showLoginOtpAlert('warning', result.message || 'Mohon tunggu jeda sebelum meminta kode OTP kembali.');
+          startLoginOtpResendCountdown(result.retryAfter || 60);
+          return;
+        }
+
         if (res.ok && result.success) {
           if (result.channel === 'whatsapp') {
             updateLoginOtpScreenToWhatsApp(result.data?.phone || activeLoginPhone);
@@ -1465,7 +1501,7 @@
           }
           showLoginOtpAlert('success', result.message || 'Kode OTP baru telah berhasil dikirim.');
           resetLoginOtpDeck();
-          startLoginOtpResendCountdown();
+          startLoginOtpResendCountdown(60);
           loginOtpBoxes[0].focus();
         } else {
           showLoginOtpAlert('danger', result.message || 'Gagal mengirim ulang OTP.');
@@ -1478,14 +1514,17 @@
     });
 
     // --- WhatsApp OTP Fallback for Login ---
-    const loginBtnSwitchWa = document.getElementById('login-btn-switch-wa-otp');
-    const loginWaPrompt = document.getElementById('login-wa-phone-prompt');
-    const loginInputWa = document.getElementById('login-input-wa-prompt');
-    const loginBtnSubmitWa = document.getElementById('login-btn-submit-wa-prompt');
-
     async function requestLoginWhatsAppOtp(phone) {
+      if (isLoginCooldownActive) {
+        showLoginOtpAlert('warning', 'Mohon tunggu jeda waktu sebelum meminta kode OTP kembali.');
+        return;
+      }
+
       try {
-        if (loginBtnSwitchWa) loginBtnSwitchWa.disabled = true;
+        if (loginBtnSwitchWa) {
+          loginBtnSwitchWa.disabled = true;
+          loginBtnSwitchWa.style.pointerEvents = 'none';
+        }
         if (loginBtnSubmitWa) loginBtnSubmitWa.disabled = true;
         const btnText = document.getElementById('login-btn-switch-wa-text');
         if (btnText) btnText.textContent = 'Mengirim via WhatsApp...';
@@ -1497,24 +1536,39 @@
         });
 
         const result = await res.json();
+
+        if (res.status === 429) {
+          showLoginOtpAlert('warning', result.message || 'Mohon tunggu jeda sebelum meminta kode OTP kembali.');
+          startLoginOtpResendCountdown(result.retryAfter || 60);
+          return;
+        }
+
         if (res.ok && result.success) {
           activeLoginPhone = phone;
           updateLoginOtpScreenToWhatsApp(result.data?.phone || phone);
           showLoginOtpAlert('success', result.message || 'Kode OTP telah berhasil dikirim ke nomor WhatsApp Anda.');
           if (loginWaPrompt) loginWaPrompt.style.display = 'none';
           resetLoginOtpDeck();
-          startLoginOtpResendCountdown();
+          startLoginOtpResendCountdown(60);
           setTimeout(() => loginOtpBoxes[0].focus(), 300);
         } else {
           showLoginOtpAlert('danger', result.message || 'Gagal mengirim OTP via WhatsApp.');
+          if (!isLoginCooldownActive && loginBtnSwitchWa) {
+            loginBtnSwitchWa.disabled = false;
+            loginBtnSwitchWa.style.pointerEvents = 'auto';
+            if (btnText) btnText.textContent = 'Kirim Ulang via WhatsApp';
+          }
         }
       } catch (err) {
         showLoginOtpAlert('danger', 'Gagal terhubung ke layanan WhatsApp gateway.');
+        if (!isLoginCooldownActive && loginBtnSwitchWa) {
+          loginBtnSwitchWa.disabled = false;
+          loginBtnSwitchWa.style.pointerEvents = 'auto';
+          const btnText = document.getElementById('login-btn-switch-wa-text');
+          if (btnText) btnText.textContent = 'Kirim Ulang via WhatsApp';
+        }
       } finally {
-        if (loginBtnSwitchWa) loginBtnSwitchWa.disabled = false;
         if (loginBtnSubmitWa) loginBtnSubmitWa.disabled = false;
-        const btnText = document.getElementById('login-btn-switch-wa-text');
-        if (btnText) btnText.textContent = 'Kirim Ulang via WhatsApp';
       }
     }
 

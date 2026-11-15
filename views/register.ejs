@@ -1705,26 +1705,55 @@
     // --- 7. Resend OTP & Countdown Timer ---
     const resendOtpBtn = document.getElementById('resend-otp-btn');
     const resendTimer = document.getElementById('resend-timer');
+    const btnSwitchWaOtp = document.getElementById('btn-switch-wa-otp');
+    const waPhonePrompt = document.getElementById('wa-phone-prompt');
+    const inputWaPrompt = document.getElementById('input-wa-prompt');
+    const btnSubmitWaPrompt = document.getElementById('btn-submit-wa-prompt');
     let timerInterval = null;
+    let isCooldownActive = false;
 
-    function startResendCountdown() {
-      let seconds = 60;
+    function startResendCountdown(duration = 60) {
+      let seconds = Math.max(1, parseInt(duration, 10) || 60);
+      isCooldownActive = true;
       resendOtpBtn.disabled = true;
       resendTimer.textContent = seconds;
+
+      if (btnSwitchWaOtp) {
+        btnSwitchWaOtp.disabled = true;
+        btnSwitchWaOtp.style.opacity = '0.6';
+        btnSwitchWaOtp.style.pointerEvents = 'none';
+        const waText = document.getElementById('btn-switch-wa-text');
+        if (waText) waText.textContent = `Tunggu (${seconds}s)...`;
+      }
 
       clearInterval(timerInterval);
       timerInterval = setInterval(() => {
         seconds--;
         resendTimer.textContent = seconds;
+        if (btnSwitchWaOtp) {
+          const waText = document.getElementById('btn-switch-wa-text');
+          if (waText) waText.textContent = `Tunggu (${seconds}s)...`;
+        }
+
         if (seconds <= 0) {
           clearInterval(timerInterval);
+          isCooldownActive = false;
           resendOtpBtn.disabled = false;
           resendOtpBtn.innerHTML = '<i class="fas fa-rotate-right" style="font-size: 11px;"></i> Kirim Ulang Kode';
+
+          if (btnSwitchWaOtp) {
+            btnSwitchWaOtp.disabled = false;
+            btnSwitchWaOtp.style.opacity = '1';
+            btnSwitchWaOtp.style.pointerEvents = 'auto';
+            const waText = document.getElementById('btn-switch-wa-text');
+            if (waText) waText.textContent = 'Kirim Ulang via WhatsApp';
+          }
         }
       }, 1000);
     }
 
     resendOtpBtn.addEventListener('click', async () => {
+      if (isCooldownActive) return;
       try {
         resendOtpBtn.disabled = true;
         const res = await fetch('/api/auth/resend-otp', {
@@ -1737,6 +1766,13 @@
           }),
         });
         const result = await res.json();
+
+        if (res.status === 429) {
+          showAlert('alert-banner-otp', 'warning', result.message || 'Mohon tunggu jeda sebelum meminta kode OTP kembali.');
+          startResendCountdown(result.retryAfter || 60);
+          return;
+        }
+
         if (res.ok && result.success) {
           if (result.channel === 'whatsapp') {
             updateOtpScreenToWhatsApp(result.data?.phone || registeredPhone);
@@ -1745,7 +1781,7 @@
           }
           showAlert('alert-banner-otp', 'success', result.message || 'Kode OTP baru telah dikirim.');
           resetOtpDeck();
-          startResendCountdown();
+          startResendCountdown(60);
           otpBoxes[0].focus();
         } else {
           showAlert('alert-banner-otp', 'danger', result.message || 'Gagal mengirim ulang OTP.');
@@ -1758,14 +1794,17 @@
     });
 
     // --- WhatsApp OTP Fallback Interaction ---
-    const btnSwitchWaOtp = document.getElementById('btn-switch-wa-otp');
-    const waPhonePrompt = document.getElementById('wa-phone-prompt');
-    const inputWaPrompt = document.getElementById('input-wa-prompt');
-    const btnSubmitWaPrompt = document.getElementById('btn-submit-wa-prompt');
-
     async function requestWhatsAppOtp(phone) {
+      if (isCooldownActive) {
+        showAlert('alert-banner-otp', 'warning', 'Mohon tunggu jeda waktu sebelum meminta kode OTP kembali.');
+        return;
+      }
+
       try {
-        if (btnSwitchWaOtp) btnSwitchWaOtp.disabled = true;
+        if (btnSwitchWaOtp) {
+          btnSwitchWaOtp.disabled = true;
+          btnSwitchWaOtp.style.pointerEvents = 'none';
+        }
         if (btnSubmitWaPrompt) btnSubmitWaPrompt.disabled = true;
         const btnText = document.getElementById('btn-switch-wa-text');
         if (btnText) btnText.textContent = 'Mengirim via WhatsApp...';
@@ -1777,24 +1816,39 @@
         });
 
         const result = await res.json();
+
+        if (res.status === 429) {
+          showAlert('alert-banner-otp', 'warning', result.message || 'Mohon tunggu jeda sebelum meminta kode OTP kembali.');
+          startResendCountdown(result.retryAfter || 60);
+          return;
+        }
+
         if (res.ok && result.success) {
           registeredPhone = phone;
           updateOtpScreenToWhatsApp(result.data?.phone || phone);
           showAlert('alert-banner-otp', 'success', result.message || 'Kode OTP telah berhasil dikirim ke nomor WhatsApp Anda.');
           if (waPhonePrompt) waPhonePrompt.style.display = 'none';
           resetOtpDeck();
-          startResendCountdown();
+          startResendCountdown(60);
           setTimeout(() => otpBoxes[0].focus(), 300);
         } else {
           showAlert('alert-banner-otp', 'danger', result.message || 'Gagal mengirim OTP via WhatsApp.');
+          if (!isCooldownActive && btnSwitchWaOtp) {
+            btnSwitchWaOtp.disabled = false;
+            btnSwitchWaOtp.style.pointerEvents = 'auto';
+            if (btnText) btnText.textContent = 'Kirim Ulang via WhatsApp';
+          }
         }
       } catch (err) {
         showAlert('alert-banner-otp', 'danger', 'Gagal terhubung ke layanan WhatsApp gateway.');
+        if (!isCooldownActive && btnSwitchWaOtp) {
+          btnSwitchWaOtp.disabled = false;
+          btnSwitchWaOtp.style.pointerEvents = 'auto';
+          const btnText = document.getElementById('btn-switch-wa-text');
+          if (btnText) btnText.textContent = 'Kirim Ulang via WhatsApp';
+        }
       } finally {
-        if (btnSwitchWaOtp) btnSwitchWaOtp.disabled = false;
         if (btnSubmitWaPrompt) btnSubmitWaPrompt.disabled = false;
-        const btnText = document.getElementById('btn-switch-wa-text');
-        if (btnText) btnText.textContent = 'Kirim Ulang via WhatsApp';
       }
     }
 

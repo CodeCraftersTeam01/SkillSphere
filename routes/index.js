@@ -120,9 +120,19 @@ router.get(['/admin', '/admin/dashboard', '/admin/verification'], function(req, 
   res.render('admin/verification', { title: 'Dashboard Admin & Verifikasi Pengajar | SkillSphere AI' });
 });
 
+/* GET Admin Reports & Platform Analytics */
+router.get(['/admin/analytics', '/admin/reports'], function(req, res, next) {
+  res.render('admin/analytics', { title: 'Laporan & Analitik Platform | Admin SkillSphere AI' });
+});
+
 /* GET Tutor Material Upload & Management Portal (Sprint 2 - Satrio) */
 router.get('/tutor/materials', function(req, res, next) {
   res.render('tutor/materials', { title: 'Portal Manajemen & Upload Materi | Tutor SkillSphere' });
+});
+
+/* GET Tutor Performance & Course Analytics */
+router.get(['/tutor/analytics', '/tutor/reports', '/dashboard/tutor/analytics'], function(req, res, next) {
+  res.render('tutor/analytics', { title: 'Laporan & Analitik Pengajar | Studio Pengajar SkillSphere AI' });
 });
 
 /* GET Tutor Course Settings & Edit Portal */

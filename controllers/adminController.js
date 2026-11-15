@@ -11,9 +11,12 @@ const {
   Category,
   Enrollment,
   Certificate,
+  Exam,
+  ExamResult,
 } = require('../models');
 const { Op } = require('sequelize');
 const bcrypt = require('bcryptjs');
+const whatsappService = require('../services/whatsappService');
 
 /**
  * Get Admin Dashboard & Verification Stats
@@ -216,6 +219,23 @@ exports.approveTutorApplication = async (req, res) => {
       });
     }
 
+    // Kirim notifikasi WhatsApp ke calon tutor
+    (async () => {
+      try {
+        if (user) {
+          const profile = await UserProfile.findOne({ where: { user_id: user.id } });
+          const userPhone = profile?.phone_number || '085648077829';
+          await whatsappService.sendWhatsAppTutorApprovalStatus(userPhone, {
+            applicantName: user.name,
+            isApproved: true,
+            loginUrl: `${process.env.APP_URL || 'https://demo.codingsolver.my.id'}/login`,
+          });
+        }
+      } catch (waErr) {
+        console.warn('⚠️ [Tutor Approval WA] Gagal mengirim pesan:', waErr.message);
+      }
+    })();
+
     return res.status(200).json({
       success: true,
       message: `Pengajuan tutor untuk ${user ? user.name : 'pengguna'} berhasil disetujui. Akun telah ditingkatkan menjadi Tutor dan Dompet telah aktif.`,
@@ -264,6 +284,24 @@ exports.rejectTutorApplication = async (req, res) => {
       user.role = 'student';
       await user.save();
     }
+
+    // Kirim notifikasi WhatsApp ke pelamar terkait penolakan
+    (async () => {
+      try {
+        if (user) {
+          const profile = await UserProfile.findOne({ where: { user_id: user.id } });
+          const userPhone = profile?.phone_number || '085648077829';
+          await whatsappService.sendWhatsAppTutorApprovalStatus(userPhone, {
+            applicantName: user.name,
+            isApproved: false,
+            notes: application.rejection_reason,
+            loginUrl: `${process.env.APP_URL || 'https://demo.codingsolver.my.id'}/login`,
+          });
+        }
+      } catch (waErr) {
+        console.warn('⚠️ [Tutor Rejection WA] Gagal mengirim pesan:', waErr.message);
+      }
+    })();
 
     return res.status(200).json({
       success: true,
@@ -554,6 +592,27 @@ exports.approveWithdrawal = async (req, res) => {
     if (proof_url) withdrawal.proof_url = String(proof_url).trim();
     await withdrawal.save();
 
+    // Kirim notifikasi WhatsApp ke Tutor bahwa penarikan telah disetujui / ditransfer
+    (async () => {
+      try {
+        const tutor = await User.findByPk(withdrawal.tutor_id, {
+          include: [{ model: UserProfile, as: 'profile' }],
+        });
+        const tutorPhone = tutor?.profile?.phone_number || '085648077829';
+        await whatsappService.sendWhatsAppWithdrawalStatusToTutor(tutorPhone, {
+          tutorName: tutor?.name || 'Tutor',
+          withdrawalId: withdrawal.id,
+          amount: withdrawal.amount,
+          status: 'completed',
+          bankName: withdrawal.bank_name,
+          accountNumber: withdrawal.account_number,
+          proofUrl: withdrawal.proof_url,
+        });
+      } catch (waErr) {
+        console.warn('⚠️ [Withdrawal Approval WA] Gagal mengirim pesan:', waErr.message);
+      }
+    })();
+
     return res.status(200).json({
       success: true,
       message: 'Penarikan dana berhasil disetujui dan ditandai selesai.',
@@ -614,6 +673,27 @@ exports.rejectWithdrawal = async (req, res) => {
         description: `Pengembalian dana penarikan: ${withdrawal.rejection_reason}`,
       });
     }
+
+    // Kirim notifikasi WhatsApp ke Tutor bahwa penarikan ditolak
+    (async () => {
+      try {
+        const tutor = await User.findByPk(withdrawal.tutor_id, {
+          include: [{ model: UserProfile, as: 'profile' }],
+        });
+        const tutorPhone = tutor?.profile?.phone_number || '085648077829';
+        await whatsappService.sendWhatsAppWithdrawalStatusToTutor(tutorPhone, {
+          tutorName: tutor?.name || 'Tutor',
+          withdrawalId: withdrawal.id,
+          amount: withdrawal.amount,
+          status: 'rejected',
+          bankName: withdrawal.bank_name,
+          accountNumber: withdrawal.account_number,
+          notes: withdrawal.rejection_reason,
+        });
+      } catch (waErr) {
+        console.warn('⚠️ [Withdrawal Rejection WA] Gagal mengirim pesan:', waErr.message);
+      }
+    })();
 
     return res.status(200).json({
       success: true,
@@ -1301,6 +1381,133 @@ exports.deleteUser = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: 'Gagal menghapus akun pengguna.',
+      error: err.message,
+    });
+  }
+};
+
+/**
+ * Platform Business & Operations Analytics (Clean & Minimalist)
+ * GET /api/admin/analytics
+ */
+exports.getAdminAnalytics = async (req, res) => {
+  try {
+    // 1. Financial Metrics
+    const settledTransactions = await Transaction.findAll({
+      where: { payment_status: 'settlement' },
+      attributes: ['amount', 'platform_fee', 'tutor_earning', 'created_at'],
+    });
+
+    const totalGMV = settledTransactions.reduce((acc, t) => acc + Number(t.amount || 0), 0);
+    const totalPlatformFee = settledTransactions.reduce((acc, t) => acc + Number(t.platform_fee || 0), 0);
+    const totalTutorShare = settledTransactions.reduce((acc, t) => acc + Number(t.tutor_earning || 0), 0);
+    const totalSettledCount = settledTransactions.length;
+
+    const totalPendingCount = await Transaction.count({ where: { payment_status: 'pending' } });
+    const totalFailedCount = await Transaction.count({
+      where: { payment_status: { [Op.in]: ['expired', 'failed'] } },
+    });
+    const totalTransactions = totalSettledCount + totalPendingCount + totalFailedCount;
+    const successRate = totalTransactions > 0 ? Math.round((totalSettledCount / totalTransactions) * 100) : 100;
+
+    // 2. User Metrics
+    const totalStudents = await User.count({ where: { role: 'student' } });
+    const totalTutors = await User.count({ where: { role: 'tutor' } });
+    const totalActiveEnrollments = await Enrollment.count({ where: { status: 'active' } });
+    const totalCompletedEnrollments = await Enrollment.count({ where: { status: 'completed' } });
+
+    // 3. Courses Breakdown
+    const totalCourses = await Course.count();
+    const publishedCourses = await Course.count({ where: { status: 'published' } });
+    const privateCourses = await Course.count({ where: { status: 'private' } });
+    const freeCourses = await Course.count({ where: { price: 0 } });
+    const paidCourses = await Course.count({ where: { price: { [Op.gt]: 0 } } });
+
+    // Top Courses
+    const courses = await Course.findAll({
+      include: [
+        { model: User, as: 'tutor', attributes: ['id', 'name'] },
+        { model: Enrollment, as: 'enrollments', attributes: ['id', 'status', 'progress_percentage'] },
+      ],
+    });
+
+    const coursesRanked = courses.map(c => {
+      const studentCount = c.enrollments ? c.enrollments.length : 0;
+      const revenue = studentCount * Number(c.price || 0);
+      const avgProgress = studentCount > 0
+        ? Math.round(c.enrollments.reduce((sum, e) => sum + Number(e.progress_percentage || 0), 0) / studentCount)
+        : 0;
+
+      return {
+        id: c.id,
+        title: c.title,
+        price: Number(c.price || 0),
+        status: c.status,
+        tutor_name: c.tutor ? c.tutor.name : 'Instruktur',
+        total_students: studentCount,
+        total_revenue: revenue,
+        platform_fee_earned: Math.round(revenue * 0.2),
+        avg_progress: avgProgress,
+      };
+    }).sort((a, b) => b.total_revenue - a.total_revenue).slice(0, 5);
+
+    // 4. Exams & Certificates
+    const totalExamAttempts = await ExamResult.count();
+    const passedExams = await ExamResult.count({ where: { is_passed: true } });
+    const totalCertificates = await Certificate.count();
+    const examPassRate = totalExamAttempts > 0 ? Math.round((passedExams / totalExamAttempts) * 100) : 0;
+
+    // 5. Payout & Withdrawals
+    const pendingWithdrawalsCount = await WithdrawalRequest.count({ where: { status: 'pending' } });
+    const pendingWithdrawalsAmount = (await WithdrawalRequest.sum('amount', { where: { status: 'pending' } })) || 0;
+    const completedWithdrawalsAmount = (await WithdrawalRequest.sum('amount', { where: { status: 'completed' } })) || 0;
+
+    return res.status(200).json({
+      success: true,
+      message: 'Data laporan & analitik platform berhasil dimuat.',
+      data: {
+        financial: {
+          total_gmv: totalGMV,
+          total_platform_fee: totalPlatformFee,
+          total_tutor_share: totalTutorShare,
+          settled_count: totalSettledCount,
+          pending_count: totalPendingCount,
+          failed_count: totalFailedCount,
+          total_transactions: totalTransactions,
+          success_rate: successRate,
+        },
+        users: {
+          total_students: totalStudents,
+          total_tutors: totalTutors,
+          active_enrollments: totalActiveEnrollments,
+          completed_enrollments: totalCompletedEnrollments,
+        },
+        courses: {
+          total: totalCourses,
+          published: publishedCourses,
+          private: privateCourses,
+          free: freeCourses,
+          paid: paidCourses,
+          top_courses: coursesRanked,
+        },
+        learning: {
+          exam_attempts: totalExamAttempts,
+          passed_exams: passedExams,
+          exam_pass_rate: examPassRate,
+          certificates_issued: totalCertificates,
+        },
+        payouts: {
+          pending_count: pendingWithdrawalsCount,
+          pending_amount: Number(pendingWithdrawalsAmount),
+          completed_amount: Number(completedWithdrawalsAmount),
+        },
+      },
+    });
+  } catch (err) {
+    console.error('Error in getAdminAnalytics:', err);
+    return res.status(500).json({
+      success: false,
+      message: 'Gagal memuat analitik admin.',
       error: err.message,
     });
   }

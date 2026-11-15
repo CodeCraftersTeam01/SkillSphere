@@ -9,6 +9,7 @@ router.use(authenticateJWT, authorizeRoles('admin'));
 
 // Admin Dashboard & Overview Stats
 router.get('/stats', adminController.getAdminStats);
+router.get('/analytics', adminController.getAdminAnalytics);
 
 // Tutor Applications Review & Approval
 router.get('/tutor-applications', adminController.getTutorApplications);
