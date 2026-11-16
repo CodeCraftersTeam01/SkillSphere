@@ -30,6 +30,7 @@
   <link rel="stylesheet" href="/stylesheets/accessibility.css">
   <!-- Custom Alert & Toast Stylesheet & Script -->
   <link rel="stylesheet" href="/stylesheets/custom-alert.css">
+  <link rel="stylesheet" href="/stylesheets/layout-modular.css">
   <script src="/javascripts/custom-alert.js"></script>
 
   <style>
@@ -416,61 +417,8 @@
 <body>
 
   <div class="dashboard-layout">
-    <!-- Navigation Bar -->
-    <header class="navbar">
-      <div class="nav-main-row">
-        <div class="nav-brand-group">
-          <a href="/dashboard" class="brand-logo" style="text-decoration:none;">
-            <div class="brand-icon">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                <path opacity="0.38" d="M12 7.6L17.3 4.7L14.4 10L17.3 15.3L12 12.4L6.7 15.3L9.6 10L6.7 4.7Z" />
-                <path d="M12 0L13.8 8.2L22 10L13.8 11.8L12 20L10.2 11.8L2 10L10.2 8.2L12 0Z" />
-              </svg>
-            </div>
-            <span>SkillSphere AI</span>
-          </a>
-        </div>
-
-        <ul class="nav-links-menu desktop-only">
-          <li><a href="/dashboard" class="nav-link-item">Beranda</a></li>
-          <li><a href="/courses" class="nav-link-item">Katalog Kursus</a></li>
-          <li><a href="/dashboard/roadmap" class="nav-link-item active">Jalur Belajar AI</a></li>
-          <li><a href="/dashboard#activities-section" class="nav-link-item">Tantangan</a></li>
-        </ul>
-
-        <div class="nav-actions">
-          <!-- Theme Toggle -->
-          <button class="theme-toggle-btn" id="theme-toggle-btn" type="button" aria-label="Toggle dark/light mode">
-            <i class="fas fa-sun" id="theme-icon-sun" style="display:none;"></i>
-            <i class="fas fa-moon" id="theme-icon-moon"></i>
-            <span id="theme-text">Mode Gelap</span>
-          </button>
-
-          <!-- User Profile Pill -->
-          <div class="user-profile-badge" onclick="window.location.href='/profile'" style="cursor:pointer;" title="Buka Pengaturan Profil Saya">
-            <div class="user-avatar-sm" id="nav-avatar">U</div>
-            <span class="user-name-label" id="nav-user-name">Memuat...</span>
-            <span class="user-role-tag" id="nav-user-role">Siswa</span>
-          </div>
-
-          <!-- Logout Button -->
-          <button class="logout-btn" id="logout-btn" type="button" title="Keluar">
-            <i class="fas fa-arrow-right-from-bracket"></i>
-            <span>Keluar</span>
-          </button>
-        </div>
-      </div>
-
-      <!-- Mobile Scrollable Subnav Menu -->
-      <div class="nav-mobile-row mobile-only">
-        <ul class="nav-links-menu mobile-scroll">
-          <li><a href="/dashboard" class="nav-link-item">Beranda</a></li>
-          <li><a href="/courses" class="nav-link-item">Katalog Kursus</a></li>
-          <li><a href="/dashboard/roadmap" class="nav-link-item active">Jalur Belajar AI</a></li>
-          <li><a href="/dashboard#activities-section" class="nav-link-item">Tantangan</a></li>
-        </ul>
-      </div>
-    </header>
+    <!-- Modular Student Navigation Bar -->
+    <%- include('partials/student-header', { activeNav: 'roadmap' }) %>
 
     <!-- Main Content -->
     <main class="roadmap-page">
@@ -568,10 +516,8 @@
       </section>
     </main>
 
-    <!-- Footer -->
-    <footer style="border-top: 1px solid var(--border-subtle); padding: 32px 24px; text-align: center; font-size: 12.5px; color: var(--text-tertiary);">
-      &copy; 2026 SkillSphere AI. Platform Pembelajaran Cerdas & Kurikulum Adaptif.
-    </footer>
+    <!-- Modular Site Footer -->
+    <%- include('partials/footer') %>
   </div>
 
   <div id="toast" class="toast-popup"></div>
@@ -888,5 +834,7 @@
       loadRoadmap();
     });
   </script>
+  <!-- Modular Layout Script -->
+  <script src="/javascripts/layout-modular.js"></script>
 </body>
 </html>

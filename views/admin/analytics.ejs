@@ -25,6 +25,7 @@
   <link rel="stylesheet" href="/stylesheets/style.css">
   <link rel="stylesheet" href="/stylesheets/claude-theme.css">
   <link rel="stylesheet" href="/stylesheets/accessibility.css">
+  <link rel="stylesheet" href="/stylesheets/layout-modular.css">
 
   <style>
     :root {
@@ -463,69 +464,17 @@
 </head>
 <body>
 
-  <!-- Fixed Left Sidebar -->
-  <aside class="admin-sidebar">
-    <div class="sidebar-brand">
-      <a href="/admin">
-        <i class="fa-solid fa-sparkles" style="color: #F59E0B;"></i>
-        <span>SkillSphere</span>
-      </a>
-      <span class="admin-badge-tag">Admin</span>
-    </div>
+  <div class="admin-app-wrapper">
+    <!-- Mobile Sidebar Backdrop -->
+    <div class="sidebar-backdrop" id="sidebar-backdrop" onclick="toggleMobileSidebar(false)"></div>
 
-    <div class="sidebar-nav-container">
-      <span class="nav-group-label">Navigasi Utama</span>
-      <a href="/admin" class="sidebar-nav-item">
-        <i class="fa-solid fa-house"></i>
-        <span>Dashboard Utama</span>
-      </a>
-      <a href="/admin/analytics" class="sidebar-nav-item active">
-        <i class="fa-solid fa-chart-line"></i>
-        <span>Laporan & Analitik</span>
-      </a>
+    <!-- Modular Left Navigation Sidebar -->
+    <%- include('../partials/admin-sidebar', { activeView: 'analytics' }) %>
 
-      <span class="nav-group-label">Manajemen</span>
-      <a href="/admin#users" class="sidebar-nav-item">
-        <i class="fa-solid fa-users"></i>
-        <span>Manajemen Pengguna</span>
-      </a>
-      <a href="/admin#courses" class="sidebar-nav-item">
-        <i class="fa-solid fa-book-bookmark"></i>
-        <span>Katalog Kursus</span>
-      </a>
-      <a href="/admin#financial" class="sidebar-nav-item">
-        <i class="fa-solid fa-wallet"></i>
-        <span>Arsitektur Finansial</span>
-      </a>
-    </div>
-  </aside>
-
-  <!-- Main Content -->
-  <div class="admin-main">
-    <header class="top-header">
-      <div class="header-left">
-        <div class="header-breadcrumb">
-          <span>Admin</span>
-          <i class="fa-solid fa-chevron-right" style="font-size: 10px;"></i>
-          <span style="font-weight: 600; color: var(--text-primary);">Laporan & Analitik Platform</span>
-        </div>
-      </div>
-
-      <div class="header-right">
-        <button type="button" class="icon-btn" onclick="toggleTheme()" title="Ganti Tema">
-          <i class="fa-solid fa-moon" id="themeIcon"></i>
-        </button>
-
-        <div class="admin-pill">
-          <i class="fa-solid fa-shield-halved" style="color: #F59E0B;"></i>
-          <span>Administrator</span>
-        </div>
-
-        <a href="/login" class="icon-btn" title="Keluar">
-          <i class="fa-solid fa-arrow-right-from-bracket"></i>
-        </a>
-      </div>
-    </header>
+    <!-- Main Viewport -->
+    <div class="admin-main-viewport">
+      <!-- Top Modular Navigation Header -->
+      <%- include('../partials/admin-header', { breadcrumb: 'Laporan & Analitik' }) %>
 
     <main class="content-wrapper">
       <h1 class="page-title">Laporan & Analitik Platform</h1>
@@ -671,6 +620,7 @@
       </div>
     </main>
   </div>
+</div>
 
   <script>
     function toggleTheme() {
@@ -782,5 +732,6 @@
       loadAdminAnalytics();
     });
   </script>
+  <script src="/javascripts/layout-modular.js"></script>
 </body>
 </html>

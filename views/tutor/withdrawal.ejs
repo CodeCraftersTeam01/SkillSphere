@@ -13,6 +13,7 @@
   <link rel="stylesheet" href="/stylesheets/style.css">
   <link rel="stylesheet" href="/stylesheets/claude-theme.css">
   <link rel="stylesheet" href="/stylesheets/accessibility.css">
+  <link rel="stylesheet" href="/stylesheets/layout-modular.css">
   <link rel="stylesheet" href="/stylesheets/custom-alert.css">
   <script src="/javascripts/custom-alert.js"></script>
 
@@ -691,122 +692,13 @@
   </style>
 </head>
 <body>
-  <!-- Top Navigation Header -->
-  <header class="navbar" role="banner">
-    <div class="nav-main-row">
-      <div class="nav-brand-group">
-        <button class="sidebar-toggle-btn" id="sidebar-toggle" type="button" aria-label="Buka Menu Samping" onclick="toggleClassroomSidebar()">
-          <i class="fas fa-bars"></i>
-        </button>
-        <a href="/dashboard" class="brand-logo" aria-label="SkillSphere AI Beranda">
-          <div class="brand-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-              <path opacity="0.38" d="M12 7.6L17.3 4.7L14.4 10L17.3 15.3L12 12.4L6.7 15.3L9.6 10L6.7 4.7Z" />
-              <path d="M12 0L13.8 8.2L22 10L13.8 11.8L12 20L10.2 11.8L2 10L10.2 8.2L12 0Z" />
-            </svg>
-          </div>
-          <span>SkillSphere AI</span>
-        </a>
-      </div>
-
-      <div class="nav-actions">
-        <!-- Theme Toggle -->
-        <button class="theme-toggle-btn" id="theme-toggle-btn" type="button" aria-label="Ganti mode gelap atau terang">
-          <i class="fas fa-moon" id="theme-icon"></i>
-          <span id="theme-text">Mode Gelap</span>
-        </button>
-
-        <!-- User Profile Pill -->
-        <div class="user-profile-badge" onclick="window.location.href='/profile'" title="Pengaturan Akun Pengajar">
-          <div class="user-avatar-sm" id="nav-avatar">T</div>
-          <span class="user-name-label" id="nav-user-name">Memuat...</span>
-          <span class="user-role-tag">TUTOR</span>
-        </div>
-
-        <!-- Logout Button -->
-        <button class="logout-btn" id="logout-btn" type="button" title="Keluar">
-          <i class="fas fa-arrow-right-from-bracket" aria-hidden="true"></i>
-          <span>Keluar</span>
-        </button>
-      </div>
-    </div>
-  </header>
+  <!-- Modular Tutor Header -->
+  <%- include('../partials/tutor-header', { isCourseContext: false }) %>
 
   <!-- Main Container -->
   <div class="classroom-app-container">
-    <!-- Backdrop for Mobile Drawer -->
-    <div class="classroom-sidebar-backdrop" id="sidebar-backdrop" onclick="toggleClassroomSidebar(false)"></div>
-
-    <!-- Docked Left Sidebar -->
-    <aside class="classroom-left-sidebar" id="classroom-sidebar" aria-label="Menu Studio Pengajar">
-      <div class="classroom-sidebar-inner">
-        <div class="sidebar-section-header">Navigasi Utama</div>
-        <div class="sidebar-nav-group">
-          <a href="/dashboard" class="sidebar-nav-pill">
-            <i class="fas fa-home sidebar-nav-icon"></i>
-            <span>Beranda Studio</span>
-          </a>
-        </div>
-
-        <div class="sidebar-divider-line"></div>
-
-        <div class="sidebar-section-header">Keuangan & Dompet</div>
-        <div class="sidebar-nav-group">
-          <a href="/tutor/wallet" class="sidebar-nav-pill">
-            <i class="fas fa-wallet sidebar-nav-icon"></i>
-            <span>Dompet Digital</span>
-          </a>
-          <a href="/tutor/withdrawal" class="sidebar-nav-pill active">
-            <i class="fas fa-money-bill-transfer sidebar-nav-icon"></i>
-            <span>Penarikan Dana</span>
-          </a>
-        </div>
-
-        <div class="sidebar-divider-line"></div>
-
-        <div class="sidebar-section-header">Studio Pengajar & Alat</div>
-        <div class="sidebar-nav-group">
-          <a href="/dashboard" class="sidebar-nav-pill">
-            <i class="fas fa-chalkboard-user sidebar-nav-icon"></i>
-            <span>Daftar Kelas Mengajar</span>
-          </a>
-          <a href="/tutor/materials" class="sidebar-nav-pill">
-            <i class="fas fa-folder-open sidebar-nav-icon"></i>
-            <span>Portal Upload Materi</span>
-          </a>
-          <a href="/tutor/exams" class="sidebar-nav-pill">
-            <i class="fas fa-file-signature sidebar-nav-icon"></i>
-            <span>Ujian Kelulusan</span>
-          </a>
-          <a href="/tutor/certificates" class="sidebar-nav-pill">
-            <i class="fas fa-certificate sidebar-nav-icon"></i>
-            <span>Studio Sertifikat</span>
-          </a>
-          <a href="/tutor/analytics" class="sidebar-nav-pill">
-            <i class="fas fa-chart-line sidebar-nav-icon"></i>
-            <span>Laporan & Analitik</span>
-          </a>
-          <a href="/tutor/verify" class="sidebar-nav-pill">
-            <i class="fas fa-id-card-clip sidebar-nav-icon"></i>
-            <span>Verifikasi Pengajar</span>
-          </a>
-          <a href="/courses" class="sidebar-nav-pill">
-            <i class="fas fa-compass sidebar-nav-icon"></i>
-            <span>Katalog Kursus Publik</span>
-          </a>
-        </div>
-
-        <div class="sidebar-divider-line"></div>
-
-        <div class="sidebar-section-header">Setelan</div>
-        <div class="sidebar-nav-group">
-          <a href="/profile" class="sidebar-nav-pill">
-            <i class="fas fa-gear sidebar-nav-icon"></i>
-            <span>Pengaturan Akun</span>
-          </a>
-        </div>
-      </div>
-    </aside>
+    <!-- Modular Tutor Sidebar -->
+    <%- include('../partials/tutor-sidebar', { activeNav: 'withdrawal' }) %>
 
     <!-- Main Content Area -->
     <main class="classroom-main-pane">
@@ -1302,6 +1194,8 @@
       fetchWalletData();
     });
   </script>
+  <!-- Modular Layout Script -->
+  <script src="/javascripts/layout-modular.js"></script>
 </body>
 </html>
 

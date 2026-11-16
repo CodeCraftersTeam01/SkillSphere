@@ -690,9 +690,9 @@
     "semantic_hash": ""
   },
   "views/admin/verification.ejs": {
-    "mtime": 1794749211.261398,
-    "seen": 1794749459.201397,
-    "ast_hash": "d95a8e26aecfc95e64764b5b39dc67c9",
+    "mtime": 1794801717.6735966,
+    "seen": 1794803667.376349,
+    "ast_hash": "10e6e007795e7593ea70b3d58739cc3e",
     "semantic_hash": ""
   },
   "views/certificates/verify.ejs": {
@@ -714,9 +714,9 @@
     "semantic_hash": ""
   },
   "views/courses/index.ejs": {
-    "mtime": 1793551427.1301022,
-    "seen": 1794367136.87857,
-    "ast_hash": "fa578648dd330244e45ffcd35f200c74",
+    "mtime": 1794803322.2464125,
+    "seen": 1794803667.3763552,
+    "ast_hash": "5695d1448052e9f898816f738d3621fd",
     "semantic_hash": ""
   },
   "views/courses/learn.ejs": {
@@ -726,9 +726,9 @@
     "semantic_hash": ""
   },
   "views/dashboard.ejs": {
-    "mtime": 1794576353.3340344,
-    "seen": 1794577198.924514,
-    "ast_hash": "c49e66650b32e44c640445f635fb4569",
+    "mtime": 1794802699.0364573,
+    "seen": 1794803667.376357,
+    "ast_hash": "9afb23773c4550b7c45058c68ff60b2e",
     "semantic_hash": ""
   },
   "views/error.ejs": {
@@ -756,15 +756,15 @@
     "semantic_hash": ""
   },
   "views/privacy.ejs": {
-    "mtime": 1791375043.0,
-    "seen": 1794367136.878579,
-    "ast_hash": "d9de8ad1dfcee4b1499ac17ff02e4654",
+    "mtime": 1794803210.1913548,
+    "seen": 1794803667.3763719,
+    "ast_hash": "215086c00d85b8aff2e9cdc94ce0ee1b",
     "semantic_hash": ""
   },
   "views/profile.ejs": {
-    "mtime": 1791553175.0,
-    "seen": 1794367136.8785799,
-    "ast_hash": "4b947f21fe576569a4b49786574ae005",
+    "mtime": 1794803000.8793986,
+    "seen": 1794803667.376373,
+    "ast_hash": "9108d7db20c1e2a81dadaccb25c736ea",
     "semantic_hash": ""
   },
   "views/register.ejs": {
@@ -774,15 +774,15 @@
     "semantic_hash": ""
   },
   "views/roadmap.ejs": {
-    "mtime": 1791553216.0,
-    "seen": 1794367136.878582,
-    "ast_hash": "4b51d4047ab4fcd4f9fe021878cdcf32",
+    "mtime": 1794803112.2686772,
+    "seen": 1794803667.3763762,
+    "ast_hash": "f1666fe299bd3ebcfde372479010be54",
     "semantic_hash": ""
   },
   "views/student/certificates.ejs": {
-    "mtime": 1794160056.941723,
-    "seen": 1794367136.878583,
-    "ast_hash": "c11c453f5ecea51c95e29d67addda84b",
+    "mtime": 1794802527.8219035,
+    "seen": 1794803667.376377,
+    "ast_hash": "0eb218f060986fb9fc42bb5e119973c8",
     "semantic_hash": ""
   },
   "views/student/exam.ejs": {
@@ -792,39 +792,39 @@
     "semantic_hash": ""
   },
   "views/student/transactions.ejs": {
-    "mtime": 1793588808.8235254,
-    "seen": 1794367136.878586,
-    "ast_hash": "34cdf09216a2af3878894bd77888d696",
+    "mtime": 1794802446.9559717,
+    "seen": 1794803667.37638,
+    "ast_hash": "993722647aaf74778d2fab059077ec6d",
     "semantic_hash": ""
   },
   "views/student/wishlist.ejs": {
-    "mtime": 1793550798.2093093,
-    "seen": 1794367136.8785868,
-    "ast_hash": "eb6f96f9bc5eec1977fbb26e62f0f79a",
+    "mtime": 1794802346.4931962,
+    "seen": 1794803667.376381,
+    "ast_hash": "bc4bb52e2177d8462568bf0e8cf20d10",
     "semantic_hash": ""
   },
   "views/terms.ejs": {
-    "mtime": 1791375018.0,
-    "seen": 1794367136.878589,
-    "ast_hash": "f2f063b1bd7317f4b0caabd79fc91801",
+    "mtime": 1794803166.7935479,
+    "seen": 1794803667.3763819,
+    "ast_hash": "8d72c3c798349827b55f6999c323b66c",
     "semantic_hash": ""
   },
   "views/tutor/certificates.ejs": {
-    "mtime": 1794749227.305359,
-    "seen": 1794749459.2014139,
-    "ast_hash": "7dbc7dcffc619cb7f18d0523c7487bc4",
+    "mtime": 1794803457.1685019,
+    "seen": 1794803667.376385,
+    "ast_hash": "ab7000755cb049e32be53f8b07fba3f2",
     "semantic_hash": ""
   },
   "views/tutor/exams.ejs": {
-    "mtime": 1794749243.5084717,
-    "seen": 1794749459.2014148,
-    "ast_hash": "43af558cd6da464175ae6849100ec25b",
+    "mtime": 1794803392.9082096,
+    "seen": 1794803667.3763871,
+    "ast_hash": "1cf2418ccdeaa254ec6d44706855a817",
     "semantic_hash": ""
   },
   "views/tutor/materials.ejs": {
-    "mtime": 1794797186.7513368,
-    "seen": 1794797222.693393,
-    "ast_hash": "fa6f4a849b6a9c4d70b2c9ab3192eb72",
+    "mtime": 1794802768.6575341,
+    "seen": 1794803667.376388,
+    "ast_hash": "a9979b39f0b5b34cbbedbb5c0b169e46",
     "semantic_hash": ""
   },
   "views/tutor/verify.ejs": {
@@ -834,15 +834,15 @@
     "semantic_hash": ""
   },
   "views/tutor/wallet.ejs": {
-    "mtime": 1794749262.5559711,
-    "seen": 1794749459.201418,
-    "ast_hash": "9b94e41e883059c0c4d0e733f97ebaf7",
+    "mtime": 1794802848.4443758,
+    "seen": 1794803667.37639,
+    "ast_hash": "656fcb22468b9bbc618d62af3d768306",
     "semantic_hash": ""
   },
   "views/tutor/withdrawal.ejs": {
-    "mtime": 1794749291.171916,
-    "seen": 1794749459.201418,
-    "ast_hash": "f856faed2a277875c3397b77a3f985e2",
+    "mtime": 1794802943.587841,
+    "seen": 1794803667.376391,
+    "ast_hash": "106a255d03a142db5a66a0800da5e11c",
     "semantic_hash": ""
   },
   "views/warp.ejs": {
@@ -1206,27 +1206,69 @@
     "semantic_hash": ""
   },
   "views/admin/analytics.ejs": {
-    "mtime": 1794749191.1034777,
-    "seen": 1794749459.201396,
-    "ast_hash": "24809c3200c874808b19f722334412ab",
+    "mtime": 1794802227.532392,
+    "seen": 1794803667.376348,
+    "ast_hash": "57701ed3ff7ff38d9e72c217b769cc96",
     "semantic_hash": ""
   },
   "views/tutor/analytics.ejs": {
-    "mtime": 1794749141.044357,
-    "seen": 1794749459.2014132,
-    "ast_hash": "214b4f0c05f2efc925125725fa2c6d37",
+    "mtime": 1794803525.0127444,
+    "seen": 1794803667.376383,
+    "ast_hash": "df2ce1391a0a3471d819af03133acbe4",
     "semantic_hash": ""
   },
   "views/landing.ejs": {
-    "mtime": 1794796750.667752,
-    "seen": 1794796796.14796,
-    "ast_hash": "d51f6cfaec1f957f32c0208587b73ce6",
+    "mtime": 1794803266.9077826,
+    "seen": 1794803667.376361,
+    "ast_hash": "9382fa3338f0d3c19b20c47806855f71",
     "semantic_hash": ""
   },
   "docs/superpowers/plans/2026-11-16-landing-page.md": {
     "mtime": 1794790454.7984536,
     "seen": 1794790754.345718,
     "ast_hash": "bdd57ba922f8ab2089e37a4699ea3676",
+    "semantic_hash": ""
+  },
+  "public/javascripts/layout-modular.js": {
+    "mtime": 1794801243.719374,
+    "seen": 1794803667.376271,
+    "ast_hash": "e0d5fbdafb840490044f074d3f6c77fb",
+    "semantic_hash": ""
+  },
+  "views/partials/admin-header.ejs": {
+    "mtime": 1794801273.6825123,
+    "seen": 1794803667.376365,
+    "ast_hash": "4312146ee3316d4b6ff6bb15fe7cd9fa",
+    "semantic_hash": ""
+  },
+  "views/partials/admin-sidebar.ejs": {
+    "mtime": 1794801262.0055525,
+    "seen": 1794803667.3763661,
+    "ast_hash": "a62ba306cef987d5535dd630f66d58e4",
+    "semantic_hash": ""
+  },
+  "views/partials/footer.ejs": {
+    "mtime": 1794801380.3579955,
+    "seen": 1794803667.376368,
+    "ast_hash": "427bf99f12021bc3e0979c37d3ecacbd",
+    "semantic_hash": ""
+  },
+  "views/partials/student-header.ejs": {
+    "mtime": 1794802575.8238947,
+    "seen": 1794803667.376369,
+    "ast_hash": "7d4247a742cc534e526ed785155daa12",
+    "semantic_hash": ""
+  },
+  "views/partials/tutor-header.ejs": {
+    "mtime": 1794801341.017825,
+    "seen": 1794803667.37637,
+    "ast_hash": "80b00b3066b8828c17b9f900c8aa5c89",
+    "semantic_hash": ""
+  },
+  "views/partials/tutor-sidebar.ejs": {
+    "mtime": 1794801363.345249,
+    "seen": 1794803667.376371,
+    "ast_hash": "b52708847c2bcf512ff0298e99f410f3",
     "semantic_hash": ""
   },
   "package-lock.json": {

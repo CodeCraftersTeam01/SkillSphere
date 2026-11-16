@@ -1,0 +1,43 @@
+<%
+  const breadcrumbText = (typeof breadcrumb !== 'undefined' && breadcrumb) ? breadcrumb : 'Ringkasan Platform';
+%>
+<!-- Admin Modular Header -->
+<header class="admin-header" role="banner">
+  <div class="header-left-side">
+    <button type="button" class="mobile-menu-toggle" onclick="toggleMobileSidebar(true)" aria-label="Buka Menu Sidebar">
+      <i class="fas fa-bars" aria-hidden="true"></i>
+    </button>
+    
+    <div class="header-breadcrumb">
+      <a href="/admin" style="color:var(--text-secondary); text-decoration:none;" title="Beranda Administrator">
+        <i class="fas fa-shield-halved" style="font-size:12px;" aria-hidden="true"></i>
+      </a>
+      <span>/</span>
+      <span>Admin Panel</span>
+      <span>/</span>
+      <strong id="current-view-breadcrumb"><%= breadcrumbText %></strong>
+    </div>
+  </div>
+
+  <div class="header-right-side">
+    <!-- Theme Toggle -->
+    <button class="theme-toggle-btn" id="theme-toggle-btn" type="button" aria-label="Ganti mode gelap atau terang" title="Ganti Mode Tampilan">
+      <i class="fas fa-sun" id="theme-icon-sun" style="display:none;" aria-hidden="true"></i>
+      <i class="fas fa-moon" id="theme-icon-moon" aria-hidden="true"></i>
+      <span id="theme-text">Mode Gelap</span>
+    </button>
+
+    <!-- Admin User Profile Pill -->
+    <div class="user-profile-badge" onclick="window.location.href='/profile'" style="cursor:pointer;" title="Buka Pengaturan Profil Saya" role="link" tabindex="0">
+      <div class="user-avatar-sm" id="header-avatar">AS</div>
+      <span class="user-name-label" id="header-user-name">Admin SkillSphere</span>
+      <span class="user-role-tag" id="header-user-role">ADMIN</span>
+    </div>
+
+    <!-- Logout Button -->
+    <button class="logout-btn modular-logout-btn" id="header-logout-btn" type="button" title="Keluar dari Admin">
+      <i class="fas fa-arrow-right-from-bracket" aria-hidden="true"></i>
+      <span>Keluar</span>
+    </button>
+  </div>
+</header>

@@ -1,0 +1,63 @@
+<%
+  const currentView = (typeof activeView !== 'undefined' && activeView) ? activeView : 'overview';
+%>
+<!-- Admin Modular Left Navigation Sidebar -->
+<aside class="admin-sidebar" id="admin-sidebar" aria-label="Navigasi Panel Administrator">
+  <div class="sidebar-brand">
+    <a href="/admin" class="brand-logo" title="Beranda Administrator SkillSphere">
+      <div class="brand-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path opacity="0.38" d="M12 7.6L17.3 4.7L14.4 10L17.3 15.3L12 12.4L6.7 15.3L9.6 10L6.7 4.7Z" />
+          <path d="M12 0L13.8 8.2L22 10L13.8 11.8L12 20L10.2 11.8L2 10L10.2 8.2L12 0Z" />
+        </svg>
+      </div>
+      <span>SkillSphere</span>
+    </a>
+    <span class="admin-badge-tag">ADMIN</span>
+  </div>
+
+  <nav class="sidebar-nav-container">
+    <div class="nav-group-label">Menu Utama</div>
+    
+    <button type="button" class="sidebar-nav-item <%= currentView === 'overview' ? 'active' : '' %>" data-view="overview" onclick="if(typeof switchAdminView === 'function'){ switchAdminView('overview'); } else { window.location.href='/admin#overview'; }">
+      <span><i class="fas fa-chart-pie" aria-hidden="true"></i> Ringkasan Platform</span>
+    </button>
+
+    <button type="button" class="sidebar-nav-item <%= currentView === 'verification' ? 'active' : '' %>" data-view="verification" onclick="if(typeof switchAdminView === 'function'){ switchAdminView('verification'); } else { window.location.href='/admin#verification'; }">
+      <span><i class="fas fa-user-shield" aria-hidden="true"></i> Verifikasi & Sertifikasi</span>
+      <span class="sidebar-count-badge alert" id="badge-pending-verification-total">0</span>
+    </button>
+
+    <div class="nav-group-label">Manajemen Sistem</div>
+
+    <button type="button" class="sidebar-nav-item <%= currentView === 'users' ? 'active' : '' %>" data-view="users" onclick="if(typeof switchAdminView === 'function'){ switchAdminView('users'); } else { window.location.href='/admin#users'; }">
+      <span><i class="fas fa-users-gear" aria-hidden="true"></i> Manajemen Pengguna</span>
+      <span class="sidebar-count-badge" id="badge-users-total">0</span>
+    </button>
+
+    <button type="button" class="sidebar-nav-item <%= currentView === 'courses' ? 'active' : '' %>" data-view="courses" onclick="if(typeof switchAdminView === 'function'){ switchAdminView('courses'); } else { window.location.href='/admin#courses'; }">
+      <span><i class="fas fa-graduation-cap" aria-hidden="true"></i> Data Kursus & Materi</span>
+    </button>
+
+    <button type="button" class="sidebar-nav-item <%= currentView === 'financial' ? 'active' : '' %>" data-view="financial" onclick="if(typeof switchAdminView === 'function'){ switchAdminView('financial'); } else { window.location.href='/admin#financial'; }">
+      <span><i class="fas fa-wallet" aria-hidden="true"></i> Bagi Hasil & Finansial</span>
+    </button>
+
+    <a href="/admin/analytics" class="sidebar-nav-item <%= currentView === 'analytics' ? 'active' : '' %>" style="text-decoration:none;">
+      <span><i class="fas fa-chart-line" aria-hidden="true"></i> Laporan & Analitik</span>
+    </a>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="sidebar-user-info" onclick="window.location.href='/profile'" style="cursor:pointer;" title="Buka Pengaturan Profil Saya">
+      <div class="sidebar-user-avatar" id="sidebar-avatar">AS</div>
+      <div class="sidebar-user-meta">
+        <span class="sidebar-user-name" id="sidebar-user-name">Admin SkillSphere</span>
+        <span class="sidebar-user-role" id="sidebar-user-role">Super Administrator</span>
+      </div>
+    </div>
+    <button class="logout-btn modular-logout-btn" id="sidebar-logout-btn" type="button" title="Keluar">
+      <i class="fas fa-arrow-right-from-bracket" aria-hidden="true"></i>
+    </button>
+  </div>
+</aside>

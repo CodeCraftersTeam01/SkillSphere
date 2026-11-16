@@ -27,6 +27,7 @@
   <!-- Claude Warm Paper Design Tokens & Base Styles -->
   <link rel="stylesheet" href="/stylesheets/claude-theme.css">
   <link rel="stylesheet" href="/stylesheets/accessibility.css">
+  <link rel="stylesheet" href="/stylesheets/layout-modular.css">
 
   <style>
     /* -------------------------------------------------------------
@@ -1981,64 +1982,8 @@
     </div>
   </section>
 
-  <!-- Editorial Footer -->
-  <footer class="landing-footer">
-    <div class="footer-container">
-      <div>
-        <div class="brand-wrap">
-          <div class="brand-logo-icon" style="display:flex; align-items:center; justify-content:center; color:var(--text-primary); background:transparent;">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-              <path opacity="0.38" d="M12 7.6L17.3 4.7L14.4 10L17.3 15.3L12 12.4L6.7 15.3L9.6 10L6.7 4.7Z" />
-              <path d="M12 0L13.8 8.2L22 10L13.8 11.8L12 20L10.2 11.8L2 10L10.2 8.2L12 0Z" />
-            </svg>
-          </div>
-          <div class="brand-title">SkillSphere AI</div>
-        </div>
-        <p class="footer-brand-desc">
-          Platform pembelajaran adaptif teknologi berbasis AI yang menghubungkan siswa, instruktur ahli, dan standar kompetensi industri rekayasa perangkat lunak.
-        </p>
-      </div>
-
-      <div class="footer-col">
-        <h5>Kurikulum</h5>
-        <ul class="footer-links">
-          <li><a href="/catalog">Katalog Lengkap</a></li>
-          <li><a href="/roadmap">Jalur Belajar Karir</a></li>
-          <li><a href="/catalog?cat=backend">Backend & Cloud</a></li>
-          <li><a href="/catalog?cat=ai">AI & Machine Learning</a></li>
-        </ul>
-      </div>
-
-      <div class="footer-col">
-        <h5>Ekosistem</h5>
-        <ul class="footer-links">
-          <li><a href="/register?role=tutor">Studio Pengajar</a></li>
-          <li><a href="#sertifikasi">Validasi Sertifikat</a></li>
-          <li><a href="#orion">Orion Socratic AI</a></li>
-          <li><a href="/login">Portal Siswa</a></li>
-        </ul>
-      </div>
-
-      <div class="footer-col">
-        <h5>Kebijakan & Hukum</h5>
-        <ul class="footer-links">
-          <li><a href="/terms">Syarat & Ketentuan</a></li>
-          <li><a href="/privacy">Kebijakan Privasi</a></li>
-          <li><a href="#fitur">Transparansi Finansial</a></li>
-          <li><a href="mailto:support@skillsphere.ai">Hubungi Dukungan</a></li>
-        </ul>
-      </div>
-    </div>
-
-    <div class="footer-bottom-bar">
-      <div>
-        &copy; 2026 SkillSphere AI. Seluruh hak cipta dilindungi undang-undang.
-      </div>
-      <div style="display:flex; gap:16px;">
-        <span style="font-family:var(--font-mono); font-size:11.5px; color:var(--text-tertiary);">Status: Sistem Operasional 100%</span>
-      </div>
-    </div>
-  </footer>
+  <!-- Modular Site Footer -->
+  <%- include('partials/footer') %>
 
   <!-- Accessibility Accessibility Controls Helper -->
   <script src="/javascripts/accessibility.js"></script>
@@ -2457,5 +2402,7 @@
     </div>
     <span class="floating-launcher-label">Tanya Orion AI</span>
   </button>
+  <!-- Modular Layout Script -->
+  <script src="/javascripts/layout-modular.js"></script>
 </body>
 </html>

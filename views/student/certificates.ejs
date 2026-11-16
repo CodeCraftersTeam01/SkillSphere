@@ -25,6 +25,7 @@
   <!-- Claude Design System Stylesheet & Accessibility Toolkit -->
   <link rel="stylesheet" href="/stylesheets/claude-theme.css?v=2.0">
   <link rel="stylesheet" href="/stylesheets/accessibility.css">
+  <link rel="stylesheet" href="/stylesheets/layout-modular.css">
   <link rel="stylesheet" href="/stylesheets/custom-alert.css">
   <script src="/javascripts/custom-alert.js"></script>
 
@@ -392,32 +393,8 @@
 </head>
 <body>
 
-  <!-- Top Navigation -->
-  <header class="navbar" role="banner">
-    <div style="display: flex; align-items: center; gap: 16px;">
-      <a href="/dashboard" class="brand-logo" aria-label="Ke Dashboard Utama">
-        <i class="fa-solid fa-sparkles" style="color: var(--accent-amber);"></i>
-        <span>SkillSphere AI</span>
-      </a>
-
-      <nav class="nav-links" aria-label="Navigasi Siswa">
-        <a href="/dashboard" class="nav-pill">Dashboard</a>
-        <a href="/catalog" class="nav-pill">Katalog</a>
-        <a href="/certificates" class="nav-pill active" aria-current="page">Sertifikat</a>
-      </nav>
-    </div>
-
-    <div style="display: flex; align-items: center; gap: 10px;">
-      <button type="button" class="icon-btn" id="themeToggleBtn" onclick="toggleTheme()" aria-label="Ganti Tema Tampilan" title="Ganti Tema">
-        <i class="fa-solid fa-moon" id="themeIcon"></i>
-      </button>
-
-      <a href="/dashboard" class="btn btn-outline" style="min-height: 38px; padding: 4px 12px; font-size: 0.82rem;">
-        <i class="fa-solid fa-house"></i>
-        <span>Dashboard</span>
-      </a>
-    </div>
-  </header>
+  <!-- Modular Student Header -->
+  <%- include('../partials/student-header', { activeNav: 'certificates' }) %>
 
   <main class="container" role="main">
     <div class="page-header">
@@ -684,5 +661,10 @@
       loadVouchers();
     });
   </script>
+  <!-- Modular Site Footer -->
+  <%- include('../partials/footer') %>
+
+  <!-- Modular Layout Script -->
+  <script src="/javascripts/layout-modular.js"></script>
 </body>
 </html>

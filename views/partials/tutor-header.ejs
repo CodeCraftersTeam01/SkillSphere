@@ -1,0 +1,77 @@
+<%
+  const showCourseTabs = (typeof isCourseContext !== 'undefined' && isCourseContext);
+  const activeCourseTab = (typeof activeTab !== 'undefined' && activeTab) ? activeTab : 'forum';
+%>
+<!-- Tutor Modular Navigation Bar -->
+<header class="navbar" role="banner">
+  <div class="nav-brand-group">
+    <!-- Sidebar Hamburger Button -->
+    <button type="button" class="classroom-sidebar-toggle-btn" id="classroom-sidebar-toggle" onclick="toggleClassroomSidebar()" title="Menu Utama" aria-label="Menu Utama">
+      <i class="fas fa-bars" aria-hidden="true"></i>
+    </button>
+
+    <a href="/dashboard" class="brand-logo" title="Studio Pengajar SkillSphere AI">
+      <div class="brand-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path opacity="0.38" d="M12 7.6L17.3 4.7L14.4 10L17.3 15.3L12 12.4L6.7 15.3L9.6 10L6.7 4.7Z" />
+          <path d="M12 0L13.8 8.2L22 10L13.8 11.8L12 20L10.2 11.8L2 10L10.2 8.2L12 0Z" />
+        </svg>
+      </div>
+      <span>SkillSphere AI</span>
+    </a>
+  </div>
+
+  <% if (showCourseTabs) { %>
+    <!-- Center Classroom Tabs (Forum, Tugas kelas, Ujian & Kuis, Sertifikat, Anggota) -->
+    <nav class="classroom-top-nav-tabs" aria-label="Tab Pembelajaran Kelas">
+      <button type="button" class="classroom-nav-tab <%= activeCourseTab === 'forum' ? 'active' : '' %>" id="tab-btn-forum" onclick="if(typeof switchClassroomTab === 'function') switchClassroomTab('forum');">
+        <i class="fas fa-comments" aria-hidden="true"></i>
+        <span>Forum</span>
+      </button>
+      <button type="button" class="classroom-nav-tab <%= activeCourseTab === 'classwork' ? 'active' : '' %>" id="tab-btn-classwork" onclick="if(typeof switchClassroomTab === 'function') switchClassroomTab('classwork');">
+        <i class="fas fa-book-open" aria-hidden="true"></i>
+        <span>Tugas kelas</span>
+      </button>
+      <button type="button" class="classroom-nav-tab <%= activeCourseTab === 'exams' ? 'active' : '' %>" id="tab-btn-exams" onclick="if(typeof switchClassroomTab === 'function') switchClassroomTab('exams');">
+        <i class="fas fa-file-signature" aria-hidden="true"></i>
+        <span>Ujian & Kuis</span>
+      </button>
+      <button type="button" class="classroom-nav-tab <%= activeCourseTab === 'certificates' ? 'active' : '' %>" id="tab-btn-certificates" onclick="if(typeof switchClassroomTab === 'function') switchClassroomTab('certificates');">
+        <i class="fas fa-certificate" aria-hidden="true"></i>
+        <span>Sertifikat</span>
+      </button>
+      <button type="button" class="classroom-nav-tab <%= activeCourseTab === 'people' ? 'active' : '' %>" id="tab-btn-people" onclick="if(typeof switchClassroomTab === 'function') switchClassroomTab('people');">
+        <i class="fas fa-user-group" aria-hidden="true"></i>
+        <span>Anggota</span>
+      </button>
+    </nav>
+  <% } %>
+
+  <div class="nav-actions">
+    <!-- Back to Studio Dashboard -->
+    <a href="/dashboard" class="btn-dashboard-back" title="Kembali ke Dashboard Studio">
+      <i class="fas fa-arrow-left" aria-hidden="true"></i>
+      <span>Dashboard</span>
+    </a>
+
+    <!-- Theme Toggle -->
+    <button class="theme-toggle-btn" id="theme-toggle-btn" type="button" aria-label="Ganti mode gelap atau terang" title="Ganti Mode Tampilan">
+      <i class="fas fa-sun" id="theme-icon-sun" style="display:none;" aria-hidden="true"></i>
+      <i class="fas fa-moon" id="theme-icon-moon" aria-hidden="true"></i>
+      <span id="theme-text">Mode Gelap</span>
+    </button>
+
+    <!-- Tutor Profile Pill (Clickable) -->
+    <a href="/profile" class="user-profile-badge" style="text-decoration:none;" title="Buka Pengaturan Profil Saya" aria-label="Profil Tutor">
+      <div class="user-avatar-sm" id="nav-avatar">T</div>
+      <span class="user-name-label" id="nav-user-name">Pengajar</span>
+      <span class="user-role-tag" id="nav-user-role">TUTOR</span>
+    </a>
+
+    <!-- Logout Button -->
+    <button class="logout-btn modular-logout-btn" id="logout-btn" type="button" title="Keluar">
+      <i class="fas fa-arrow-right-from-bracket" aria-hidden="true"></i>
+      <span>Keluar</span>
+    </button>
+  </div>
+</header>

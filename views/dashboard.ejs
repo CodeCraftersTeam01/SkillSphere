@@ -30,6 +30,7 @@
   <link rel="stylesheet" href="/stylesheets/accessibility.css">
   <!-- Custom Alert & Toast Stylesheet & Script -->
   <link rel="stylesheet" href="/stylesheets/custom-alert.css">
+  <link rel="stylesheet" href="/stylesheets/layout-modular.css">
   <script src="/javascripts/custom-alert.js"></script>
 
   <style>
@@ -1591,71 +1592,8 @@
     <!-- Google Classroom Drawer Sidebar Backdrop -->
     <div class="classroom-sidebar-backdrop" id="classroom-sidebar-backdrop" onclick="toggleClassroomSidebar(false)"></div>
 
-    <!-- Top Navigation Bar -->
-    <header class="navbar">
-      <div class="nav-main-row">
-        <div class="nav-brand-group">
-          <!-- Classroom Sidebar Hamburger Button (Visible for Tutor) -->
-          <button class="classroom-sidebar-toggle-btn" id="classroom-sidebar-toggle" style="display:none;" onclick="toggleClassroomSidebar()" title="Menu Utama" aria-label="Menu Utama">
-            <i class="fas fa-bars"></i>
-          </button>
-
-          <a href="/dashboard" class="brand-logo" style="text-decoration:none;">
-            <div class="brand-icon">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                <path opacity="0.38" d="M12 7.6L17.3 4.7L14.4 10L17.3 15.3L12 12.4L6.7 15.3L9.6 10L6.7 4.7Z" />
-                <path d="M12 0L13.8 8.2L22 10L13.8 11.8L12 20L10.2 11.8L2 10L10.2 8.2L12 0Z" />
-              </svg>
-            </div>
-            <span>SkillSphere AI</span>
-          </a>
-        </div>
-
-        <!-- Desktop Navigation Links (Student Only) -->
-        <ul class="nav-links-menu desktop-only" id="desktop-nav-menu">
-          <li><a href="/dashboard" class="nav-link-item active">Beranda</a></li>
-          <li><a href="#courses-catalog-section" class="nav-link-item">Katalog Kursus</a></li>
-          <li><a href="/dashboard/roadmap" class="nav-link-item">Jalur Belajar AI</a></li>
-        </ul>
-
-        <div class="nav-actions">
-          <!-- Streak Indicator -->
-          <div class="streak-badge" title="Runtutan Belajar Aktif">
-            <i class="fas fa-bolt" style="color:var(--text-primary); font-size:13px;"></i>
-            <span id="nav-streak-count">1</span>
-          </div>
-
-          <!-- Theme Toggle -->
-          <button class="theme-toggle-btn" id="theme-toggle-btn" type="button" aria-label="Toggle dark/light mode">
-            <i class="fas fa-sun" id="theme-icon-sun" style="display:none;"></i>
-            <i class="fas fa-moon" id="theme-icon-moon"></i>
-            <span id="theme-text">Mode Gelap</span>
-          </button>
-
-          <!-- User Profile Pill (Clickable) -->
-          <div class="user-profile-badge" onclick="window.location.href='/profile'" style="cursor:pointer;" title="Buka Pengaturan Profil Saya">
-            <div class="user-avatar-sm" id="nav-avatar">U</div>
-            <span class="user-name-label" id="nav-user-name">Memuat...</span>
-            <span class="user-role-tag" id="nav-user-role">Siswa</span>
-          </div>
-
-          <!-- Logout Button -->
-          <button class="logout-btn" id="logout-btn" type="button" title="Keluar">
-            <i class="fas fa-arrow-right-from-bracket"></i>
-            <span>Keluar</span>
-          </button>
-        </div>
-      </div>
-
-      <!-- Mobile Scrollable Subnav Menu (Student Only) -->
-      <div class="nav-mobile-row mobile-only" id="mobile-nav-row">
-        <ul class="nav-links-menu mobile-scroll" id="mobile-nav-menu">
-          <li><a href="/dashboard" class="nav-link-item active">Beranda</a></li>
-          <li><a href="#courses-catalog-section" class="nav-link-item">Katalog Kursus</a></li>
-          <li><a href="/dashboard/roadmap" class="nav-link-item">Jalur Belajar AI</a></li>
-        </ul>
-      </div>
-    </header>
+    <!-- Modular Navigation Bar -->
+    <%- include('partials/student-header', { activeNav: 'dashboard' }) %>
 
     <!-- Top Full-Width Verification Announcement Bar (Dicoding / Claude Warm Paper Style) -->
     <div class="top-announcement-bar" id="tutor-verification-bar" style="display:none;">
@@ -3606,9 +3544,14 @@
 
   </script>
 
+  <!-- Modular Site Footer -->
+  <%- include('partials/footer') %>
+
   <!-- PWA Service Worker & Install Prompt Banner -->
   <script src="/javascripts/pwa-installer.js"></script>
   <!-- Inclusive Accessibility, TTS, & Head Tracking Script -->
   <script src="/javascripts/accessibility.js"></script>
+  <!-- Modular Layout Script -->
+  <script src="/javascripts/layout-modular.js"></script>
 </body>
 </html>

@@ -13,6 +13,7 @@
   <link rel="stylesheet" href="/stylesheets/style.css">
   <link rel="stylesheet" href="/stylesheets/claude-theme.css">
   <link rel="stylesheet" href="/stylesheets/accessibility.css">
+  <link rel="stylesheet" href="/stylesheets/layout-modular.css">
   <link rel="stylesheet" href="/stylesheets/custom-alert.css">
   <script src="/javascripts/custom-alert.js"></script>
 
@@ -509,64 +510,8 @@
   </style>
 </head>
 <body>
-  <!-- Top Navigation Bar -->
-  <header class="navbar" role="banner">
-    <div class="nav-main-row">
-      <div class="nav-brand-group">
-        <a href="/dashboard" class="brand-logo" aria-label="SkillSphere AI Beranda">
-          <div class="brand-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-              <path opacity="0.38" d="M12 7.6L17.3 4.7L14.4 10L17.3 15.3L12 12.4L6.7 15.3L9.6 10L6.7 4.7Z" />
-              <path d="M12 0L13.8 8.2L22 10L13.8 11.8L12 20L10.2 11.8L2 10L10.2 8.2L12 0Z" />
-            </svg>
-          </div>
-          <span>SkillSphere AI</span>
-        </a>
-
-        <!-- Desktop Navigation Menu -->
-        <nav class="desktop-only" aria-label="Navigasi Utama">
-          <ul class="nav-links-menu">
-            <li><a href="/dashboard" class="nav-link-item">Beranda</a></li>
-            <li><a href="/courses" class="nav-link-item">Katalog Kursus</a></li>
-            <li><a href="/dashboard/roadmap" class="nav-link-item">Jalur Belajar AI</a></li>
-            <li><a href="/dashboard/wishlist" class="nav-link-item">Wishlist</a></li>
-            <li><a href="/dashboard/transactions" class="nav-link-item active">Riwayat Transaksi</a></li>
-          </ul>
-        </nav>
-      </div>
-
-      <div class="nav-actions">
-        <!-- Theme Toggle -->
-        <button class="theme-toggle-btn" id="theme-toggle-btn" type="button" aria-label="Ganti tema gelap atau terang">
-          <i class="fas fa-moon" id="theme-icon"></i>
-          <span id="theme-text">Mode Gelap</span>
-        </button>
-
-        <!-- User Profile Pill -->
-        <div class="user-profile-badge" onclick="window.location.href='/profile'" title="Buka Profil Saya">
-          <div class="user-avatar-sm" id="nav-avatar">S</div>
-          <span class="user-name-label" id="nav-user-name">Memuat...</span>
-        </div>
-
-        <!-- Logout Button -->
-        <button class="logout-btn" id="logout-btn" type="button" title="Keluar">
-          <i class="fas fa-arrow-right-from-bracket" aria-hidden="true"></i>
-          <span>Keluar</span>
-        </button>
-      </div>
-    </div>
-  </header>
-
-  <!-- Mobile Scrollable Subnav Menu -->
-  <div class="nav-mobile-row" aria-label="Navigasi Ponsel">
-    <div style="display:flex; gap:6px;">
-      <a href="/dashboard" class="nav-link-item">Beranda</a>
-      <a href="/courses" class="nav-link-item">Katalog Kursus</a>
-      <a href="/dashboard/roadmap" class="nav-link-item">Jalur Belajar AI</a>
-      <a href="/dashboard/wishlist" class="nav-link-item">Wishlist</a>
-      <a href="/dashboard/transactions" class="nav-link-item active">Riwayat Transaksi</a>
-    </div>
-  </div>
+  <!-- Modular Student Header -->
+  <%- include('../partials/student-header', { activeNav: 'transactions' }) %>
 
   <!-- Main Content Layout -->
   <main class="page-main-container">
@@ -1022,5 +967,10 @@
       loadTransactions();
     });
   </script>
+  <!-- Modular Site Footer -->
+  <%- include('../partials/footer') %>
+
+  <!-- Modular Layout Script -->
+  <script src="/javascripts/layout-modular.js"></script>
 </body>
 </html>

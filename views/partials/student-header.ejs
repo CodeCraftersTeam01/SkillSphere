@@ -1,0 +1,72 @@
+<%
+  const activeItem = (typeof activeNav !== 'undefined' && activeNav) ? activeNav : 'dashboard';
+%>
+<!-- Student Modular Navigation Bar -->
+<header class="navbar" role="banner">
+  <div class="nav-main-row">
+    <div class="nav-brand-group">
+      <!-- Classroom Sidebar Hamburger Button (Visible for Tutor fallback) -->
+      <button class="classroom-sidebar-toggle-btn" id="classroom-sidebar-toggle" style="display:none;" onclick="toggleClassroomSidebar()" title="Menu Utama" aria-label="Menu Utama">
+        <i class="fas fa-bars"></i>
+      </button>
+
+      <a href="/dashboard" class="brand-logo" title="Beranda SkillSphere AI">
+        <div class="brand-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path opacity="0.38" d="M12 7.6L17.3 4.7L14.4 10L17.3 15.3L12 12.4L6.7 15.3L9.6 10L6.7 4.7Z" />
+            <path d="M12 0L13.8 8.2L22 10L13.8 11.8L12 20L10.2 11.8L2 10L10.2 8.2L12 0Z" />
+          </svg>
+        </div>
+        <span>SkillSphere AI</span>
+      </a>
+
+      <!-- Desktop Navigation Links -->
+      <nav class="nav-links-menu desktop-only" id="desktop-nav-menu" aria-label="Navigasi Utama">
+        <a href="/dashboard" class="nav-link-item <%= activeItem === 'dashboard' ? 'active' : '' %>">Beranda</a>
+        <a href="/courses" class="nav-link-item <%= activeItem === 'courses' ? 'active' : '' %>">Katalog Kursus</a>
+        <a href="/dashboard/roadmap" class="nav-link-item <%= activeItem === 'roadmap' ? 'active' : '' %>">Jalur Belajar AI</a>
+        <a href="/student/wishlist" class="nav-link-item <%= activeItem === 'wishlist' ? 'active' : '' %>">Wishlist</a>
+        <a href="/student/transactions" class="nav-link-item <%= activeItem === 'transactions' ? 'active' : '' %>">Riwayat Transaksi</a>
+      </nav>
+    </div>
+
+    <div class="nav-actions">
+      <!-- Streak Indicator -->
+      <div class="streak-badge" title="Runtutan Belajar Aktif">
+        <i class="fas fa-bolt" style="color:var(--text-primary); font-size:13px;" aria-hidden="true"></i>
+        <span id="nav-streak-count">1</span>
+      </div>
+
+      <!-- Theme Toggle -->
+      <button class="theme-toggle-btn" id="theme-toggle-btn" type="button" aria-label="Ganti mode gelap atau terang" title="Ganti Mode Tampilan">
+        <i class="fas fa-sun" id="theme-icon-sun" style="display:none;" aria-hidden="true"></i>
+        <i class="fas fa-moon" id="theme-icon-moon" aria-hidden="true"></i>
+        <span id="theme-text">Mode Gelap</span>
+      </button>
+
+      <!-- Student User Profile Pill (Clickable) -->
+      <a href="/profile" class="user-profile-badge" style="text-decoration:none;" title="Buka Pengaturan Profil Saya" aria-label="Profil Pengguna">
+        <div class="user-avatar-sm" id="nav-avatar">S</div>
+        <span class="user-name-label" id="nav-user-name">Siswa</span>
+        <span class="user-role-tag" id="nav-user-role">SISWA</span>
+      </a>
+
+      <!-- Logout Button -->
+      <button class="logout-btn modular-logout-btn" id="logout-btn" type="button" title="Keluar">
+        <i class="fas fa-arrow-right-from-bracket" aria-hidden="true"></i>
+        <span>Keluar</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile Scrollable Subnav Row -->
+  <div class="nav-mobile-row mobile-only" id="mobile-nav-row">
+    <nav class="nav-links-menu mobile-scroll" id="mobile-nav-menu" aria-label="Navigasi Seluler">
+      <a href="/dashboard" class="nav-link-item <%= activeItem === 'dashboard' ? 'active' : '' %>">Beranda</a>
+      <a href="/courses" class="nav-link-item <%= activeItem === 'courses' ? 'active' : '' %>">Katalog Kursus</a>
+      <a href="/dashboard/roadmap" class="nav-link-item <%= activeItem === 'roadmap' ? 'active' : '' %>">Jalur Belajar AI</a>
+      <a href="/student/wishlist" class="nav-link-item <%= activeItem === 'wishlist' ? 'active' : '' %>">Wishlist</a>
+      <a href="/student/transactions" class="nav-link-item <%= activeItem === 'transactions' ? 'active' : '' %>">Riwayat Transaksi</a>
+    </nav>
+  </div>
+</header>

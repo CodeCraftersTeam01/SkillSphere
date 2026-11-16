@@ -30,6 +30,7 @@
   <link rel="stylesheet" href="/stylesheets/accessibility.css">
   <!-- Custom Alert & Toast Stylesheet & Script -->
   <link rel="stylesheet" href="/stylesheets/custom-alert.css">
+  <link rel="stylesheet" href="/stylesheets/layout-modular.css">
   <script src="/javascripts/custom-alert.js"></script>
 
   <style>
@@ -719,34 +720,8 @@
 <body>
 
   <div class="profile-layout">
-    <!-- Navbar Header (Clean brand logo on left, styled mode toggle and logout on right) -->
-    <header class="navbar">
-      <div class="nav-main-row">
-        <div class="nav-brand-group">
-          <a href="/dashboard" id="navbar-brand-link" class="brand-logo" style="text-decoration:none;">
-            <div class="brand-icon">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 0L13.8 8.2L22 10L13.8 11.8L12 20L10.2 11.8L2 10L10.2 8.2L12 0Z" />
-              </svg>
-            </div>
-            <span>SkillSphere AI</span>
-          </a>
-        </div>
-
-        <div class="nav-actions">
-          <button class="theme-toggle-btn" id="theme-toggle-btn" type="button" aria-label="Ganti mode tampilan">
-            <i class="fas fa-sun" id="theme-icon-sun" style="display:none;"></i>
-            <i class="fas fa-moon" id="theme-icon-moon"></i>
-            <span class="theme-text-label" id="theme-text">Mode Gelap</span>
-          </button>
-
-          <button class="logout-btn" id="logout-btn" type="button" title="Keluar dari akun">
-            <i class="fas fa-arrow-right-from-bracket"></i>
-            <span class="logout-text-label">Keluar</span>
-          </button>
-        </div>
-      </div>
-    </header>
+    <!-- Modular Header -->
+    <%- include('partials/student-header', { activeNav: 'profile' }) %>
 
     <!-- Main Container -->
     <main class="profile-container">
@@ -1456,7 +1431,12 @@
       loadTrustedDevices();
     });
   </script>
+  <!-- Modular Site Footer -->
+  <%- include('partials/footer') %>
+
   <!-- Inclusive Accessibility, TTS, & Head Tracking Script -->
   <script src="/javascripts/accessibility.js"></script>
+  <!-- Modular Layout Script -->
+  <script src="/javascripts/layout-modular.js"></script>
 </body>
 </html>

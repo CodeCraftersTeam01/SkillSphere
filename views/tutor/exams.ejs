@@ -25,6 +25,7 @@
   <!-- Claude Design System Stylesheet & Accessibility Toolkit -->
   <link rel="stylesheet" href="/stylesheets/claude-theme.css?v=2.0">
   <link rel="stylesheet" href="/stylesheets/accessibility.css">
+  <link rel="stylesheet" href="/stylesheets/layout-modular.css">
   <link rel="stylesheet" href="/stylesheets/custom-alert.css">
   <script src="/javascripts/custom-alert.js"></script>
 
@@ -446,54 +447,14 @@
 </head>
 <body>
 
-  <!-- Top Studio Header -->
-  <header class="navbar" role="banner">
-    <div class="nav-brand-group">
-      <a href="/dashboard" class="brand-logo" aria-label="Ke Dashboard SkillSphere">
-        <i class="fa-solid fa-sparkles" style="color: var(--accent-amber);"></i>
-        <span>SkillSphere Studio</span>
-        <span class="brand-tag">Pengajar</span>
-      </a>
-    </div>
+  <!-- Modular Tutor Header -->
+  <%- include('../partials/tutor-header', { isCourseContext: false }) %>
 
-    <!-- Center Studio Tabs -->
-    <nav class="studio-nav-tabs" aria-label="Navigasi Studio Pengajar">
-      <a href="/tutor/materials" class="studio-nav-tab">
-        <i class="fa-solid fa-book-open"></i>
-        <span>Kurikulum & Materi</span>
-      </a>
-      <a href="/tutor/exams" class="studio-nav-tab active" aria-current="page">
-        <i class="fa-solid fa-file-signature"></i>
-        <span>Ujian Kelulusan</span>
-      </a>
-      <a href="/tutor/certificates" class="studio-nav-tab">
-        <i class="fa-solid fa-certificate"></i>
-        <span>Sertifikat Kursus</span>
-      </a>
-      <a href="/tutor/wallet" class="studio-nav-tab">
-        <i class="fa-solid fa-wallet"></i>
-        <span>Dompet & Penarikan</span>
-      </a>
-      <a href="/tutor/analytics" class="studio-nav-tab">
-        <i class="fa-solid fa-chart-line"></i>
-        <span>Laporan & Analitik</span>
-      </a>
-    </nav>
+  <div class="classroom-app-container">
+    <!-- Modular Tutor Sidebar -->
+    <%- include('../partials/tutor-sidebar', { activeNav: 'exams' }) %>
 
-    <!-- Right Controls -->
-    <div class="nav-actions">
-      <button type="button" class="icon-btn" id="themeToggleBtn" onclick="toggleTheme()" aria-label="Ganti Tema Tampilan" title="Ganti Tema">
-        <i class="fa-solid fa-moon" id="themeIcon"></i>
-      </button>
-
-      <a href="/dashboard" class="btn btn-outline" style="min-height: 40px; padding: 6px 14px; font-size: 0.84rem;">
-        <i class="fa-solid fa-arrow-left"></i>
-        <span>Dashboard</span>
-      </a>
-    </div>
-  </header>
-
-  <main class="container" role="main">
+    <main class="classroom-main-pane container" role="main" style="padding: 24px 32px 60px;">
     <div class="page-header">
       <h1 class="page-title">Pembuat Ujian Kelulusan Resmi</h1>
       <p class="page-subtitle">Rancang bank soal pilihan ganda, tetapkan standar nilai kelulusan (passing grade), dan durasi pengerjaan untuk sertifikasi siswa.</p>
@@ -591,6 +552,7 @@
       </div>
     </section>
   </main>
+</div>
 
   <!-- Sticky Footer Action Bar -->
   <footer class="sticky-footer" id="stickyFooter" style="display: none;" role="contentinfo">
@@ -1003,5 +965,7 @@
       }
     });
   </script>
+  <!-- Modular Layout Script -->
+  <script src="/javascripts/layout-modular.js"></script>
 </body>
 </html>

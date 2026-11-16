@@ -13,6 +13,7 @@
   <link rel="stylesheet" href="/stylesheets/style.css">
   <link rel="stylesheet" href="/stylesheets/claude-theme.css">
   <link rel="stylesheet" href="/stylesheets/accessibility.css">
+  <link rel="stylesheet" href="/stylesheets/layout-modular.css">
   <link rel="stylesheet" href="/stylesheets/custom-alert.css">
   <script src="/javascripts/custom-alert.js"></script>
 
@@ -438,50 +439,8 @@
 </head>
 <body>
 
-  <!-- Top Sticky Navigation Bar -->
-  <header class="navbar" role="banner">
-    <div class="nav-main-row">
-      <div class="nav-brand-group">
-        <a href="/dashboard" class="brand-logo" aria-label="Beranda SkillSphere AI">
-          <div class="brand-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-              <path opacity="0.38" d="M12 7.6L17.3 4.7L14.4 10L17.3 15.3L12 12.4L6.7 15.3L9.6 10L6.7 4.7Z" />
-              <path d="M12 0L13.8 8.2L22 10L13.8 11.8L12 20L10.2 11.8L2 10L10.2 8.2L12 0Z" />
-            </svg>
-          </div>
-          <span>SkillSphere AI</span>
-        </a>
-
-        <!-- Desktop Navigation Links -->
-        <nav class="nav-links-menu desktop-only" aria-label="Navigasi Utama">
-          <a href="/dashboard" class="nav-link-item">Beranda</a>
-          <a href="/courses" class="nav-link-item">Katalog Kursus</a>
-          <a href="/dashboard/roadmap" class="nav-link-item">Jalur Belajar AI</a>
-        </nav>
-      </div>
-
-      <div class="nav-actions">
-        <!-- Theme Toggle -->
-        <button class="theme-toggle-btn" id="theme-toggle-btn" type="button" aria-label="Ganti mode gelap atau terang" onclick="toggleThemeMode()">
-          <i class="fas fa-moon" id="theme-icon-moon"></i>
-          <span id="theme-text">Mode Gelap</span>
-        </button>
-
-        <!-- User Profile Pill -->
-        <a href="/profile" class="user-profile-badge" title="Buka Pengaturan Profil Saya" aria-label="Profil Pengguna">
-          <div class="user-avatar-sm" id="nav-avatar">S</div>
-          <span class="user-name-label" id="nav-user-name">Siswa</span>
-          <span class="user-role-tag">SISWA</span>
-        </a>
-
-        <!-- Logout Button -->
-        <button class="logout-btn" id="logout-btn" type="button" onclick="handleLogout()" title="Keluar dari Akun">
-          <i class="fas fa-arrow-right-from-bracket" aria-hidden="true"></i>
-          <span>Keluar</span>
-        </button>
-      </div>
-    </div>
-  </header>
+  <!-- Modular Student Header -->
+  <%- include('../partials/student-header', { activeNav: 'wishlist' }) %>
 
   <!-- Main Content -->
   <main class="wish-main-container" id="main-content" role="main">
@@ -666,7 +625,12 @@
     document.addEventListener('DOMContentLoaded', loadWishlistPage);
   </script>
 
+  <!-- Modular Site Footer -->
+  <%- include('../partials/footer') %>
+
   <!-- Inclusive Accessibility, TTS, & Head Tracking Script -->
   <script src="/javascripts/accessibility.js"></script>
+  <!-- Modular Layout Script -->
+  <script src="/javascripts/layout-modular.js"></script>
 </body>
 </html>

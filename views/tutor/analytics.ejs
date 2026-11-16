@@ -25,6 +25,7 @@
   <link rel="stylesheet" href="/stylesheets/style.css">
   <link rel="stylesheet" href="/stylesheets/claude-theme.css">
   <link rel="stylesheet" href="/stylesheets/accessibility.css">
+  <link rel="stylesheet" href="/stylesheets/layout-modular.css">
 
   <style>
     :root {
@@ -493,52 +494,15 @@
 </head>
 <body>
 
-  <!-- Top Studio Navbar -->
-  <header class="studio-navbar">
-    <div class="brand-group">
-      <a href="/dashboard" class="brand-logo" aria-label="Ke Dashboard SkillSphere">
-        <i class="fa-solid fa-sparkles" style="color: #F59E0B;"></i>
-        <span>SkillSphere Studio</span>
-        <span class="brand-tag">Pengajar</span>
-      </a>
-    </div>
+  <!-- Modular Tutor Header -->
+  <%- include('../partials/tutor-header', { isCourseContext: false }) %>
 
-    <nav class="studio-nav-tabs" aria-label="Navigasi Studio Pengajar">
-      <a href="/tutor/materials" class="studio-nav-tab">
-        <i class="fa-solid fa-book-open"></i>
-        <span>Kurikulum & Materi</span>
-      </a>
-      <a href="/tutor/exams" class="studio-nav-tab">
-        <i class="fa-solid fa-file-signature"></i>
-        <span>Ujian Kelulusan</span>
-      </a>
-      <a href="/tutor/certificates" class="studio-nav-tab">
-        <i class="fa-solid fa-certificate"></i>
-        <span>Sertifikat Kursus</span>
-      </a>
-      <a href="/tutor/wallet" class="studio-nav-tab">
-        <i class="fa-solid fa-wallet"></i>
-        <span>Dompet & Penarikan</span>
-      </a>
-      <a href="/tutor/analytics" class="studio-nav-tab active" aria-current="page">
-        <i class="fa-solid fa-chart-line"></i>
-        <span>Laporan & Analitik</span>
-      </a>
-    </nav>
+  <div class="classroom-app-container">
+    <!-- Modular Tutor Sidebar -->
+    <%- include('../partials/tutor-sidebar', { activeNav: 'analytics' }) %>
 
-    <div class="nav-actions">
-      <button type="button" class="icon-btn" id="themeToggleBtn" onclick="toggleTheme()" aria-label="Ganti Tema Tampilan" title="Ganti Tema">
-        <i class="fa-solid fa-moon" id="themeIcon"></i>
-      </button>
-
-      <a href="/dashboard" class="icon-btn" title="Kembali ke Dashboard Utama">
-        <i class="fa-solid fa-arrow-left"></i>
-      </a>
-    </div>
-  </header>
-
-  <!-- Main Content Container -->
-  <main class="main-container">
+    <!-- Main Content Container -->
+    <main class="classroom-main-pane main-container" style="padding: 24px 32px 60px;">
     <div class="header-section">
       <h1 class="page-title">Laporan & Analitik Pengajar</h1>
       <p class="page-subtitle">Pantau performa penjualan kelas, efektivitas materi kurikulum, dan perkembangan kemajuan belajar siswa Anda secara terukur.</p>
@@ -628,6 +592,7 @@
       </section>
     </div>
   </main>
+</div>
 
   <div class="toast-container" id="toastContainer"></div>
 
@@ -789,5 +754,7 @@
       loadTutorAnalytics();
     });
   </script>
+  <!-- Modular Layout Script -->
+  <script src="/javascripts/layout-modular.js"></script>
 </body>
 </html>

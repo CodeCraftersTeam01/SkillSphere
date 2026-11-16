@@ -28,6 +28,8 @@
   <link rel="stylesheet" href="/stylesheets/claude-theme.css?v=2.0">
   <!-- Accessibility & Head Tracking Stylesheet -->
   <link rel="stylesheet" href="/stylesheets/accessibility.css">
+  <!-- Modular Layout Stylesheet -->
+  <link rel="stylesheet" href="/stylesheets/layout-modular.css">
   
   <style>
     .legal-container {
@@ -748,16 +750,8 @@
 
     </div>
 
-    <!-- Footer -->
-    <footer class="legal-footer">
-      <p>© 2026 SkillSphere AI. Seluruh hak cipta dilindungi undang-undang.</p>
-      <div class="legal-footer-links">
-        <a href="/privacy">Kebijakan Privasi</a>
-        <a href="/terms">Syarat & Ketentuan</a>
-        <a href="/login">Halaman Masuk</a>
-        <a href="/register">Pendaftaran Akun</a>
-      </div>
-    </footer>
+    <!-- Modular Site Footer -->
+    <%- include('partials/footer') %>
 
   </div>
 
@@ -828,5 +822,7 @@
   </script>
   <!-- Inclusive Accessibility, TTS, & Head Tracking Script -->
   <script src="/javascripts/accessibility.js"></script>
+  <!-- Modular Layout Script -->
+  <script src="/javascripts/layout-modular.js"></script>
 </body>
 </html>

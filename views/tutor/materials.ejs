@@ -30,6 +30,7 @@
   <link rel="stylesheet" href="/stylesheets/accessibility.css">
   <!-- Custom Alert & Toast Stylesheet & Script -->
   <link rel="stylesheet" href="/stylesheets/custom-alert.css">
+  <link rel="stylesheet" href="/stylesheets/layout-modular.css">
   <script src="/javascripts/custom-alert.js"></script>
 
   <style>
@@ -1690,135 +1691,13 @@
       </div>
     </div>
 
-    <!-- Google Classroom Drawer Sidebar Backdrop -->
-    <div class="classroom-sidebar-backdrop" id="classroom-sidebar-backdrop" onclick="toggleClassroomSidebar(false)"></div>
-
-    <!-- Top Sticky Navigation Bar -->
-    <header class="navbar">
-      <div class="nav-brand-group">
-        <!-- Sidebar Hamburger Button -->
-        <button class="classroom-sidebar-toggle-btn" id="classroom-sidebar-toggle" onclick="toggleClassroomSidebar()" title="Menu Utama" aria-label="Menu Utama">
-          <i class="fas fa-bars"></i>
-        </button>
-
-        <a href="/dashboard" class="brand-logo" style="text-decoration:none;">
-          <div class="brand-icon">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
-              <path opacity="0.38" d="M12 7.6L17.3 4.7L14.4 10L17.3 15.3L12 12.4L6.7 15.3L9.6 10L6.7 4.7Z" />
-              <path d="M12 0L13.8 8.2L22 10L13.8 11.8L12 20L10.2 11.8L2 10L10.2 8.2L12 0Z" />
-            </svg>
-          </div>
-          <span>SkillSphere AI</span>
-        </a>
-      </div>
-
-      <!-- Center Tabs (Forum, Tugas kelas, Ujian & Kuis, Sertifikat, Anggota) -->
-      <nav class="classroom-top-nav-tabs">
-        <button class="classroom-nav-tab active" id="tab-btn-forum" onclick="switchClassroomTab('forum')">
-          <i class="fas fa-comments"></i>
-          <span>Forum</span>
-        </button>
-        <button class="classroom-nav-tab" id="tab-btn-classwork" onclick="switchClassroomTab('classwork')">
-          <i class="fas fa-book-open"></i>
-          <span>Tugas kelas</span>
-        </button>
-        <button class="classroom-nav-tab" id="tab-btn-exams" onclick="switchClassroomTab('exams')">
-          <i class="fas fa-file-signature"></i>
-          <span>Ujian & Kuis</span>
-        </button>
-        <button class="classroom-nav-tab" id="tab-btn-certificates" onclick="switchClassroomTab('certificates')">
-          <i class="fas fa-certificate"></i>
-          <span>Sertifikat</span>
-        </button>
-        <button class="classroom-nav-tab" id="tab-btn-people" onclick="switchClassroomTab('people')">
-          <i class="fas fa-user-group"></i>
-          <span>Anggota</span>
-        </button>
-      </nav>
-
-      <!-- Right Header Actions -->
-      <div class="nav-actions">
-        <!-- Back to Dashboard -->
-        <a href="/dashboard" class="btn-dashboard-back" title="Kembali ke Dashboard Studio">
-          <i class="fas fa-arrow-left"></i>
-          <span>Dashboard</span>
-        </a>
-
-        <!-- Course Settings / Edit Quick Link -->
-        <button type="button" class="btn-dashboard-back" onclick="openEditCoursePage()" title="Pengaturan & Edit Kelas" style="padding: 6px 12px; cursor: pointer;">
-          <i class="fas fa-gear"></i>
-        </button>
-
-        <!-- Theme Toggle -->
-        <button class="theme-toggle-btn" id="theme-toggle-btn" type="button" aria-label="Toggle dark/light mode" title="Ganti Mode Tampilan">
-          <i class="fas fa-sun" id="theme-icon-sun" style="display:none;"></i>
-          <i class="fas fa-moon" id="theme-icon-moon"></i>
-        </button>
-
-        <!-- User Profile Pill (Clickable) -->
-        <div class="user-profile-badge" onclick="window.location.href='/profile'" style="cursor:pointer;" title="Buka Pengaturan Profil Saya">
-          <div class="user-avatar-sm" id="nav-avatar">T</div>
-          <span class="user-name-label" id="nav-user-name">Memuat...</span>
-        </div>
-
-        <!-- Logout Button -->
-        <button class="logout-btn" id="logout-btn" type="button" title="Keluar">
-          <i class="fas fa-arrow-right-from-bracket"></i>
-        </button>
-      </div>
-    </header>
+    <!-- Top Modular Navigation Bar -->
+    <%- include('../partials/tutor-header', { isCourseContext: true, activeTab: 'forum' }) %>
 
     <!-- Google Classroom App Shell: Left Sidebar + Main Content -->
     <div class="classroom-app-container">
-      <!-- Left Sidebar (Docked on Desktop, Drawer on Mobile) -->
-      <aside class="classroom-left-sidebar" id="classroom-left-sidebar">
-        <div class="sidebar-scroll-body">
-          <div class="sidebar-nav-group">
-            <a href="/dashboard" class="sidebar-nav-pill">
-              <i class="fas fa-home sidebar-nav-icon"></i>
-              <span>Beranda</span>
-            </a>
-            <a href="/dashboard" class="sidebar-nav-pill">
-              <i class="fas fa-calendar-days sidebar-nav-icon"></i>
-              <span>Kalender</span>
-            </a>
-          </div>
-
-          <div class="sidebar-divider-line"></div>
-
-          <!-- Section: Mengajar -->
-          <div class="sidebar-section-header">
-            <span>Mengajar</span>
-            <i class="fas fa-chalkboard-user" style="font-size:13px; color:var(--text-tertiary);"></i>
-          </div>
-
-          <div class="sidebar-nav-group" id="sidebar-courses-list">
-            <!-- Dynamically populated courses list -->
-            <div style="padding:10px 24px; font-size:12px; color:var(--text-tertiary);">Memuat kelas...</div>
-          </div>
-
-          <div class="sidebar-divider-line"></div>
-
-          <div class="sidebar-nav-group">
-            <a href="/tutor/exams" class="sidebar-nav-pill">
-              <i class="fas fa-file-signature sidebar-nav-icon"></i>
-              <span>Ujian Kelulusan</span>
-            </a>
-            <a href="/tutor/certificates" class="sidebar-nav-pill">
-              <i class="fas fa-certificate sidebar-nav-icon"></i>
-              <span>Studio Sertifikat</span>
-            </a>
-            <a href="/dashboard" class="sidebar-nav-pill">
-              <i class="fas fa-clipboard-check sidebar-nav-icon"></i>
-              <span>Periksa Tugas</span>
-            </a>
-            <a href="/profile" class="sidebar-nav-pill">
-              <i class="fas fa-gear sidebar-nav-icon"></i>
-              <span>Setelan Profil</span>
-            </a>
-          </div>
-        </div>
-      </aside>
+      <!-- Modular Left Sidebar -->
+      <%- include('../partials/tutor-sidebar', { activeNav: 'materials' }) %>
 
       <!-- Right Main Content Area -->
       <main class="classroom-main-pane">
@@ -4297,5 +4176,7 @@
   </script>
   <!-- Accessibility & Head Tracking Script -->
   <script src="/javascripts/accessibility.js"></script>
+  <!-- Modular Layout Script -->
+  <script src="/javascripts/layout-modular.js"></script>
 </body>
 </html>
