@@ -1,0 +1,2024 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <meta name="description" content="SkillSphere AI adalah platform pembelajaran adaptif berbasis kecerdasan buatan dengan kurikulum rekayasa perangkat lunak, bimbingan sokratik Orion AI, dan sertifikasi digital terverifikasi.">
+
+  <!-- PWA Manifest & App Icons -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#1F1E1B">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="SkillSphere">
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="shortcut icon" href="/favicon.svg">
+
+  <!-- Google Fonts: Newsreader (Editorial Serif) & Plus Jakarta Sans (Modern Sans) & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome 6 Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- Claude Warm Paper Design Tokens & Base Styles -->
+  <link rel="stylesheet" href="/stylesheets/claude-theme.css">
+  <link rel="stylesheet" href="/stylesheets/accessibility.css">
+
+  <style>
+    /* -------------------------------------------------------------
+       SkillSphere AI - Landing Page Dedicated Motion & Layout Engine
+       Standards: Anthropic Claude Warm Paper + Jakub Krehel & Emil Kowalski Motion
+       ------------------------------------------------------------- */
+    
+    /* Root Reset & Smooth Scrolling */
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background-color: var(--bg-app);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      margin: 0;
+      padding: 0;
+      line-height: 1.6;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      transition: background-color 300ms ease, color 300ms ease;
+    }
+
+    /* Ambient Lighting Background Pattern */
+    .landing-ambient-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+      background: 
+        radial-gradient(circle at 18% 12%, rgba(217, 119, 6, 0.04) 0%, transparent 45%),
+        radial-gradient(circle at 82% 38%, rgba(59, 130, 246, 0.035) 0%, transparent 50%),
+        radial-gradient(circle at 50% 88%, rgba(16, 185, 129, 0.03) 0%, transparent 55%);
+      opacity: 0.85;
+    }
+
+    /* Sticky Glassmorphic Navbar */
+    .landing-nav {
+      position: sticky;
+      top: 0;
+      width: 100%;
+      z-index: 1000;
+      background: rgba(251, 249, 245, 0.82);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border-subtle);
+      transition: background-color 250ms ease, border-color 250ms ease, box-shadow 250ms ease;
+    }
+
+    [data-theme="dark"] .landing-nav {
+      background: rgba(24, 24, 27, 0.82);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .landing-nav.scrolled {
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+    }
+
+    .nav-container {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .brand-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--text-primary);
+    }
+
+    .brand-logo-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: var(--radius-md);
+      background: var(--text-primary);
+      color: var(--bg-surface);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      transition: transform 200ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .brand-wrap:hover .brand-logo-icon {
+      transform: scale(1.04);
+    }
+
+    .brand-title {
+      font-family: var(--font-serif);
+      font-size: 20px;
+      font-weight: 600;
+      letter-spacing: -0.3px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .version-pill {
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: var(--radius-full);
+      background: rgba(217, 119, 6, 0.12);
+      color: #D97706;
+      letter-spacing: 0.3px;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .nav-link {
+      text-decoration: none;
+      font-size: 13.5px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      transition: color 180ms ease;
+      position: relative;
+    }
+
+    .nav-link:hover {
+      color: var(--text-primary);
+    }
+
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: -6px;
+      left: 0;
+      width: 0;
+      height: 1.5px;
+      background: var(--text-primary);
+      transition: width 200ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .nav-link:hover::after {
+      width: 100%;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* Common Button Styles with Emil Kowalski click feedback */
+    .btn-clean {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 9px 18px;
+      font-size: 13.5px;
+      font-weight: 600;
+      border-radius: var(--radius-md);
+      text-decoration: none;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 180ms cubic-bezier(0.16, 1, 0.3, 1);
+      user-select: none;
+    }
+
+    .btn-clean:active {
+      transform: scale(0.98);
+    }
+
+    .btn-clean-primary {
+      background: var(--text-primary);
+      color: var(--bg-surface);
+      border-color: var(--text-primary);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    }
+
+    .btn-clean-primary:hover {
+      background: var(--accent-primary-hover);
+      border-color: var(--accent-primary-hover);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+      transform: translateY(-1px);
+    }
+
+    .btn-clean-outline {
+      background: var(--bg-surface);
+      color: var(--text-primary);
+      border-color: var(--border-subtle);
+    }
+
+    .btn-clean-outline:hover {
+      background: var(--bg-surface-subtle);
+      border-color: var(--border-strong);
+      transform: translateY(-1px);
+    }
+
+    .theme-icon-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-full);
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 180ms ease;
+    }
+
+    .theme-icon-btn:hover {
+      background: var(--bg-surface-subtle);
+      border-color: var(--border-strong);
+    }
+
+    .mobile-menu-btn {
+      display: none;
+      width: 38px;
+      height: 38px;
+      border-radius: var(--radius-md);
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    /* Hero Section */
+    .hero-section {
+      position: relative;
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 72px 24px 60px;
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      align-items: center;
+      gap: 48px;
+      z-index: 1;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      border-radius: var(--radius-full);
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 22px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .hero-badge i {
+      color: var(--accent-amber);
+    }
+
+    .hero-headline {
+      font-family: var(--font-serif);
+      font-size: 50px;
+      font-weight: 500;
+      line-height: 1.15;
+      letter-spacing: -1px;
+      color: var(--text-primary);
+      margin: 0 0 20px;
+    }
+
+    .hero-headline em {
+      font-style: italic;
+      color: var(--text-primary);
+      text-decoration: underline;
+      text-decoration-color: rgba(217, 119, 6, 0.4);
+      text-decoration-thickness: 3px;
+      text-underline-offset: 6px;
+    }
+
+    .hero-description {
+      font-size: 17px;
+      line-height: 1.6;
+      color: var(--text-secondary);
+      margin: 0 0 32px;
+      max-width: 580px;
+    }
+
+    .hero-cta-group {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-bottom: 36px;
+    }
+
+    .hero-proof-bar {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border-subtle);
+      flex-wrap: wrap;
+    }
+
+    .proof-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 12.5px;
+      color: var(--text-secondary);
+    }
+
+    .proof-item i {
+      color: var(--color-success);
+      font-size: 14px;
+    }
+
+    /* Orion AI Interactive Living Card */
+    .orion-preview-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-xl);
+      padding: 28px 24px;
+      box-shadow: var(--shadow-floating);
+      position: relative;
+      overflow: hidden;
+      transition: transform 300ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 300ms ease;
+    }
+
+    .orion-preview-card:hover {
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+    }
+
+    .orion-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .orion-identity {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    /* Living Orb Avatar */
+    .orion-orb-container {
+      width: 48px;
+      height: 48px;
+      border-radius: var(--radius-full);
+      background: radial-gradient(circle at 35% 35%, #60A5FA 0%, #2563EB 55%, #1E3A8A 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 24px rgba(59, 130, 246, 0.45);
+      position: relative;
+      animation: orbBreathing 4s ease-in-out infinite alternate;
+    }
+
+    @keyframes orbBreathing {
+      0% {
+        transform: translateY(0px) scale(1);
+        box-shadow: 0 0 20px rgba(59, 130, 246, 0.35);
+      }
+      100% {
+        transform: translateY(-4px) scale(1.03);
+        box-shadow: 0 0 32px rgba(59, 130, 246, 0.55);
+      }
+    }
+
+    /* Living Eyes and Mouth Inside Orb */
+    .orb-face {
+      width: 24px;
+      height: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .orb-eyes {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .orb-eye {
+      width: 4.5px;
+      height: 7px;
+      background: #FFFFFF;
+      border-radius: var(--radius-full);
+      box-shadow: 0 0 6px #FFFFFF;
+      animation: orbBlink 3.8s infinite;
+    }
+
+    @keyframes orbBlink {
+      0%, 94%, 100% {
+        transform: scaleY(1);
+      }
+      96% {
+        transform: scaleY(0.1);
+      }
+    }
+
+    .orb-mouth {
+      width: 8px;
+      height: 2px;
+      background: rgba(255, 255, 255, 0.85);
+      border-radius: var(--radius-full);
+      transition: width 150ms ease, height 150ms ease;
+    }
+
+    .orb-mouth.speaking {
+      animation: mouthSpeak 0.35s infinite alternate;
+    }
+
+    @keyframes mouthSpeak {
+      0% {
+        width: 6px;
+        height: 2px;
+        border-radius: 2px;
+      }
+      100% {
+        width: 9px;
+        height: 4px;
+        border-radius: 4px;
+      }
+    }
+
+    .orion-title-text h4 {
+      margin: 0;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .orion-title-text span {
+      font-size: 11.5px;
+      color: var(--text-secondary);
+      font-family: var(--font-mono);
+    }
+
+    .orion-status-badge {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: var(--radius-full);
+      background: rgba(16, 185, 129, 0.12);
+      color: var(--color-success);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .pulse-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: var(--radius-full);
+      background: var(--color-success);
+      animation: pulseGreen 2s infinite;
+    }
+
+    @keyframes pulseGreen {
+      0% { opacity: 0.4; }
+      50% { opacity: 1; }
+      100% { opacity: 0.4; }
+    }
+
+    .orion-chat-bubble {
+      background: var(--bg-surface-subtle);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      font-size: 13.5px;
+      line-height: 1.55;
+      color: var(--text-primary);
+      margin-bottom: 16px;
+      position: relative;
+    }
+
+    .orion-chip-prompt-title {
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+
+    .orion-prompt-chips {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .prompt-chip-btn {
+      text-align: left;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 10px 14px;
+      font-size: 12.5px;
+      color: var(--text-primary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      transition: all 180ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .prompt-chip-btn:hover {
+      background: var(--bg-surface-subtle);
+      border-color: var(--text-primary);
+      transform: translateX(2px);
+    }
+
+    .prompt-chip-btn i {
+      color: var(--text-tertiary);
+      font-size: 11px;
+    }
+
+    /* Section Headers */
+    .section-wrap {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 80px 24px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .section-header-center {
+      text-align: center;
+      max-width: 680px;
+      margin: 0 auto 52px;
+    }
+
+    .section-tag {
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--accent-amber);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 12px;
+      display: inline-block;
+    }
+
+    .section-heading {
+      font-family: var(--font-serif);
+      font-size: 38px;
+      font-weight: 500;
+      line-height: 1.2;
+      letter-spacing: -0.5px;
+      color: var(--text-primary);
+      margin: 0 0 16px;
+    }
+
+    .section-subtext {
+      font-size: 16px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    /* Bento Grid (Core Pillars) */
+    .bento-grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 20px;
+    }
+
+    .bento-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-xl);
+      padding: 32px;
+      position: relative;
+      overflow: hidden;
+      transition: all 250ms cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .bento-card:hover {
+      border-color: var(--border-strong);
+      box-shadow: var(--shadow-md);
+      transform: translateY(-2px);
+    }
+
+    .bento-col-8 {
+      grid-column: span 8;
+    }
+
+    .bento-col-4 {
+      grid-column: span 4;
+    }
+
+    .bento-col-6 {
+      grid-column: span 6;
+    }
+
+    .bento-col-12 {
+      grid-column: span 12;
+    }
+
+    .bento-icon-box {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-md);
+      background: var(--bg-surface-subtle);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      margin-bottom: 20px;
+    }
+
+    .bento-title {
+      font-family: var(--font-serif);
+      font-size: 22px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin: 0 0 10px;
+    }
+
+    .bento-desc {
+      font-size: 14.5px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      margin: 0 0 20px;
+    }
+
+    .bento-interactive-pill-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .bento-mini-pill {
+      font-size: 12px;
+      padding: 4px 10px;
+      border-radius: var(--radius-full);
+      background: var(--bg-surface-subtle);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-subtle);
+    }
+
+    /* Socratic Comparison Section */
+    .compare-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-top: 10px;
+    }
+
+    .compare-box {
+      border-radius: var(--radius-xl);
+      padding: 32px;
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-surface);
+    }
+
+    .compare-box.highlight {
+      border-color: rgba(217, 119, 6, 0.4);
+      background: linear-gradient(180deg, var(--bg-surface) 0%, rgba(217, 119, 6, 0.02) 100%);
+      box-shadow: var(--shadow-md);
+    }
+
+    .compare-tag {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: var(--radius-full);
+      display: inline-block;
+      margin-bottom: 14px;
+    }
+
+    .compare-tag.passive {
+      background: rgba(239, 68, 68, 0.1);
+      color: var(--color-danger);
+    }
+
+    .compare-tag.socratic {
+      background: rgba(16, 185, 129, 0.12);
+      color: var(--color-success);
+    }
+
+    .compare-title {
+      font-family: var(--font-serif);
+      font-size: 20px;
+      font-weight: 600;
+      margin: 0 0 12px;
+      color: var(--text-primary);
+    }
+
+    .compare-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      font-size: 13.5px;
+      color: var(--text-secondary);
+    }
+
+    .compare-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .compare-list li i {
+      margin-top: 3px;
+    }
+
+    /* Curriculum Explorer */
+    .category-tabs-nav {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 36px;
+    }
+
+    .tab-category-btn {
+      padding: 8px 18px;
+      font-size: 13px;
+      font-weight: 600;
+      border-radius: var(--radius-full);
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 180ms ease;
+    }
+
+    .tab-category-btn.active, .tab-category-btn:hover {
+      background: var(--text-primary);
+      color: var(--bg-surface);
+      border-color: var(--text-primary);
+    }
+
+    .courses-showcase-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 24px;
+    }
+
+    .course-showcase-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-xl);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all 250ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .course-showcase-card:hover {
+      border-color: var(--border-strong);
+      box-shadow: var(--shadow-md);
+      transform: translateY(-3px);
+    }
+
+    .card-top-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
+    .course-cat-label {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--accent-amber);
+    }
+
+    .course-level-pill {
+      font-size: 11px;
+      padding: 2px 7px;
+      border-radius: var(--radius-sm);
+      background: var(--bg-surface-subtle);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .card-course-title {
+      font-family: var(--font-serif);
+      font-size: 19px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin: 0 0 10px;
+      line-height: 1.35;
+    }
+
+    .card-course-desc {
+      font-size: 13.5px;
+      color: var(--text-secondary);
+      line-height: 1.55;
+      margin: 0 0 20px;
+    }
+
+    .card-course-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 16px;
+      border-top: 1px solid var(--border-subtle);
+      font-size: 12.5px;
+      color: var(--text-secondary);
+    }
+
+    .tutor-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tutor-avatar-circle {
+      width: 24px;
+      height: 24px;
+      border-radius: var(--radius-full);
+      background: var(--text-primary);
+      color: var(--bg-surface);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    /* Metrics Strip */
+    .metrics-banner {
+      background: var(--bg-surface);
+      border-top: 1px solid var(--border-subtle);
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 48px 24px;
+    }
+
+    .metrics-container {
+      max-width: 1240px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+      text-align: center;
+    }
+
+    .metric-num {
+      font-family: var(--font-serif);
+      font-size: 42px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin: 0 0 6px;
+      line-height: 1;
+    }
+
+    .metric-label {
+      font-size: 13.5px;
+      color: var(--text-secondary);
+      margin: 0;
+      font-weight: 500;
+    }
+
+    /* Testimonials */
+    .testimonial-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 24px;
+    }
+
+    .testimonial-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-xl);
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .testimonial-quote {
+      font-size: 14.5px;
+      line-height: 1.6;
+      color: var(--text-primary);
+      margin: 0 0 20px;
+      font-style: italic;
+    }
+
+    .testimonial-user {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .testimonial-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-full);
+      background: var(--bg-surface-subtle);
+      border: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .user-meta h5 {
+      margin: 0;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .user-meta span {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    /* Final CTA Section */
+    .final-cta-card {
+      background: var(--text-primary);
+      color: var(--bg-surface);
+      border-radius: var(--radius-xl);
+      padding: 64px 40px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--shadow-floating);
+    }
+
+    .final-cta-card h2 {
+      font-family: var(--font-serif);
+      font-size: 40px;
+      font-weight: 500;
+      letter-spacing: -0.5px;
+      margin: 0 0 16px;
+      color: var(--bg-surface);
+    }
+
+    .final-cta-card p {
+      font-size: 16px;
+      color: rgba(255, 255, 255, 0.82);
+      max-width: 620px;
+      margin: 0 auto 32px;
+      line-height: 1.6;
+    }
+
+    [data-theme="dark"] .final-cta-card {
+      background: #242220;
+      border: 1px solid var(--border-subtle);
+    }
+
+    [data-theme="dark"] .final-cta-card h2 {
+      color: #F5F3EF;
+    }
+
+    [data-theme="dark"] .final-cta-card p {
+      color: #A8A29A;
+    }
+
+    .cta-btn-invert {
+      background: var(--bg-surface);
+      color: var(--text-primary);
+      border: 1px solid transparent;
+      padding: 12px 26px;
+      font-size: 15px;
+      font-weight: 600;
+      border-radius: var(--radius-md);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      transition: all 180ms ease;
+    }
+
+    .cta-btn-invert:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Editorial Footer */
+    .landing-footer {
+      background: var(--bg-surface);
+      border-top: 1px solid var(--border-subtle);
+      padding: 64px 24px 32px;
+      margin-top: 60px;
+    }
+
+    .footer-container {
+      max-width: 1240px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 40px;
+      margin-bottom: 48px;
+    }
+
+    .footer-brand-desc {
+      font-size: 13.5px;
+      color: var(--text-secondary);
+      max-width: 320px;
+      line-height: 1.6;
+      margin-top: 12px;
+    }
+
+    .footer-col h5 {
+      font-family: var(--font-sans);
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-primary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin: 0 0 16px;
+    }
+
+    .footer-links {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .footer-links a {
+      text-decoration: none;
+      font-size: 13.5px;
+      color: var(--text-secondary);
+      transition: color 180ms ease;
+    }
+
+    .footer-links a:hover {
+      color: var(--text-primary);
+    }
+
+    .footer-bottom-bar {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding-top: 24px;
+      border-top: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12.5px;
+      color: var(--text-secondary);
+      flex-wrap: wrap;
+      gap: 14px;
+    }
+
+    /* Scroll Reveal Motion Classes */
+    .reveal-on-scroll {
+      opacity: 0;
+      transform: translateY(18px);
+      transition: opacity 350ms cubic-bezier(0.16, 1, 0.3, 1), transform 350ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .reveal-on-scroll.revealed {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Accessibility: Reduced Motion Override */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+      .reveal-on-scroll {
+        opacity: 1 !important;
+        transform: none !important;
+      }
+      .orion-orb-container {
+        animation: none !important;
+      }
+    }
+
+    /* Mobile Drawer */
+    .mobile-drawer {
+      position: fixed;
+      top: 0;
+      right: -100%;
+      width: 290px;
+      height: 100vh;
+      background: var(--bg-surface);
+      border-left: 1px solid var(--border-subtle);
+      z-index: 2000;
+      padding: 28px 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: right 300ms cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: -8px 0 24px rgba(0, 0, 0, 0.1);
+    }
+
+    .mobile-drawer.open {
+      right: 0;
+    }
+
+    .drawer-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(4px);
+      z-index: 1999;
+      display: none;
+    }
+
+    .drawer-backdrop.active {
+      display: block;
+    }
+
+    /* Responsive Breakpoints */
+    @media (max-width: 960px) {
+      .hero-section {
+        grid-template-columns: 1fr;
+        padding-top: 40px;
+        gap: 40px;
+      }
+      .hero-headline {
+        font-size: 38px;
+      }
+      .nav-links {
+        display: none;
+      }
+      .mobile-menu-btn {
+        display: flex;
+      }
+      .bento-col-8, .bento-col-4, .bento-col-6 {
+        grid-column: span 12;
+      }
+      .compare-container {
+        grid-template-columns: 1fr;
+      }
+      .metrics-container {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 32px;
+      }
+      .footer-container {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .hero-headline {
+        font-size: 32px;
+      }
+      .hero-cta-group {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .btn-clean {
+        width: 100%;
+      }
+      .metrics-container {
+        grid-template-columns: 1fr;
+      }
+      .footer-container {
+        grid-template-columns: 1fr;
+      }
+      .final-cta-card {
+        padding: 40px 20px;
+      }
+      .final-cta-card h2 {
+        font-size: 28px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Ambient Light Pattern -->
+  <div class="landing-ambient-bg"></div>
+
+  <!-- Sticky Glassmorphic Navigation -->
+  <nav class="landing-nav" id="mainNav">
+    <div class="nav-container">
+      <a href="/" class="brand-wrap" title="Beranda SkillSphere AI">
+        <div class="brand-logo-icon">
+          <i class="fa-solid fa-graduation-cap"></i>
+        </div>
+        <div class="brand-title">
+          SkillSphere <span class="version-pill">v2.4 Adaptif</span>
+        </div>
+      </a>
+
+      <!-- Desktop Navigation Links -->
+      <ul class="nav-links">
+        <li><a href="#fitur" class="nav-link">Pilar Unggulan</a></li>
+        <li><a href="#orion" class="nav-link">Orion AI Partner</a></li>
+        <li><a href="#kurikulum" class="nav-link">Jalur Karir</a></li>
+        <li><a href="#sertifikasi" class="nav-link">Sertifikasi Resmi</a></li>
+        <li><a href="/catalog" class="nav-link">Katalog Kursus</a></li>
+      </ul>
+
+      <!-- Action Buttons & Theme Switcher -->
+      <div class="nav-actions">
+        <button type="button" class="theme-icon-btn" id="themeToggleBtn" title="Ganti Mode Terang / Gelap" aria-label="Toggle Theme">
+          <i class="fa-solid fa-moon" id="themeIcon"></i>
+        </button>
+
+        <a href="/login" class="btn-clean btn-clean-outline" id="navLoginBtn">Masuk</a>
+        <a href="/register" class="btn-clean btn-clean-primary" id="navRegisterBtn">Daftar Akun</a>
+
+        <!-- Mobile Drawer Hamburger -->
+        <button type="button" class="mobile-menu-btn" id="mobileMenuTrigger" aria-label="Buka Menu Navigasi">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Mobile Drawer Menu -->
+  <div class="drawer-backdrop" id="drawerBackdrop"></div>
+  <aside class="mobile-drawer" id="mobileDrawer">
+    <div>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:28px;">
+        <div class="brand-title" style="font-size:18px;">
+          SkillSphere AI
+        </div>
+        <button type="button" class="theme-icon-btn" id="drawerCloseBtn" aria-label="Tutup Menu">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <ul style="list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:16px;">
+        <li><a href="#fitur" class="nav-link" onclick="closeDrawer()">Pilar Unggulan</a></li>
+        <li><a href="#orion" class="nav-link" onclick="closeDrawer()">Orion AI Partner</a></li>
+        <li><a href="#kurikulum" class="nav-link" onclick="closeDrawer()">Jalur Karir</a></li>
+        <li><a href="#sertifikasi" class="nav-link" onclick="closeDrawer()">Sertifikasi Resmi</a></li>
+        <li><a href="/catalog" class="nav-link">Katalog Kursus</a></li>
+      </ul>
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:10px;">
+      <a href="/login" class="btn-clean btn-clean-outline" style="width:100%;">Masuk Akun</a>
+      <a href="/register" class="btn-clean btn-clean-primary" style="width:100%;">Mulai Belajar Gratis</a>
+    </div>
+  </aside>
+
+  <!-- Hero Section -->
+  <header class="hero-section">
+    <div class="hero-content">
+      <div class="hero-badge reveal-on-scroll">
+        <i class="fa-solid fa-sparkles"></i>
+        <span>AI-Powered Adaptive Learning Experience</span>
+      </div>
+
+      <h1 class="hero-headline reveal-on-scroll">
+        Kuasai Rekayasa Perangkat Lunak dengan <em>Bimbingan Sokratik AI.</em>
+      </h1>
+
+      <p class="hero-description reveal-on-scroll">
+        Platform pembelajaran adaptif yang menyesuaikan tempo pemahaman Anda secara presisi. Dari fondasi struktur data hingga arsitektur cloud skala besar, dibimbing langkah demi langkah oleh partner AI interaktif Orion.
+      </p>
+
+      <div class="hero-cta-group reveal-on-scroll">
+        <a href="/register" class="btn-clean btn-clean-primary" style="padding:12px 24px; font-size:15px;">
+          Mulai Belajar Sekarang <i class="fa-solid fa-arrow-right"></i>
+        </a>
+        <a href="#kurikulum" class="btn-clean btn-clean-outline" style="padding:12px 20px; font-size:15px;">
+          Eksplorasi Kurikulum <i class="fa-solid fa-compass"></i>
+        </a>
+      </div>
+
+      <div class="hero-proof-bar reveal-on-scroll">
+        <div class="proof-item">
+          <i class="fa-solid fa-circle-check"></i>
+          <span>19 Relasi Database Terintegrasi</span>
+        </div>
+        <div class="proof-item">
+          <i class="fa-solid fa-shield-halved"></i>
+          <span>Sertifikat Digital Terverifikasi Hash</span>
+        </div>
+        <div class="proof-item">
+          <i class="fa-solid fa-hand-holding-dollar"></i>
+          <span>Bagi Hasil Transparan Tutor 80/20</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Living Orion AI Interactive Card -->
+    <div class="orion-preview-card reveal-on-scroll">
+      <div class="orion-card-header">
+        <div class="orion-identity">
+          <div class="orion-orb-container" id="heroOrb">
+            <div class="orb-face">
+              <div class="orb-eyes">
+                <div class="orb-eye"></div>
+                <div class="orb-eye"></div>
+              </div>
+              <div class="orb-mouth" id="orbMouth"></div>
+            </div>
+          </div>
+          <div class="orion-title-text">
+            <h4>Orion AI Partner</h4>
+            <span>Metode Sokratik Adaptif</span>
+          </div>
+        </div>
+        <div class="orion-status-badge">
+          <div class="pulse-dot"></div>
+          <span>Aktif Membimbing</span>
+        </div>
+      </div>
+
+      <div class="orion-chat-bubble" id="orionSpeechBubble">
+        Halo! Saya <strong>Orion</strong>. Alih-alih memberikan jawaban langsung, saya akan memandu logika berpikir Anda secara terstruktur. Pertanyaan rekayasa apa yang ingin Anda bedah hari ini?
+      </div>
+
+      <div class="orion-chip-prompt-title">Coba Simulasi Bimbingan Sokratik:</div>
+      <div class="orion-prompt-chips">
+        <button type="button" class="prompt-chip-btn" onclick="simulateOrionGuidance('normalisasi')">
+          <span>Bagaimana membedakan 2NF dan 3NF pada basis data?</span>
+          <i class="fa-solid fa-arrow-right"></i>
+        </button>
+        <button type="button" class="prompt-chip-btn" onclick="simulateOrionGuidance('jwt')">
+          <span>Mengapa Refresh Token disimpan di HttpOnly cookie?</span>
+          <i class="fa-solid fa-arrow-right"></i>
+        </button>
+        <button type="button" class="prompt-chip-btn" onclick="simulateOrionGuidance('cache')">
+          <span>Kapan strategi Cache-Aside lebih tepat dari Write-Through?</span>
+          <i class="fa-solid fa-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Metrics & Integrity Strip -->
+  <section class="metrics-banner">
+    <div class="metrics-container">
+      <div class="metric-item reveal-on-scroll">
+        <div class="metric-num">98.4%</div>
+        <p class="metric-label">Tingkat Ketuntasan Ujian Zen</p>
+      </div>
+      <div class="metric-item reveal-on-scroll">
+        <div class="metric-num">155+ Mnt</div>
+        <p class="metric-label">Rata-rata Durasi Modul Mendalam</p>
+      </div>
+      <div class="metric-item reveal-on-scroll">
+        <div class="metric-num">80%</div>
+        <p class="metric-label">Bagi Hasil Bersih Mitra Pengajar</p>
+      </div>
+      <div class="metric-item reveal-on-scroll">
+        <div class="metric-num">100%</div>
+        <p class="metric-label">Sertifikat Digital Anti-Pemalsuan</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Socratic Learning Philosophy Section -->
+  <section class="section-wrap" id="orion">
+    <div class="section-header-center">
+      <span class="section-tag">Metode Pembelajaran Masa Depan</span>
+      <h2 class="section-heading">Bukan Sekadar AI Biasa, Orion Melatih Cara Berpikir Anda.</h2>
+      <p class="section-subtext">
+        AI konvensional sering memanjakan siswa dengan jawaban instan yang mematikan nalar kritis. SkillSphere membalik paradigma tersebut dengan metode dialog Sokratik.
+      </p>
+    </div>
+
+    <div class="compare-container">
+      <!-- Passive LLM Box -->
+      <div class="compare-box reveal-on-scroll">
+        <span class="compare-tag passive">AI Konvensional (Pasif)</span>
+        <h3 class="compare-title">Jawaban Mentah Tanpa Konteks</h3>
+        <ul class="compare-list">
+          <li>
+            <i class="fa-solid fa-xmark" style="color:var(--color-danger);"></i>
+            <span>Langsung menuliskan kode solusi lengkap tanpa menjelaskan logika di baliknya.</span>
+          </li>
+          <li>
+            <i class="fa-solid fa-xmark" style="color:var(--color-danger);"></i>
+            <span>Memicu ketergantungan copy-paste tanpa pemahaman arsitektural yang mendalam.</span>
+          </li>
+          <li>
+            <i class="fa-solid fa-xmark" style="color:var(--color-danger);"></i>
+            <span>Tidak mendeteksi tingkat pemahaman aktual siswa, menghasilkan ilusi kompetensi.</span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Socratic Partner Box -->
+      <div class="compare-box highlight reveal-on-scroll">
+        <span class="compare-tag socratic">Orion AI di SkillSphere</span>
+        <h3 class="compare-title">Dialog Sokratik yang Membangun Daya Nalar</h3>
+        <ul class="compare-list">
+          <li>
+            <i class="fa-solid fa-check" style="color:var(--color-success);"></i>
+            <span>Mengajukan pertanyaan pemantik bertahap untuk memandu Anda menemukan solusi sendiri.</span>
+          </li>
+          <li>
+            <i class="fa-solid fa-check" style="color:var(--color-success);"></i>
+            <span>Menyesuaikan penjelasan berdasarkan 5 langkah profil onboarding dan riwayat evaluasi Anda.</span>
+          </li>
+          <li>
+            <i class="fa-solid fa-check" style="color:var(--color-success);"></i>
+            <span>Membedah trade-off nyata sistem produksi, seperti performa vs konsistensi data.</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Bento Grid (Core Pillars) -->
+  <section class="section-wrap" id="fitur">
+    <div class="section-header-center">
+      <span class="section-tag">Arsitektur Terpadu</span>
+      <h2 class="section-heading">Fondasi Rekayasa Tanpa Kompromi</h2>
+      <p class="section-subtext">
+        Setiap modul dan komponen di SkillSphere dirancang untuk memberikan pengalaman belajar profesional tanpa distraksi.
+      </p>
+    </div>
+
+    <div class="bento-grid">
+      <!-- Bento 1: Adaptive Onboarding (Col 8) -->
+      <div class="bento-card bento-col-8 reveal-on-scroll">
+        <div class="bento-icon-box">
+          <i class="fa-solid fa-sliders"></i>
+        </div>
+        <h3 class="bento-title">5 Langkah Onboarding Personalisasi</h3>
+        <p class="bento-desc">
+          Kurikulum belajar tidak pernah seragam. SkillSphere memetakan minat spesifik, jam komitmen belajar mingguan, gaya belajar visual atau kinestetik, serta preferensi karir teknologi sebelum menyusun jalur belajar personal Anda.
+        </p>
+        <div class="bento-interactive-pill-list">
+          <span class="bento-mini-pill">Gaya Belajar Adaptif</span>
+          <span class="bento-mini-pill">Penyesuaian Tempo Otomatis</span>
+          <span class="bento-mini-pill">Rekomendasi Jalur Karir</span>
+          <span class="bento-mini-pill">Target Evaluasi Realistis</span>
+        </div>
+      </div>
+
+      <!-- Bento 2: WebP Certified Credentials (Col 4) -->
+      <div class="bento-card bento-col-4 reveal-on-scroll" id="sertifikasi">
+        <div class="bento-icon-box">
+          <i class="fa-solid fa-certificate" style="color:var(--accent-amber);"></i>
+        </div>
+        <h3 class="bento-title">Sertifikat Digital WebP</h3>
+        <p class="bento-desc">
+          Kompresi visual efisien berbasis Sharp WebP dengan nomor registrasi unik anti-pemalsuan dan QR validasi publik.
+        </p>
+        <div style="font-family:var(--font-mono); font-size:12px; color:var(--text-secondary); background:var(--bg-surface-subtle); padding:10px 12px; border-radius:var(--radius-md); border:1px solid var(--border-subtle);">
+          ID: CERT-2026-SKILL-895F<br>
+          Status: Verified Authentic
+        </div>
+      </div>
+
+      <!-- Bento 3: HTTP 206 Streaming (Col 4) -->
+      <div class="bento-card bento-col-4 reveal-on-scroll">
+        <div class="bento-icon-box">
+          <i class="fa-solid fa-film"></i>
+        </div>
+        <h3 class="bento-title">HTTP 206 Partial Streaming</h3>
+        <p class="bento-desc">
+          Pemutaran video modul tanpa jeda buffering dengan dukungan byte-range streaming, slide presentasi PPT kuliah asli, serta dokumen kurikulum multi-format.
+        </p>
+        <div class="bento-interactive-pill-list">
+          <span class="bento-mini-pill">Video MP4 1080p</span>
+          <span class="bento-mini-pill">Slide PPT Asli</span>
+          <span class="bento-mini-pill">PDF & E-Book</span>
+        </div>
+      </div>
+
+      <!-- Bento 4: 80/20 Transparent Tutor Ecosystem (Col 8) -->
+      <div class="bento-card bento-col-8 reveal-on-scroll">
+        <div class="bento-icon-box">
+          <i class="fa-solid fa-wallet"></i>
+        </div>
+        <h3 class="bento-title">Ekosistem Tutor Berkeadilan: Bagi Hasil 80% / 20%</h3>
+        <p class="bento-desc">
+          Platform memotong 20% biaya operasional dan token AI, sementara 80% hasil bersih penjualan kursus langsung masuk ke Virtual Wallet Tutor. Dilengkapi masa holding proteksi sengketa 7 hari dan batas penarikan transparan mulai Rp 100.000.
+        </p>
+        <div class="bento-interactive-pill-list">
+          <span class="bento-mini-pill">80% Bersih Pengajar</span>
+          <span class="bento-mini-pill">Pencairan Bank & E-Wallet</span>
+          <span class="bento-mini-pill">Studio Kelas Tanpa Onboarding Siswa</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Curriculum & Career Paths Showcase -->
+  <section class="section-wrap" id="kurikulum">
+    <div class="section-header-center">
+      <span class="section-tag">Kurikulum Berstandar Industri</span>
+      <h2 class="section-heading">Pilih Spesialisasi Rekayasa Anda</h2>
+      <p class="section-subtext">
+        Dirancang dari studi kasus industri nyata. Setiap kurikulum dilengkapi kuis per bab dan ujian akhir kelulusan ber-passing grade.
+      </p>
+    </div>
+
+    <!-- Category Tabs -->
+    <div class="category-tabs-nav reveal-on-scroll">
+      <button type="button" class="tab-category-btn active" onclick="switchCategoryTab('backend')">Backend & Cloud</button>
+      <button type="button" class="tab-category-btn" onclick="switchCategoryTab('ai')">AI & Machine Learning</button>
+      <button type="button" class="tab-category-btn" onclick="switchCategoryTab('frontend')">Frontend Modern</button>
+      <button type="button" class="tab-category-btn" onclick="switchCategoryTab('mobile')">Mobile Engineering</button>
+    </div>
+
+    <!-- Courses Grid -->
+    <div class="courses-showcase-grid" id="coursesGrid">
+      <!-- Course 1 -->
+      <div class="course-showcase-card reveal-on-scroll" data-category="backend">
+        <div>
+          <div class="card-top-meta">
+            <span class="course-cat-label">Backend Architecture</span>
+            <span class="course-level-pill">Menengah</span>
+          </div>
+          <h4 class="card-course-title">Basis Data Lanjut: Arsitektur Skema & Normalisasi Relasional</h4>
+          <p class="card-course-desc">
+            Reduksi redundansi, mitigasi tiga anomali database, dekomposisi tabel dari 1NF hingga 3NF dan BCNF berdasarkan kasus nyata perbankan.
+          </p>
+        </div>
+        <div class="card-course-footer">
+          <div class="tutor-info">
+            <div class="tutor-avatar-circle">AL</div>
+            <span>Arjuna Lanang</span>
+          </div>
+          <a href="/catalog" class="btn-clean btn-clean-outline" style="padding:6px 12px; font-size:12px;">Lihat Silabus</a>
+        </div>
+      </div>
+
+      <!-- Course 2 -->
+      <div class="course-showcase-card reveal-on-scroll" data-category="backend">
+        <div>
+          <div class="card-top-meta">
+            <span class="course-cat-label">Cloud Native</span>
+            <span class="course-level-pill">Lanjutan</span>
+          </div>
+          <h4 class="card-course-title">Mastering Enterprise Backend: Microservices & Event-Driven</h4>
+          <p class="card-course-desc">
+            Perancangan arsitektur microservices berdaya tahan tinggi, message broker Redis Pub/Sub, gRPC, dan orkestrasi kontainer Kubernetes.
+          </p>
+        </div>
+        <div class="card-course-footer">
+          <div class="tutor-info">
+            <div class="tutor-avatar-circle">CS</div>
+            <span>CS-Orion Lead</span>
+          </div>
+          <a href="/catalog" class="btn-clean btn-clean-outline" style="padding:6px 12px; font-size:12px;">Lihat Silabus</a>
+        </div>
+      </div>
+
+      <!-- Course 3 -->
+      <div class="course-showcase-card reveal-on-scroll" data-category="ai">
+        <div>
+          <div class="card-top-meta">
+            <span class="course-cat-label">AI & LLM</span>
+            <span class="course-level-pill">Semua Tingkat</span>
+          </div>
+          <h4 class="card-course-title">Mastering Large Language Models: Dari Prompting hingga Agen Otonom</h4>
+          <p class="card-course-desc">
+            Integrasi Gemini Interactions API, pembuatan retrieval-augmented generation (RAG), vector embeddings, dan perancangan AI agent handal.
+          </p>
+        </div>
+        <div class="card-course-footer">
+          <div class="tutor-info">
+            <div class="tutor-avatar-circle">AS</div>
+            <span>Akhmad Satrio</span>
+          </div>
+          <a href="/catalog" class="btn-clean btn-clean-outline" style="padding:6px 12px; font-size:12px;">Lihat Silabus</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Authentic Testimonials Section -->
+  <section class="section-wrap" style="padding-top:40px;">
+    <div class="section-header-center">
+      <span class="section-tag">Komunitas & Pembuktian</span>
+      <h2 class="section-heading">Dipercaya Pembelajar dan Praktisi</h2>
+      <p class="section-subtext">
+        Pengalaman nyata dari mereka yang telah bertransformasi bersama metodologi pembelajaran adaptif SkillSphere.
+      </p>
+    </div>
+
+    <div class="testimonial-grid">
+      <div class="testimonial-card reveal-on-scroll">
+        <p class="testimonial-quote">
+          "Orion AI beneran beda dari chat AI biasa. Pas belajar normalisasi database, dia nanya dulu 'Menurutmu jika satu kolom menyimpan dua nomor telepon, anomali apa yang terjadi waktu update?'. Itu bikin konsepnya nempel di kepala."
+        </p>
+        <div class="testimonial-user">
+          <div class="testimonial-avatar">RH</div>
+          <div class="user-meta">
+            <h5>Rafi Hidayat</h5>
+            <span>Junior Backend Developer</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="testimonial-card reveal-on-scroll">
+        <p class="testimonial-quote">
+          "Sebagai tutor, skema bagi hasil 80/20 sangat adil dan transparan. Saya bisa mengunggah video, slide PPT materi kuliah asli, dan menyusun kuis kelulusan langsung di portal pengajar tanpa kerumitan."
+        </p>
+        <div class="testimonial-user">
+          <div class="testimonial-avatar">DP</div>
+          <div class="user-meta">
+            <h5>Dimas Pratama</h5>
+            <span>Cloud Infrastructure Engineer & Tutor</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="testimonial-card reveal-on-scroll">
+        <p class="testimonial-quote">
+          "Ujian Zen Mode-nya membuat fokus saya terjaga. Setelah lulus, sertifikat dengan nomor verifikasi unik langsung terbit dan saya cantumkan di portofolio LinkedIn tanpa ragu."
+        </p>
+        <div class="testimonial-user">
+          <div class="testimonial-avatar">NW</div>
+          <div class="user-meta">
+            <h5>Nadia Wardani</h5>
+            <span>Fullstack Engineering Student</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Final Call to Action -->
+  <section class="section-wrap" style="padding-bottom:20px;">
+    <div class="final-cta-card reveal-on-scroll">
+      <h2>Mulai Langkah Nyata Menuju Karir Rekayasa Hari Ini</h2>
+      <p>
+        Bergabunglah dengan ribuan pembelajar adaptif. Rasakan bimbingan sokratik personal, raih kredensial resmi, dan bangun keahlian teknologi berstandar industri.
+      </p>
+      <div style="display:flex; justify-content:center; gap:14px; flex-wrap:wrap;">
+        <a href="/register" class="cta-btn-invert">
+          Daftar Akun Baru (Gratis) <i class="fa-solid fa-arrow-right"></i>
+        </a>
+        <a href="/register?role=tutor" class="btn-clean btn-clean-outline" style="color:var(--bg-surface); border-color:rgba(255,255,255,0.3); background:transparent;">
+          Daftar Menjadi Pengajar
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Editorial Footer -->
+  <footer class="landing-footer">
+    <div class="footer-container">
+      <div>
+        <div class="brand-wrap">
+          <div class="brand-logo-icon">
+            <i class="fa-solid fa-graduation-cap"></i>
+          </div>
+          <div class="brand-title">SkillSphere AI</div>
+        </div>
+        <p class="footer-brand-desc">
+          Platform pembelajaran adaptif teknologi berbasis AI yang menghubungkan siswa, instruktur ahli, dan standar kompetensi industri rekayasa perangkat lunak.
+        </p>
+      </div>
+
+      <div class="footer-col">
+        <h5>Kurikulum</h5>
+        <ul class="footer-links">
+          <li><a href="/catalog">Katalog Lengkap</a></li>
+          <li><a href="/roadmap">Jalur Belajar Karir</a></li>
+          <li><a href="/catalog?cat=backend">Backend & Cloud</a></li>
+          <li><a href="/catalog?cat=ai">AI & Machine Learning</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h5>Ekosistem</h5>
+        <ul class="footer-links">
+          <li><a href="/register?role=tutor">Studio Pengajar</a></li>
+          <li><a href="#sertifikasi">Validasi Sertifikat</a></li>
+          <li><a href="#orion">Orion Socratic AI</a></li>
+          <li><a href="/login">Portal Siswa</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h5>Kebijakan & Hukum</h5>
+        <ul class="footer-links">
+          <li><a href="/terms">Syarat & Ketentuan</a></li>
+          <li><a href="/privacy">Kebijakan Privasi</a></li>
+          <li><a href="#fitur">Transparansi Finansial</a></li>
+          <li><a href="mailto:support@skillsphere.ai">Hubungi Dukungan</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom-bar">
+      <div>
+        &copy; 2026 SkillSphere AI. Seluruh hak cipta dilindungi undang-undang.
+      </div>
+      <div style="display:flex; gap:16px;">
+        <span style="font-family:var(--font-mono); font-size:11.5px; color:var(--text-tertiary);">Status: Sistem Operasional 100%</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Accessibility Accessibility Controls Helper -->
+  <script src="/javascripts/accessibility.js"></script>
+
+  <!-- Interactive Landing Script -->
+  <script>
+    // -------------------------------------------------------------
+    // Theme Engine (Sync with Claude Warm Paper & Obsidian)
+    // -------------------------------------------------------------
+    const themeToggleBtn = document.getElementById('themeToggleBtn');
+    const themeIcon = document.getElementById('themeIcon');
+
+    function applyTheme(theme) {
+      document.documentElement.setAttribute('data-theme', theme);
+      localStorage.setItem('skillsphere_theme', theme);
+      localStorage.setItem('theme', theme);
+      if (themeIcon) {
+        themeIcon.className = theme === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+      }
+    }
+
+    const savedTheme = localStorage.getItem('skillsphere_theme') || localStorage.getItem('theme') || 'light';
+    applyTheme(savedTheme);
+
+    if (themeToggleBtn) {
+      themeToggleBtn.addEventListener('click', () => {
+        const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+        const nextTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        applyTheme(nextTheme);
+      });
+    }
+
+    // -------------------------------------------------------------
+    // Auth State Detection in Header Actions
+    // -------------------------------------------------------------
+    document.addEventListener('DOMContentLoaded', () => {
+      const token = localStorage.getItem('skillsphere_access_token') || localStorage.getItem('accessToken') || localStorage.getItem('token');
+      if (token) {
+        const loginBtn = document.getElementById('navLoginBtn');
+        const regBtn = document.getElementById('navRegisterBtn');
+        if (loginBtn) {
+          loginBtn.textContent = 'Dashboard';
+          loginBtn.href = '/dashboard';
+          loginBtn.className = 'btn-clean btn-clean-primary';
+        }
+        if (regBtn) {
+          regBtn.style.display = 'none';
+        }
+      }
+    });
+
+    // -------------------------------------------------------------
+    // Mobile Drawer Controls
+    // -------------------------------------------------------------
+    const mobileMenuTrigger = document.getElementById('mobileMenuTrigger');
+    const drawerCloseBtn = document.getElementById('drawerCloseBtn');
+    const mobileDrawer = document.getElementById('mobileDrawer');
+    const drawerBackdrop = document.getElementById('drawerBackdrop');
+
+    function openDrawer() {
+      if (mobileDrawer) mobileDrawer.classList.add('open');
+      if (drawerBackdrop) drawerBackdrop.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeDrawer() {
+      if (mobileDrawer) mobileDrawer.classList.remove('open');
+      if (drawerBackdrop) drawerBackdrop.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    if (mobileMenuTrigger) mobileMenuTrigger.addEventListener('click', openDrawer);
+    if (drawerCloseBtn) drawerCloseBtn.addEventListener('click', closeDrawer);
+    if (drawerBackdrop) drawerBackdrop.addEventListener('click', closeDrawer);
+
+    // -------------------------------------------------------------
+    // Sticky Nav Shadow on Scroll
+    // -------------------------------------------------------------
+    const mainNav = document.getElementById('mainNav');
+    window.addEventListener('scroll', () => {
+      if (mainNav) {
+        if (window.scrollY > 20) {
+          mainNav.classList.add('scrolled');
+        } else {
+          mainNav.classList.remove('scrolled');
+        }
+      }
+    });
+
+    // -------------------------------------------------------------
+    // Jakub Krehel Smooth Scroll Reveal (IntersectionObserver)
+    // -------------------------------------------------------------
+    const revealElements = document.querySelectorAll('.reveal-on-scroll');
+    if ('IntersectionObserver' in window) {
+      const revealObserver = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('revealed');
+            observer.unobserve(entry.target);
+          }
+        });
+      }, {
+        threshold: 0.12,
+        rootMargin: '0px 0px -40px 0px'
+      });
+
+      revealElements.forEach(el => revealObserver.observe(el));
+    } else {
+      revealElements.forEach(el => el.classList.add('revealed'));
+    }
+
+    // -------------------------------------------------------------
+    // Interactive Orion Socratic Guidance Simulator
+    // -------------------------------------------------------------
+    const orionScenarios = {
+      normalisasi: {
+        prompt: "Bagaimana membedakan 2NF dan 3NF pada basis data?",
+        response: "Mari kita tinjau dari ketergantungan fungsional: <strong>2NF</strong> mensyaratkan setiap atribut non-kunci bergantung secara penuh pada Primary Key (bukan sebagian). Sedangkan <strong>3NF</strong> melangkah lebih jauh: tidak boleh ada ketergantungan transitif. Pertanyaan untuk Anda: jika tabel memiliki kolom <em>Kode_Pos</em> dan <em>Kota</em> di mana Kota bergantung pada Kode_Pos dan Kode_Pos bergantung pada ID_Siswa, anomali apa yang timbul?"
+      },
+      jwt: {
+        prompt: "Mengapa Refresh Token disimpan di HttpOnly cookie?",
+        response: "Pertimbangan keamanan utamanya adalah mitigasi celah <strong>XSS (Cross-Site Scripting)</strong>. Jika token disimpan di localStorage biasa, script berbahaya yang disuntikkan dapat membacanya langsung. Dengan flag <code>HttpOnly; Secure; SameSite=Strict</code>, JavaScript di browser sama sekali tidak memiliki akses baca ke cookie tersebut. Pertanyaan refleksi: bagaimana strategi Anda memitigasi serangan CSRF ketika memakai cookie?"
+      },
+      cache: {
+        prompt: "Kapan strategi Cache-Aside lebih tepat dari Write-Through?",
+        response: "Pilihan arsitektur ini bergantung pada pola beban kerja baca vs tulis. <strong>Cache-Aside (Lazy Loading)</strong> sangat hemat memori pada sistem dengan perbandingan read-heavy yang tinggi, karena hanya data yang diminta yang disimpan di Redis. Sebaliknya, Write-Through menjaga cache selalu mutakhir tapi membebani latensi setiap kali ada penulisan data baru."
+      }
+    };
+
+    let typingTimer = null;
+
+    function simulateOrionGuidance(scenarioKey) {
+      const data = orionScenarios[scenarioKey];
+      if (!data) return;
+
+      const bubble = document.getElementById('orionSpeechBubble');
+      const mouth = document.getElementById('orbMouth');
+
+      if (!bubble) return;
+
+      // Animate speaking mouth
+      if (mouth) mouth.classList.add('speaking');
+      bubble.style.opacity = '0.4';
+      bubble.style.transform = 'translateY(4px)';
+
+      clearTimeout(typingTimer);
+
+      setTimeout(() => {
+        bubble.innerHTML = `
+          <div style="font-size:11.5px; color:var(--accent-amber); font-weight:700; margin-bottom:6px; font-family:var(--font-mono);">
+            TANYA: "${data.prompt}"
+          </div>
+          <div>${data.response}</div>
+        `;
+        bubble.style.opacity = '1';
+        bubble.style.transform = 'translateY(0)';
+        if (mouth) mouth.classList.remove('speaking');
+      }, 350);
+    }
+
+    // -------------------------------------------------------------
+    // Curriculum Explorer Category Switcher
+    // -------------------------------------------------------------
+    const coursesData = [
+      {
+        category: 'backend',
+        catLabel: 'Backend Architecture',
+        level: 'Menengah',
+        title: 'Basis Data Lanjut: Arsitektur Skema & Normalisasi Relasional',
+        desc: 'Reduksi redundansi, mitigasi tiga anomali database, dekomposisi tabel dari 1NF hingga 3NF dan BCNF berdasarkan kasus nyata perbankan.',
+        tutorInitial: 'AL',
+        tutorName: 'Arjuna Lanang',
+        url: '/catalog'
+      },
+      {
+        category: 'backend',
+        catLabel: 'Cloud Native',
+        level: 'Lanjutan',
+        title: 'Mastering Enterprise Backend: Microservices & Event-Driven',
+        desc: 'Perancangan arsitektur microservices berdaya tahan tinggi, message broker Redis Pub/Sub, gRPC, dan orkestrasi kontainer Kubernetes.',
+        tutorInitial: 'CS',
+        tutorName: 'CS-Orion Lead',
+        url: '/catalog'
+      },
+      {
+        category: 'ai',
+        catLabel: 'AI & LLM',
+        level: 'Semua Tingkat',
+        title: 'Mastering Large Language Models: Dari Prompting hingga Agen Otonom',
+        desc: 'Integrasi Gemini Interactions API, pembuatan retrieval-augmented generation (RAG), vector embeddings, dan perancangan AI agent handal.',
+        tutorInitial: 'AS',
+        tutorName: 'Akhmad Satrio',
+        url: '/catalog'
+      },
+      {
+        category: 'ai',
+        catLabel: 'Data Science',
+        level: 'Dasar - Menengah',
+        title: 'Data Science & Machine Learning: Analitika Prediktif Python',
+        desc: 'Pemodelan data tabular, visualisasi interaktif, feature engineering dengan scikit-learn, dan deployment model ke production pipeline.',
+        tutorInitial: 'DP',
+        tutorName: 'Dimas Pratama',
+        url: '/catalog'
+      },
+      {
+        category: 'frontend',
+        catLabel: 'Frontend Engineering',
+        level: 'Dasar',
+        title: 'Mastering Modern HTML5, Semantik Web & Desain Responsif',
+        desc: 'Fondasi arsitektur web modern, aksesibilitas WCAG AA, Core Web Vitals, dan sistem tata letak grid fleksibel tanpa ketergantungan framework berat.',
+        tutorInitial: 'NW',
+        tutorName: 'Nadia Wardani',
+        url: '/catalog'
+      },
+      {
+        category: 'frontend',
+        catLabel: 'UI/UX Engineering',
+        level: 'Menengah',
+        title: 'UI/UX Design Masterclass: Dari Wireframe ke Sistem Desain Produksi',
+        desc: 'Penguasaan prinsip desain warm paper, micro-interaction bernilai tinggi, desain motion Jakob Krehel, dan standarisasi token komponen.',
+        tutorInitial: 'FA',
+        tutorName: 'Fadiyah A.',
+        url: '/catalog'
+      },
+      {
+        category: 'mobile',
+        catLabel: 'Mobile App',
+        level: 'Menengah',
+        title: 'Membangun Aplikasi Multi-Platform dengan Flutter & Clean Architecture',
+        desc: 'Penerapan BLoC state management, offline-first SQLite cache, autentikasi biometric, dan optimalisasi render 60 FPS pada iOS dan Android.',
+        tutorInitial: 'RH',
+        tutorName: 'Rafi Hidayat',
+        url: '/catalog'
+      }
+    ];
+
+    function switchCategoryTab(cat) {
+      document.querySelectorAll('.tab-category-btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      event.target.classList.add('active');
+
+      const grid = document.getElementById('coursesGrid');
+      if (!grid) return;
+
+      const filtered = coursesData.filter(c => c.category === cat);
+      grid.style.opacity = '0.3';
+      grid.style.transform = 'translateY(6px)';
+
+      setTimeout(() => {
+        grid.innerHTML = filtered.map(c => `
+          <div class="course-showcase-card revealed" data-category="${c.category}">
+            <div>
+              <div class="card-top-meta">
+                <span class="course-cat-label">${c.catLabel}</span>
+                <span class="course-level-pill">${c.level}</span>
+              </div>
+              <h4 class="card-course-title">${c.title}</h4>
+              <p class="card-course-desc">${c.desc}</p>
+            </div>
+            <div class="card-course-footer">
+              <div class="tutor-info">
+                <div class="tutor-avatar-circle">${c.tutorInitial}</div>
+                <span>${c.tutorName}</span>
+              </div>
+              <a href="${c.url}" class="btn-clean btn-clean-outline" style="padding:6px 12px; font-size:12px;">Lihat Silabus</a>
+            </div>
+          </div>
+        `).join('');
+
+        grid.style.opacity = '1';
+        grid.style.transform = 'translateY(0)';
+      }, 180);
+    }
+  </script>
+</body>
+</html>

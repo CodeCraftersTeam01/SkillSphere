@@ -7,6 +7,7 @@ async function runStudentViewsCatalogTests() {
   console.log('🧪 Starting Student FE & Course Catalog Test Suite (Sprint 1 & Sprint 2 - Fadiyah)...\n');
 
   const viewsToTest = [
+    { name: 'Public Landing Page', file: 'views/landing.ejs', data: { title: 'SkillSphere AI - Platform Pembelajaran Adaptif & Karir Teknologi', user: null } },
     { name: 'Login Page', file: 'views/login.ejs', data: { title: 'Masuk | SkillSphere AI' } },
     { name: 'Register Page with OTP Modal', file: 'views/register.ejs', data: { title: 'Daftar Akun | SkillSphere AI' } },
     { name: 'Onboarding 5-Step Personalization', file: 'views/onboarding.ejs', data: { title: 'Personalisasi Belajar | SkillSphere AI' } },

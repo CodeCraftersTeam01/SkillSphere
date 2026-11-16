@@ -1,9 +1,12 @@
 const express = require('express');
 const router = express.Router();
 
-/* GET home page - redirect to login or dashboard */
-router.get('/', function(req, res, next) {
-  res.redirect('/login');
+/* GET home page - Landing Page */
+router.get(['/', '/landing'], function(req, res, next) {
+  res.render('landing', {
+    title: 'SkillSphere AI - Platform Pembelajaran Adaptif & Karir Teknologi',
+    user: req.user || null
+  });
 });
 
 /* GET login page */
