@@ -498,9 +498,9 @@
     "semantic_hash": ""
   },
   "routes/index.js": {
-    "mtime": 1794749076.9815571,
-    "seen": 1794749459.201362,
-    "ast_hash": "b9eadd37d99d800837def3ae8732a5fe",
+    "mtime": 1794790469.3365703,
+    "seen": 1794790754.345511,
+    "ast_hash": "56ffb239f0d2c53cdb8783dec4377d31",
     "semantic_hash": ""
   },
   "routes/users.js": {
@@ -648,9 +648,9 @@
     "semantic_hash": ""
   },
   "tests/studentViewsCatalog.test.js": {
-    "mtime": 1794576587.3097904,
-    "seen": 1794577198.9244869,
-    "ast_hash": "a5548240a99dac0b421d1733e2ca33c2",
+    "mtime": 1794790482.8110154,
+    "seen": 1794790754.345571,
+    "ast_hash": "f70d90322bd178da1bf8699dc05b4ba2",
     "semantic_hash": ""
   },
   "tests/ttsAccessibility.test.js": {
@@ -1215,6 +1215,18 @@
     "mtime": 1794749141.044357,
     "seen": 1794749459.2014132,
     "ast_hash": "214b4f0c05f2efc925125725fa2c6d37",
+    "semantic_hash": ""
+  },
+  "views/landing.ejs": {
+    "mtime": 1794791557.0670254,
+    "seen": 1794791592.115778,
+    "ast_hash": "207a7a4862e0b727a29e30618c82a5dd",
+    "semantic_hash": ""
+  },
+  "docs/superpowers/plans/2026-11-16-landing-page.md": {
+    "mtime": 1794790454.7984536,
+    "seen": 1794790754.345718,
+    "ast_hash": "bdd57ba922f8ab2089e37a4699ea3676",
     "semantic_hash": ""
   },
   "package-lock.json": {
