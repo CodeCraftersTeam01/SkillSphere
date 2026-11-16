@@ -128,15 +128,36 @@
       box-shadow: 0 20px 48px -10px rgba(0, 0, 0, 0.6);
     }
 
-    /* Brand Logo (DORA Micro-Hierarchy) */
+    /* Brand Logo (Claude 8-pointed star + DORA Micro-Hierarchy) */
     .brand-dora-wrap {
       display: flex;
-      flex-direction: column;
+      align-items: center;
+      gap: 10px;
       text-decoration: none;
       color: var(--text-primary);
-      line-height: 1.1;
       user-select: none;
       flex-shrink: 0;
+    }
+
+    .brand-star-icon {
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-primary);
+      flex-shrink: 0;
+      transition: transform 300ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .brand-dora-wrap:hover .brand-star-icon {
+      transform: rotate(45deg) scale(1.08);
+    }
+
+    .brand-text-block {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.1;
     }
 
     .brand-dora-main {
@@ -146,6 +167,7 @@
       letter-spacing: -0.5px;
       display: flex;
       align-items: baseline;
+      color: var(--text-primary);
     }
 
     .brand-accent-dot {
@@ -357,26 +379,6 @@
       z-index: 1;
     }
 
-    .hero-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 6px 16px;
-      border-radius: var(--radius-full);
-      background: var(--bg-surface);
-      border: 1px solid var(--border-subtle);
-      font-size: 12.5px;
-      font-weight: 600;
-      color: var(--text-secondary);
-      margin-bottom: 22px;
-      box-shadow: var(--shadow-sm);
-    }
-
-    .hero-badge i {
-      color: var(--accent-amber);
-      font-size: 11px;
-    }
-
     .hero-headline {
       font-family: var(--font-serif);
       font-size: 52px;
@@ -468,15 +470,6 @@
       display: flex;
       align-items: center;
       gap: 6px;
-    }
-
-    .prompt-hint-tag {
-      font-size: 11.5px;
-      color: var(--text-tertiary);
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-weight: 500;
     }
 
     /* Input Area with Simulated Typewriter and Blinking Cursor */
@@ -640,30 +633,6 @@
       white-space: nowrap;
     }
 
-    /* Trust Badges Strip Under Card */
-    .hero-trust-strip {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 22px;
-      flex-wrap: wrap;
-      font-size: 12.5px;
-      color: var(--text-secondary);
-      font-weight: 500;
-      margin-top: 4px;
-    }
-
-    .trust-badge-item {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-    }
-
-    .trust-badge-item i {
-      color: var(--color-success);
-      font-size: 11.5px;
-    }
-
     /* Living Orb Avatar Components */
     .orion-orb-container {
       width: 44px;
@@ -812,17 +781,6 @@
       margin: 0 auto 52px;
     }
 
-    .section-tag {
-      font-family: var(--font-mono);
-      font-size: 11.5px;
-      font-weight: 700;
-      color: var(--accent-amber);
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-      margin-bottom: 12px;
-      display: inline-block;
-    }
-
     .section-heading {
       font-family: var(--font-serif);
       font-size: 38px;
@@ -909,19 +867,31 @@
       margin: 0 0 20px;
     }
 
-    .bento-interactive-pill-list {
+    .bento-feature-points {
+      list-style: none;
+      padding: 0;
+      margin: 16px 0 0;
       display: flex;
-      flex-wrap: wrap;
+      flex-direction: column;
       gap: 8px;
     }
 
-    .bento-mini-pill {
-      font-size: 12px;
-      padding: 4px 10px;
-      border-radius: var(--radius-full);
-      background: var(--bg-surface-subtle);
+    .bento-feature-points li {
+      font-size: 13px;
       color: var(--text-secondary);
-      border: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      line-height: 1.4;
+    }
+
+    .bento-feature-points li::before {
+      content: "";
+      width: 4px;
+      height: 4px;
+      border-radius: var(--radius-full);
+      background: var(--accent-amber);
+      flex-shrink: 0;
     }
 
     /* Socratic Comparison Section */
@@ -945,32 +915,19 @@
       box-shadow: var(--shadow-md);
     }
 
-    .compare-tag {
-      font-family: var(--font-mono);
-      font-size: 11px;
-      font-weight: 700;
-      padding: 3px 8px;
-      border-radius: var(--radius-full);
-      display: inline-block;
-      margin-bottom: 14px;
-    }
-
-    .compare-tag.passive {
-      background: rgba(239, 68, 68, 0.1);
-      color: var(--color-danger);
-    }
-
-    .compare-tag.socratic {
-      background: rgba(16, 185, 129, 0.12);
-      color: var(--color-success);
-    }
-
     .compare-title {
       font-family: var(--font-serif);
-      font-size: 20px;
+      font-size: 22px;
       font-weight: 600;
-      margin: 0 0 12px;
+      margin: 0 0 6px;
       color: var(--text-primary);
+    }
+
+    .compare-subtitle {
+      font-size: 13.5px;
+      color: var(--text-secondary);
+      margin: 0 0 20px;
+      line-height: 1.45;
     }
 
     .compare-list {
@@ -1114,37 +1071,40 @@
       font-weight: 700;
     }
 
-    /* Metrics Strip */
+    /* Metrics Strip (Dicoding-Inspired Clean Open Layout) */
     .metrics-banner {
-      background: var(--bg-surface);
+      background: transparent;
       border-top: 1px solid var(--border-subtle);
       border-bottom: 1px solid var(--border-subtle);
-      padding: 48px 24px;
+      padding: 56px 24px;
     }
 
     .metrics-container {
-      max-width: 1240px;
+      max-width: 1200px;
       margin: 0 auto;
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 24px;
+      gap: 32px 24px;
       text-align: center;
     }
 
     .metric-num {
-      font-family: var(--font-serif);
-      font-size: 42px;
-      font-weight: 600;
+      font-family: var(--font-sans);
+      font-size: 38px;
+      font-weight: 700;
       color: var(--text-primary);
-      margin: 0 0 6px;
-      line-height: 1;
+      margin: 0 0 8px;
+      line-height: 1.1;
+      letter-spacing: -0.8px;
     }
 
     .metric-label {
       font-size: 13.5px;
       color: var(--text-secondary);
-      margin: 0;
+      margin: 0 auto;
       font-weight: 500;
+      line-height: 1.45;
+      max-width: 220px;
     }
 
     /* Testimonials */
@@ -1450,11 +1410,21 @@
         padding: 0 8px;
       }
       .landing-nav {
-        padding: 6px 10px 6px 16px;
+        padding: 6px 10px 6px 14px;
+      }
+      .brand-dora-main {
+        font-size: 16px;
+      }
+      .brand-star-icon svg {
+        width: 18px;
+        height: 18px;
+      }
+      .brand-dora-sub {
+        display: none;
       }
       .nav-pill-btn-cta {
-        padding: 7px 16px;
-        font-size: 12.5px;
+        padding: 7px 14px;
+        font-size: 12px;
       }
       .hero-section {
         padding-top: 36px;
@@ -1497,12 +1467,6 @@
         width: 100%;
         justify-content: center;
       }
-      .hero-trust-strip {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 8px;
-        padding: 0 4px;
-      }
       .floating-orion-launcher .floating-launcher-label {
         display: none;
       }
@@ -1534,13 +1498,22 @@
   <!-- Floating Island Pill Navigation (DORA Style) -->
   <div class="landing-nav-wrapper">
     <nav class="landing-nav" id="mainNav">
-      <!-- Brand Logo (DORA Micro-Hierarchy) -->
+      <!-- Brand Logo (Claude 8-pointed star + DORA Micro-Hierarchy) -->
       <a href="/" class="brand-dora-wrap" title="Beranda SkillSphere AI">
-        <div class="brand-dora-main">
-          SkillSphere<span class="brand-accent-dot">.</span>
+        <div class="brand-star-icon">
+          <!-- 8-pointed signature star with subtle diagonal glow -->
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+            <path opacity="0.38" d="M12 7.6L17.3 4.7L14.4 10L17.3 15.3L12 12.4L6.7 15.3L9.6 10L6.7 4.7Z" />
+            <path d="M12 0L13.8 8.2L22 10L13.8 11.8L12 20L10.2 11.8L2 10L10.2 8.2L12 0Z" />
+          </svg>
         </div>
-        <div class="brand-dora-sub">
-          AI-POWERED ADAPTIVE LEARNING
+        <div class="brand-text-block">
+          <div class="brand-dora-main">
+            SkillSphere<span class="brand-accent-dot">.</span>
+          </div>
+          <div class="brand-dora-sub">
+            AI-POWERED ADAPTIVE LEARNING
+          </div>
         </div>
       </a>
 
@@ -1579,8 +1552,21 @@
   <aside class="mobile-drawer" id="mobileDrawer">
     <div>
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:28px;">
-        <div class="brand-title" style="font-size:18px;">
-          SkillSphere AI
+        <div class="brand-dora-wrap" style="gap:10px;">
+          <div class="brand-star-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path opacity="0.38" d="M12 7.6L17.3 4.7L14.4 10L17.3 15.3L12 12.4L6.7 15.3L9.6 10L6.7 4.7Z" />
+              <path d="M12 0L13.8 8.2L22 10L13.8 11.8L12 20L10.2 11.8L2 10L10.2 8.2L12 0Z" />
+            </svg>
+          </div>
+          <div class="brand-text-block">
+            <div class="brand-dora-main" style="font-size:17px;">
+              SkillSphere<span class="brand-accent-dot">.</span>
+            </div>
+            <div class="brand-dora-sub" style="font-size:7px;">
+              AI-POWERED ADAPTIVE LEARNING
+            </div>
+          </div>
         </div>
         <button type="button" class="theme-icon-btn" id="drawerCloseBtn" aria-label="Tutup Menu">
           <i class="fa-solid fa-xmark"></i>
@@ -1604,12 +1590,6 @@
 
   <!-- Hero Section (Dicoding Inspired & Socratic Differentiated) -->
   <header class="hero-section">
-    <!-- Subtle Tag Pill -->
-    <div class="hero-badge reveal-on-scroll">
-      <i class="fa-solid fa-sparkles"></i>
-      <span>Platform Pembelajaran Rekayasa Perangkat Lunak Berbasis AI Sokratik</span>
-    </div>
-
     <!-- Editorial Serif Headline (Dicoding-Inspired Spacious Clarity) -->
     <h1 class="hero-headline reveal-on-scroll">
       Bangun Karir sebagai Talenta Digital<br>
@@ -1636,19 +1616,11 @@
             </div>
           </div>
           <div class="card-orion-meta">
-            <span class="card-orion-name">
-              Orion AI Partner
-              <span class="version-pill" style="font-size:9.5px; padding:1px 6px;">Sokratik</span>
-            </span>
+            <span class="card-orion-name">Orion AI Partner</span>
             <span class="card-orion-status">
               <span class="pulse-dot"></span> Mode Pembelajaran Adaptif
             </span>
           </div>
-        </div>
-
-        <div class="prompt-hint-tag">
-          <i class="fa-regular fa-lightbulb"></i>
-          <span>Ketik tujuan atau pilih topik di bawah</span>
         </div>
       </div>
 
@@ -1699,32 +1671,11 @@
       <!-- Card Bottom Bar: Helper Text & Submit CTA -->
       <div class="prompt-card-bottom">
         <div class="prompt-helper-note">
-          <i class="fa-regular fa-keyboard"></i>
           <span>Tekan Enter atau klik Belajar Sekarang untuk kurikulum adaptif</span>
         </div>
         <button type="button" class="btn-clean btn-clean-primary hero-prompt-submit-btn" id="submitGoalBtn" onclick="handleGoalSubmit()">
           Belajar Sekarang <i class="fa-solid fa-arrow-right"></i>
         </button>
-      </div>
-    </div>
-
-    <!-- Verified Trust Badges Strip Under Card -->
-    <div class="hero-trust-strip reveal-on-scroll">
-      <div class="trust-badge-item">
-        <i class="fa-solid fa-circle-check"></i>
-        <span>19 Relasi Database Terintegrasi</span>
-      </div>
-      <div class="trust-badge-item">
-        <i class="fa-solid fa-circle-check"></i>
-        <span>Sertifikat Digital Hash WebP</span>
-      </div>
-      <div class="trust-badge-item">
-        <i class="fa-solid fa-circle-check"></i>
-        <span>Bagi Hasil Transparan Tutor 80/20</span>
-      </div>
-      <div class="trust-badge-item">
-        <i class="fa-solid fa-circle-check"></i>
-        <span>Standar Rekayasa Industri</span>
       </div>
     </div>
   </header>
@@ -1754,18 +1705,17 @@
   <!-- Socratic Learning Philosophy Section -->
   <section class="section-wrap" id="orion">
     <div class="section-header-center">
-      <span class="section-tag">Metode Pembelajaran Masa Depan</span>
-      <h2 class="section-heading">Bukan Sekadar AI Biasa, Orion Melatih Cara Berpikir Anda.</h2>
+      <h2 class="section-heading">Bimbingan Sokratik yang Melatih Logika Berpikir</h2>
       <p class="section-subtext">
-        AI konvensional sering memanjakan siswa dengan jawaban instan yang mematikan nalar kritis. SkillSphere membalik paradigma tersebut dengan metode dialog Sokratik.
+        Bukan sekadar memberikan jawaban langsung. SkillSphere memandu Anda memahami akar masalah dan merumuskan solusi rekayasa secara mandiri.
       </p>
     </div>
 
     <div class="compare-container">
       <!-- Passive LLM Box -->
       <div class="compare-box reveal-on-scroll">
-        <span class="compare-tag passive">AI Konvensional (Pasif)</span>
-        <h3 class="compare-title">Jawaban Mentah Tanpa Konteks</h3>
+        <h3 class="compare-title">Model Jawaban Instan</h3>
+        <p class="compare-subtitle">Pola asisten AI umum tanpa proses penalaran mendalam.</p>
         <ul class="compare-list">
           <li>
             <i class="fa-solid fa-xmark" style="color:var(--color-danger);"></i>
@@ -1784,8 +1734,8 @@
 
       <!-- Socratic Partner Box -->
       <div class="compare-box highlight reveal-on-scroll">
-        <span class="compare-tag socratic">Orion AI di SkillSphere</span>
-        <h3 class="compare-title">Dialog Sokratik yang Membangun Daya Nalar</h3>
+        <h3 class="compare-title">Dialog Sokratik Orion</h3>
+        <p class="compare-subtitle">Mitra belajar interaktif berbasis evaluasi adaptif berkelanjutan.</p>
         <ul class="compare-list">
           <li>
             <i class="fa-solid fa-check" style="color:var(--color-success);"></i>
@@ -1807,7 +1757,6 @@
   <!-- Bento Grid (Core Pillars) -->
   <section class="section-wrap" id="fitur">
     <div class="section-header-center">
-      <span class="section-tag">Arsitektur Terpadu</span>
       <h2 class="section-heading">Fondasi Rekayasa Tanpa Kompromi</h2>
       <p class="section-subtext">
         Setiap modul dan komponen di SkillSphere dirancang untuk memberikan pengalaman belajar profesional tanpa distraksi.
@@ -1824,12 +1773,11 @@
         <p class="bento-desc">
           Kurikulum belajar tidak pernah seragam. SkillSphere memetakan minat spesifik, jam komitmen belajar mingguan, gaya belajar visual atau kinestetik, serta preferensi karir teknologi sebelum menyusun jalur belajar personal Anda.
         </p>
-        <div class="bento-interactive-pill-list">
-          <span class="bento-mini-pill">Gaya Belajar Adaptif</span>
-          <span class="bento-mini-pill">Penyesuaian Tempo Otomatis</span>
-          <span class="bento-mini-pill">Rekomendasi Jalur Karir</span>
-          <span class="bento-mini-pill">Target Evaluasi Realistis</span>
-        </div>
+        <ul class="bento-feature-points">
+          <li>Pemetaan minat spesifik dan jam komitmen belajar mingguan</li>
+          <li>Penyesuaian tempo materi dan target evaluasi adaptif</li>
+          <li>Rekomendasi spesialisasi karir berdasarkan profil belajar</li>
+        </ul>
       </div>
 
       <!-- Bento 2: WebP Certified Credentials (Col 4) -->
@@ -1856,11 +1804,10 @@
         <p class="bento-desc">
           Pemutaran video modul tanpa jeda buffering dengan dukungan byte-range streaming, slide presentasi PPT kuliah asli, serta dokumen kurikulum multi-format.
         </p>
-        <div class="bento-interactive-pill-list">
-          <span class="bento-mini-pill">Video MP4 1080p</span>
-          <span class="bento-mini-pill">Slide PPT Asli</span>
-          <span class="bento-mini-pill">PDF & E-Book</span>
-        </div>
+        <ul class="bento-feature-points">
+          <li>Video modul 1080p dengan pemutaran byte-range responsif</li>
+          <li>Slide presentasi PPT asli kuliah dan dokumen panduan PDF</li>
+        </ul>
       </div>
 
       <!-- Bento 4: 80/20 Transparent Tutor Ecosystem (Col 8) -->
@@ -1872,11 +1819,11 @@
         <p class="bento-desc">
           Platform memotong 20% biaya operasional dan token AI, sementara 80% hasil bersih penjualan kursus langsung masuk ke Virtual Wallet Tutor. Dilengkapi masa holding proteksi sengketa 7 hari dan batas penarikan transparan mulai Rp 100.000.
         </p>
-        <div class="bento-interactive-pill-list">
-          <span class="bento-mini-pill">80% Bersih Pengajar</span>
-          <span class="bento-mini-pill">Pencairan Bank & E-Wallet</span>
-          <span class="bento-mini-pill">Studio Kelas Tanpa Onboarding Siswa</span>
-        </div>
+        <ul class="bento-feature-points">
+          <li>80% bagi hasil bersih masuk langsung ke Virtual Wallet Tutor</li>
+          <li>Holding period 7 hari untuk proteksi sengketa transaksi</li>
+          <li>Studio manajemen kelas mandiri tanpa onboarding siswa</li>
+        </ul>
       </div>
     </div>
   </section>
@@ -1884,7 +1831,6 @@
   <!-- Curriculum & Career Paths Showcase -->
   <section class="section-wrap" id="kurikulum">
     <div class="section-header-center">
-      <span class="section-tag">Kurikulum Berstandar Industri</span>
       <h2 class="section-heading">Pilih Spesialisasi Rekayasa Anda</h2>
       <p class="section-subtext">
         Dirancang dari studi kasus industri nyata. Setiap kurikulum dilengkapi kuis per bab dan ujian akhir kelulusan ber-passing grade.
@@ -1969,7 +1915,6 @@
   <!-- Authentic Testimonials Section -->
   <section class="section-wrap" style="padding-top:40px;">
     <div class="section-header-center">
-      <span class="section-tag">Komunitas & Pembuktian</span>
       <h2 class="section-heading">Dipercaya Pembelajar dan Praktisi</h2>
       <p class="section-subtext">
         Pengalaman nyata dari mereka yang telah bertransformasi bersama metodologi pembelajaran adaptif SkillSphere.
@@ -2041,8 +1986,11 @@
     <div class="footer-container">
       <div>
         <div class="brand-wrap">
-          <div class="brand-logo-icon">
-            <i class="fa-solid fa-graduation-cap"></i>
+          <div class="brand-logo-icon" style="display:flex; align-items:center; justify-content:center; color:var(--text-primary); background:transparent;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+              <path opacity="0.38" d="M12 7.6L17.3 4.7L14.4 10L17.3 15.3L12 12.4L6.7 15.3L9.6 10L6.7 4.7Z" />
+              <path d="M12 0L13.8 8.2L22 10L13.8 11.8L12 20L10.2 11.8L2 10L10.2 8.2L12 0Z" />
+            </svg>
           </div>
           <div class="brand-title">SkillSphere AI</div>
         </div>
@@ -2122,24 +2070,6 @@
         applyTheme(nextTheme);
       });
     }
-
-    // -------------------------------------------------------------
-    // Auth State Detection in Header Actions
-    // -------------------------------------------------------------
-    document.addEventListener('DOMContentLoaded', () => {
-      const token = localStorage.getItem('skillsphere_access_token') || localStorage.getItem('accessToken') || localStorage.getItem('token');
-      if (token) {
-        const loginBtn = document.getElementById('navLoginBtn');
-        const regBtn = document.getElementById('navRegisterBtn');
-        if (loginBtn) {
-          loginBtn.style.display = 'none';
-        }
-        if (regBtn) {
-          regBtn.textContent = 'Dashboard';
-          regBtn.href = '/dashboard';
-        }
-      }
-    });
 
     // -------------------------------------------------------------
     // Mobile Drawer Controls
