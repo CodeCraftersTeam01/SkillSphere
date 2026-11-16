@@ -1,7 +1,7 @@
 # Graph Report - SkillSphare  (2026-11-16)
 
 ## Corpus Check
-- 185 files · ~606,510 words
+- 185 files · ~606,662 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 10 file(s) not represented in the graph (top: .css 7, .example 1, (none) 1)
 
@@ -11,7 +11,7 @@
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `c8924982`
+- Built from commit: `c76f1db9`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -770,16 +770,16 @@ Nodes (5): { execSync }, fs, generateHtml(), main(), path
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `sequelize` connect `models/index.js` to `examController.js`, `Course`, `app.js`, `dependencies`, `adminVerification.test.js`, `authController.js`, `adminController.js`, `geminiService.js`, `package.json`, `courseController.js`?**
-  _High betweenness centrality (0.008) - this node is a cross-community bridge._
+- **Why does `Motion Cookbook` connect `Motion Cookbook` to `9. Clip-Path Animations (Emil)`, `6. Shared Layout Animations (Jakub)`, `10. Button & Interactive Feedback (Emil)`, `11. CSS Transitions vs Keyframes (Emil)`, `12. Spring Physics (Emil)`, `14. Scroll-Driven Animations (Jhey)`, `1. Enter & Exit Animations`, `3. Visual Effects`, `7. CSS Custom Properties & @property (Jhey)`, `8. 3D CSS (Jhey)`, `2. Easing & Timing`?**
+  _High betweenness centrality (0.005) - this node is a cross-community bridge._
 - **Should `assets.mjs` be split into smaller, more focused modules?**
   _Cohesion score 0.06648426812585499 - nodes in this community are weakly interconnected._
-- **Why does `express` connect `api/index.js` to `app.js`, `api/auth.js`, `media.js`, `routes/index.js`, `middleware/auth.js`, `tts.js`, `redisCompression.test.js`, `package.json`?**
-  _High betweenness centrality (0.006) - this node is a cross-community bridge._
+- **Why does `User` connect `app.js` to `examController.js`, `Course`, `models/index.js`, `mediaStorage.test.js`, `mediaStorage.test.js`, `adminVerification.test.js`, `sprint4E2EQA.test.js`, `authController.js`, `adminController.js`, `middleware/auth.js`, `geminiService.js`, `analyticsDashboard.test.js`, `courseController.js`?**
+  _High betweenness centrality (0.004) - this node is a cross-community bridge._
 - **Should `verification.ejs` be split into smaller, more focused modules?**
   _Cohesion score 0.06926406926406926 - nodes in this community are weakly interconnected._
-- **Why does `dependencies` connect `dependencies` to `morgan`, `www`, `api/index.js`, `bcryptjs`, `compression`, `helmet`, `http-errors`, `package.json`, `mysql2`, `qrcode`, `imageHelper.js`, `nodemailer`, `cors`, `dotenv@^18.0.1`?**
-  _High betweenness centrality (0.005) - this node is a cross-community bridge._
+- **Why does `showCustomAlert()` connect `verification.ejs` to `detail.ejs`, `learn.ejs`?**
+  _High betweenness centrality (0.004) - this node is a cross-community bridge._
 - **Should `materials.ejs` be split into smaller, more focused modules?**
   _Cohesion score 0.05765765765765766 - nodes in this community are weakly interconnected._
 - **Should `learn.ejs` be split into smaller, more focused modules?**
