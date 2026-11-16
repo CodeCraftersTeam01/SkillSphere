@@ -2758,14 +2758,6 @@
       const prevCourse = document.getElementById('portal-preview-course');
       if (prevCourse) prevCourse.textContent = course.title;
 
-      currentMaterialsFlat = allMaterialsFlat;
-
-      // Always proactively load exams so metrics, forum feed, and curriculum tree reflect exams
-      loadPortalExam();
-
-      const certsPane = document.getElementById('classroom-tab-certificates');
-      if (certsPane && certsPane.style.display !== 'none') loadPortalCertificates();
-
       const bannerImg = document.getElementById('banner-bg-img');
       if (course.thumbnail_url) {
         bannerImg.src = course.thumbnail_url;
@@ -2800,15 +2792,23 @@
 
       // Render Upload Modal Section Selector
       const sectionSelect = document.getElementById('material-section-select');
-      sectionSelect.innerHTML = sections.map(s => `
-        <option value="${s.id}">${escapeHtml(s.title)}</option>
-      `).join('');
+      if (sectionSelect) {
+        sectionSelect.innerHTML = sections.map(s => `
+          <option value="${s.id}">${escapeHtml(s.title)}</option>
+        `).join('');
+      }
 
       // Render Tab 1: Forum Stream Feed
       renderForumFeed(allMaterialsFlat);
 
       // Render Tab 2: Tugas Kelas (Curriculum Tree)
       renderClassworkSections(sections);
+
+      // Always proactively load exams so metrics, forum feed, and curriculum tree reflect exams
+      loadPortalExam();
+
+      const certsPane = document.getElementById('classroom-tab-certificates');
+      if (certsPane && certsPane.style.display !== 'none') loadPortalCertificates();
     }
 
     // Render Forum Stream Feed Items
