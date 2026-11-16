@@ -43,85 +43,6 @@
       -webkit-font-smoothing: antialiased;
     }
 
-    /* Top Navigation Bar */
-    .navbar {
-      background: var(--bg-surface);
-      border-bottom: 1px solid var(--border-subtle);
-      padding: 0 24px;
-      height: 60px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      position: sticky;
-      top: 0;
-      z-index: 40;
-      box-sizing: border-box;
-      gap: 16px;
-    }
-
-    .brand-logo {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      text-decoration: none;
-      color: var(--text-primary);
-      font-weight: 700;
-      font-size: 1.12rem;
-    }
-
-    .brand-logo span {
-      font-family: var(--font-serif);
-      font-size: 1.25rem;
-      font-weight: 700;
-      letter-spacing: -0.3px;
-    }
-
-    .nav-links {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .nav-pill {
-      text-decoration: none;
-      font-size: 0.88rem;
-      font-weight: 500;
-      color: var(--text-secondary);
-      padding: 8px 14px;
-      border-radius: var(--radius-md);
-      transition: all 0.15s ease-out;
-    }
-
-    .nav-pill:hover {
-      color: var(--text-primary);
-      background: var(--bg-surface-subtle);
-    }
-
-    .nav-pill.active {
-      color: var(--text-primary);
-      background: var(--bg-surface-subtle);
-      font-weight: 600;
-    }
-
-    .icon-btn {
-      width: 40px;
-      height: 40px;
-      border-radius: var(--radius-full);
-      border: 1px solid var(--border-subtle);
-      background: var(--bg-surface);
-      color: var(--text-primary);
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: all 0.15s ease-out;
-    }
-
-    .icon-btn:hover {
-      background: var(--bg-surface-subtle);
-      transform: translateY(-1px);
-    }
-
     /* Main Container */
     .container {
       max-width: 1040px;
@@ -379,12 +300,6 @@
     }
 
     @media (max-width: 640px) {
-      .navbar {
-        padding: 0 16px;
-      }
-      .nav-links {
-        display: none;
-      }
       .page-title {
         font-size: 1.85rem;
       }

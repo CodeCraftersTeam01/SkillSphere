@@ -1,7 +1,7 @@
 # Graph Report - SkillSphare  (2026-11-16)
 
 ## Corpus Check
-- 192 files · ~606,462 words
+- 192 files · ~604,693 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 11 file(s) not represented in the graph (top: .css 8, .example 1, (none) 1)
 
@@ -11,7 +11,7 @@
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `3ddbce39`
+- Built from commit: `0436449c`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -751,10 +751,10 @@ Nodes (9): assert, ejs, fs, generateToken(), http, jwt, path, request() (+1 more
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `User` connect `User` to `examController.js`, `mediaStorage.test.js`, `models/index.js`, `app.js`, `mediaStorage.test.js`, `sprint4CertificateAiReadiness.test.js`, `sprint4E2EQA.test.js`, `runWhatsAppOtpTestSuite`, `authController.js`, `adminController.js`, `geminiService.js`, `exams.js`, `analyticsDashboard.test.js`, `middleware/auth.js`, `courseController.js`?**
-  _High betweenness centrality (0.006) - this node is a cross-community bridge._
+  _High betweenness centrality (0.005) - this node is a cross-community bridge._
 - **Should `assets.mjs` be split into smaller, more focused modules?**
   _Cohesion score 0.06648426812585499 - nodes in this community are weakly interconnected._
-- **Why does `sequelize` connect `models/index.js` to `examController.js`, `mediaStorage.test.js`, `app.js`, `package.json`, `User`, `authController.js`, `adminController.js`, `geminiService.js`, `courseController.js`?**
+- **Why does `express` connect `express` to `app.js`, `api/auth.js`, `package.json`, `api/index.js`, `media.js`, `routes/index.js`, `User`, `exams.js`, `tts.js`, `redisCompression.test.js`, `middleware/auth.js`?**
   _High betweenness centrality (0.004) - this node is a cross-community bridge._
 - **Should `verification.ejs` be split into smaller, more focused modules?**
   _Cohesion score 0.06259183073758448 - nodes in this community are weakly interconnected._
