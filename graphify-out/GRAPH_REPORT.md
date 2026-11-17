@@ -1,17 +1,17 @@
 # Graph Report - SkillSphare  (2026-11-17)
 
 ## Corpus Check
-- 192 files · ~609,796 words
+- 192 files · ~609,682 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 11 file(s) not represented in the graph (top: .css 8, .example 1, (none) 1)
 
 ## Summary
-- 2350 nodes · 4168 edges · 151 communities (131 shown, 20 thin omitted)
+- 2349 nodes · 4167 edges · 153 communities (135 shown, 18 thin omitted)
 - Extraction: 96% EXTRACTED · 4% INFERRED · 0% AMBIGUOUS · INFERRED: 182 edges (avg confidence: 0.85)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `c68ca731`
+- Built from commit: `2863036c`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -96,7 +96,7 @@
 - Critique — judging the render
 - rules.mjs
 - api/index.js
-- sprint4E2EQA.test.js
+- Course
 - privacy.ejs
 - terms.ejs
 - cdp.mjs
@@ -118,8 +118,8 @@
 - scripts
 - app.json
 - 9. Type and colour
-- compression
-- cors
+- compression.js
+- mediaStorage.test.js
 - Star
 - 10. Button & Interactive Feedback (Emil)
 - 11. CSS Transitions vs Keyframes (Emil)
@@ -127,8 +127,8 @@
 - 3. The shell
 - 4. The canvas and the page title
 - 6. Charts
-- media.js
-- dotenv@^18.0.1
+- middleware/auth.js
+- sprint4E2EQA.test.js
 - 12. Spring Physics (Emil)
 - 14. Scroll-Driven Animations (Jhey)
 - 1. Enter & Exit Animations
@@ -158,10 +158,12 @@
 - requestWhatsAppOtp
 - triggerAutoVerify
 - switchLegalDocTab
-- midtrans-client
+- exams.js
 - morgan
-- pdfkit
-- qrcode
+- cookie-parser
+- http-errors
+- ioredis
+- nodemailer
 - tts.js
 - analyticsDashboard.test.js
 
@@ -186,13 +188,13 @@
   docs/superpowers/plans/2026-11-01-sprint3-payment-and-finance.md → controllers/paymentController.js
 - `Task 2: Arjuna (AA) - Payment Gateway, Split Fee 20/80, API Mutasi & Payout` --references--> `requestWithdrawal()`  [INFERRED]
   docs/superpowers/plans/2026-11-01-sprint3-payment-and-finance.md → controllers/paymentController.js
-- `optionalAuth()` --calls--> `authenticateJWT()`  [EXTRACTED]
-  routes/api/materials.js → middleware/auth.js
+- `downloadCertificatePdf()` --calls--> `generateCertificatePdf()`  [EXTRACTED]
+  controllers/certificateController.js → services/certificateGenerator.js
 
 ## Import Cycles
 - None detected.
 
-## Communities (151 total, 20 thin omitted)
+## Communities (153 total, 18 thin omitted)
 
 ### Community 0 - "assets.mjs"
 Cohesion: 0.07
@@ -212,7 +214,7 @@ Nodes (58): fetchAdminProfile(), showCustomAlert(), aiConversationHistory, clear
 
 ### Community 4 - "models/index.js"
 Cohesion: 0.06
-Nodes (47): path, { Sequelize }, getAdaptiveCourseRecommendations(), triggerInactivityReminders(), getAllCourses(), { Op }, PLATFORM_FEE_PERCENTAGE, TUTOR_SHARE_PERCENTAGE (+39 more)
+Nodes (41): path, { Sequelize }, getAllCourses(), { Op }, PLATFORM_FEE_PERCENTAGE, TUTOR_SHARE_PERCENTAGE, WITHDRAWAL_MIN_AMOUNT, AICareerRoadmap (+33 more)
 
 ### Community 5 - "login.ejs"
 Cohesion: 0.05
@@ -224,7 +226,7 @@ Nodes (33): btnChangeRole, btnSubmitWaPrompt, btnSwitchWaOtp, cardChooseStudent,
 
 ### Community 7 - "app.js"
 Cohesion: 0.05
-Nodes (53): app, cookieParser, cors, createError, express, helmet, logger, path (+45 more)
+Nodes (54): app, cookieParser, cors, createError, express, helmet, logger, path (+46 more)
 
 ### Community 8 - "draw.mjs"
 Cohesion: 0.05
@@ -235,8 +237,8 @@ Cohesion: 0.13
 Nodes (39): applyPrefs(), calibrateHeadNeutral(), cancel9PointCalibration(), checkAndAdjustLightingForHeadTracking(), closePanel(), draw3DFaceMeshMask(), drawFallback3DMask(), extractCleanText() (+31 more)
 
 ### Community 10 - "sprint4CertificateAiReadiness.test.js"
-Cohesion: 0.09
-Nodes (24): downloadCertificatePdf(), fs, path, ejs, CERT_STORAGE_DIR, ensureCertificatePdf(), fs, generateCertificatePdf() (+16 more)
+Cohesion: 0.08
+Nodes (25): downloadCertificatePdf(), fs, path, submitExam(), ejs, CERT_STORAGE_DIR, ensureCertificatePdf(), fs (+17 more)
 
 ### Community 11 - "course-edit.ejs"
 Cohesion: 0.07
@@ -247,12 +249,12 @@ Cohesion: 0.10
 Nodes (33): closeCourseOptionsModal(), closeCreateCourseModal(), copyReferralCode(), currentEnrolledCourseIds, enrollInCourse(), escapeHtml(), handleCreateCourseSubmit(), handleDailyCheckin() (+25 more)
 
 ### Community 13 - "landing.ejs"
-Cohesion: 0.08
-Nodes (17): coursesData, displaySocraticInsight(), drawerBackdrop, drawerCloseBtn, goalInput, handleGoalSubmit(), mainNav, mobileDrawer (+9 more)
+Cohesion: 0.09
+Nodes (16): coursesData, displaySocraticInsight(), drawerBackdrop, drawerCloseBtn, goalInput, handleGoalSubmit(), mainNav, mobileDrawer (+8 more)
 
 ### Community 14 - "package.json"
 Cohesion: 0.20
-Nodes (9): cookie-parser@~1.4.4, http-errors@~1.6.3, multer@^2.4.0, name, private, version, cookie-parser, http-errors (+1 more)
+Nodes (9): cors@^2.8.6, midtrans-client@^1.4.3, pdfkit@^0.20.2, name, private, version, cors, midtrans-client (+1 more)
 
 ### Community 15 - "HTML mode"
 Cohesion: 0.06
@@ -307,8 +309,8 @@ Cohesion: 0.19
 Nodes (20): escapeHtml(), getAuthToken(), getCurrentDeviceId(), handleAvatarFileSelect(), handleRevokeAllOtherDevices(), handleRevokeDevice(), handleTwoFactorToggle(), handleUpdateBio() (+12 more)
 
 ### Community 28 - "redisCompression.test.js"
-Cohesion: 0.16
-Nodes (14): deleteCache(), getCache(), memoryFallbackStore, Redis, setCache(), cacheMiddleware(), invalidateCacheMiddleware(), compression (+6 more)
+Cohesion: 0.20
+Nodes (12): deleteCache(), getCache(), memoryFallbackStore, Redis, setCache(), cacheMiddleware(), invalidateCacheMiddleware(), assert (+4 more)
 
 ### Community 29 - "exam.ejs"
 Cohesion: 0.17
@@ -319,12 +321,12 @@ Cohesion: 0.14
 Nodes (22): escapeHtml(), formatDate(), formatRupiah(), getChartThemeColors(), loadAdminAnalytics(), observer, populateTables(), renderAllCharts() (+14 more)
 
 ### Community 31 - "courseController.js"
-Cohesion: 0.12
-Nodes (6): getCourseReviews(), getWishlist(), { Op }, submitReview(), toggleWishlist(), runReviewsWishlistTests()
+Cohesion: 0.10
+Nodes (9): getCourseReviews(), getWishlist(), { Op }, submitReview(), toggleWishlist(), Category, { DataTypes }, assert (+1 more)
 
 ### Community 32 - "examController.js"
-Cohesion: 0.13
-Nodes (16): createOrUpdateExam(), getCourseExam(), getCourseExams(), getExamHistory(), submitExam(), createOrUpdateMilestone(), evaluateAndClaimMilestone(), getStudentDiscounts() (+8 more)
+Cohesion: 0.17
+Nodes (11): createOrUpdateExam(), getCourseExam(), getCourseExams(), getExamHistory(), createOrUpdateMilestone(), evaluateAndClaimMilestone(), getStudentDiscounts(), validateDiscountCode() (+3 more)
 
 ### Community 33 - "404.ejs"
 Cohesion: 0.11
@@ -363,8 +365,8 @@ Cohesion: 0.24
 Nodes (15): cachedTransactions, closeInvoiceModal(), escapeHtml(), formatRupiah(), getAuthToken(), initTheme(), loadTransactions(), loadUserProfile() (+7 more)
 
 ### Community 42 - "dependencies"
-Cohesion: 0.20
-Nodes (10): dependencies, ejs@~2.6.1, ioredis@^6.0.0, jsonwebtoken@^9.0.3, nodemailer@^10.0.10, sequelize@^6.37.8, sqlite3@^6.0.1, ioredis (+2 more)
+Cohesion: 0.17
+Nodes (12): dependencies, dotenv@^18.0.1, ejs@~2.6.1, jsonwebtoken@^9.0.3, multer@^2.4.0, qrcode@^1.5.4, sequelize@^6.37.8, sqlite3@^6.0.1 (+4 more)
 
 ### Community 43 - "AI-Slop Motion Patterns"
 Cohesion: 0.13
@@ -455,8 +457,8 @@ Cohesion: 0.18
 Nodes (10): 1. What the study measured, 2. The scale: few sizes, far apart, 3. Setting display type, 4. Setting text, 5. Loading the fonts properly, 6. One family or two, 7. Details that separate set type from typed text, 8. Mistakes the inspector cannot see (+2 more)
 
 ### Community 67 - "mediaStorage.test.js"
-Cohesion: 0.08
-Nodes (36): deleteMaterial(), updateMaterial(), deleteMedia(), fs, getCategorySubfolder(), getMediaInfo(), mapCategoryToContentType(), path (+28 more)
+Cohesion: 0.12
+Nodes (23): fs, getCategorySubfolder(), getMediaInfo(), mapCategoryToContentType(), path, streamMedia(), uploadMaterial(), uploadThumbnail() (+15 more)
 
 ### Community 68 - "checkout.ejs"
 Cohesion: 0.33
@@ -495,12 +497,12 @@ Cohesion: 0.31
 Nodes (8): APP_SKIP, colourFamily(), hexToHsl(), inRange(), judge(), judgeApp(), judgeLayout(), RULE_IDS
 
 ### Community 79 - "api/index.js"
-Cohesion: 0.11
-Nodes (26): authenticateJWT(), authorizeRoles(), jwt, optionalAuth(), express@~4.16.1, express, express, router (+18 more)
+Cohesion: 0.13
+Nodes (15): express@~4.16.1, express, express, router, express, router, express, router (+7 more)
 
-### Community 80 - "sprint4E2EQA.test.js"
-Cohesion: 0.12
-Nodes (14): CourseMaterial, { DataTypes }, CourseSection, { DataTypes }, html5Articles, materialsContent, assert, ejs (+6 more)
+### Community 80 - "Course"
+Cohesion: 0.11
+Nodes (16): getAdaptiveCourseRecommendations(), triggerInactivityReminders(), deleteMaterial(), updateMaterial(), deleteMedia(), Course, CourseMaterial, CourseSection (+8 more)
 
 ### Community 81 - "privacy.ejs"
 Cohesion: 0.22
@@ -582,6 +584,14 @@ Nodes (5): about, patterns, shells, styles, version
 Cohesion: 0.33
 Nodes (6): 9.1 Type, 9.2 Colour on light screens, 9.3 Colour on dark screens, 9.4 Surfaces, radius, icons, spacing, 9.5 Default tokens, 9. Type and colour
 
+### Community 102 - "compression.js"
+Cohesion: 0.40
+Nodes (4): compression, compressionMiddleware, compression@^1.8.2, compression
+
+### Community 103 - "mediaStorage.test.js"
+Cohesion: 0.27
+Nodes (9): assert, buildMultipartFormData(), fs, http, jwt, makeRequest(), path, runMediaStorageTests() (+1 more)
+
 ### Community 105 - "10. Button & Interactive Feedback (Emil)"
 Cohesion: 0.40
 Nodes (5): 10. Button & Interactive Feedback (Emil), Blur as a Bridge, Don't Animate from scale(0), Scale on Press, Tooltip Delay Pattern
@@ -606,9 +616,13 @@ Nodes (5): 4.1 Width and gutters, 4.2 One left edge, one right edge, 4.3 The tit
 Cohesion: 0.40
 Nodes (5): 6.1 Which chart for which question, 6.2 One question, one series, 6.3 Axes and gridlines, 6.4 Marks, 6. Charts
 
-### Community 111 - "media.js"
-Cohesion: 0.20
-Nodes (8): express, optionalAuth(), router, express, generalUploader, router, thumbnailUploader, materialUploader
+### Community 111 - "middleware/auth.js"
+Cohesion: 0.15
+Nodes (16): authenticateJWT(), authorizeRoles(), jwt, optionalAuth(), express, express, optionalAuth(), router (+8 more)
+
+### Community 112 - "sprint4E2EQA.test.js"
+Cohesion: 0.31
+Nodes (8): assert, ejs, fs, generateToken(), http, jwt, request(), runQATests()
 
 ### Community 113 - "12. Spring Physics (Emil)"
 Cohesion: 0.50
@@ -710,6 +724,10 @@ Nodes (5): encodeSecret(), fanOutCardsBackToPosition(), saveAccountLocally(), st
 Cohesion: 0.67
 Nodes (3): openLegalModal(), switchLegalDocTab(), updateScrollProgress()
 
+### Community 145 - "exams.js"
+Cohesion: 0.40
+Nodes (3): express, jwt, router
+
 ### Community 154 - "tts.js"
 Cohesion: 0.22
 Nodes (8): express, fetchEdgeTtsAudio(), generateLocalEdgeTts(), https, router, { spawn }, SUPPORTED_VOICES, synthesizeSpeech()
@@ -719,21 +737,21 @@ Cohesion: 0.24
 Nodes (9): assert, ejs, fs, generateToken(), http, jwt, path, request() (+1 more)
 
 ## Knowledge Gaps
-- **20 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **18 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `User` connect `app.js` to `examController.js`, `mediaStorage.test.js`, `models/index.js`, `sprint4CertificateAiReadiness.test.js`, `api/index.js`, `sprint4E2EQA.test.js`, `authController.js`, `analyticsDashboard.test.js`, `courseController.js`?**
+- **Why does `showCustomAlert()` connect `learn.ejs` to `verification.ejs`, `detail.ejs`?**
   _High betweenness centrality (0.006) - this node is a cross-community bridge._
 - **Should `assets.mjs` be split into smaller, more focused modules?**
   _Cohesion score 0.06648426812585499 - nodes in this community are weakly interconnected._
-- **Why does `sequelize` connect `models/index.js` to `examController.js`, `app.js`, `dependencies`, `package.json`, `sprint4E2EQA.test.js`, `authController.js`, `adminController.js`, `courseController.js`?**
+- **Why does `sequelize` connect `models/index.js` to `app.js`, `dependencies`, `package.json`, `Course`, `authController.js`, `adminController.js`, `courseController.js`?**
   _High betweenness centrality (0.005) - this node is a cross-community bridge._
 - **Should `verification.ejs` be split into smaller, more focused modules?**
   _Cohesion score 0.0712280701754386 - nodes in this community are weakly interconnected._
-- **Why does `express` connect `api/index.js` to `models/index.js`, `app.js`, `api/auth.js`, `package.json`, `media.js`, `adminController.js`, `tts.js`, `redisCompression.test.js`?**
-  _High betweenness centrality (0.005) - this node is a cross-community bridge._
+- **Why does `User` connect `app.js` to `examController.js`, `models/index.js`, `mediaStorage.test.js`, `sprint4CertificateAiReadiness.test.js`, `middleware/auth.js`, `Course`, `exams.js`, `sprint4E2EQA.test.js`, `authController.js`, `analyticsDashboard.test.js`, `courseController.js`?**
+  _High betweenness centrality (0.004) - this node is a cross-community bridge._
 - **Should `materials.ejs` be split into smaller, more focused modules?**
   _Cohesion score 0.05765765765765766 - nodes in this community are weakly interconnected._
 - **Should `learn.ejs` be split into smaller, more focused modules?**
