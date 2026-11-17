@@ -1206,9 +1206,9 @@
     "semantic_hash": ""
   },
   "views/admin/analytics.ejs": {
-    "mtime": 1794932457.0570548,
-    "seen": 1794932481.060208,
-    "ast_hash": "1cc258743fa1e504b8f66bd1e3c993fe",
+    "mtime": 1794933240.0477743,
+    "seen": 1794933289.132473,
+    "ast_hash": "9b3b4a2f3e98ca7b0c06d0d8c03fb0b6",
     "semantic_hash": ""
   },
   "views/tutor/analytics.ejs": {
@@ -1401,6 +1401,12 @@
     "mtime": 1794931005.5358531,
     "seen": 1794931622.641493,
     "ast_hash": "eeca2582f0217edc4ac85af347e0d4ad",
+    "semantic_hash": ""
+  },
+  "public/javascripts/highcharts.js": {
+    "mtime": 1794932605.0231788,
+    "seen": 1794933289.1324239,
+    "ast_hash": "69b37fddb33f5c27b872c1c7a42948ee",
     "semantic_hash": ""
   },
   "package-lock.json": {

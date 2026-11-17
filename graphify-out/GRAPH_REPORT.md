@@ -1,17 +1,17 @@
 # Graph Report - SkillSphare  (2026-11-17)
 
 ## Corpus Check
-- 193 files · ~613,157 words
+- 194 files · ~616,186 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 11 file(s) not represented in the graph (top: .css 8, .example 1, (none) 1)
 
 ## Summary
-- 3098 nodes · 5989 edges · 177 communities (148 shown, 29 thin omitted)
-- Extraction: 96% EXTRACTED · 4% INFERRED · 0% AMBIGUOUS · INFERRED: 258 edges (avg confidence: 0.85)
+- 3711 nodes · 7488 edges · 184 communities (157 shown, 27 thin omitted)
+- Extraction: 96% EXTRACTED · 4% INFERRED · 0% AMBIGUOUS · INFERRED: 303 edges (avg confidence: 0.85)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `3d964a8c`
+- Built from commit: `faf6b282`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -43,7 +43,7 @@
 - geminiService.js
 - Imagery
 - detail.ejs
-- profile.ejs
+- highcharts.js
 - redisCompression.test.js
 - exam.ejs
 - admin/analytics.ejs
@@ -58,11 +58,11 @@
 - onboarding.ejs
 - The study
 - transactions.ejs
-- dependencies
+- v
 - AI-Slop Motion Patterns
 - Page
 - manifest.json
-- Sprint 3: Payment Gateway, Split Revenue 20/80 & Financial System Implementation Plan
+- S
 - lint.mjs
 - showCustomConfirm
 - roadmap.ejs
@@ -94,15 +94,15 @@
 - design-motion-principles/SKILL.md
 - 2. The run for an app screen
 - Critique — judging the render
-- rules.mjs
+- iK
 - api/index.js
 - Js
 - privacy.ejs
 - terms.ejs
-- cdp.mjs
+- eY
 - Review Focus
 - mysql2
-- generateProjectDocumentationPdf.js
+- j
 - SkillSphereStar3D
 - fireLaser
 - wishlist.ejs
@@ -118,7 +118,7 @@
 - scripts
 - app.json
 - 9. Type and colour
-- compression
+- eQ
 - va
 - Star
 - 10. Button & Interactive Feedback (Emil)
@@ -127,10 +127,10 @@
 - 3. The shell
 - 4. The canvas and the page title
 - 6. Charts
-- media.js
+- N
 - s
 - 12. Spring Physics (Emil)
-- sequelize
+- app-draw.mjs
 - no
 - 3. Visual Effects
 - a
@@ -159,48 +159,53 @@
 - triggerAutoVerify
 - switchLegalDocTab
 - Eo
-- morgan
-- cookie-parser
-- http-errors
-- ioredis
+- iG
+- tK
+- eU
+- t2
 - tn
 - bn
 - ws
 - bt
 - tts.js
-- Cs
+- s
 - sprint4E2EQA.test.js
 - completeAndNextModule
 - playOrionSpeechText
-- update
+- jn
 - .notifyPlugins
 - rs
 - En
+- sD
 - u
 - generateIcons.js
-- whatsappOtp.test.js
-- Bt
-- ca
-- Hs
+- .register
+- em
+- Sections (in render order)
 - playPipelinedSegments
-- .buildOrUpdateControllers
+- tM
 - scheduleNextOrionBlink
-- midtrans-client
-- pdfkit
-- qrcode
-- sqlite3@^6.0.1
+- Terminal mode (flag-triggered fallback)
+- .constructor
+- Qs
+- 11. CSS Transitions vs Keyframes (Emil)
+- 14. Scroll-Driven Animations (Jhey)
+- 1. Enter & Exit Animations
+- 7. CSS Custom Properties & @property (Jhey)
+- 8. 3D CSS (Jhey)
+- 6. Shared Layout Animations (Jakub)
 
 ## God Nodes (most connected - your core abstractions)
-1. `Js` - 72 edges
-2. `An` - 63 edges
-3. `Ns` - 58 edges
-4. `s()` - 44 edges
-5. `no` - 36 edges
-6. `User` - 33 edges
-7. `va` - 31 edges
-8. `getOne()` - 31 edges
-9. `n()` - 31 edges
-10. `sequelize` - 30 edges
+1. `N()` - 83 edges
+2. `v()` - 75 edges
+3. `Js` - 72 edges
+4. `iD` - 69 edges
+5. `An` - 63 edges
+6. `Ns` - 58 edges
+7. `iK` - 55 edges
+8. `S()` - 49 edges
+9. `tK` - 48 edges
+10. `s()` - 44 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `Task 2: Arjuna (AA) - Payment Gateway, Split Fee 20/80, API Mutasi & Payout` --references--> `createSnapToken()`  [INFERRED]
@@ -211,13 +216,13 @@
   docs/superpowers/plans/2026-11-01-sprint3-payment-and-finance.md → controllers/paymentController.js
 - `Task 2: Arjuna (AA) - Payment Gateway, Split Fee 20/80, API Mutasi & Payout` --references--> `requestWithdrawal()`  [INFERRED]
   docs/superpowers/plans/2026-11-01-sprint3-payment-and-finance.md → controllers/paymentController.js
-- `optionalAuth()` --calls--> `authenticateJWT()`  [EXTRACTED]
-  routes/api/materials.js → middleware/auth.js
+- `downloadCertificatePdf()` --calls--> `generateCertificatePdf()`  [EXTRACTED]
+  controllers/certificateController.js → services/certificateGenerator.js
 
 ## Import Cycles
 - None detected.
 
-## Communities (177 total, 29 thin omitted)
+## Communities (184 total, 27 thin omitted)
 
 ### Community 0 - "assets.mjs"
 Cohesion: 0.07
@@ -236,8 +241,8 @@ Cohesion: 0.10
 Nodes (22): aiConversationHistory, completedMaterialIds, courseExams, escapeHtml(), flatMaterials, formatAIChatMarkdown(), handleAIChatActionClick(), handleAIChatInputSubmit() (+14 more)
 
 ### Community 4 - "models/index.js"
-Cohesion: 0.08
-Nodes (38): getAdaptiveCourseRecommendations(), triggerInactivityReminders(), { Op }, PLATFORM_FEE_PERCENTAGE, TUTOR_SHARE_PERCENTAGE, WITHDRAWAL_MIN_AMOUNT, AICareerRoadmap, { DataTypes } (+30 more)
+Cohesion: 0.06
+Nodes (45): path, { Sequelize }, getAllCourses(), { Op }, PLATFORM_FEE_PERCENTAGE, TUTOR_SHARE_PERCENTAGE, WITHDRAWAL_MIN_AMOUNT, AICareerRoadmap (+37 more)
 
 ### Community 5 - "login.ejs"
 Cohesion: 0.05
@@ -249,19 +254,19 @@ Nodes (33): btnChangeRole, btnSubmitWaPrompt, btnSwitchWaOtp, cardChooseStudent,
 
 ### Community 7 - "app.js"
 Cohesion: 0.05
-Nodes (52): app, cookieParser, cors, createError, express, helmet, logger, path (+44 more)
+Nodes (54): app, cookieParser, cors, createError, express, helmet, logger, path (+46 more)
 
 ### Community 8 - "draw.mjs"
-Cohesion: 0.05
-Nodes (63): adjustments(), argv, assetQueries(), ASSETS_PATH, briefStop(), briefWords(), deal(), dealHero() (+55 more)
+Cohesion: 0.10
+Nodes (41): adjustments(), argv, assetQueries(), ASSETS_PATH, briefStop(), briefWords(), deal(), dealHero() (+33 more)
 
 ### Community 9 - "accessibility.js"
 Cohesion: 0.13
 Nodes (39): applyPrefs(), calibrateHeadNeutral(), cancel9PointCalibration(), checkAndAdjustLightingForHeadTracking(), closePanel(), draw3DFaceMeshMask(), drawFallback3DMask(), extractCleanText() (+31 more)
 
 ### Community 10 - "sprint4CertificateAiReadiness.test.js"
-Cohesion: 0.11
-Nodes (18): downloadCertificatePdf(), fs, path, CERT_STORAGE_DIR, ensureCertificatePdf(), fs, generateCertificatePdf(), path (+10 more)
+Cohesion: 0.07
+Nodes (33): downloadCertificatePdf(), fs, path, ejs, CERT_STORAGE_DIR, ensureCertificatePdf(), fs, generateCertificatePdf() (+25 more)
 
 ### Community 11 - "course-edit.ejs"
 Cohesion: 0.07
@@ -272,28 +277,28 @@ Cohesion: 0.10
 Nodes (33): closeCourseOptionsModal(), closeCreateCourseModal(), copyReferralCode(), currentEnrolledCourseIds, enrollInCourse(), escapeHtml(), handleCreateCourseSubmit(), handleDailyCheckin() (+25 more)
 
 ### Community 13 - "landing.ejs"
-Cohesion: 0.09
-Nodes (16): coursesData, displaySocraticInsight(), drawerBackdrop, drawerCloseBtn, goalInput, handleGoalSubmit(), mainNav, mobileDrawer (+8 more)
+Cohesion: 0.07
+Nodes (36): coursesData, displaySocraticInsight(), drawerBackdrop, drawerCloseBtn, goalInput, handleGoalSubmit(), mainNav, mobileDrawer (+28 more)
 
 ### Community 14 - "package.json"
-Cohesion: 0.17
-Nodes (11): cors@^2.8.6, dotenv@^18.0.1, helmet@^8.3.0, multer@^2.4.0, name, private, version, cors (+3 more)
+Cohesion: 0.07
+Nodes (40): dependencies, bcryptjs@^3.0.3, compression@^1.8.2, cookie-parser@~1.4.4, cors@^2.8.6, debug@~2.6.9, dotenv@^18.0.1, ejs@~2.6.1 (+32 more)
 
 ### Community 15 - "HTML mode"
-Cohesion: 0.06
-Nodes (33): 01 · Lens summary, 02 · Where the timings land — duration-budget diagram, 03–05 · Per-lens sections, 06 · Combined recommendations, 07 · Lens Reference Summary, Absolute bans, Canonical references, Combined Recommendations (+25 more)
+Cohesion: 0.14
+Nodes (14): Absolute bans, Canonical references, Demo cards (the centerpiece), Design system, Dual theme, Empty-state behavior, File structure, HTML mode (+6 more)
 
 ### Community 16 - "6. Recipes"
 Cohesion: 0.06
 Nodes (31): 10. Rules for motion, 1. The budget, 2. What strong pages do with motion, 3. Four questions before any animation, 4. Tokens, 5. Scroll behaviours, ranked, 6. Recipes, 7. Signature moves (+23 more)
 
 ### Community 17 - "inspect.mjs"
-Cohesion: 0.09
-Nodes (21): allow, appMode, args, asJson, dealtFonts, fails, film, HEIGHT (+13 more)
+Cohesion: 0.07
+Nodes (29): allow, appMode, args, asJson, dealtFonts, fails, film, HEIGHT (+21 more)
 
 ### Community 18 - "whatsappService.js"
-Cohesion: 0.34
-Nodes (16): createMaterial(), applyTutor(), checkAndRemindInactiveStudents(), generateStudyEncouragement(), formatRupiah(), sendWhatsAppCourseSaleToTutor(), sendWhatsAppInactivityReminder(), sendWhatsAppMessage() (+8 more)
+Cohesion: 0.24
+Nodes (22): createMaterial(), applyTutor(), checkAndRemindInactiveStudents(), generateStudyEncouragement(), buildOtpMessage(), formatRupiah(), maskPhoneNumber(), normalizePhoneNumber() (+14 more)
 
 ### Community 19 - "charts.js"
 Cohesion: 0.21
@@ -304,20 +309,20 @@ Cohesion: 0.12
 Nodes (17): createTransporter(), nodemailer, sendOTPEmail(), bcrypt, checkOtpCooldown(), generateTokens(), jwt, login() (+9 more)
 
 ### Community 21 - "imageHelper.js"
-Cohesion: 0.12
-Nodes (18): personalize(), uploadAvatar(), uploadCertificate(), assert, fs, path, runImageHelperTests(), sharp (+10 more)
+Cohesion: 0.11
+Nodes (20): personalize(), uploadAvatar(), uploadCertificate(), sharp@^0.35.4, sharp, assert, fs, path (+12 more)
 
 ### Community 22 - "midtransService.js"
-Cohesion: 0.15
-Nodes (16): createSnapToken(), getStudentTransactions(), getTransactionStatus(), getTutorWallet(), handleNotification(), requestWithdrawal(), Task 2: Arjuna (AA) - Payment Gateway, Split Fee 20/80, API Mutasi & Payout, checkTransactionStatus() (+8 more)
+Cohesion: 0.10
+Nodes (23): createSnapToken(), getStudentTransactions(), getTransactionStatus(), getTutorWallet(), handleNotification(), requestWithdrawal(), Sprint 3: Payment Gateway, Split Revenue 20/80 & Financial System Implementation Plan, Task 1: Environment Setup & Midtrans Service Scaffolding (+15 more)
 
 ### Community 23 - "adminController.js"
 Cohesion: 0.05
 Nodes (4): bcrypt, { Op }, express, router
 
 ### Community 24 - "geminiService.js"
-Cohesion: 0.13
-Nodes (24): chatStudyAssistant(), explainMaterial(), generateCareerRoadmap(), generateMaterialNarrative(), generateQuiz(), getExamReadiness(), getMyCareerRoadmap(), assessExamReadiness() (+16 more)
+Cohesion: 0.12
+Nodes (27): chatStudyAssistant(), explainMaterial(), generateCareerRoadmap(), generateMaterialNarrative(), generateQuiz(), getAdaptiveCourseRecommendations(), getExamReadiness(), getMyCareerRoadmap() (+19 more)
 
 ### Community 25 - "Imagery"
 Cohesion: 0.09
@@ -327,13 +332,13 @@ Nodes (22): 10. Markup and credits, 11. Video, 12. Where pictures and footage go
 Cohesion: 0.12
 Nodes (19): authBtn, closePreviewModalDirect(), escapeHtml(), formatRupiah(), getAuthToken(), handleClosePreviewModal(), handleEnrollCourse(), handleOpenPreviewModal() (+11 more)
 
-### Community 27 - "profile.ejs"
-Cohesion: 0.19
-Nodes (20): escapeHtml(), getAuthToken(), getCurrentDeviceId(), handleAvatarFileSelect(), handleRevokeAllOtherDevices(), handleRevokeDevice(), handleTwoFactorToggle(), handleUpdateBio() (+12 more)
+### Community 27 - "highcharts.js"
+Cohesion: 0.04
+Nodes (63): addLabel(), addTitle(), adjustStackPosition(), adjustTickAmount(), alignToOthers(), autoLabelAlign(), buildSVG(), createGroups() (+55 more)
 
 ### Community 28 - "redisCompression.test.js"
-Cohesion: 0.16
-Nodes (14): deleteCache(), getCache(), memoryFallbackStore, Redis, setCache(), cacheMiddleware(), invalidateCacheMiddleware(), compression (+6 more)
+Cohesion: 0.14
+Nodes (16): deleteCache(), getCache(), memoryFallbackStore, Redis, setCache(), cacheMiddleware(), invalidateCacheMiddleware(), compression (+8 more)
 
 ### Community 29 - "exam.ejs"
 Cohesion: 0.17
@@ -341,15 +346,15 @@ Nodes (19): confirmSubmitExam(), doubts, escapeHtml(), initExam(), nextQuestion(
 
 ### Community 30 - "admin/analytics.ejs"
 Cohesion: 0.16
-Nodes (24): ensureChartJsReady(), escapeHtml(), formatDate(), formatRupiah(), getChartThemeColors(), loadAdminAnalytics(), observer, populateTables() (+16 more)
+Nodes (24): ensureHighchartsReady(), escapeHtml(), formatDate(), formatRupiah(), getChartThemeColors(), loadAdminAnalytics(), observer, populateTables() (+16 more)
 
 ### Community 31 - "courseController.js"
-Cohesion: 0.12
-Nodes (6): getCourseReviews(), getWishlist(), { Op }, submitReview(), toggleWishlist(), runReviewsWishlistTests()
+Cohesion: 0.10
+Nodes (9): getCourseReviews(), getWishlist(), { Op }, submitReview(), toggleWishlist(), Course, { DataTypes }, assert (+1 more)
 
 ### Community 32 - "examController.js"
-Cohesion: 0.17
-Nodes (11): createOrUpdateExam(), getCourseExam(), getCourseExams(), getExamHistory(), submitExam(), createOrUpdateMilestone(), evaluateAndClaimMilestone(), getStudentDiscounts() (+3 more)
+Cohesion: 0.10
+Nodes (17): createOrUpdateExam(), getCourseExam(), getCourseExams(), getExamHistory(), submitExam(), createOrUpdateMilestone(), evaluateAndClaimMilestone(), getStudentDiscounts() (+9 more)
 
 ### Community 33 - "404.ejs"
 Cohesion: 0.11
@@ -387,25 +392,29 @@ Nodes (15): 10. The 25 highest-scored sites and their ideas, 11. How the skill w
 Cohesion: 0.24
 Nodes (15): cachedTransactions, closeInvoiceModal(), escapeHtml(), formatRupiah(), getAuthToken(), initTheme(), loadTransactions(), loadUserProfile() (+7 more)
 
-### Community 42 - "dependencies"
-Cohesion: 0.18
-Nodes (10): dependencies, bcryptjs@^3.0.3, debug@~2.6.9, ejs@~2.6.1, jsonwebtoken@^9.0.3, nodemailer@^10.0.10, sequelize@^6.37.8, bcryptjs (+2 more)
+### Community 42 - "v"
+Cohesion: 0.04
+Nodes (20): adjustForMinRange(), createLabel(), getClosest(), getLabelPosition(), getLabelText(), hasData(), i8(), iD (+12 more)
 
 ### Community 43 - "AI-Slop Motion Patterns"
 Cohesion: 0.13
 Nodes (14): AI-Slop Motion Patterns, Anti-Checklist, Blur-everywhere entrances, Bouncy-springs-on-utility-actions, From Emil's Perspective (Purposeful Restraint), From Jakub's Perspective (Production Polish), From Jhey's Perspective (Creative Learning), General Motion Design Mistakes (+6 more)
 
+### Community 44 - "Page"
+Cohesion: 0.25
+Nodes (3): Browser, Page, sleep()
+
 ### Community 45 - "manifest.json"
 Cohesion: 0.13
 Nodes (14): background_color, categories, description, dir, display, icons, lang, name (+6 more)
 
-### Community 46 - "Sprint 3: Payment Gateway, Split Revenue 20/80 & Financial System Implementation Plan"
-Cohesion: 0.25
-Nodes (7): Sprint 3: Payment Gateway, Split Revenue 20/80 & Financial System Implementation Plan, Task 1: Environment Setup & Midtrans Service Scaffolding, Task 3: Tegar (TM) - Ratings, Reviews & Wishlist API, Task 4: Satrio (AS) - UI Dompet Tutor, Riwayat Mutasi, Penarikan Dana & Admin Finance, Task 5: Fadiyah (F) - UI Checkout Kursus, Midtrans Snap & Invoice, Task 6: Bustanul (BA) - UI Riwayat Transaksi & Wishlist Siswa, Task 7: Final Verification & PR Link Generation
+### Community 46 - "S"
+Cohesion: 0.07
+Nodes (17): b(), c(), compose(), eg, I(), i0, iJ(), ik() (+9 more)
 
 ### Community 47 - "lint.mjs"
-Cohesion: 0.14
-Nodes (13): APP_LEVEL, appMode, args, asJson, byId, EXT, files, findings (+5 more)
+Cohesion: 0.10
+Nodes (16): alive(), findChrome(), sweepProfiles(), APP_LEVEL, appMode, args, asJson, byId (+8 more)
 
 ### Community 48 - "showCustomConfirm"
 Cohesion: 0.26
@@ -425,11 +434,11 @@ Nodes (12): 10. How pages fail, 1. What strong pages do, 2. Margins and the grid
 
 ### Community 52 - "scenes.mjs"
 Cohesion: 0.21
-Nodes (10): sleep(), args, go(), only, outDir, problems, rel(), run() (+2 more)
+Nodes (9): args, go(), only, outDir, problems, rel(), run(), sheet() (+1 more)
 
 ### Community 53 - "chart.umd.min.js"
 Cohesion: 0.03
-Nodes (73): ai(), an(), ao(), at(), beforeDatasetDraw(), beforeDatasetsDraw(), beforeDraw(), beforeLayout() (+65 more)
+Nodes (84): ai(), an(), ao(), at(), be(), beforeDatasetDraw(), beforeDatasetsDraw(), beforeDraw() (+76 more)
 
 ### Community 54 - "Particle"
 Cohesion: 0.18
@@ -504,15 +513,15 @@ Cohesion: 0.20
 Nodes (9): 1. Write the argument first, 2. The two-line headline, 3. Headline shapes that work, 4. Supporting line, body, buttons, 5. Proof without inventing it, 6. Things that read as generated, 7. Micro-typography, Contents (+1 more)
 
 ### Community 73 - "Ns"
-Cohesion: 0.05
-Nodes (12): As(), Bn(), _calculateBarValuePixels(), initialize(), jn, Ls(), Ns, g() (+4 more)
+Cohesion: 0.06
+Nodes (8): As(), Cs, Ns, g(), Os, Rs(), rt(), zs()
 
 ### Community 74 - "BossSkillSphereStar3D"
 Cohesion: 0.22
 Nodes (4): BossSkillSphereStar3D, showBossAlert(), spawnBoss(), updateBossHPBar()
 
 ### Community 75 - "design-motion-principles/SKILL.md"
-Cohesion: 0.20
+Cohesion: 0.22
 Nodes (5): Accessibility, Functional vs. Decorative Motion, Implementation Checklist, Motion Sensitivity Considerations, Respect User Preferences
 
 ### Community 76 - "2. The run for an app screen"
@@ -523,29 +532,29 @@ Nodes (9): 2.1 Inventory the data and the jobs, 2.2 Name the screen's one questi
 Cohesion: 0.22
 Nodes (8): 1. How to look, 2. The score, 3. Caps, 4. Writing the critique, 5. What to fix first, 6. When to stop, Contents, Critique — judging the render
 
-### Community 78 - "rules.mjs"
-Cohesion: 0.31
-Nodes (8): APP_SKIP, colourFamily(), hexToHsl(), inRange(), judge(), judgeApp(), judgeLayout(), RULE_IDS
+### Community 78 - "iK"
+Cohesion: 0.08
+Nodes (4): iK, redraw(), tC(), to()
 
 ### Community 79 - "api/index.js"
-Cohesion: 0.11
-Nodes (26): authenticateJWT(), authorizeRoles(), jwt, optionalAuth(), express@~4.16.1, express, express, router (+18 more)
+Cohesion: 0.10
+Nodes (31): authenticateJWT(), authorizeRoles(), jwt, optionalAuth(), express, express, router, express (+23 more)
 
 ### Community 80 - "Js"
-Cohesion: 0.06
-Nodes (7): Ae(), d(), getValueForPixel(), Js, xo, Xs(), ze()
+Cohesion: 0.07
+Nodes (7): d(), inXRange(), inYRange(), Js, oo(), Xs(), Y()
 
 ### Community 81 - "privacy.ejs"
-Cohesion: 0.20
+Cohesion: 0.22
 Nodes (7): filterInput, sections, themeBtn, themeIconMoon, themeIconSun, themeText, tocLinks
 
 ### Community 82 - "terms.ejs"
 Cohesion: 0.22
 Nodes (7): filterInput, sections, themeBtn, themeIconMoon, themeIconSun, themeText, tocLinks
 
-### Community 83 - "cdp.mjs"
-Cohesion: 0.21
-Nodes (4): alive(), Browser, findChrome(), sweepProfiles()
+### Community 83 - "eY"
+Cohesion: 0.07
+Nodes (16): a(), drawCrosshair(), eY, f(), getPlotLinePath(), v(), getPosition(), hideCrosshair() (+8 more)
 
 ### Community 84 - "Review Focus"
 Cohesion: 0.22
@@ -555,16 +564,16 @@ Nodes (8): Global Constraints, Review Focus, SkillSphere AI Landing Page Impleme
 Cohesion: 0.40
 Nodes (3): mysql2@^3.24.4, mysql2, mysql
 
-### Community 86 - "generateProjectDocumentationPdf.js"
-Cohesion: 0.33
-Nodes (5): { execSync }, fs, generateHtml(), main(), path
+### Community 86 - "j"
+Cohesion: 0.08
+Nodes (18): applyRowCount(), constructor(), deleteRows(), destroy(), i4(), i6(), isPollutingKey(), j() (+10 more)
 
 ### Community 88 - "fireLaser"
 Cohesion: 0.25
 Nodes (5): fireLaser(), initAudio(), PerspectiveLaser, playLaserSound(), startShooting()
 
 ### Community 89 - "wishlist.ejs"
-Cohesion: 0.43
+Cohesion: 0.36
 Nodes (6): formatRupiah(), getAuthToken(), loadWishlistPage(), removeWishlistItem(), toggleThemeMode(), updateThemeDisplay()
 
 ### Community 90 - "tutor/verify.ejs"
@@ -584,8 +593,8 @@ Cohesion: 0.29
 Nodes (6): Common Mistakes (Jakub's Perspective), Core Philosophy: Invisible Enhancement, Jakub Krehel's Animation Principles, Jakub vs. Emil vs. Jhey, Signature Techniques (decision context — code in cookbook), When to Apply Jakub's Mindset
 
 ### Community 94 - "Motion Cookbook"
-Cohesion: 0.07
-Nodes (30): 11. CSS Transitions vs Keyframes (Emil), 13. Origin-Aware Animations (Emil), 14. Scroll-Driven Animations (Jhey), 1. Enter & Exit Animations, 4. Optical Alignment, 5. Icon & State Animations (Jakub), 6. Shared Layout Animations (Jakub), 7. CSS Custom Properties & @property (Jhey) (+22 more)
+Cohesion: 0.29
+Nodes (6): 13. Origin-Aware Animations (Emil), 4. Optical Alignment, 5. Icon & State Animations (Jakub), Contextual Icon Transitions, Geometric vs. Optical (Jakub), Motion Cookbook
 
 ### Community 95 - "2. Easing & Timing"
 Cohesion: 0.29
@@ -616,16 +625,16 @@ Cohesion: 0.33
 Nodes (6): 9.1 Type, 9.2 Colour on light screens, 9.3 Colour on dark screens, 9.4 Surfaces, radius, icons, spacing, 9.5 Default tokens, 9. Type and colour
 
 ### Community 103 - "va"
-Cohesion: 0.09
-Nodes (12): Ee(), f(), generateLabels(), Ie(), ki(), Le(), Oi(), Si() (+4 more)
+Cohesion: 0.08
+Nodes (12): f(), generateLabels(), gs(), initialize(), ki(), oa(), Oi(), Si() (+4 more)
 
 ### Community 105 - "10. Button & Interactive Feedback (Emil)"
 Cohesion: 0.40
 Nodes (5): 10. Button & Interactive Feedback (Emil), Blur as a Bridge, Don't Animate from scale(0), Scale on Press, Tooltip Delay Pattern
 
 ### Community 106 - "Zt"
-Cohesion: 0.07
-Nodes (13): ce(), de, he(), It(), kt(), mt(), Qs, qt() (+5 more)
+Cohesion: 0.11
+Nodes (8): It(), kt(), mt(), qt(), _t(), wt(), Xt(), Zt
 
 ### Community 107 - "kinds"
 Cohesion: 0.40
@@ -643,37 +652,37 @@ Nodes (5): 4.1 Width and gutters, 4.2 One left edge, one right edge, 4.3 The tit
 Cohesion: 0.40
 Nodes (5): 6.1 Which chart for which question, 6.2 One question, one series, 6.3 Axes and gridlines, 6.4 Marks, 6. Charts
 
-### Community 111 - "media.js"
-Cohesion: 0.20
-Nodes (8): express, optionalAuth(), router, express, generalUploader, router, thumbnailUploader, materialUploader
+### Community 111 - "N"
+Cohesion: 0.08
+Nodes (10): defaultLabelFormatter(), e, H(), N(), nameToX(), sm, sr, t1 (+2 more)
 
 ### Community 112 - "s"
-Cohesion: 0.07
-Nodes (18): bo, Bo(), De(), et(), H(), ii(), j(), js() (+10 more)
+Cohesion: 0.08
+Nodes (16): bo, De(), H(), ii(), j(), js(), label(), mo() (+8 more)
 
 ### Community 113 - "12. Spring Physics (Emil)"
 Cohesion: 0.50
 Nodes (4): 12. Spring Physics (Emil), Interruptibility, Key Parameters, Spring for Mouse Position
 
-### Community 114 - "sequelize"
-Cohesion: 0.08
-Nodes (20): path, { Sequelize }, getAllCourses(), { DataTypes }, { DataTypes }, { DataTypes }, { DataTypes }, { DataTypes } (+12 more)
+### Community 114 - "app-draw.mjs"
+Cohesion: 0.11
+Nodes (22): argv, deal(), dealScreen(), dealShell(), dealStyle(), fontLink(), HERE, kebab() (+14 more)
 
 ### Community 115 - "no"
 Cohesion: 0.09
-Nodes (9): buildLookupTable(), eo(), Fo(), _generate(), _getTimestampsForTable(), initOffsets(), no, nt() (+1 more)
+Nodes (11): Bo(), buildLookupTable(), eo(), et(), Fo(), _generate(), _getTimestampsForTable(), initOffsets() (+3 more)
 
 ### Community 116 - "3. Visual Effects"
 Cohesion: 0.50
 Nodes (4): 3. Visual Effects, Blur as a Signal (Jakub), Gradients & Color Spaces (Jakub), Shadows Instead of Borders (Jakub)
 
 ### Community 117 - "a"
-Cohesion: 0.10
-Nodes (12): a(), aa(), afterDatasetsUpdate(), buildTicks(), configure(), determineDataLimits(), Di(), init() (+4 more)
+Cohesion: 0.07
+Nodes (13): a(), Ae(), buildTicks(), configure(), determineDataLimits(), Di(), getValueForPixel(), init() (+5 more)
 
 ### Community 118 - "l"
-Cohesion: 0.11
-Nodes (19): _calculateBarIndexPixels(), Fn(), getLabelAndValue(), getMaxOverflow(), _getRuler(), _getStackCount(), _getStackIndex(), _getStacks() (+11 more)
+Cohesion: 0.09
+Nodes (22): addElements(), Bn(), _calculateBarIndexPixels(), _calculateBarValuePixels(), Fn(), getLabelAndValue(), getMaxOverflow(), _getRuler() (+14 more)
 
 ### Community 119 - "builder"
 Cohesion: 0.50
@@ -736,8 +745,8 @@ Cohesion: 0.39
 Nodes (6): validateChangePassword(), validateLogin(), validateProfileUpdate(), validateRegister(), express, router
 
 ### Community 141 - "n"
-Cohesion: 0.13
-Nodes (21): b(), Do(), e(), ei(), g(), gi(), _i(), je() (+13 more)
+Cohesion: 0.08
+Nodes (34): aa(), afterDatasetsUpdate(), b(), dn(), Do(), e(), ei(), fs() (+26 more)
 
 ### Community 142 - "requestWhatsAppOtp"
 Cohesion: 0.25
@@ -752,24 +761,28 @@ Cohesion: 0.67
 Nodes (3): openLegalModal(), switchLegalDocTab(), updateScrollProgress()
 
 ### Community 145 - "Eo"
-Cohesion: 0.13
+Cohesion: 0.11
 Nodes (5): Bi(), Ci(), Eo, Fi(), zi()
 
-### Community 151 - "bn"
-Cohesion: 0.15
-Nodes (4): bn, dn(), pn(), un()
+### Community 146 - "iG"
+Cohesion: 0.14
+Nodes (3): iG, init(), w()
 
 ### Community 152 - "ws"
-Cohesion: 0.14
-Nodes (11): be(), ct(), ge(), gs(), ms(), pe(), ps(), vs() (+3 more)
+Cohesion: 0.17
+Nodes (8): ct(), ge(), ms(), ps(), vs(), we(), ws, ys()
 
 ### Community 154 - "tts.js"
-Cohesion: 0.22
-Nodes (8): express, fetchEdgeTtsAudio(), generateLocalEdgeTts(), https, router, { spawn }, SUPPORTED_VOICES, synthesizeSpeech()
+Cohesion: 0.13
+Nodes (13): express, fetchEdgeTtsAudio(), generateLocalEdgeTts(), https, router, { spawn }, SUPPORTED_VOICES, synthesizeSpeech() (+5 more)
+
+### Community 155 - "s"
+Cohesion: 0.12
+Nodes (5): E(), O(), s, tB, tG()
 
 ### Community 156 - "sprint4E2EQA.test.js"
-Cohesion: 0.09
-Nodes (23): ejs, assert, ejs, fs, generateToken(), http, jwt, path (+15 more)
+Cohesion: 0.31
+Nodes (8): assert, ejs, fs, generateToken(), http, jwt, request(), runQATests()
 
 ### Community 157 - "completeAndNextModule"
 Cohesion: 0.29
@@ -779,29 +792,25 @@ Nodes (14): fetchAdminProfile(), showCustomAlert(), completeAndNextModule(), dis
 Cohesion: 0.35
 Nodes (11): detectLanguage(), dismissAuroraOverlay(), fallbackSpeechSynthesis(), getA11ySelectedVoice(), playOrionSpeechText(), playOrionWelcomeSpeech(), runSimulatedSpeechVisualizer(), startAudioVisualizerLoop() (+3 more)
 
-### Community 159 - "update"
+### Community 163 - "sD"
 Cohesion: 0.18
-Nodes (10): addElements(), es(), is(), ns(), os(), pt(), Qi(), ss() (+2 more)
+Nodes (4): getThreshold(), sD, toPixels(), toValue()
+
+### Community 164 - "u"
+Cohesion: 0.27
+Nodes (3): Mn(), u(), vn()
 
 ### Community 165 - "generateIcons.js"
-Cohesion: 0.29
-Nodes (7): sharp@^0.35.4, sharp, fs, generateAllIcons(), iconsDir, path, sharp
-
-### Community 166 - "whatsappOtp.test.js"
-Cohesion: 0.46
-Nodes (7): buildOtpMessage(), maskPhoneNumber(), normalizePhoneNumber(), assert, http, request(), runWhatsAppOtpTestSuite()
-
-### Community 167 - "Bt"
-Cohesion: 0.38
-Nodes (6): Bt(), Ft(), Gt(), jt(), vt(), zt()
-
-### Community 168 - "ca"
-Cohesion: 0.29
-Nodes (4): ca(), ha, la(), ra()
-
-### Community 169 - "Hs"
 Cohesion: 0.40
-Nodes (3): getCenterPoint(), Hs, tooltipPosition()
+Nodes (5): fs, generateAllIcons(), iconsDir, path, sharp
+
+### Community 166 - ".register"
+Cohesion: 0.32
+Nodes (4): ce(), de, he(), te()
+
+### Community 169 - "Sections (in render order)"
+Cohesion: 0.18
+Nodes (11): 01 · Lens summary, 02 · Where the timings land — duration-budget diagram, 03–05 · Per-lens sections, 06 · Combined recommendations, 07 · Lens Reference Summary, Finding rows (Critical + Important only), Footer, Global theme switch (+3 more)
 
 ### Community 170 - "playPipelinedSegments"
 Cohesion: 0.47
@@ -811,23 +820,55 @@ Nodes (6): clearAIFocusHighlight(), ensureAudioContext(), fetchAndDecodeTTS(), h
 Cohesion: 0.40
 Nodes (5): scheduleNextOrionBlink(), scheduleNextOrionGaze(), shiftOrionGaze(), startOrionLifeMotions(), triggerOrionBlink()
 
+### Community 173 - "Terminal mode (flag-triggered fallback)"
+Cohesion: 0.22
+Nodes (8): Combined Recommendations, Lens Reference Summary, Mode selection, Output Format, Overall Assessment, Per-Designer Sections, Quick Summary (show first), Terminal mode (flag-triggered fallback)
+
+### Community 175 - ".constructor"
+Cohesion: 0.40
+Nodes (5): dt(), fe(), ks(), Sn(), wn()
+
+### Community 177 - "11. CSS Transitions vs Keyframes (Emil)"
+Cohesion: 0.40
+Nodes (5): 11. CSS Transitions vs Keyframes (Emil), Damping for Natural Boundaries, Direct Style Updates for Performance, Interruptibility Problem, Momentum-Based Dismissal
+
+### Community 178 - "14. Scroll-Driven Animations (Jhey)"
+Cohesion: 0.50
+Nodes (4): 14. Scroll-Driven Animations (Jhey), Duration Control Pattern, Progressive Enhancement, The Core Problem
+
+### Community 179 - "1. Enter & Exit Animations"
+Cohesion: 0.50
+Nodes (4): 1. Enter & Exit Animations, Enter Animation Recipe (Jakub), Exit Animation Subtlety (Jakub), Fill Mode for Persistence (Jhey)
+
+### Community 180 - "7. CSS Custom Properties & @property (Jhey)"
+Cohesion: 0.50
+Nodes (4): 7. CSS Custom Properties & @property (Jhey), Decompose Complex Transforms, Scoped Variables for Dynamic Behavior (Jhey), Type Specification Unlocks Animation
+
+### Community 181 - "8. 3D CSS (Jhey)"
+Cohesion: 0.50
+Nodes (4): 8. 3D CSS (Jhey), Essential Setup, Responsive 3D, Think in Cuboids
+
+### Community 182 - "6. Shared Layout Animations (Jakub)"
+Cohesion: 0.67
+Nodes (3): 6. Shared Layout Animations (Jakub), Best Practices, FLIP Technique via layoutId
+
 ## Knowledge Gaps
-- **29 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **27 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `Ns` connect `Ns` to `n`, `a`, `l`, `chart.umd.min.js`, `update`?**
-  _High betweenness centrality (0.005) - this node is a cross-community bridge._
-- **Are the 14 inferred relationships involving `s()` (e.g. with `ho()` and `ii()`) actually correct?**
-  _`s()` has 14 INFERRED edges - model-reasoned connections that need verification._
+- **Why does `n()` connect `n` to `u`, `An`, `va`, `Ns`, `iK`, `Js`, `s`, `no`, `chart.umd.min.js`, `a`, `l`, `ws`, `highcharts.js`?**
+  _High betweenness centrality (0.068) - this node is a cross-community bridge._
+- **Are the 2 inferred relationships involving `v()` (e.g. with `.addPoint()` and `.removePoint()`) actually correct?**
+  _`v()` has 2 INFERRED edges - model-reasoned connections that need verification._
 - **Should `assets.mjs` be split into smaller, more focused modules?**
   _Cohesion score 0.06648426812585499 - nodes in this community are weakly interconnected._
-- **Why does `Zt` connect `Zt` to `chart.umd.min.js`, `Bt`?**
-  _High betweenness centrality (0.004) - this node is a cross-community bridge._
+- **Why does `iD` connect `v` to `iK`, `S`, `N`, `j`, `highcharts.js`?**
+  _High betweenness centrality (0.011) - this node is a cross-community bridge._
 - **Should `verification.ejs` be split into smaller, more focused modules?**
   _Cohesion score 0.0712280701754386 - nodes in this community are weakly interconnected._
-- **Why does `no` connect `no` to `ca`, `Hs`, `n`, `Js`, `Eo`, `a`, `chart.umd.min.js`, `l`?**
-  _High betweenness centrality (0.004) - this node is a cross-community bridge._
+- **Why does `tK` connect `tK` to `.attr`, `v`, `.getBBox`, `N`, `S`, `eY`, `.onAdd`, `highcharts.js`?**
+  _High betweenness centrality (0.010) - this node is a cross-community bridge._
 - **Should `materials.ejs` be split into smaller, more focused modules?**
   _Cohesion score 0.05765765765765766 - nodes in this community are weakly interconnected._

@@ -26,11 +26,11 @@
   <link rel="stylesheet" href="/stylesheets/accessibility.css">
   <link rel="stylesheet" href="/stylesheets/layout-modular.css?v=2.3">
   
-  <!-- Chart.js for High-Precision Analytical Visualizations (Local Bundle + CDN Fallback) -->
-  <script src="/javascripts/chart.umd.min.js"></script>
+  <!-- Highcharts for SVG-Based Analytical Visualizations (Local Bundle + CDN Fallback) -->
+  <script src="/javascripts/highcharts.js"></script>
   <script>
-    if (typeof Chart === 'undefined') {
-      document.write('<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"><\/script>');
+    if (typeof Highcharts === 'undefined') {
+      document.write('<script src="https://code.highcharts.com/highcharts.js"><\/script>');
     }
   </script>
 
@@ -620,7 +620,7 @@
             </div>
           </div>
           <div class="chart-canvas-container">
-            <canvas id="chartOverviewTrends"></canvas>
+            <div id="chartOverviewTrends" style="width: 100%; height: 100%;"></div>
           </div>
         </div>
 
@@ -726,7 +726,7 @@
               </div>
             </div>
             <div class="chart-canvas-container">
-              <canvas id="chartUserGrowth"></canvas>
+              <div id="chartUserGrowth" style="width: 100%; height: 100%;"></div>
             </div>
           </div>
 
@@ -738,7 +738,7 @@
               </div>
             </div>
             <div class="chart-canvas-container donut-container">
-              <canvas id="chartRoleDistribution"></canvas>
+              <div id="chartRoleDistribution" style="width: 100%; height: 100%;"></div>
             </div>
           </div>
         </div>
@@ -827,7 +827,7 @@
               </div>
             </div>
             <div class="chart-canvas-container">
-              <canvas id="chartCourseGrowth"></canvas>
+              <div id="chartCourseGrowth" style="width: 100%; height: 100%;"></div>
             </div>
           </div>
 
@@ -839,7 +839,7 @@
               </div>
             </div>
             <div class="chart-canvas-container donut-container">
-              <canvas id="chartCategoryDistribution"></canvas>
+              <div id="chartCategoryDistribution" style="width: 100%; height: 100%;"></div>
             </div>
           </div>
         </div>
@@ -853,7 +853,7 @@
             </div>
           </div>
           <div class="chart-canvas-container" style="height: 240px;">
-            <canvas id="chartMaterialTypes"></canvas>
+            <div id="chartMaterialTypes" style="width: 100%; height: 100%;"></div>
           </div>
         </div>
 
@@ -941,7 +941,7 @@
             </div>
           </div>
           <div class="chart-canvas-container">
-            <canvas id="chartRevenueSplit"></canvas>
+            <div id="chartRevenueSplit" style="width: 100%; height: 100%;"></div>
           </div>
         </div>
 
@@ -955,7 +955,7 @@
               </div>
             </div>
             <div class="chart-canvas-container donut-container">
-              <canvas id="chartPaymentMethods"></canvas>
+              <div id="chartPaymentMethods" style="width: 100%; height: 100%;"></div>
             </div>
           </div>
 
@@ -1069,7 +1069,7 @@
               </div>
             </div>
             <div class="chart-canvas-container donut-container">
-              <canvas id="chartExamStats"></canvas>
+              <div id="chartExamStats" style="width: 100%; height: 100%;"></div>
             </div>
           </div>
 
@@ -1118,7 +1118,7 @@
   </div>
 </div>
 
-  <!-- Client-side Logic: Chart.js Initialization, Data Binding, & Search Filters -->
+  <!-- Client-side Logic: Highcharts Initialization, Data Binding, & Search Filters -->
   <script>
     // State Store
     let analyticsPayload = null;
@@ -1171,10 +1171,15 @@
         pane.classList.toggle('active', pane.id === `tab-pane-${tabId}`);
       });
 
-      // Render charts for the newly activated tab (ensures non-zero canvas dimensions)
+      // Reflow and render Highcharts SVG for the newly activated tab
       setTimeout(() => {
+        if (window.Highcharts && Highcharts.charts) {
+          Highcharts.charts.forEach(c => {
+            if (c && c.reflow) c.reflow();
+          });
+        }
         if (!analyticsPayload) return;
-        ensureChartJsReady(() => {
+        ensureHighchartsReady(() => {
           if (tabId === 'overview') {
             renderOverviewChart();
           } else if (tabId === 'users') {
@@ -1194,20 +1199,20 @@
       }, 50);
     }
 
-    // Resilient Chart.js loader check
-    function ensureChartJsReady(callback, retries = 30) {
-      if (typeof Chart !== 'undefined') {
+    // Resilient Highcharts loader check
+    function ensureHighchartsReady(callback, retries = 30) {
+      if (typeof Highcharts !== 'undefined') {
         callback();
       } else if (retries > 0) {
-        setTimeout(() => ensureChartJsReady(callback, retries - 1), 100);
+        setTimeout(() => ensureHighchartsReady(callback, retries - 1), 100);
       } else {
-        console.error('Chart.js gagal dimuat setelah beberapa percobaan.');
+        console.error('Highcharts gagal dimuat setelah beberapa percobaan.');
         document.querySelectorAll('.chart-canvas-container').forEach(c => {
           if (!c.querySelector('.chart-fallback-msg')) {
             const msg = document.createElement('div');
             msg.className = 'chart-fallback-msg';
             msg.style.cssText = 'display:flex;align-items:center;justify-content:center;height:100%;color:var(--text-tertiary);font-size:0.9rem;gap:8px;';
-            msg.innerHTML = '<i class="fas fa-triangle-exclamation"></i> Gagal memuat library grafik. Silakan refresh halaman.';
+            msg.innerHTML = '<i class="fas fa-triangle-exclamation"></i> Gagal memuat library grafik Highcharts. Silakan refresh halaman.';
             c.appendChild(msg);
           }
         });
@@ -1222,6 +1227,7 @@
         textMuted: isDark ? '#A3A29E' : '#6B6963',
         gridColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.06)',
         surfaceColor: isDark ? '#1F1E1B' : '#FFFFFF',
+        borderSubtle: isDark ? '#2A2926' : '#E5E4DE',
         accent1: isDark ? '#FAF9F5' : '#1F1E1B',
         accentGreen: isDark ? '#75F39F' : '#0A6C35',
         accentYellow: isDark ? '#FCD34D' : '#92400E',
@@ -1230,101 +1236,103 @@
       };
     }
 
-    // Render Overview Chart
+    // Render Overview Chart (Highcharts Mixed Column + Spline)
     function renderOverviewChart() {
-      if (typeof Chart === 'undefined') return;
+      if (typeof Highcharts === 'undefined') return;
       if (!analyticsPayload || !analyticsPayload.charts) return;
-      const canvas = document.getElementById('chartOverviewTrends');
-      if (!canvas) return;
-      const ctx = canvas.getContext('2d');
-      if (!ctx) return;
+      const container = document.getElementById('chartOverviewTrends');
+      if (!container) return;
 
       const colors = getChartThemeColors();
       const revData = analyticsPayload.charts.revenue_growth[overviewScale];
       const userData = analyticsPayload.charts.user_growth[overviewScale];
       if (!revData || !userData) return;
 
-      if (chartOverviewInstance) chartOverviewInstance.destroy();
+      if (chartOverviewInstance && chartOverviewInstance.destroy) {
+        chartOverviewInstance.destroy();
+      }
 
-      chartOverviewInstance = new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels: revData.labels,
-          datasets: [
-            {
-              type: 'line',
-              label: 'Pertumbuhan Pengguna Baru',
-              data: userData.total,
-              borderColor: colors.accentYellow,
-              backgroundColor: colors.accentYellow,
-              borderWidth: 2.5,
-              tension: 0.35,
-              pointRadius: 4,
-              yAxisID: 'yUsers',
-            },
-            {
-              type: 'bar',
-              label: 'Omzet GMV (Rp)',
-              data: revData.gmv,
-              backgroundColor: colors.accent1,
-              borderRadius: 6,
-              yAxisID: 'yRevenue',
-            }
-          ]
+      chartOverviewInstance = Highcharts.chart('chartOverviewTrends', {
+        chart: {
+          backgroundColor: 'transparent',
+          style: { fontFamily: "'Plus Jakarta Sans', sans-serif" }
         },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          interaction: { mode: 'index', intersect: false },
-          plugins: {
-            legend: {
-              labels: { color: colors.textColor, font: { family: 'Plus Jakarta Sans', size: 12 } }
-            },
-            tooltip: {
-              callbacks: {
-                label: function(context) {
-                  if (context.dataset.yAxisID === 'yRevenue') {
-                    return ` Omzet GMV: ${formatRupiah(context.raw)}`;
-                  }
-                  return ` Pengguna Baru: ${context.raw} akun`;
-                }
+        title: { text: null },
+        credits: { enabled: false },
+        xAxis: {
+          categories: revData.labels,
+          labels: {
+            style: { color: colors.textMuted, fontSize: '11px', fontFamily: "'Plus Jakarta Sans', sans-serif" }
+          },
+          lineColor: colors.gridColor,
+          tickColor: colors.gridColor
+        },
+        yAxis: [
+          {
+            title: { text: null },
+            gridLineColor: colors.gridColor,
+            labels: {
+              style: { color: colors.textMuted, fontFamily: "'JetBrains Mono', monospace", fontSize: '10px' },
+              formatter: function() {
+                const n = Number(this.value) || 0;
+                if (n >= 1000000) return 'Rp ' + (n / 1000000).toLocaleString('id-ID') + ' Jt';
+                if (n >= 1000) return 'Rp ' + (n / 1000).toLocaleString('id-ID') + ' Rb';
+                return 'Rp ' + n;
               }
             }
           },
-          scales: {
-            x: {
-              ticks: { color: colors.textMuted, font: { family: 'Plus Jakarta Sans', size: 11 } },
-              grid: { color: colors.gridColor }
-            },
-            yRevenue: {
-              type: 'linear',
-              axis: 'y',
-              position: 'left',
-              ticks: {
-                color: colors.textMuted,
-                font: { family: 'JetBrains Mono', size: 10 },
-                callback: function(val) {
-                  const n = Number(val) || 0;
-                  if (n >= 1000000) return 'Rp ' + (n / 1000000).toLocaleString('id-ID') + ' Jt';
-                  if (n >= 1000) return 'Rp ' + (n / 1000).toLocaleString('id-ID') + ' Rb';
-                  return 'Rp ' + n;
-                }
-              },
-              grid: { color: colors.gridColor }
-            },
-            yUsers: {
-              type: 'linear',
-              axis: 'y',
-              position: 'right',
-              ticks: {
-                color: colors.textMuted,
-                font: { family: 'Plus Jakarta Sans', size: 10 },
-                precision: 0
-              },
-              grid: { drawOnChartArea: false }
+          {
+            title: { text: null },
+            opposite: true,
+            gridLineWidth: 0,
+            labels: {
+              style: { color: colors.textMuted, fontSize: '10px' },
+              format: '{value}'
             }
           }
-        }
+        ],
+        legend: {
+          itemStyle: { color: colors.textColor, fontSize: '12px', fontWeight: '500' },
+          itemHoverStyle: { color: colors.accent1 }
+        },
+        tooltip: {
+          shared: true,
+          backgroundColor: colors.surfaceColor,
+          borderColor: colors.borderSubtle,
+          borderRadius: 8,
+          shadow: true,
+          style: { color: colors.textColor, fontSize: '12px' },
+          formatter: function() {
+            let s = `<b>${this.x}</b><br/>`;
+            this.points.forEach(p => {
+              if (p.series.name.includes('Omzet')) {
+                s += `<span style="color:${p.color}">\u25CF</span> ${p.series.name}: <b>${formatRupiah(p.y)}</b><br/>`;
+              } else {
+                s += `<span style="color:${p.color}">\u25CF</span> ${p.series.name}: <b>${p.y} akun</b><br/>`;
+              }
+            });
+            return s;
+          }
+        },
+        series: [
+          {
+            name: 'Omzet GMV (Rp)',
+            type: 'column',
+            yAxis: 0,
+            data: revData.gmv,
+            color: colors.accent1,
+            borderRadius: 4
+          },
+          {
+            name: 'Pertumbuhan Pengguna Baru',
+            type: 'spline',
+            yAxis: 1,
+            data: userData.total,
+            color: colors.accentYellow,
+            lineWidth: 2.5,
+            marker: { radius: 4 }
+          }
+        ]
       });
     }
 
@@ -1335,51 +1343,67 @@
       renderOverviewChart();
     }
 
-    // Render User Growth Chart
+    // Render User Growth Chart (Highcharts Column)
     function renderUserGrowthChart() {
-      if (typeof Chart === 'undefined') return;
+      if (typeof Highcharts === 'undefined') return;
       if (!analyticsPayload || !analyticsPayload.charts) return;
-      const canvas = document.getElementById('chartUserGrowth');
-      if (!canvas) return;
-      const ctx = canvas.getContext('2d');
-      if (!ctx) return;
+      const container = document.getElementById('chartUserGrowth');
+      if (!container) return;
 
       const colors = getChartThemeColors();
       const uData = analyticsPayload.charts.user_growth[userScale];
       if (!uData) return;
 
-      if (chartUserGrowthInstance) chartUserGrowthInstance.destroy();
+      if (chartUserGrowthInstance && chartUserGrowthInstance.destroy) {
+        chartUserGrowthInstance.destroy();
+      }
 
-      chartUserGrowthInstance = new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels: uData.labels,
-          datasets: [
-            {
-              label: 'Siswa Baru',
-              data: uData.students,
-              backgroundColor: colors.accent1,
-              borderRadius: 4,
-            },
-            {
-              label: 'Pengajar Baru (Tutor)',
-              data: uData.tutors,
-              backgroundColor: colors.accentBlue,
-              borderRadius: 4,
-            }
-          ]
+      chartUserGrowthInstance = Highcharts.chart('chartUserGrowth', {
+        chart: {
+          type: 'column',
+          backgroundColor: 'transparent',
+          style: { fontFamily: "'Plus Jakarta Sans', sans-serif" }
         },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { labels: { color: colors.textColor, font: { family: 'Plus Jakarta Sans', size: 12 } } },
+        title: { text: null },
+        credits: { enabled: false },
+        xAxis: {
+          categories: uData.labels,
+          labels: { style: { color: colors.textMuted, fontSize: '11px' } },
+          lineColor: colors.gridColor,
+          tickColor: colors.gridColor
+        },
+        yAxis: {
+          title: { text: null },
+          gridLineColor: colors.gridColor,
+          allowDecimals: false,
+          labels: { style: { color: colors.textMuted, fontSize: '10px' } }
+        },
+        legend: {
+          itemStyle: { color: colors.textColor, fontSize: '12px', fontWeight: '500' },
+          itemHoverStyle: { color: colors.accent1 }
+        },
+        tooltip: {
+          backgroundColor: colors.surfaceColor,
+          borderColor: colors.borderSubtle,
+          borderRadius: 8,
+          shadow: true,
+          style: { color: colors.textColor, fontSize: '12px' },
+          pointFormat: '<span style="color:{point.color}">\u25CF</span> {series.name}: <b>{point.y} akun</b><br/>'
+        },
+        series: [
+          {
+            name: 'Siswa Baru',
+            data: uData.students,
+            color: colors.accent1,
+            borderRadius: 4
           },
-          scales: {
-            x: { ticks: { color: colors.textMuted }, grid: { color: colors.gridColor } },
-            y: { ticks: { color: colors.textMuted, precision: 0 }, grid: { color: colors.gridColor } }
+          {
+            name: 'Pengajar Baru (Tutor)',
+            data: uData.tutors,
+            color: colors.accentBlue,
+            borderRadius: 4
           }
-        }
+        ]
       });
     }
 
@@ -1390,83 +1414,133 @@
       renderUserGrowthChart();
     }
 
-    // Render Role Distribution Chart
+    // Render Role Distribution Chart (Highcharts Donut)
     function renderRoleDistributionChart() {
-      if (typeof Chart === 'undefined') return;
+      if (typeof Highcharts === 'undefined') return;
       if (!analyticsPayload || !analyticsPayload.charts) return;
-      const canvas = document.getElementById('chartRoleDistribution');
-      if (!canvas) return;
-      const ctx = canvas.getContext('2d');
-      if (!ctx) return;
+      const container = document.getElementById('chartRoleDistribution');
+      if (!container) return;
 
       const colors = getChartThemeColors();
       const roleData = analyticsPayload.charts.role_distribution;
       if (!roleData) return;
 
-      if (chartRoleDistInstance) chartRoleDistInstance.destroy();
+      if (chartRoleDistInstance && chartRoleDistInstance.destroy) {
+        chartRoleDistInstance.destroy();
+      }
 
-      chartRoleDistInstance = new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-          labels: roleData.labels,
-          datasets: [{
-            data: roleData.counts,
-            backgroundColor: [colors.accent1, colors.accentBlue, colors.accentYellow],
+      const roleColors = [colors.accent1, colors.accentBlue, colors.accentYellow];
+      const dataPoints = roleData.labels.map((lbl, idx) => ({
+        name: lbl,
+        y: roleData.counts[idx] || 0,
+        color: roleColors[idx % roleColors.length]
+      }));
+
+      chartRoleDistInstance = Highcharts.chart('chartRoleDistribution', {
+        chart: {
+          type: 'pie',
+          backgroundColor: 'transparent',
+          style: { fontFamily: "'Plus Jakarta Sans', sans-serif" }
+        },
+        title: { text: null },
+        credits: { enabled: false },
+        tooltip: {
+          backgroundColor: colors.surfaceColor,
+          borderColor: colors.borderSubtle,
+          borderRadius: 8,
+          shadow: true,
+          style: { color: colors.textColor, fontSize: '12px' },
+          pointFormat: '<span style="color:{point.color}">\u25CF</span> {point.name}: <b>{point.y} akun ({point.percentage:.1f}%)</b>'
+        },
+        plotOptions: {
+          pie: {
+            innerSize: '60%',
             borderWidth: 2,
             borderColor: colors.surfaceColor,
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { position: 'bottom', labels: { color: colors.textColor, font: { size: 11 } } }
+            showInLegend: true,
+            dataLabels: { enabled: false }
           }
-        }
+        },
+        legend: {
+          align: 'center',
+          verticalAlign: 'bottom',
+          layout: 'horizontal',
+          itemStyle: { color: colors.textColor, fontSize: '11px', fontWeight: '500' },
+          itemHoverStyle: { color: colors.accent1 }
+        },
+        series: [{
+          name: 'Peran Akun',
+          colorByPoint: true,
+          data: dataPoints
+        }]
       });
     }
 
-    // Render Course Growth Chart
+    // Render Course Growth Chart (Highcharts Areaspline)
     function renderCourseGrowthChart() {
-      if (typeof Chart === 'undefined') return;
+      if (typeof Highcharts === 'undefined') return;
       if (!analyticsPayload || !analyticsPayload.charts) return;
-      const canvas = document.getElementById('chartCourseGrowth');
-      if (!canvas) return;
-      const ctx = canvas.getContext('2d');
-      if (!ctx) return;
+      const container = document.getElementById('chartCourseGrowth');
+      if (!container) return;
 
       const colors = getChartThemeColors();
       const cData = analyticsPayload.charts.course_growth[courseScale];
       if (!cData) return;
 
-      if (chartCourseGrowthInstance) chartCourseGrowthInstance.destroy();
+      if (chartCourseGrowthInstance && chartCourseGrowthInstance.destroy) {
+        chartCourseGrowthInstance.destroy();
+      }
 
-      chartCourseGrowthInstance = new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: cData.labels,
-          datasets: [{
-            label: 'Kursus Diterbitkan',
-            data: cData.courses,
-            borderColor: colors.accentGreen,
-            backgroundColor: 'rgba(10, 108, 53, 0.1)',
-            fill: true,
-            tension: 0.35,
-            borderWidth: 2.5,
-            pointRadius: 4,
-          }]
+      chartCourseGrowthInstance = Highcharts.chart('chartCourseGrowth', {
+        chart: {
+          type: 'areaspline',
+          backgroundColor: 'transparent',
+          style: { fontFamily: "'Plus Jakarta Sans', sans-serif" }
         },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { labels: { color: colors.textColor } }
-          },
-          scales: {
-            x: { ticks: { color: colors.textMuted }, grid: { color: colors.gridColor } },
-            y: { ticks: { color: colors.textMuted, precision: 0 }, grid: { color: colors.gridColor } }
+        title: { text: null },
+        credits: { enabled: false },
+        xAxis: {
+          categories: cData.labels,
+          labels: { style: { color: colors.textMuted, fontSize: '11px' } },
+          lineColor: colors.gridColor,
+          tickColor: colors.gridColor
+        },
+        yAxis: {
+          title: { text: null },
+          gridLineColor: colors.gridColor,
+          allowDecimals: false,
+          labels: { style: { color: colors.textMuted, fontSize: '10px' } }
+        },
+        legend: {
+          itemStyle: { color: colors.textColor, fontSize: '12px', fontWeight: '500' },
+          itemHoverStyle: { color: colors.accent1 }
+        },
+        tooltip: {
+          backgroundColor: colors.surfaceColor,
+          borderColor: colors.borderSubtle,
+          borderRadius: 8,
+          shadow: true,
+          style: { color: colors.textColor, fontSize: '12px' },
+          pointFormat: '<span style="color:{point.color}">\u25CF</span> {series.name}: <b>{point.y} kursus</b><br/>'
+        },
+        plotOptions: {
+          areaspline: {
+            fillColor: {
+              linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
+              stops: [
+                [0, 'rgba(10, 108, 53, 0.25)'],
+                [1, 'rgba(10, 108, 53, 0.0)']
+              ]
+            },
+            lineWidth: 2.5,
+            marker: { radius: 4 }
           }
-        }
+        },
+        series: [{
+          name: 'Kursus Diterbitkan',
+          data: cData.courses,
+          color: colors.accentGreen
+        }]
       });
     }
 
@@ -1477,156 +1551,220 @@
       renderCourseGrowthChart();
     }
 
-    // Render Category Distribution Chart
+    // Render Category Distribution Chart (Highcharts Donut)
     function renderCategoryDistributionChart() {
-      if (typeof Chart === 'undefined') return;
+      if (typeof Highcharts === 'undefined') return;
       if (!analyticsPayload || !analyticsPayload.charts) return;
-      const canvas = document.getElementById('chartCategoryDistribution');
-      if (!canvas) return;
-      const ctx = canvas.getContext('2d');
-      if (!ctx) return;
+      const container = document.getElementById('chartCategoryDistribution');
+      if (!container) return;
 
       const colors = getChartThemeColors();
       const catData = analyticsPayload.charts.category_distribution;
       if (!catData) return;
 
-      if (chartCatDistInstance) chartCatDistInstance.destroy();
+      if (chartCatDistInstance && chartCatDistInstance.destroy) {
+        chartCatDistInstance.destroy();
+      }
 
-      chartCatDistInstance = new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-          labels: catData.labels,
-          datasets: [{
-            data: catData.counts,
-            backgroundColor: [
-              '#1F1E1B', '#2563EB', '#0A6C35', '#D97706',
-              '#7C3AED', '#0891B2', '#DC2626', '#4B5563'
-            ],
+      const isDark = document.documentElement.classList.contains('dark') || 
+                     document.documentElement.getAttribute('data-theme') === 'dark';
+      const categoryPalette = [
+        isDark ? '#FAF9F5' : '#1F1E1B',
+        '#2563EB', '#0A6C35', '#D97706',
+        '#7C3AED', '#0891B2', '#DC2626', '#4B5563'
+      ];
+
+      const dataPoints = catData.labels.map((lbl, idx) => ({
+        name: lbl,
+        y: catData.counts[idx] || 0,
+        color: categoryPalette[idx % categoryPalette.length]
+      }));
+
+      chartCatDistInstance = Highcharts.chart('chartCategoryDistribution', {
+        chart: {
+          type: 'pie',
+          backgroundColor: 'transparent',
+          style: { fontFamily: "'Plus Jakarta Sans', sans-serif" }
+        },
+        title: { text: null },
+        credits: { enabled: false },
+        tooltip: {
+          backgroundColor: colors.surfaceColor,
+          borderColor: colors.borderSubtle,
+          borderRadius: 8,
+          shadow: true,
+          style: { color: colors.textColor, fontSize: '12px' },
+          pointFormat: '<span style="color:{point.color}">\u25CF</span> {point.name}: <b>{point.y} kursus ({point.percentage:.1f}%)</b>'
+        },
+        plotOptions: {
+          pie: {
+            innerSize: '60%',
             borderWidth: 2,
             borderColor: colors.surfaceColor,
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { position: 'bottom', labels: { color: colors.textColor, font: { size: 10 } } }
+            showInLegend: true,
+            dataLabels: { enabled: false }
           }
-        }
+        },
+        legend: {
+          align: 'center',
+          verticalAlign: 'bottom',
+          layout: 'horizontal',
+          itemStyle: { color: colors.textColor, fontSize: '10px', fontWeight: '500' },
+          itemHoverStyle: { color: colors.accent1 }
+        },
+        series: [{
+          name: 'Kategori Kursus',
+          colorByPoint: true,
+          data: dataPoints
+        }]
       });
     }
 
-    // Render Material Types Chart
+    // Render Material Types Chart (Highcharts Column)
     function renderMaterialTypesChart() {
-      if (typeof Chart === 'undefined') return;
+      if (typeof Highcharts === 'undefined') return;
       if (!analyticsPayload || !analyticsPayload.charts) return;
-      const canvas = document.getElementById('chartMaterialTypes');
-      if (!canvas) return;
-      const ctx = canvas.getContext('2d');
-      if (!ctx) return;
+      const container = document.getElementById('chartMaterialTypes');
+      if (!container) return;
 
       const colors = getChartThemeColors();
       const mData = analyticsPayload.charts.material_types;
       if (!mData) return;
 
-      if (chartMaterialTypesInstance) chartMaterialTypesInstance.destroy();
+      if (chartMaterialTypesInstance && chartMaterialTypesInstance.destroy) {
+        chartMaterialTypesInstance.destroy();
+      }
 
-      chartMaterialTypesInstance = new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels: mData.labels,
-          datasets: [{
-            label: 'Jumlah Unit Materi',
-            data: mData.counts,
-            backgroundColor: [
-              colors.accent1,
-              colors.accentBlue,
-              colors.accentYellow,
-              colors.accentGreen,
-              colors.accentPurple
-            ],
-            borderRadius: 6
-          }]
+      const matColors = [
+        colors.accent1,
+        colors.accentBlue,
+        colors.accentYellow,
+        colors.accentGreen,
+        colors.accentPurple
+      ];
+
+      const dataPoints = mData.labels.map((lbl, idx) => ({
+        name: lbl,
+        y: mData.counts[idx] || 0,
+        color: matColors[idx % matColors.length]
+      }));
+
+      chartMaterialTypesInstance = Highcharts.chart('chartMaterialTypes', {
+        chart: {
+          type: 'column',
+          backgroundColor: 'transparent',
+          style: { fontFamily: "'Plus Jakarta Sans', sans-serif" }
         },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { display: false }
-          },
-          scales: {
-            x: { ticks: { color: colors.textMuted }, grid: { color: colors.gridColor } },
-            y: { ticks: { color: colors.textMuted, precision: 0 }, grid: { color: colors.gridColor } }
+        title: { text: null },
+        credits: { enabled: false },
+        xAxis: {
+          categories: mData.labels,
+          labels: { style: { color: colors.textMuted, fontSize: '11px' } },
+          lineColor: colors.gridColor,
+          tickColor: colors.gridColor
+        },
+        yAxis: {
+          title: { text: null },
+          gridLineColor: colors.gridColor,
+          allowDecimals: false,
+          labels: { style: { color: colors.textMuted, fontSize: '10px' } }
+        },
+        legend: { enabled: false },
+        tooltip: {
+          backgroundColor: colors.surfaceColor,
+          borderColor: colors.borderSubtle,
+          borderRadius: 8,
+          shadow: true,
+          style: { color: colors.textColor, fontSize: '12px' },
+          pointFormat: '<span style="color:{point.color}">\u25CF</span> {point.name}: <b>{point.y} unit materi</b><br/>'
+        },
+        plotOptions: {
+          column: {
+            borderRadius: 4
           }
-        }
+        },
+        series: [{
+          name: 'Unit Materi',
+          colorByPoint: true,
+          data: dataPoints
+        }]
       });
     }
 
-    // Render Revenue Split Chart (20% Platform vs 80% Tutor)
+    // Render Revenue Split Chart (20% Platform vs 80% Tutor - Highcharts Stacked Column)
     function renderRevenueSplitChart() {
-      if (typeof Chart === 'undefined') return;
+      if (typeof Highcharts === 'undefined') return;
       if (!analyticsPayload || !analyticsPayload.charts) return;
-      const canvas = document.getElementById('chartRevenueSplit');
-      if (!canvas) return;
-      const ctx = canvas.getContext('2d');
-      if (!ctx) return;
+      const container = document.getElementById('chartRevenueSplit');
+      if (!container) return;
 
       const colors = getChartThemeColors();
       const rData = analyticsPayload.charts.revenue_growth[revenueScale];
       if (!rData) return;
 
-      if (chartRevenueSplitInstance) chartRevenueSplitInstance.destroy();
+      if (chartRevenueSplitInstance && chartRevenueSplitInstance.destroy) {
+        chartRevenueSplitInstance.destroy();
+      }
 
-      chartRevenueSplitInstance = new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels: rData.labels,
-          datasets: [
-            {
-              label: 'Biaya Platform (20%)',
-              data: rData.platform_fee,
-              backgroundColor: colors.accent1,
-              borderRadius: 4,
-              stack: 'revenue'
-            },
-            {
-              label: 'Hak Tutor Terkredit (80%)',
-              data: rData.tutor_share,
-              backgroundColor: colors.accentGreen,
-              borderRadius: 4,
-              stack: 'revenue'
-            }
-          ]
+      chartRevenueSplitInstance = Highcharts.chart('chartRevenueSplit', {
+        chart: {
+          type: 'column',
+          backgroundColor: 'transparent',
+          style: { fontFamily: "'Plus Jakarta Sans', sans-serif" }
         },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { labels: { color: colors.textColor } },
-            tooltip: {
-              callbacks: {
-                label: function(context) {
-                  return ` ${context.dataset.label}: ${formatRupiah(context.raw)}`;
-                }
-              }
-            }
-          },
-          scales: {
-            x: { ticks: { color: colors.textMuted }, grid: { color: colors.gridColor } },
-            y: {
-              ticks: {
-                color: colors.textMuted,
-                callback: function(val) {
-                  const n = Number(val) || 0;
-                  if (n >= 1000000) return 'Rp ' + (n / 1000000).toLocaleString('id-ID') + ' Jt';
-                  if (n >= 1000) return 'Rp ' + (n / 1000).toLocaleString('id-ID') + ' Rb';
-                  return 'Rp ' + n;
-                }
-              },
-              grid: { color: colors.gridColor }
+        title: { text: null },
+        credits: { enabled: false },
+        xAxis: {
+          categories: rData.labels,
+          labels: { style: { color: colors.textMuted, fontSize: '11px' } },
+          lineColor: colors.gridColor,
+          tickColor: colors.gridColor
+        },
+        yAxis: {
+          title: { text: null },
+          gridLineColor: colors.gridColor,
+          labels: {
+            style: { color: colors.textMuted, fontFamily: "'JetBrains Mono', monospace", fontSize: '10px' },
+            formatter: function() {
+              const n = Number(this.value) || 0;
+              if (n >= 1000000) return 'Rp ' + (n / 1000000).toLocaleString('id-ID') + ' Jt';
+              if (n >= 1000) return 'Rp ' + (n / 1000).toLocaleString('id-ID') + ' Rb';
+              return 'Rp ' + n;
             }
           }
-        }
+        },
+        legend: {
+          itemStyle: { color: colors.textColor, fontSize: '12px', fontWeight: '500' },
+          itemHoverStyle: { color: colors.accent1 }
+        },
+        plotOptions: {
+          column: {
+            stacking: 'normal',
+            borderRadius: 4
+          }
+        },
+        tooltip: {
+          backgroundColor: colors.surfaceColor,
+          borderColor: colors.borderSubtle,
+          borderRadius: 8,
+          shadow: true,
+          style: { color: colors.textColor, fontSize: '12px' },
+          formatter: function() {
+            return `<b>${this.x}</b><br/><span style="color:${this.color}">\u25CF</span> ${this.series.name}: <b>${formatRupiah(this.y)}</b>`;
+          }
+        },
+        series: [
+          {
+            name: 'Biaya Platform (20%)',
+            data: rData.platform_fee,
+            color: colors.accent1
+          },
+          {
+            name: 'Hak Tutor Terkredit (80%)',
+            data: rData.tutor_share,
+            color: colors.accentGreen
+          }
+        ]
       });
     }
 
@@ -1637,81 +1775,131 @@
       renderRevenueSplitChart();
     }
 
-    // Render Payment Methods Chart
+    // Render Payment Methods Chart (Highcharts Donut)
     function renderPaymentMethodsChart() {
-      if (typeof Chart === 'undefined') return;
+      if (typeof Highcharts === 'undefined') return;
       if (!analyticsPayload || !analyticsPayload.charts) return;
-      const canvas = document.getElementById('chartPaymentMethods');
-      if (!canvas) return;
-      const ctx = canvas.getContext('2d');
-      if (!ctx) return;
+      const container = document.getElementById('chartPaymentMethods');
+      if (!container) return;
 
       const colors = getChartThemeColors();
       const pmData = analyticsPayload.charts.payment_methods;
       if (!pmData) return;
 
-      if (chartPaymentMethodsInstance) chartPaymentMethodsInstance.destroy();
+      if (chartPaymentMethodsInstance && chartPaymentMethodsInstance.destroy) {
+        chartPaymentMethodsInstance.destroy();
+      }
 
-      chartPaymentMethodsInstance = new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-          labels: pmData.labels,
-          datasets: [{
-            data: pmData.counts,
-            backgroundColor: [colors.accent1, colors.accentBlue, colors.accentYellow, colors.accentGreen],
+      const pmPalette = [colors.accent1, colors.accentBlue, colors.accentYellow, colors.accentGreen];
+      const dataPoints = pmData.labels.map((lbl, idx) => ({
+        name: lbl,
+        y: pmData.counts[idx] || 0,
+        color: pmPalette[idx % pmPalette.length]
+      }));
+
+      chartPaymentMethodsInstance = Highcharts.chart('chartPaymentMethods', {
+        chart: {
+          type: 'pie',
+          backgroundColor: 'transparent',
+          style: { fontFamily: "'Plus Jakarta Sans', sans-serif" }
+        },
+        title: { text: null },
+        credits: { enabled: false },
+        tooltip: {
+          backgroundColor: colors.surfaceColor,
+          borderColor: colors.borderSubtle,
+          borderRadius: 8,
+          shadow: true,
+          style: { color: colors.textColor, fontSize: '12px' },
+          pointFormat: '<span style="color:{point.color}">\u25CF</span> {point.name}: <b>{point.y} transaksi ({point.percentage:.1f}%)</b>'
+        },
+        plotOptions: {
+          pie: {
+            innerSize: '60%',
             borderWidth: 2,
             borderColor: colors.surfaceColor,
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { position: 'bottom', labels: { color: colors.textColor, font: { size: 11 } } }
+            showInLegend: true,
+            dataLabels: { enabled: false }
           }
-        }
+        },
+        legend: {
+          align: 'center',
+          verticalAlign: 'bottom',
+          layout: 'horizontal',
+          itemStyle: { color: colors.textColor, fontSize: '11px', fontWeight: '500' },
+          itemHoverStyle: { color: colors.accent1 }
+        },
+        series: [{
+          name: 'Metode Pembayaran',
+          colorByPoint: true,
+          data: dataPoints
+        }]
       });
     }
 
-    // Render Exam Stats Chart
+    // Render Exam Stats Chart (Highcharts Donut)
     function renderExamStatsChart() {
-      if (typeof Chart === 'undefined') return;
+      if (typeof Highcharts === 'undefined') return;
       if (!analyticsPayload || !analyticsPayload.charts) return;
-      const canvas = document.getElementById('chartExamStats');
-      if (!canvas) return;
-      const ctx = canvas.getContext('2d');
-      if (!ctx) return;
+      const container = document.getElementById('chartExamStats');
+      if (!container) return;
 
       const colors = getChartThemeColors();
       const exData = analyticsPayload.charts.exam_stats;
       if (!exData) return;
 
-      if (chartExamStatsInstance) chartExamStatsInstance.destroy();
+      if (chartExamStatsInstance && chartExamStatsInstance.destroy) {
+        chartExamStatsInstance.destroy();
+      }
 
-      chartExamStatsInstance = new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-          labels: exData.labels,
-          datasets: [{
-            data: exData.counts,
-            backgroundColor: [colors.accentGreen, colors.accentYellow],
+      const dataPoints = [
+        { name: exData.labels[0] || 'Lulus Ujian (Passed)', y: exData.counts[0] || 0, color: colors.accentGreen },
+        { name: exData.labels[1] || 'Belum Lulus (Failed)', y: exData.counts[1] || 0, color: colors.accentYellow }
+      ];
+
+      chartExamStatsInstance = Highcharts.chart('chartExamStats', {
+        chart: {
+          type: 'pie',
+          backgroundColor: 'transparent',
+          style: { fontFamily: "'Plus Jakarta Sans', sans-serif" }
+        },
+        title: { text: null },
+        credits: { enabled: false },
+        tooltip: {
+          backgroundColor: colors.surfaceColor,
+          borderColor: colors.borderSubtle,
+          borderRadius: 8,
+          shadow: true,
+          style: { color: colors.textColor, fontSize: '12px' },
+          pointFormat: '<span style="color:{point.color}">\u25CF</span> {point.name}: <b>{point.y} peserta ({point.percentage:.1f}%)</b>'
+        },
+        plotOptions: {
+          pie: {
+            innerSize: '60%',
             borderWidth: 2,
             borderColor: colors.surfaceColor,
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { position: 'bottom', labels: { color: colors.textColor, font: { size: 11 } } }
+            showInLegend: true,
+            dataLabels: { enabled: false }
           }
-        }
+        },
+        legend: {
+          align: 'center',
+          verticalAlign: 'bottom',
+          layout: 'horizontal',
+          itemStyle: { color: colors.textColor, fontSize: '11px', fontWeight: '500' },
+          itemHoverStyle: { color: colors.accent1 }
+        },
+        series: [{
+          name: 'Hasil Ujian',
+          colorByPoint: true,
+          data: dataPoints
+        }]
       });
     }
 
     // Render All Charts (Resilient Execution)
     function renderAllCharts() {
-      ensureChartJsReady(() => {
+      ensureHighchartsReady(() => {
         try { renderOverviewChart(); } catch (e) { console.error('Error renderOverviewChart:', e); }
         try { renderUserGrowthChart(); } catch (e) { console.error('Error renderUserGrowthChart:', e); }
         try { renderRoleDistributionChart(); } catch (e) { console.error('Error renderRoleDistributionChart:', e); }
