@@ -228,9 +228,9 @@
     "semantic_hash": ""
   },
   "controllers/tutorController.js": {
-    "mtime": 1794749409.5898883,
-    "seen": 1794749459.201324,
-    "ast_hash": "20fc02cb233470a8ae6863204e55c3a1",
+    "mtime": 1794937264.5577528,
+    "seen": 1794937621.7103932,
+    "ast_hash": "29235dc407a3e20f2fdbc85c8efc403f",
     "semantic_hash": ""
   },
   "middleware/auth.js": {
@@ -1212,9 +1212,9 @@
     "semantic_hash": ""
   },
   "views/tutor/analytics.ejs": {
-    "mtime": 1794936597.8000715,
-    "seen": 1794936744.3153,
-    "ast_hash": "f5fbf6e8358a6f4a60bd6473fd0ed285",
+    "mtime": 1794937436.3406858,
+    "seen": 1794937621.7105,
+    "ast_hash": "ee268377609a5b8629fbdbdff2fefdd6",
     "semantic_hash": ""
   },
   "views/landing.ejs": {
