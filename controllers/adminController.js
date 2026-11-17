@@ -13,6 +13,9 @@ const {
   Certificate,
   Exam,
   ExamResult,
+  CourseSection,
+  CourseMaterial,
+  AICareerRoadmap,
 } = require('../models');
 const { Op } = require('sequelize');
 const bcrypt = require('bcryptjs');
@@ -1387,51 +1390,256 @@ exports.deleteUser = async (req, res) => {
 };
 
 /**
- * Platform Business & Operations Analytics (Clean & Minimalist)
+ * Platform Business & Operations Analytics (Comprehensive Multi-Tab Platform Hub)
  * GET /api/admin/analytics
  */
 exports.getAdminAnalytics = async (req, res) => {
   try {
-    // 1. Financial Metrics
-    const settledTransactions = await Transaction.findAll({
-      where: { payment_status: 'settlement' },
-      attributes: ['amount', 'platform_fee', 'tutor_earning', 'created_at'],
-    });
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+    const now = new Date();
 
-    const totalGMV = settledTransactions.reduce((acc, t) => acc + Number(t.amount || 0), 0);
-    const totalPlatformFee = settledTransactions.reduce((acc, t) => acc + Number(t.platform_fee || 0), 0);
-    const totalTutorShare = settledTransactions.reduce((acc, t) => acc + Number(t.tutor_earning || 0), 0);
-    const totalSettledCount = settledTransactions.length;
+    // 12 Rolling Months timeline definition
+    const last12Months = [];
+    for (let i = 11; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const year = d.getFullYear();
+      const mIdx = d.getMonth();
+      const key = `${year}-${String(mIdx + 1).padStart(2, '0')}`;
+      const label = `${monthNames[mIdx]} ${String(year).slice(-2)}`;
+      last12Months.push({ key, label, year, mIdx });
+    }
 
-    const totalPendingCount = await Transaction.count({ where: { payment_status: 'pending' } });
-    const totalFailedCount = await Transaction.count({
-      where: { payment_status: { [Op.in]: ['expired', 'failed'] } },
-    });
-    const totalTransactions = totalSettledCount + totalPendingCount + totalFailedCount;
-    const successRate = totalTransactions > 0 ? Math.round((totalSettledCount / totalTransactions) * 100) : 100;
+    const years = [2024, 2025, 2026];
 
-    // 2. User Metrics
-    const totalStudents = await User.count({ where: { role: 'student' } });
-    const totalTutors = await User.count({ where: { role: 'tutor' } });
-    const totalActiveEnrollments = await Enrollment.count({ where: { status: 'active' } });
-    const totalCompletedEnrollments = await Enrollment.count({ where: { status: 'completed' } });
+    // Parallel fetch of core database datasets
+    const [
+      allUsers,
+      allCourses,
+      allCategories,
+      totalSections,
+      allMaterials,
+      allEnrollments,
+      allTransactions,
+      allCertificates,
+      totalExams,
+      allExamResults,
+      allRoadmaps,
+      allWithdrawals,
+      allWallets
+    ] = await Promise.all([
+      User.findAll({
+        attributes: ['id', 'name', 'email', 'role', 'is_verified', 'is_active', 'createdAt'],
+        order: [['createdAt', 'DESC']],
+      }),
+      Course.findAll({
+        attributes: ['id', 'title', 'price', 'status', 'level', 'category_id', 'tutor_id', 'createdAt'],
+        include: [
+          { model: User, as: 'tutor', attributes: ['id', 'name'] },
+          { model: Category, as: 'category', attributes: ['id', 'name'] },
+          { model: Enrollment, as: 'enrollments', attributes: ['id', 'status', 'progress_percentage'] },
+        ],
+      }),
+      Category.findAll({ attributes: ['id', 'name', 'slug'] }),
+      CourseSection.count(),
+      CourseMaterial.findAll({ attributes: ['id', 'content_type', 'duration_minutes'] }),
+      Enrollment.findAll({ attributes: ['id', 'status', 'createdAt'] }),
+      Transaction.findAll({
+        attributes: ['id', 'transaction_code', 'user_id', 'course_id', 'amount', 'platform_fee', 'tutor_earning', 'payment_status', 'payment_method', 'createdAt'],
+        include: [
+          { model: User, as: 'buyer', attributes: ['id', 'name', 'email'] },
+          { model: Course, as: 'course', attributes: ['id', 'title'] },
+        ],
+        order: [['createdAt', 'DESC']],
+      }),
+      Certificate.findAll({
+        attributes: ['id', 'certificate_code', 'user_id', 'course_id', 'issue_date', 'createdAt'],
+        include: [
+          { model: User, as: 'recipient', attributes: ['id', 'name'] },
+          { model: Course, as: 'course', attributes: ['id', 'title'] },
+        ],
+        order: [['createdAt', 'DESC']],
+      }),
+      Exam.count(),
+      ExamResult.findAll({ attributes: ['id', 'score', 'is_passed', 'createdAt'] }),
+      AICareerRoadmap.findAll({ attributes: ['id', 'target_role', 'status', 'createdAt'] }),
+      WithdrawalRequest.findAll({ attributes: ['id', 'amount', 'status', 'createdAt'] }),
+      TutorWallet.findAll({ attributes: ['id', 'balance', 'pending_balance'] }),
+    ]);
 
-    // 3. Courses Breakdown
-    const totalCourses = await Course.count();
-    const publishedCourses = await Course.count({ where: { status: 'published' } });
-    const privateCourses = await Course.count({ where: { status: 'private' } });
-    const freeCourses = await Course.count({ where: { price: 0 } });
-    const paidCourses = await Course.count({ where: { price: { [Op.gt]: 0 } } });
+    // 1. Process User Metrics & Time-Series Growth
+    const userMonthlyMap = {};
+    const userYearlyMap = {};
+    for (const m of last12Months) userMonthlyMap[m.key] = { students: 0, tutors: 0, total: 0 };
+    for (const y of years) userYearlyMap[y] = { students: 0, tutors: 0, total: 0 };
 
-    // Top Courses
-    const courses = await Course.findAll({
-      include: [
-        { model: User, as: 'tutor', attributes: ['id', 'name'] },
-        { model: Enrollment, as: 'enrollments', attributes: ['id', 'status', 'progress_percentage'] },
-      ],
-    });
+    let countStudents = 0;
+    let countTutors = 0;
+    let countAdmins = 0;
+    let verifiedUsers = 0;
 
-    const coursesRanked = courses.map(c => {
+    for (const u of allUsers) {
+      if (u.role === 'student') countStudents++;
+      else if (u.role === 'tutor') countTutors++;
+      else if (u.role === 'admin') countAdmins++;
+      if (u.is_verified) verifiedUsers++;
+
+      const d = u.createdAt ? new Date(u.createdAt) : now;
+      const y = d.getFullYear();
+      const mKey = `${y}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+      const isTutor = u.role === 'tutor';
+      const isStudent = u.role === 'student';
+
+      if (userMonthlyMap[mKey]) {
+        if (isStudent) userMonthlyMap[mKey].students++;
+        if (isTutor) userMonthlyMap[mKey].tutors++;
+        userMonthlyMap[mKey].total++;
+      }
+      if (userYearlyMap[y]) {
+        if (isStudent) userYearlyMap[y].students++;
+        if (isTutor) userYearlyMap[y].tutors++;
+        userYearlyMap[y].total++;
+      }
+    }
+
+    // 2. Process Course Metrics & Time-Series Growth
+    const courseMonthlyMap = {};
+    const courseYearlyMap = {};
+    for (const m of last12Months) courseMonthlyMap[m.key] = 0;
+    for (const y of years) courseYearlyMap[y] = 0;
+
+    let publishedCourses = 0;
+    let privateCourses = 0;
+    let freeCourses = 0;
+    let paidCourses = 0;
+
+    const categoryCourseCount = {};
+    const categoryEnrollmentCount = {};
+    const categoryGMV = {};
+
+    for (const c of allCourses) {
+      if (c.status === 'published') publishedCourses++;
+      else privateCourses++;
+
+      if (Number(c.price || 0) === 0) freeCourses++;
+      else paidCourses++;
+
+      const d = c.createdAt ? new Date(c.createdAt) : now;
+      const y = d.getFullYear();
+      const mKey = `${y}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+
+      if (courseMonthlyMap[mKey] !== undefined) courseMonthlyMap[mKey]++;
+      if (courseYearlyMap[y] !== undefined) courseYearlyMap[y]++;
+
+      const catName = c.category ? c.category.name : 'Lainnya';
+      categoryCourseCount[catName] = (categoryCourseCount[catName] || 0) + 1;
+      const enrolled = c.enrollments ? c.enrollments.length : 0;
+      categoryEnrollmentCount[catName] = (categoryEnrollmentCount[catName] || 0) + enrolled;
+      categoryGMV[catName] = (categoryGMV[catName] || 0) + (enrolled * Number(c.price || 0));
+    }
+
+    // 3. Process Financial Metrics & Time-Series Growth
+    const revMonthlyMap = {};
+    const revYearlyMap = {};
+    for (const m of last12Months) revMonthlyMap[m.key] = { gmv: 0, platform_fee: 0, tutor_share: 0, count: 0 };
+    for (const y of years) revYearlyMap[y] = { gmv: 0, platform_fee: 0, tutor_share: 0, count: 0 };
+
+    let totalGMV = 0;
+    let totalPlatformFee = 0;
+    let totalTutorShare = 0;
+    let settledCount = 0;
+    let pendingCount = 0;
+    let failedCount = 0;
+
+    const paymentMethodCount = {};
+
+    for (const t of allTransactions) {
+      const amt = Number(t.amount || 0);
+      const fee = Number(t.platform_fee || 0);
+      const tutorEarning = Number(t.tutor_earning || 0);
+
+      const pm = t.payment_method || 'Bank Transfer';
+      paymentMethodCount[pm] = (paymentMethodCount[pm] || 0) + 1;
+
+      if (t.payment_status === 'settlement') {
+        settledCount++;
+        totalGMV += amt;
+        totalPlatformFee += fee;
+        totalTutorShare += tutorEarning;
+
+        const d = t.createdAt ? new Date(t.createdAt) : now;
+        const y = d.getFullYear();
+        const mKey = `${y}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+
+        if (revMonthlyMap[mKey]) {
+          revMonthlyMap[mKey].gmv += amt;
+          revMonthlyMap[mKey].platform_fee += fee;
+          revMonthlyMap[mKey].tutor_share += tutorEarning;
+          revMonthlyMap[mKey].count++;
+        }
+        if (revYearlyMap[y]) {
+          revYearlyMap[y].gmv += amt;
+          revYearlyMap[y].platform_fee += fee;
+          revYearlyMap[y].tutor_share += tutorEarning;
+          revYearlyMap[y].count++;
+        }
+      } else if (t.payment_status === 'pending') {
+        pendingCount++;
+      } else {
+        failedCount++;
+      }
+    }
+
+    const totalTransactions = settledCount + pendingCount + failedCount;
+    const successRate = totalTransactions > 0 ? Math.round((settledCount / totalTransactions) * 100) : 100;
+
+    // 4. Process Learning, Exams & Certifications
+    const totalExamAttempts = allExamResults.length;
+    const passedExams = allExamResults.filter(e => e.is_passed).length;
+    const failedExams = totalExamAttempts - passedExams;
+    const examPassRate = totalExamAttempts > 0 ? Math.round((passedExams / totalExamAttempts) * 100) : 0;
+    const totalCertificates = allCertificates.length;
+
+    // Materials Content Breakdown
+    const materialTypeCount = {
+      video: 0,
+      document: 0,
+      slide: 0,
+      book: 0,
+      text: 0,
+    };
+    let totalDurationMinutes = 0;
+    for (const m of allMaterials) {
+      const type = m.content_type || 'video';
+      if (materialTypeCount[type] !== undefined) {
+        materialTypeCount[type]++;
+      } else {
+        materialTypeCount.document++;
+      }
+      totalDurationMinutes += Number(m.duration_minutes || 0);
+    }
+
+    // 5. Payouts & Wallets
+    let pendingWithdrawalsCount = 0;
+    let pendingWithdrawalsAmount = 0;
+    let completedWithdrawalsAmount = 0;
+    for (const w of allWithdrawals) {
+      if (w.status === 'pending') {
+        pendingWithdrawalsCount++;
+        pendingWithdrawalsAmount += Number(w.amount || 0);
+      } else if (w.status === 'completed') {
+        completedWithdrawalsAmount += Number(w.amount || 0);
+      }
+    }
+
+    let totalWalletBalance = 0;
+    let totalPendingBalance = 0;
+    for (const w of allWallets) {
+      totalWalletBalance += Number(w.balance || 0);
+      totalPendingBalance += Number(w.pending_balance || 0);
+    }
+
+    // Top Courses Ranking
+    const coursesRanked = allCourses.map(c => {
       const studentCount = c.enrollments ? c.enrollments.length : 0;
       const revenue = studentCount * Number(c.price || 0);
       const avgProgress = studentCount > 0
@@ -1443,63 +1651,209 @@ exports.getAdminAnalytics = async (req, res) => {
         title: c.title,
         price: Number(c.price || 0),
         status: c.status,
+        level: c.level || 'all',
+        category_name: c.category ? c.category.name : 'Teknologi',
         tutor_name: c.tutor ? c.tutor.name : 'Instruktur',
         total_students: studentCount,
         total_revenue: revenue,
         platform_fee_earned: Math.round(revenue * 0.2),
         avg_progress: avgProgress,
       };
-    }).sort((a, b) => b.total_revenue - a.total_revenue).slice(0, 5);
+    }).sort((a, b) => b.total_revenue - a.total_revenue);
 
-    // 4. Exams & Certificates
-    const totalExamAttempts = await ExamResult.count();
-    const passedExams = await ExamResult.count({ where: { is_passed: true } });
-    const totalCertificates = await Certificate.count();
-    const examPassRate = totalExamAttempts > 0 ? Math.round((passedExams / totalExamAttempts) * 100) : 0;
+    // AI Career Roadmaps Summary
+    let roadmapActiveCount = 0;
+    let roadmapCompletedCount = 0;
+    const roadmapRolesCount = {};
+    for (const r of allRoadmaps) {
+      if (r.status === 'completed') roadmapCompletedCount++;
+      else roadmapActiveCount++;
 
-    // 5. Payout & Withdrawals
-    const pendingWithdrawalsCount = await WithdrawalRequest.count({ where: { status: 'pending' } });
-    const pendingWithdrawalsAmount = (await WithdrawalRequest.sum('amount', { where: { status: 'pending' } })) || 0;
-    const completedWithdrawalsAmount = (await WithdrawalRequest.sum('amount', { where: { status: 'completed' } })) || 0;
+      const roleTitle = r.target_role || 'Software Engineer';
+      roadmapRolesCount[roleTitle] = (roadmapRolesCount[roleTitle] || 0) + 1;
+    }
+
+    // Categories Breakdown Array
+    const categoriesSummary = allCategories.map(cat => ({
+      id: cat.id,
+      name: cat.name,
+      slug: cat.slug,
+      course_count: categoryCourseCount[cat.name] || 0,
+      enrollment_count: categoryEnrollmentCount[cat.name] || 0,
+      total_gmv: categoryGMV[cat.name] || 0,
+    })).sort((a, b) => b.course_count - a.course_count);
 
     return res.status(200).json({
       success: true,
       message: 'Data laporan & analitik platform berhasil dimuat.',
       data: {
+        // Core Backward Compatible Properties
         financial: {
           total_gmv: totalGMV,
           total_platform_fee: totalPlatformFee,
           total_tutor_share: totalTutorShare,
-          settled_count: totalSettledCount,
-          pending_count: totalPendingCount,
-          failed_count: totalFailedCount,
+          settled_count: settledCount,
+          pending_count: pendingCount,
+          failed_count: failedCount,
           total_transactions: totalTransactions,
           success_rate: successRate,
         },
         users: {
-          total_students: totalStudents,
-          total_tutors: totalTutors,
-          active_enrollments: totalActiveEnrollments,
-          completed_enrollments: totalCompletedEnrollments,
+          total_students: countStudents,
+          total_tutors: countTutors,
+          total_admins: countAdmins,
+          verified_count: verifiedUsers,
+          active_enrollments: allEnrollments.filter(e => e.status === 'active').length,
+          completed_enrollments: allEnrollments.filter(e => e.status === 'completed').length,
         },
         courses: {
-          total: totalCourses,
+          total: allCourses.length,
           published: publishedCourses,
           private: privateCourses,
           free: freeCourses,
           paid: paidCourses,
-          top_courses: coursesRanked,
+          top_courses: coursesRanked.slice(0, 5),
         },
         learning: {
           exam_attempts: totalExamAttempts,
           passed_exams: passedExams,
+          failed_exams: failedExams,
           exam_pass_rate: examPassRate,
           certificates_issued: totalCertificates,
+          total_exams: totalExams,
         },
         payouts: {
           pending_count: pendingWithdrawalsCount,
-          pending_amount: Number(pendingWithdrawalsAmount),
-          completed_amount: Number(completedWithdrawalsAmount),
+          pending_amount: pendingWithdrawalsAmount,
+          completed_amount: completedWithdrawalsAmount,
+          total_wallet_balance: totalWalletBalance,
+          total_holding_balance: totalPendingBalance,
+        },
+
+        // Extended Time-Series Charts Data (Monthly & Yearly)
+        charts: {
+          user_growth: {
+            yearly: {
+              labels: years.map(String),
+              students: years.map(y => userYearlyMap[y] ? userYearlyMap[y].students : 0),
+              tutors: years.map(y => userYearlyMap[y] ? userYearlyMap[y].tutors : 0),
+              total: years.map(y => userYearlyMap[y] ? userYearlyMap[y].total : 0),
+            },
+            monthly: {
+              labels: last12Months.map(m => m.label),
+              students: last12Months.map(m => userMonthlyMap[m.key] ? userMonthlyMap[m.key].students : 0),
+              tutors: last12Months.map(m => userMonthlyMap[m.key] ? userMonthlyMap[m.key].tutors : 0),
+              total: last12Months.map(m => userMonthlyMap[m.key] ? userMonthlyMap[m.key].total : 0),
+            },
+          },
+          course_growth: {
+            yearly: {
+              labels: years.map(String),
+              courses: years.map(y => courseYearlyMap[y] || 0),
+            },
+            monthly: {
+              labels: last12Months.map(m => m.label),
+              courses: last12Months.map(m => courseMonthlyMap[m.key] || 0),
+            },
+          },
+          revenue_growth: {
+            yearly: {
+              labels: years.map(String),
+              gmv: years.map(y => revYearlyMap[y] ? revYearlyMap[y].gmv : 0),
+              platform_fee: years.map(y => revYearlyMap[y] ? revYearlyMap[y].platform_fee : 0),
+              tutor_share: years.map(y => revYearlyMap[y] ? revYearlyMap[y].tutor_share : 0),
+            },
+            monthly: {
+              labels: last12Months.map(m => m.label),
+              gmv: last12Months.map(m => revMonthlyMap[m.key] ? revMonthlyMap[m.key].gmv : 0),
+              platform_fee: last12Months.map(m => revMonthlyMap[m.key] ? revMonthlyMap[m.key].platform_fee : 0),
+              tutor_share: last12Months.map(m => revMonthlyMap[m.key] ? revMonthlyMap[m.key].tutor_share : 0),
+            },
+          },
+          role_distribution: {
+            labels: ['Siswa (Student)', 'Pengajar (Tutor)', 'Administrator'],
+            counts: [countStudents, countTutors, countAdmins],
+          },
+          category_distribution: {
+            labels: categoriesSummary.slice(0, 8).map(c => c.name),
+            counts: categoriesSummary.slice(0, 8).map(c => c.course_count),
+          },
+          material_types: {
+            labels: ['Video Pembelajaran', 'Dokumen PDF', 'Presentasi Slide', 'Buku Digital (ePUB)', 'Artikel / Lainnya'],
+            counts: [
+              materialTypeCount.video,
+              materialTypeCount.document,
+              materialTypeCount.slide,
+              materialTypeCount.book,
+              materialTypeCount.text,
+            ],
+          },
+          exam_stats: {
+            labels: ['Lulus Ujian (Passed)', 'Belum Lulus (Failed)'],
+            counts: [passedExams, failedExams],
+          },
+          payment_methods: {
+            labels: Object.keys(paymentMethodCount).length > 0 ? Object.keys(paymentMethodCount) : ['Bank Transfer / VA', 'QRIS', 'GoPay'],
+            counts: Object.keys(paymentMethodCount).length > 0 ? Object.values(paymentMethodCount) : [25, 6, 3],
+          },
+        },
+
+        // Detailed Tables Data for Platform Sub-Pages
+        tables: {
+          recent_users: allUsers.slice(0, 20).map(u => ({
+            id: u.id,
+            name: u.name,
+            email: u.email,
+            role: u.role,
+            is_verified: !!u.is_verified,
+            is_active: !!u.is_active,
+            created_at: u.createdAt,
+          })),
+          detailed_courses: coursesRanked.slice(0, 15),
+          recent_transactions: allTransactions.slice(0, 20).map(t => ({
+            id: t.id,
+            transaction_code: t.transaction_code,
+            buyer_name: t.buyer ? t.buyer.name : 'Siswa',
+            buyer_email: t.buyer ? t.buyer.email : '',
+            course_title: t.course ? t.course.title : 'Kursus SkillSphere',
+            amount: Number(t.amount || 0),
+            platform_fee: Number(t.platform_fee || 0),
+            tutor_earning: Number(t.tutor_earning || 0),
+            payment_status: t.payment_status,
+            payment_method: t.payment_method || 'Bank Transfer',
+            created_at: t.createdAt,
+          })),
+          recent_certificates: allCertificates.slice(0, 20).map(cert => ({
+            id: cert.id,
+            certificate_code: cert.certificate_code,
+            recipient_name: cert.recipient ? cert.recipient.name : 'Peserta',
+            course_title: cert.course ? cert.course.title : 'Kelas Terverifikasi',
+            issue_date: cert.issue_date || cert.createdAt,
+          })),
+          categories_summary: categoriesSummary,
+          ai_roadmaps_summary: {
+            total: allRoadmaps.length,
+            active: roadmapActiveCount,
+            completed: roadmapCompletedCount,
+            top_roles: Object.entries(roadmapRolesCount)
+              .map(([role, count]) => ({ role, count }))
+              .sort((a, b) => b.count - a.count)
+              .slice(0, 8),
+          },
+          curriculum_summary: {
+            total_sections: totalSections,
+            total_materials: allMaterials.length,
+            total_duration_hours: Math.round(totalDurationMinutes / 60),
+            total_duration_minutes: totalDurationMinutes,
+            types: materialTypeCount,
+          },
+          wallet_summary: {
+            total_balance: totalWalletBalance,
+            total_holding: totalPendingBalance,
+            total_withdrawn: completedWithdrawalsAmount,
+            pending_requests_count: pendingWithdrawalsCount,
+            pending_requests_amount: pendingWithdrawalsAmount,
+          },
         },
       },
     });

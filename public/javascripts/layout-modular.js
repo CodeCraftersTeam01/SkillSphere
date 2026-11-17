@@ -33,6 +33,12 @@
       icon.style.display = isLight ? 'inline-block' : 'none';
     });
 
+    // Single icon that swaps its Font Awesome class (landing / exam style)
+    const swapIcon = document.getElementById('themeIcon');
+    if (swapIcon && swapIcon.tagName && swapIcon.tagName.toLowerCase() === 'i') {
+      swapIcon.className = isLight ? 'fa-solid fa-moon' : 'fa-solid fa-sun';
+    }
+
     // Update text labels
     const textLabels = document.querySelectorAll('#theme-text, .theme-text-label');
     textLabels.forEach(el => {
@@ -211,13 +217,17 @@
     // Initialize Theme
     applyTheme(getPreferredTheme());
 
-    // Bind Theme Toggle Buttons
-    document.querySelectorAll('#theme-toggle-btn, #themeToggleBtn, .theme-toggle-btn').forEach(btn => {
-      btn.addEventListener('click', function (e) {
-        e.preventDefault();
-        toggleThemeMode();
-      });
-    });
+    // Bind Theme Toggle Buttons.
+    // Many views attach their own inline bubble handler to the same button.
+    // A single delegated capture handler stops propagation so exactly one
+    // toggle happens per click (otherwise two handlers cancel each other out).
+    document.addEventListener('click', function (e) {
+      const btn = e.target && e.target.closest && e.target.closest('#theme-toggle-btn, #themeToggleBtn, .theme-toggle-btn');
+      if (!btn) return;
+      e.preventDefault();
+      e.stopPropagation();
+      toggleThemeMode();
+    }, true);
 
     // Bind Universal Logout Buttons
     document.querySelectorAll('#logout-btn, #header-logout-btn, #sidebar-logout-btn, .modular-logout-btn').forEach(btn => {

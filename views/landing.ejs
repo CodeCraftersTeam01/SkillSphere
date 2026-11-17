@@ -40,6 +40,12 @@
       scroll-behavior: smooth;
     }
 
+    /* Landing-scoped: teks muted sedikit lebih terang di dark mode
+       agar label kecil (7.5px) tetap terbaca di atas kartu gelap. */
+    html[data-theme="dark"] {
+      --text-tertiary: #8A847C;
+    }
+
     body {
       background-color: var(--bg-app);
       color: var(--text-primary);
@@ -1198,6 +1204,7 @@
 
     [data-theme="dark"] .final-cta-card {
       background: #242220;
+      color: #F5F3EF;
       border: 1px solid var(--border-subtle);
     }
 
@@ -1210,8 +1217,9 @@
     }
 
     .cta-btn-invert {
-      background: var(--bg-surface);
-      color: var(--text-primary);
+      /* Card CTA selalu gelap di kedua tema, jadi tombolnya tetap terang */
+      background: #FFFFFF;
+      color: #0F0F11;
       border: 1px solid transparent;
       padding: 12px 26px;
       font-size: 15px;
@@ -1347,6 +1355,24 @@
 
     .mobile-drawer.open {
       right: 0;
+    }
+
+    /* Drawer navigation links (sebelumnya tanpa aturan -> biru default browser) */
+    .mobile-drawer .nav-link {
+      display: block;
+      font-size: 14.5px;
+      font-weight: 500;
+      color: var(--text-primary);
+      text-decoration: none;
+      padding: 8px 4px;
+      border-radius: 8px;
+      transition: color 150ms ease, background 150ms ease;
+    }
+
+    .mobile-drawer .nav-link:hover,
+    .mobile-drawer .nav-link:focus-visible {
+      color: var(--accent-amber);
+      background: var(--bg-surface-subtle);
     }
 
     .drawer-backdrop {
@@ -1985,7 +2011,7 @@
         <a href="/register" class="cta-btn-invert">
           Daftar Akun Baru (Gratis) <i class="fa-solid fa-arrow-right"></i>
         </a>
-        <a href="/register?role=tutor" class="btn-clean btn-clean-outline" style="color:var(--bg-surface); border-color:rgba(255,255,255,0.3); background:transparent;">
+        <a href="/register?role=tutor" class="btn-clean btn-clean-outline" style="color:#FFFFFF; border-color:rgba(255,255,255,0.3); background:transparent;">
           Daftar Menjadi Pengajar
         </a>
       </div>
@@ -2018,13 +2044,9 @@
     const savedTheme = localStorage.getItem('skillsphere_theme') || localStorage.getItem('theme') || 'light';
     applyTheme(savedTheme);
 
-    if (themeToggleBtn) {
-      themeToggleBtn.addEventListener('click', () => {
-        const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
-        const nextTheme = currentTheme === 'dark' ? 'light' : 'dark';
-        applyTheme(nextTheme);
-      });
-    }
+    // Catatan: handler klik tema sengaja tidak dipasang di sini.
+    // layout-modular.js sudah menangani klik tombol tema. Memasang handler
+    // kedua membuat satu klik men-toggle dua kali (gelap -> terang lagi).
 
     // -------------------------------------------------------------
     // Mobile Drawer Controls
@@ -2413,6 +2435,6 @@
     <span class="floating-launcher-label">Tanya Orion AI</span>
   </button>
   <!-- Modular Layout Script -->
-  <script src="/javascripts/layout-modular.js"></script>
+  <script src="/javascripts/layout-modular.js?v=20261117"></script>
 </body>
 </html>
