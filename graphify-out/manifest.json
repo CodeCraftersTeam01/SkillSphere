@@ -810,21 +810,21 @@
     "semantic_hash": ""
   },
   "views/tutor/certificates.ejs": {
-    "mtime": 1794925989.2091703,
-    "seen": 1794926094.106529,
-    "ast_hash": "20e85dd437182bc57c1d5a37ce83b856",
+    "mtime": 1794936586.7220411,
+    "seen": 1794936744.3153012,
+    "ast_hash": "4464431c14515d2e5fb1a0d31a255e5c",
     "semantic_hash": ""
   },
   "views/tutor/exams.ejs": {
-    "mtime": 1794925989.212681,
-    "seen": 1794926094.106532,
-    "ast_hash": "6c11a62d0d98687dc79e3358b4d62064",
+    "mtime": 1794936611.7722049,
+    "seen": 1794936744.3153028,
+    "ast_hash": "c9c7de5fc7d7672d6755521d2cf28e2c",
     "semantic_hash": ""
   },
   "views/tutor/materials.ejs": {
-    "mtime": 1794925989.2166348,
-    "seen": 1794926094.106533,
-    "ast_hash": "e0d07b1c0734d57036946762d869c2fd",
+    "mtime": 1794936623.4821184,
+    "seen": 1794936744.3153028,
+    "ast_hash": "c387912acaf5dcb52d506e51ea34b8c1",
     "semantic_hash": ""
   },
   "views/tutor/verify.ejs": {
@@ -834,15 +834,15 @@
     "semantic_hash": ""
   },
   "views/tutor/wallet.ejs": {
-    "mtime": 1794925989.2200162,
-    "seen": 1794926094.106536,
-    "ast_hash": "0bb4af32185ce0236f6d5bc6b227739e",
+    "mtime": 1794936450.0635579,
+    "seen": 1794936744.315305,
+    "ast_hash": "873aed9f975b865896dbafa7daece7a4",
     "semantic_hash": ""
   },
   "views/tutor/withdrawal.ejs": {
-    "mtime": 1794925989.22152,
-    "seen": 1794926094.1065369,
-    "ast_hash": "e511b654ff1414365d0c1859a861722c",
+    "mtime": 1794936560.704196,
+    "seen": 1794936744.315306,
+    "ast_hash": "14b6e3bbbb9649aeee8e8ac793c4ff83",
     "semantic_hash": ""
   },
   "views/warp.ejs": {
@@ -1212,9 +1212,9 @@
     "semantic_hash": ""
   },
   "views/tutor/analytics.ejs": {
-    "mtime": 1794925989.2075288,
-    "seen": 1794926094.106528,
-    "ast_hash": "7084fed47708b91dfe0091d30ada60c5",
+    "mtime": 1794936597.8000715,
+    "seen": 1794936744.3153,
+    "ast_hash": "f5fbf6e8358a6f4a60bd6473fd0ed285",
     "semantic_hash": ""
   },
   "views/landing.ejs": {
@@ -1230,9 +1230,9 @@
     "semantic_hash": ""
   },
   "public/javascripts/layout-modular.js": {
-    "mtime": 1794928773.6463833,
-    "seen": 1794929406.018807,
-    "ast_hash": "1acf253a6c2d4f2131d92373474c9cac",
+    "mtime": 1794936321.7883773,
+    "seen": 1794936744.315232,
+    "ast_hash": "a2268f0235f88d0c6efbce8e316edc63",
     "semantic_hash": ""
   },
   "views/partials/admin-header.ejs": {
