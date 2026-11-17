@@ -1,7 +1,7 @@
 # Graph Report - SkillSphare  (2026-11-17)
 
 ## Corpus Check
-- 193 files · ~613,098 words
+- 193 files · ~613,157 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 11 file(s) not represented in the graph (top: .css 8, .example 1, (none) 1)
 
@@ -11,7 +11,7 @@
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `e0ff9738`
+- Built from commit: `3d964a8c`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -197,9 +197,9 @@
 4. `s()` - 44 edges
 5. `no` - 36 edges
 6. `User` - 33 edges
-7. `n()` - 31 edges
-8. `va` - 31 edges
-9. `getOne()` - 31 edges
+7. `va` - 31 edges
+8. `getOne()` - 31 edges
+9. `n()` - 31 edges
 10. `sequelize` - 30 edges
 
 ## Surprising Connections (you probably didn't know these)
@@ -817,14 +817,14 @@ Nodes (5): scheduleNextOrionBlink(), scheduleNextOrionGaze(), shiftOrionGaze(), 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `An` connect `An` to `.notifyPlugins`, `.getDatasetMeta`, `u`, `.buildOrUpdateControllers`, `s`, `chart.umd.min.js`, `tn`, `bt`?**
-  _High betweenness centrality (0.010) - this node is a cross-community bridge._
+- **Why does `Ns` connect `Ns` to `n`, `a`, `l`, `chart.umd.min.js`, `update`?**
+  _High betweenness centrality (0.005) - this node is a cross-community bridge._
 - **Are the 14 inferred relationships involving `s()` (e.g. with `ho()` and `ii()`) actually correct?**
   _`s()` has 14 INFERRED edges - model-reasoned connections that need verification._
 - **Should `assets.mjs` be split into smaller, more focused modules?**
   _Cohesion score 0.06648426812585499 - nodes in this community are weakly interconnected._
-- **Why does `Js` connect `Js` to `s`, `a`, `no`, `chart.umd.min.js`?**
-  _High betweenness centrality (0.009) - this node is a cross-community bridge._
+- **Why does `Zt` connect `Zt` to `chart.umd.min.js`, `Bt`?**
+  _High betweenness centrality (0.004) - this node is a cross-community bridge._
 - **Should `verification.ejs` be split into smaller, more focused modules?**
   _Cohesion score 0.0712280701754386 - nodes in this community are weakly interconnected._
 - **Why does `no` connect `no` to `ca`, `Hs`, `n`, `Js`, `Eo`, `a`, `chart.umd.min.js`, `l`?**

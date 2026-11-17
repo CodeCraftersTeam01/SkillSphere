@@ -1206,9 +1206,9 @@
     "semantic_hash": ""
   },
   "views/admin/analytics.ejs": {
-    "mtime": 1794931521.6973457,
-    "seen": 1794931622.641543,
-    "ast_hash": "a7f39efa6acd46267c344445201dc4c1",
+    "mtime": 1794932457.0570548,
+    "seen": 1794932481.060208,
+    "ast_hash": "1cc258743fa1e504b8f66bd1e3c993fe",
     "semantic_hash": ""
   },
   "views/tutor/analytics.ejs": {

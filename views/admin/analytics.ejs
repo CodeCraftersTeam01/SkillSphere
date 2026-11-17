@@ -22,10 +22,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   
-  <link rel="stylesheet" href="/stylesheets/style.css">
-  <link rel="stylesheet" href="/stylesheets/claude-theme.css">
+  <link rel="stylesheet" href="/stylesheets/claude-theme.css?v=2.0">
   <link rel="stylesheet" href="/stylesheets/accessibility.css">
-  <link rel="stylesheet" href="/stylesheets/layout-modular.css?v=2.2">
+  <link rel="stylesheet" href="/stylesheets/layout-modular.css?v=2.3">
   
   <!-- Chart.js for High-Precision Analytical Visualizations (Local Bundle + CDN Fallback) -->
   <script src="/javascripts/chart.umd.min.js"></script>
@@ -89,25 +88,12 @@
       color: var(--text-primary);
       font-family: var(--font-sans);
       min-height: 100vh;
-      display: flex;
       overflow-x: hidden;
       -webkit-font-smoothing: antialiased;
     }
 
-    /* Fixed Left Sidebar Offset */
-    .admin-main-viewport,
-    .admin-main {
-      margin-left: 260px;
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      min-width: 0;
-      min-height: 100vh;
-      background-color: var(--bg-app);
-    }
-
-    .content-wrapper {
-      padding: 28px 32px 64px;
+    .admin-content-body {
+      padding: 32px 32px 64px;
       max-width: 1360px;
       width: 100%;
       margin: 0 auto;
@@ -503,12 +489,7 @@
     }
 
     @media (max-width: 860px) {
-      .admin-main-viewport,
-      .admin-main {
-        margin-left: 0 !important;
-        width: 100% !important;
-      }
-      .content-wrapper {
+      .admin-content-body {
         padding: 20px 16px 48px;
       }
       .kpi-grid {
@@ -520,18 +501,22 @@
     }
   </style>
 </head>
-<body>
+<body class="admin-body">
 
-  <!-- Admin Modular Left Sidebar -->
-  <%- include('../partials/admin-sidebar', { activeView: 'analytics' }) %>
+  <div class="admin-app-wrapper">
+    <!-- Mobile Sidebar Backdrop -->
+    <div class="sidebar-backdrop" id="sidebar-backdrop" onclick="toggleMobileSidebar(false)"></div>
 
-  <!-- Admin Main Viewport (Correct Left Margin 260px) -->
-  <div class="admin-main-viewport">
-    
-    <!-- Admin Sticky Top Header with Breadcrumb -->
-    <%- include('../partials/admin-header', { breadcrumb: 'Laporan & Analitik Platform' }) %>
+    <!-- Admin Modular Left Sidebar -->
+    <%- include('../partials/admin-sidebar', { activeView: 'analytics' }) %>
 
-    <main class="content-wrapper">
+    <!-- Admin Main Viewport -->
+    <div class="admin-main-viewport">
+      
+      <!-- Admin Sticky Top Header with Breadcrumb -->
+      <%- include('../partials/admin-header', { breadcrumb: 'Laporan & Analitik Platform' }) %>
+
+      <main class="admin-content-body">
       
       <!-- Page Header -->
       <div class="page-header-row">
@@ -1131,6 +1116,7 @@
 
     </main>
   </div>
+</div>
 
   <!-- Client-side Logic: Chart.js Initialization, Data Binding, & Search Filters -->
   <script>
@@ -1995,6 +1981,27 @@
         // Populate Tables
         populateTables(tables);
 
+        // Sync Modular Admin Sidebar Badges
+        const badgeUsers = document.getElementById('badge-users-total');
+        if (badgeUsers && users) {
+          const totalUsersCount = (users.total_students || 0) + (users.total_tutors || 0) + (users.total_admins || 0);
+          badgeUsers.textContent = totalUsersCount;
+        }
+
+        fetch('/api/admin/stats', {
+          headers: { 'Authorization': 'Bearer ' + token }
+        })
+          .then(r => r.json())
+          .then(resStats => {
+            if (resStats.success && resStats.data) {
+              const pendingApps = resStats.data.applications ? resStats.data.applications.pending : 0;
+              const pendingCerts = resStats.data.certifications ? resStats.data.certifications.pending : 0;
+              const bVerif = document.getElementById('badge-pending-verification-total');
+              if (bVerif) bVerif.textContent = pendingApps + pendingCerts;
+            }
+          })
+          .catch(() => {});
+
         // Render Visual Charts
         renderAllCharts();
 
@@ -2016,6 +2023,7 @@
     });
   </script>
 
-  <script src="/javascripts/layout-modular.js"></script>
+  <script src="/javascripts/accessibility.js"></script>
+  <script src="/javascripts/layout-modular.js?v=2.3"></script>
 </body>
 </html>
