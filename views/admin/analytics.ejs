@@ -27,8 +27,13 @@
   <link rel="stylesheet" href="/stylesheets/accessibility.css">
   <link rel="stylesheet" href="/stylesheets/layout-modular.css?v=2.2">
   
-  <!-- Chart.js for High-Precision Analytical Visualizations -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <!-- Chart.js for High-Precision Analytical Visualizations (Local Bundle + CDN Fallback) -->
+  <script src="/javascripts/chart.umd.min.js"></script>
+  <script>
+    if (typeof Chart === 'undefined') {
+      document.write('<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"><\/script>');
+    }
+  </script>
 
   <style>
     :root {
@@ -1180,18 +1185,47 @@
         pane.classList.toggle('active', pane.id === `tab-pane-${tabId}`);
       });
 
-      // Trigger Chart Resize
+      // Render charts for the newly activated tab (ensures non-zero canvas dimensions)
       setTimeout(() => {
-        if (chartOverviewInstance) chartOverviewInstance.resize();
-        if (chartUserGrowthInstance) chartUserGrowthInstance.resize();
-        if (chartRoleDistInstance) chartRoleDistInstance.resize();
-        if (chartCourseGrowthInstance) chartCourseGrowthInstance.resize();
-        if (chartCatDistInstance) chartCatDistInstance.resize();
-        if (chartMaterialTypesInstance) chartMaterialTypesInstance.resize();
-        if (chartRevenueSplitInstance) chartRevenueSplitInstance.resize();
-        if (chartPaymentMethodsInstance) chartPaymentMethodsInstance.resize();
-        if (chartExamStatsInstance) chartExamStatsInstance.resize();
+        if (!analyticsPayload) return;
+        ensureChartJsReady(() => {
+          if (tabId === 'overview') {
+            renderOverviewChart();
+          } else if (tabId === 'users') {
+            renderUserGrowthChart();
+            renderRoleDistributionChart();
+          } else if (tabId === 'courses') {
+            renderCourseGrowthChart();
+            renderCategoryDistributionChart();
+            renderMaterialTypesChart();
+          } else if (tabId === 'financial') {
+            renderRevenueSplitChart();
+            renderPaymentMethodsChart();
+          } else if (tabId === 'learning') {
+            renderExamStatsChart();
+          }
+        });
       }, 50);
+    }
+
+    // Resilient Chart.js loader check
+    function ensureChartJsReady(callback, retries = 30) {
+      if (typeof Chart !== 'undefined') {
+        callback();
+      } else if (retries > 0) {
+        setTimeout(() => ensureChartJsReady(callback, retries - 1), 100);
+      } else {
+        console.error('Chart.js gagal dimuat setelah beberapa percobaan.');
+        document.querySelectorAll('.chart-canvas-container').forEach(c => {
+          if (!c.querySelector('.chart-fallback-msg')) {
+            const msg = document.createElement('div');
+            msg.className = 'chart-fallback-msg';
+            msg.style.cssText = 'display:flex;align-items:center;justify-content:center;height:100%;color:var(--text-tertiary);font-size:0.9rem;gap:8px;';
+            msg.innerHTML = '<i class="fas fa-triangle-exclamation"></i> Gagal memuat library grafik. Silakan refresh halaman.';
+            c.appendChild(msg);
+          }
+        });
+      }
     }
 
     function getChartThemeColors() {
@@ -1212,13 +1246,17 @@
 
     // Render Overview Chart
     function renderOverviewChart() {
+      if (typeof Chart === 'undefined') return;
       if (!analyticsPayload || !analyticsPayload.charts) return;
-      const ctx = document.getElementById('chartOverviewTrends');
+      const canvas = document.getElementById('chartOverviewTrends');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
       if (!ctx) return;
 
       const colors = getChartThemeColors();
       const revData = analyticsPayload.charts.revenue_growth[overviewScale];
       const userData = analyticsPayload.charts.user_growth[overviewScale];
+      if (!revData || !userData) return;
 
       if (chartOverviewInstance) chartOverviewInstance.destroy();
 
@@ -1274,24 +1312,28 @@
             },
             yRevenue: {
               type: 'linear',
+              axis: 'y',
               position: 'left',
               ticks: {
                 color: colors.textMuted,
                 font: { family: 'JetBrains Mono', size: 10 },
                 callback: function(val) {
-                  if (val >= 1000000) return 'Rp ' + (val / 1000000) + ' Jt';
-                  if (val >= 1000) return 'Rp ' + (val / 1000) + ' Rb';
-                  return 'Rp ' + val;
+                  const n = Number(val) || 0;
+                  if (n >= 1000000) return 'Rp ' + (n / 1000000).toLocaleString('id-ID') + ' Jt';
+                  if (n >= 1000) return 'Rp ' + (n / 1000).toLocaleString('id-ID') + ' Rb';
+                  return 'Rp ' + n;
                 }
               },
               grid: { color: colors.gridColor }
             },
             yUsers: {
               type: 'linear',
+              axis: 'y',
               position: 'right',
               ticks: {
                 color: colors.textMuted,
-                font: { family: 'Plus Jakarta Sans', size: 10 }
+                font: { family: 'Plus Jakarta Sans', size: 10 },
+                precision: 0
               },
               grid: { drawOnChartArea: false }
             }
@@ -1309,12 +1351,16 @@
 
     // Render User Growth Chart
     function renderUserGrowthChart() {
+      if (typeof Chart === 'undefined') return;
       if (!analyticsPayload || !analyticsPayload.charts) return;
-      const ctx = document.getElementById('chartUserGrowth');
+      const canvas = document.getElementById('chartUserGrowth');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
       if (!ctx) return;
 
       const colors = getChartThemeColors();
       const uData = analyticsPayload.charts.user_growth[userScale];
+      if (!uData) return;
 
       if (chartUserGrowthInstance) chartUserGrowthInstance.destroy();
 
@@ -1360,12 +1406,16 @@
 
     // Render Role Distribution Chart
     function renderRoleDistributionChart() {
+      if (typeof Chart === 'undefined') return;
       if (!analyticsPayload || !analyticsPayload.charts) return;
-      const ctx = document.getElementById('chartRoleDistribution');
+      const canvas = document.getElementById('chartRoleDistribution');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
       if (!ctx) return;
 
       const colors = getChartThemeColors();
       const roleData = analyticsPayload.charts.role_distribution;
+      if (!roleData) return;
 
       if (chartRoleDistInstance) chartRoleDistInstance.destroy();
 
@@ -1392,12 +1442,16 @@
 
     // Render Course Growth Chart
     function renderCourseGrowthChart() {
+      if (typeof Chart === 'undefined') return;
       if (!analyticsPayload || !analyticsPayload.charts) return;
-      const ctx = document.getElementById('chartCourseGrowth');
+      const canvas = document.getElementById('chartCourseGrowth');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
       if (!ctx) return;
 
       const colors = getChartThemeColors();
       const cData = analyticsPayload.charts.course_growth[courseScale];
+      if (!cData) return;
 
       if (chartCourseGrowthInstance) chartCourseGrowthInstance.destroy();
 
@@ -1439,12 +1493,16 @@
 
     // Render Category Distribution Chart
     function renderCategoryDistributionChart() {
+      if (typeof Chart === 'undefined') return;
       if (!analyticsPayload || !analyticsPayload.charts) return;
-      const ctx = document.getElementById('chartCategoryDistribution');
+      const canvas = document.getElementById('chartCategoryDistribution');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
       if (!ctx) return;
 
       const colors = getChartThemeColors();
       const catData = analyticsPayload.charts.category_distribution;
+      if (!catData) return;
 
       if (chartCatDistInstance) chartCatDistInstance.destroy();
 
@@ -1474,12 +1532,16 @@
 
     // Render Material Types Chart
     function renderMaterialTypesChart() {
+      if (typeof Chart === 'undefined') return;
       if (!analyticsPayload || !analyticsPayload.charts) return;
-      const ctx = document.getElementById('chartMaterialTypes');
+      const canvas = document.getElementById('chartMaterialTypes');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
       if (!ctx) return;
 
       const colors = getChartThemeColors();
       const mData = analyticsPayload.charts.material_types;
+      if (!mData) return;
 
       if (chartMaterialTypesInstance) chartMaterialTypesInstance.destroy();
 
@@ -1516,12 +1578,16 @@
 
     // Render Revenue Split Chart (20% Platform vs 80% Tutor)
     function renderRevenueSplitChart() {
+      if (typeof Chart === 'undefined') return;
       if (!analyticsPayload || !analyticsPayload.charts) return;
-      const ctx = document.getElementById('chartRevenueSplit');
+      const canvas = document.getElementById('chartRevenueSplit');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
       if (!ctx) return;
 
       const colors = getChartThemeColors();
       const rData = analyticsPayload.charts.revenue_growth[revenueScale];
+      if (!rData) return;
 
       if (chartRevenueSplitInstance) chartRevenueSplitInstance.destroy();
 
@@ -1565,9 +1631,10 @@
               ticks: {
                 color: colors.textMuted,
                 callback: function(val) {
-                  if (val >= 1000000) return 'Rp ' + (val / 1000000) + ' Jt';
-                  if (val >= 1000) return 'Rp ' + (val / 1000) + ' Rb';
-                  return 'Rp ' + val;
+                  const n = Number(val) || 0;
+                  if (n >= 1000000) return 'Rp ' + (n / 1000000).toLocaleString('id-ID') + ' Jt';
+                  if (n >= 1000) return 'Rp ' + (n / 1000).toLocaleString('id-ID') + ' Rb';
+                  return 'Rp ' + n;
                 }
               },
               grid: { color: colors.gridColor }
@@ -1586,12 +1653,16 @@
 
     // Render Payment Methods Chart
     function renderPaymentMethodsChart() {
+      if (typeof Chart === 'undefined') return;
       if (!analyticsPayload || !analyticsPayload.charts) return;
-      const ctx = document.getElementById('chartPaymentMethods');
+      const canvas = document.getElementById('chartPaymentMethods');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
       if (!ctx) return;
 
       const colors = getChartThemeColors();
       const pmData = analyticsPayload.charts.payment_methods;
+      if (!pmData) return;
 
       if (chartPaymentMethodsInstance) chartPaymentMethodsInstance.destroy();
 
@@ -1618,12 +1689,16 @@
 
     // Render Exam Stats Chart
     function renderExamStatsChart() {
+      if (typeof Chart === 'undefined') return;
       if (!analyticsPayload || !analyticsPayload.charts) return;
-      const ctx = document.getElementById('chartExamStats');
+      const canvas = document.getElementById('chartExamStats');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
       if (!ctx) return;
 
       const colors = getChartThemeColors();
       const exData = analyticsPayload.charts.exam_stats;
+      if (!exData) return;
 
       if (chartExamStatsInstance) chartExamStatsInstance.destroy();
 
@@ -1648,17 +1723,19 @@
       });
     }
 
-    // Render All Charts
+    // Render All Charts (Resilient Execution)
     function renderAllCharts() {
-      renderOverviewChart();
-      renderUserGrowthChart();
-      renderRoleDistributionChart();
-      renderCourseGrowthChart();
-      renderCategoryDistributionChart();
-      renderMaterialTypesChart();
-      renderRevenueSplitChart();
-      renderPaymentMethodsChart();
-      renderExamStatsChart();
+      ensureChartJsReady(() => {
+        try { renderOverviewChart(); } catch (e) { console.error('Error renderOverviewChart:', e); }
+        try { renderUserGrowthChart(); } catch (e) { console.error('Error renderUserGrowthChart:', e); }
+        try { renderRoleDistributionChart(); } catch (e) { console.error('Error renderRoleDistributionChart:', e); }
+        try { renderCourseGrowthChart(); } catch (e) { console.error('Error renderCourseGrowthChart:', e); }
+        try { renderCategoryDistributionChart(); } catch (e) { console.error('Error renderCategoryDistributionChart:', e); }
+        try { renderMaterialTypesChart(); } catch (e) { console.error('Error renderMaterialTypesChart:', e); }
+        try { renderRevenueSplitChart(); } catch (e) { console.error('Error renderRevenueSplitChart:', e); }
+        try { renderPaymentMethodsChart(); } catch (e) { console.error('Error renderPaymentMethodsChart:', e); }
+        try { renderExamStatsChart(); } catch (e) { console.error('Error renderExamStatsChart:', e); }
+      });
     }
 
     // Render Top Courses in Overview
