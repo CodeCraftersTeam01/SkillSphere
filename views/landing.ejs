@@ -372,7 +372,8 @@
       position: relative;
       max-width: 960px;
       margin: 0 auto;
-      padding: 72px 24px 64px;
+      /* Jarak vertikal jelas antara navbar pill dan headline hero */
+      padding: 112px 24px 64px;
       text-align: center;
       display: flex;
       flex-direction: column;
@@ -735,7 +736,8 @@
     .floating-orion-launcher {
       position: fixed;
       bottom: 24px;
-      right: 24px;
+      /* Digeser ke kiri agar tidak tertimpa tombol aksesibilitas (fixed bottom-right) */
+      right: 88px;
       z-index: 999;
       display: flex;
       align-items: center;
@@ -1379,7 +1381,7 @@
         display: none;
       }
       .hero-section {
-        padding-top: 56px;
+        padding-top: 88px;
       }
       .hero-headline {
         font-size: 40px;
@@ -1428,7 +1430,7 @@
         font-size: 12px;
       }
       .hero-section {
-        padding-top: 36px;
+        padding-top: 72px;
         padding-left: 16px;
         padding-right: 16px;
       }
@@ -1474,7 +1476,7 @@
       .floating-orion-launcher {
         padding: 6px;
         bottom: 18px;
-        right: 18px;
+        right: 82px;
       }
       .metrics-container {
         grid-template-columns: 1fr;
@@ -1487,6 +1489,14 @@
       }
       .final-cta-card h2 {
         font-size: 28px;
+      }
+    }
+
+    /* Di layar sangat kecil tombol aksesibilitas bergeser ke kiri,
+       sehingga launcher Orion bisa kembali menempel ke kanan. */
+    @media (max-width: 480px) {
+      .floating-orion-launcher {
+        right: 18px;
       }
     }
   </style>

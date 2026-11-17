@@ -30,15 +30,23 @@
   <link rel="stylesheet" href="/stylesheets/accessibility.css">
   <!-- Custom Alert & Toast Stylesheet & Script -->
   <link rel="stylesheet" href="/stylesheets/custom-alert.css">
-  <link rel="stylesheet" href="/stylesheets/layout-modular.css?v=2.1?v=2.1?v=2.1">
+  <link rel="stylesheet" href="/stylesheets/layout-modular.css?v=2.2">
   <script src="/javascripts/custom-alert.js"></script>
 
   <style>
+    html, body {
+      overflow-x: hidden;
+      max-width: 100vw;
+    }
+
     .dashboard-layout {
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       background-color: var(--bg-app);
+      overflow-x: hidden;
+      max-width: 100vw;
+      width: 100%;
     }
 
     /* Main Container (2-Column Grid like Dicoding) */
@@ -2207,8 +2215,14 @@
           mobileNavRow.style.display = 'none';
         }
       } else if (role === 'admin') {
-        if (desktopNav) desktopNav.classList.add('is-hidden');
-        if (mobileNavRow) mobileNavRow.classList.add('is-hidden');
+        if (desktopNav) {
+          desktopNav.classList.add('is-hidden');
+          desktopNav.style.display = 'none';
+        }
+        if (mobileNavRow) {
+          mobileNavRow.classList.add('is-hidden');
+          mobileNavRow.style.display = 'none';
+        }
         if (navbar) navbar.classList.add('no-subnav');
         if (streakBadge) streakBadge.style.display = 'none';
         if (sidebarToggle) sidebarToggle.style.display = 'none';
@@ -2219,24 +2233,28 @@
         if (navbar) navbar.classList.remove('no-subnav');
 
         const studentNavHtml = `
-          <li><a href="/dashboard" class="nav-link-item active">Beranda</a></li>
-          <li><a href="#courses-catalog-section" class="nav-link-item">Katalog Kursus</a></li>
-          <li><a href="/dashboard/roadmap" class="nav-link-item">Jalur Belajar AI</a></li>
-          <li><a href="/dashboard/wishlist" class="nav-link-item">Wishlist</a></li>
-          <li><a href="/dashboard/transactions" class="nav-link-item">Riwayat Transaksi</a></li>
+          <a href="/dashboard" class="nav-link-item active">Beranda</a>
+          <a href="/courses" class="nav-link-item">Katalog Kursus</a>
+          <a href="/dashboard/roadmap" class="nav-link-item">Jalur Belajar AI</a>
+          <a href="/student/wishlist" class="nav-link-item">Wishlist</a>
+          <a href="/student/transactions" class="nav-link-item">Riwayat Transaksi</a>
         `;
 
         if (desktopNav) {
-          desktopNav.innerHTML = studentNavHtml;
+          if (!desktopNav.children || desktopNav.children.length === 0) {
+            desktopNav.innerHTML = studentNavHtml;
+          }
           desktopNav.classList.remove('is-hidden');
-          desktopNav.style.display = 'flex';
+          desktopNav.style.display = '';
         }
         if (mobileNav) {
-          mobileNav.innerHTML = studentNavHtml;
+          if (!mobileNav.children || mobileNav.children.length === 0) {
+            mobileNav.innerHTML = studentNavHtml;
+          }
         }
         if (mobileNavRow) {
           mobileNavRow.classList.remove('is-hidden');
-          mobileNavRow.style.display = 'block';
+          mobileNavRow.style.display = '';
         }
         toggleClassroomSidebar(false);
       }

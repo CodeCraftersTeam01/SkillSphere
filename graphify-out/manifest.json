@@ -726,9 +726,9 @@
     "semantic_hash": ""
   },
   "views/dashboard.ejs": {
-    "mtime": 1794925989.1842952,
-    "seen": 1794926094.106499,
-    "ast_hash": "6e1d7ba5c134bd0ff64712cfd6323078",
+    "mtime": 1794928319.8418949,
+    "seen": 1794928483.792469,
+    "ast_hash": "d2aec4fe2be9ee702c465c93460eee2f",
     "semantic_hash": ""
   },
   "views/error.ejs": {
@@ -1218,9 +1218,9 @@
     "semantic_hash": ""
   },
   "views/landing.ejs": {
-    "mtime": 1794925989.18669,
-    "seen": 1794926094.106503,
-    "ast_hash": "bcaf839e4f33a8b651455e0568139600",
+    "mtime": 1794928221.0081007,
+    "seen": 1794928483.79248,
+    "ast_hash": "e4d4e29003cb9544c10903eb0cd4d914",
     "semantic_hash": ""
   },
   "docs/superpowers/plans/2026-11-16-landing-page.md": {
@@ -1254,9 +1254,9 @@
     "semantic_hash": ""
   },
   "views/partials/student-header.ejs": {
-    "mtime": 1794925989.1919498,
-    "seen": 1794926094.106511,
-    "ast_hash": "746643ec25554d8c9a38a787fbaa4064",
+    "mtime": 1794928347.0910912,
+    "seen": 1794928483.792497,
+    "ast_hash": "eacebbb5191af15ebad6c34a681fed7c",
     "semantic_hash": ""
   },
   "views/partials/tutor-header.ejs": {

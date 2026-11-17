@@ -1,7 +1,7 @@
 # Graph Report - SkillSphare  (2026-11-17)
 
 ## Corpus Check
-- 192 files · ~604,746 words
+- 192 files · ~604,839 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 11 file(s) not represented in the graph (top: .css 8, .example 1, (none) 1)
 
@@ -11,7 +11,7 @@
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `869b2091`
+- Built from commit: `8c0fa6c4`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -755,11 +755,11 @@ _Questions this graph is uniquely positioned to answer:_
 - **Should `assets.mjs` be split into smaller, more focused modules?**
   _Cohesion score 0.06648426812585499 - nodes in this community are weakly interconnected._
 - **Why does `User` connect `User` to `examController.js`, `mediaStorage.test.js`, `models/index.js`, `app.js`, `mediaStorage.test.js`, `sprint4CertificateAiReadiness.test.js`, `sprint4E2EQA.test.js`, `runWhatsAppOtpTestSuite`, `authController.js`, `adminController.js`, `geminiService.js`, `exams.js`, `analyticsDashboard.test.js`, `middleware/auth.js`, `courseController.js`?**
-  _High betweenness centrality (0.003) - this node is a cross-community bridge._
+  _High betweenness centrality (0.005) - this node is a cross-community bridge._
 - **Should `verification.ejs` be split into smaller, more focused modules?**
   _Cohesion score 0.06259183073758448 - nodes in this community are weakly interconnected._
-- **Why does `jsonwebtoken` connect `app.js` to `mediaStorage.test.js`, `sprint4CertificateAiReadiness.test.js`, `package.json`, `User`, `sprint4E2EQA.test.js`, `authController.js`, `exams.js`, `analyticsDashboard.test.js`, `middleware/auth.js`?**
-  _High betweenness centrality (0.003) - this node is a cross-community bridge._
+- **Why does `Motion Cookbook` connect `Motion Cookbook` to `9. Clip-Path Animations (Emil)`, `6. Shared Layout Animations (Jakub)`, `10. Button & Interactive Feedback (Emil)`, `11. CSS Transitions vs Keyframes (Emil)`, `12. Spring Physics (Emil)`, `14. Scroll-Driven Animations (Jhey)`, `1. Enter & Exit Animations`, `3. Visual Effects`, `7. CSS Custom Properties & @property (Jhey)`, `8. 3D CSS (Jhey)`, `2. Easing & Timing`?**
+  _High betweenness centrality (0.004) - this node is a cross-community bridge._
 - **Should `materials.ejs` be split into smaller, more focused modules?**
   _Cohesion score 0.05765765765765766 - nodes in this community are weakly interconnected._
 - **Should `learn.ejs` be split into smaller, more focused modules?**
