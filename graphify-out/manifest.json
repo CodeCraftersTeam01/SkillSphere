@@ -702,9 +702,9 @@
     "semantic_hash": ""
   },
   "views/courses/checkout.ejs": {
-    "mtime": 1794925989.174519,
-    "seen": 1794926094.106493,
-    "ast_hash": "b2e05c885077089169c3bb664f726665",
+    "mtime": 1794939469.8583646,
+    "seen": 1794939635.097103,
+    "ast_hash": "0e566578b484428623a8cad1a4d08c8a",
     "semantic_hash": ""
   },
   "views/courses/detail.ejs": {
@@ -792,15 +792,15 @@
     "semantic_hash": ""
   },
   "views/student/transactions.ejs": {
-    "mtime": 1794925989.2039185,
-    "seen": 1794926094.106524,
-    "ast_hash": "25118f5fb38a69c7b04667d9ad8004d4",
+    "mtime": 1794939435.5642076,
+    "seen": 1794939635.097122,
+    "ast_hash": "b3019accceec2c53929ae717b72ee8e2",
     "semantic_hash": ""
   },
   "views/student/wishlist.ejs": {
-    "mtime": 1794925989.205051,
-    "seen": 1794926094.106525,
-    "ast_hash": "861b35a1844d414886d08fbeca5601dc",
+    "mtime": 1794939452.566303,
+    "seen": 1794939635.097122,
+    "ast_hash": "654402c0d3dba57ec331a5b637ab0ef0",
     "semantic_hash": ""
   },
   "views/terms.ejs": {
@@ -834,15 +834,15 @@
     "semantic_hash": ""
   },
   "views/tutor/wallet.ejs": {
-    "mtime": 1794936450.0635579,
-    "seen": 1794936744.315305,
-    "ast_hash": "873aed9f975b865896dbafa7daece7a4",
+    "mtime": 1794939508.7243748,
+    "seen": 1794939635.0971289,
+    "ast_hash": "c2ecddf272cc2f49b3b767b239e0d783",
     "semantic_hash": ""
   },
   "views/tutor/withdrawal.ejs": {
-    "mtime": 1794936560.704196,
-    "seen": 1794936744.315306,
-    "ast_hash": "14b6e3bbbb9649aeee8e8ac793c4ff83",
+    "mtime": 1794939530.1627946,
+    "seen": 1794939635.09713,
+    "ast_hash": "ef66911bead50c35f4d738a101f3ca82",
     "semantic_hash": ""
   },
   "views/warp.ejs": {
@@ -1212,9 +1212,9 @@
     "semantic_hash": ""
   },
   "views/tutor/analytics.ejs": {
-    "mtime": 1794937688.5195591,
-    "seen": 1794938416.6829922,
-    "ast_hash": "f37d205227af97ebd250bf0c9d84cd8e",
+    "mtime": 1794939515.7736764,
+    "seen": 1794939635.097124,
+    "ast_hash": "c93af24a0cc0c208e1c4a165493f01c6",
     "semantic_hash": ""
   },
   "views/landing.ejs": {

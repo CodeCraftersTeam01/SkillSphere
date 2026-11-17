@@ -23,12 +23,25 @@
   <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400..700;1,6..72,400..700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
-  <link rel="stylesheet" href="/stylesheets/style.css">
+  <!-- Claude Design System Stylesheet & Accessibility Toolkit -->
   <link rel="stylesheet" href="/stylesheets/claude-theme.css?v=2.0">
   <link rel="stylesheet" href="/stylesheets/accessibility.css">
   <link rel="stylesheet" href="/stylesheets/layout-modular.css?v=2.4">
 
   <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: var(--bg-app);
+      font-family: var(--font-sans);
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+    }
+
     /* Tutor Earnings & Financial Overview Banner */
     .tutor-earnings-card {
       background: var(--bg-surface);
@@ -402,7 +415,7 @@
     <%- include('../partials/tutor-sidebar', { activeNav: 'wallet' }) %>
 
     <!-- Main Content Pane -->
-    <main class="classroom-main-pane">
+    <main class="classroom-main-pane" style="padding: 24px 32px 60px;">
       <!-- 1. TUTOR FINANCIAL HUB BANNER (Matching Dashboard Exactly) -->
       <div class="tutor-earnings-card">
         <div class="earnings-header-row">

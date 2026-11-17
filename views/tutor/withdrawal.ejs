@@ -10,7 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   
-  <link rel="stylesheet" href="/stylesheets/style.css">
+  <!-- Claude Design System Stylesheet & Accessibility Toolkit -->
   <link rel="stylesheet" href="/stylesheets/claude-theme.css?v=2.0">
   <link rel="stylesheet" href="/stylesheets/accessibility.css">
   <link rel="stylesheet" href="/stylesheets/layout-modular.css?v=2.4">
@@ -18,6 +18,19 @@
   <script src="/javascripts/custom-alert.js"></script>
 
   <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: var(--bg-app);
+      font-family: var(--font-sans);
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+    }
+
     /* Top Banner */
     .tutor-earnings-card {
       background: var(--bg-surface);
@@ -391,7 +404,7 @@
     <%- include('../partials/tutor-sidebar', { activeNav: 'withdrawal' }) %>
 
     <!-- Main Content Area -->
-    <main class="classroom-main-pane">
+    <main class="classroom-main-pane" style="padding: 24px 32px 60px;">
       <!-- 1. Banner Ringkasan Keuangan Pengajar -->
       <section class="tutor-earnings-card" aria-labelledby="banner-heading">
         <div class="earnings-header-row">

@@ -1,7 +1,7 @@
 # Graph Report - SkillSphare  (2026-11-18)
 
 ## Corpus Check
-- 195 files · ~620,194 words
+- 195 files · ~620,284 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 11 file(s) not represented in the graph (top: .css 8, .example 1, (none) 1)
 
@@ -11,7 +11,7 @@
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `ad62bb2b`
+- Built from commit: `1f1e8997`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -220,9 +220,9 @@
 ## Surprising Connections (you probably didn't know these)
 - `Task 2: Arjuna (AA) - Payment Gateway, Split Fee 20/80, API Mutasi & Payout` --references--> `createSnapToken()`  [INFERRED]
   docs/superpowers/plans/2026-11-01-sprint3-payment-and-finance.md → controllers/paymentController.js
-- `Task 2: Arjuna (AA) - Payment Gateway, Split Fee 20/80, API Mutasi & Payout` --references--> `handleNotification()`  [INFERRED]
-  docs/superpowers/plans/2026-11-01-sprint3-payment-and-finance.md → controllers/paymentController.js
 - `Task 2: Arjuna (AA) - Payment Gateway, Split Fee 20/80, API Mutasi & Payout` --references--> `getTutorWallet()`  [INFERRED]
+  docs/superpowers/plans/2026-11-01-sprint3-payment-and-finance.md → controllers/paymentController.js
+- `Task 2: Arjuna (AA) - Payment Gateway, Split Fee 20/80, API Mutasi & Payout` --references--> `handleNotification()`  [INFERRED]
   docs/superpowers/plans/2026-11-01-sprint3-payment-and-finance.md → controllers/paymentController.js
 - `Task 2: Arjuna (AA) - Payment Gateway, Split Fee 20/80, API Mutasi & Payout` --references--> `requestWithdrawal()`  [INFERRED]
   docs/superpowers/plans/2026-11-01-sprint3-payment-and-finance.md → controllers/paymentController.js
@@ -905,16 +905,16 @@ Nodes (3): 6. Shared Layout Animations (Jakub), Best Practices, FLIP Technique v
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `n()` connect `n` to `u`, `An`, `va`, `Ns`, `iK`, `Js`, `s`, `Cs`, `no`, `chart.umd.min.js`, `a`, `ws`, `highcharts.js`?**
-  _High betweenness centrality (0.071) - this node is a cross-community bridge._
+  _High betweenness centrality (0.094) - this node is a cross-community bridge._
 - **Are the 2 inferred relationships involving `v()` (e.g. with `.addPoint()` and `.removePoint()`) actually correct?**
   _`v()` has 2 INFERRED edges - model-reasoned connections that need verification._
 - **Should `assets.mjs` be split into smaller, more focused modules?**
   _Cohesion score 0.06648426812585499 - nodes in this community are weakly interconnected._
 - **Why does `r()` connect `n` to `Ns`, `lint.mjs`, `s`, `Js`, `chart.umd.min.js`, `a`?**
-  _High betweenness centrality (0.056) - this node is a cross-community bridge._
+  _High betweenness centrality (0.049) - this node is a cross-community bridge._
 - **Should `verification.ejs` be split into smaller, more focused modules?**
   _Cohesion score 0.0967741935483871 - nodes in this community are weakly interconnected._
-- **Why does `Ns` connect `Ns` to `a`, `chart.umd.min.js`, `n`, `jn`?**
-  _High betweenness centrality (0.018) - this node is a cross-community bridge._
+- **Why does `tK` connect `tK` to `.attr`, `S`, `.getBBox`, `eY`, `.onAdd`, `eU`, `j`, `highcharts.js`?**
+  _High betweenness centrality (0.014) - this node is a cross-community bridge._
 - **Should `materials.ejs` be split into smaller, more focused modules?**
   _Cohesion score 0.07899159663865546 - nodes in this community are weakly interconnected._
