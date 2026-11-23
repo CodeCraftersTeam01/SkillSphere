@@ -1,0 +1,252 @@
+<%
+  const pageTitle = (typeof title !== 'undefined' && title) ? title : 'Ruang Lab & Praktikum Kode | SkillSphere AI';
+%>
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <title><%= pageTitle %></title>
+  <meta name="description" content="Ruang Lab & Praktikum kode interaktif dengan evaluasi AI secara langsung di SkillSphere AI.">
+
+  <!-- Immediate Theme Initializer -->
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('skillsphere_theme') || localStorage.getItem('theme') || 'light';
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    })();
+  </script>
+
+  <!-- Google Fonts: Newsreader, Plus Jakarta Sans, JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome 6 Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- SkillSphere Design System & Lab Stylesheet -->
+  <link rel="stylesheet" href="/stylesheets/claude-theme.css?v=2.0">
+  <link rel="stylesheet" href="/stylesheets/accessibility.css">
+  <link rel="stylesheet" href="/stylesheets/layout-modular.css?v=2.1">
+  <link rel="stylesheet" href="/stylesheets/custom-alert.css">
+  <link rel="stylesheet" href="/stylesheets/labs.css?v=1.0">
+  <script src="/javascripts/custom-alert.js"></script>
+</head>
+<body class="labs-page">
+
+  <!-- Modular Student Header -->
+  <%- include('../partials/student-header', { activeNav: 'labs' }) %>
+
+  <!-- Main Content -->
+  <main class="labs-container" id="main-content" role="main">
+
+    <!-- 1. Top Hero -->
+    <section class="labs-hero" aria-label="Header Ruang Lab dan Praktikum">
+      <div class="labs-hero-top">
+        <div class="labs-hero-title-group">
+          <div class="labs-eyebrow">
+            <i class="fas fa-terminal" aria-hidden="true"></i>
+            <span>Evaluasi Kode Adaptif Berbasis AI</span>
+          </div>
+          <h1 class="labs-title">Ruang Lab &amp; Praktikum Kode</h1>
+          <p class="labs-subtitle">
+            Selesaikan tantangan buat kode dan perbaiki bug dalam satu ruang praktik interaktif dengan analisis AI secara langsung.
+          </p>
+        </div>
+
+        <!-- Live Student Stats Pills -->
+        <div class="labs-stats-row" id="labsStatsRow" aria-label="Statistik Praktikum Saya">
+          <div class="lab-stat-pill">
+            <span class="lab-stat-label">Selesai</span>
+            <span class="lab-stat-value is-success" id="statSolved">0</span>
+          </div>
+          <div class="lab-stat-pill">
+            <span class="lab-stat-label">Total Percobaan</span>
+            <span class="lab-stat-value" id="statAttempts">0</span>
+          </div>
+          <div class="lab-stat-pill">
+            <span class="lab-stat-label">Rata-rata Skor</span>
+            <span class="lab-stat-value" id="statAvgScore">0</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. Filter & Challenge Selector Bar -->
+    <section class="labs-selector-section" aria-label="Daftar Tantangan Kode">
+      <div class="labs-filter-bar">
+        <div class="filter-groups-wrap">
+          <!-- Mode Filter -->
+          <div class="filter-group" id="modeFilterGroup" role="group" aria-label="Filter Mode Tugas">
+            <span class="filter-group-label">Mode:</span>
+            <button type="button" class="filter-pill active" data-mode="all">Semua</button>
+            <button type="button" class="filter-pill" data-mode="create">Buat Kode</button>
+            <button type="button" class="filter-pill" data-mode="fix">Perbaiki Kode</button>
+          </div>
+
+          <!-- Language Filter -->
+          <div class="filter-group" id="langFilterGroup" role="group" aria-label="Filter Bahasa Pemrograman">
+            <span class="filter-group-label">Bahasa:</span>
+            <button type="button" class="filter-pill active" data-lang="all">Semua</button>
+            <button type="button" class="filter-pill" data-lang="javascript">JavaScript</button>
+            <button type="button" class="filter-pill" data-lang="python">Python</button>
+            <button type="button" class="filter-pill" data-lang="sql">SQL</button>
+            <button type="button" class="filter-pill" data-lang="html/css">HTML/CSS</button>
+            <button type="button" class="filter-pill" data-lang="php">PHP</button>
+          </div>
+
+          <!-- Difficulty Filter -->
+          <div class="filter-group" id="difficultyFilterGroup" role="group" aria-label="Filter Tingkat Kesulitan">
+            <span class="filter-group-label">Tingkat:</span>
+            <button type="button" class="filter-pill active" data-filter-difficulty="all">Semua</button>
+            <button type="button" class="filter-pill" data-filter-difficulty="beginner">Pemula</button>
+            <button type="button" class="filter-pill" data-filter-difficulty="intermediate">Menengah</button>
+            <button type="button" class="filter-pill" data-filter-difficulty="advanced">Lanjutan</button>
+          </div>
+        </div>
+
+        <!-- Search Input -->
+        <div class="labs-search-wrap">
+          <i class="fas fa-search" aria-hidden="true"></i>
+          <input
+            type="search"
+            id="labSearchInput"
+            class="labs-search-input"
+            placeholder="Cari judul tantangan..."
+            aria-label="Cari judul tantangan kode"
+          >
+        </div>
+      </div>
+
+      <!-- Challenge Cards Grid -->
+      <div class="challenges-grid" id="challengesGrid" aria-live="polite">
+        <div class="labs-empty-state">
+          <i class="fas fa-spinner fa-spin" aria-hidden="true"></i>
+          <h3>Memuat Tantangan Lab &amp; Praktikum...</h3>
+          <p>Menghubungkan ke server Lab &amp; Praktikum SkillSphere AI.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. Interactive Coding Workspace (Split Pane) -->
+    <section class="ide-workspace" id="ideWorkspace" aria-label="Area Kerja Kode Interaktif">
+
+      <!-- Left Panel: Instructions & Test Cases / Submission History -->
+      <div class="ide-panel" id="ideLeftPanel">
+        <div class="panel-tab-header">
+          <div class="panel-tabs" role="tablist" aria-label="Tab Panel Soal">
+            <button
+              type="button"
+              class="panel-tab-btn active"
+              id="leftTabInstructions"
+              role="tab"
+              aria-selected="true"
+              data-left-tab="instructions"
+            >
+              <i class="fas fa-book-open" aria-hidden="true"></i> Instruksi Soal
+            </button>
+            <button
+              type="button"
+              class="panel-tab-btn"
+              id="leftTabSubmissions"
+              role="tab"
+              aria-selected="false"
+              data-left-tab="submissions"
+            >
+              <i class="fas fa-clock-rotate-left" aria-hidden="true"></i> Riwayat Pengumpulan
+            </button>
+          </div>
+        </div>
+
+        <div class="panel-body-scroll">
+          <!-- Instructions Pane -->
+          <div id="instructionsPane">
+            <div class="labs-empty-state" style="border:none; background:transparent;">
+              <i class="fas fa-code" aria-hidden="true"></i>
+              <h3>Pilih Tantangan Kode</h3>
+              <p>Klik salah satu kartu tantangan di atas untuk membuka instruksi lengkap dan mulai menulis kode.</p>
+            </div>
+          </div>
+
+          <!-- Submissions History Pane -->
+          <div id="submissionsPane" style="display:none;" aria-live="polite">
+            <div class="labs-empty-state" style="border:none; background:transparent;">
+              <i class="fas fa-clock-rotate-left" aria-hidden="true"></i>
+              <h3>Belum Ada Riwayat</h3>
+              <p>Pilih tantangan terlebih dahulu untuk melihat riwayat pengumpulan kode Anda.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Panel: Code Editor & AI Analysis -->
+      <div class="ide-panel" id="ideRightPanel">
+        <div class="editor-toolbar">
+          <div class="editor-toolbar-left">
+            <span class="lab-pill" id="wsRoomBadge">Lab &amp; Praktikum</span>
+            <span class="lab-pill pill-lang" id="editorLangBadge">JavaScript</span>
+            <span class="lab-pill" id="editorModeBadge">Buat Kode</span>
+          </div>
+          <div class="editor-toolbar-actions">
+            <button type="button" class="btn-editor-secondary" id="btnResetCode" title="Kembalikan ke kode awal">
+              <i class="fas fa-rotate-left" aria-hidden="true"></i>
+              <span>Reset Kode Awal</span>
+            </button>
+            <button type="button" class="btn-editor-secondary" id="btnCopyCode" title="Salin kode ke clipboard">
+              <i class="fas fa-copy" aria-hidden="true"></i>
+              <span id="copyCodeLabel">Salin Kode</span>
+            </button>
+            <button type="button" class="btn-analyze-ai" id="btnAnalyzeCode">
+              <i class="fas fa-wand-magic-sparkles" id="analyzeBtnIcon" aria-hidden="true"></i>
+              <span id="analyzeBtnText">Analisis Kode dengan AI</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Inline Alert Container (Login required / Error feedback) -->
+        <div id="labInlineAlertContainer" aria-live="assertive"></div>
+
+        <!-- Monospace Code Editor -->
+        <div class="code-editor-shell">
+          <div class="code-line-numbers" id="codeLineNumbers" aria-hidden="true">1</div>
+          <textarea
+            id="codeEditorTextarea"
+            class="code-textarea"
+            spellcheck="false"
+            autocapitalize="off"
+            autocomplete="off"
+            autocorrect="off"
+            aria-label="Editor Kode Pemrograman"
+            placeholder="// Pilih tantangan kode di atas untuk mulai menulis atau memperbaiki kode..."
+          ></textarea>
+        </div>
+
+        <div class="editor-statusbar">
+          <span id="editorCursorInfo">Baris 1, Kolom 1</span>
+          <span>Tekan Tab untuk 2 spasi : Ctrl/Cmd + Enter untuk Analisis AI</span>
+        </div>
+
+        <!-- AI Analysis Result Panel -->
+        <div class="ai-analysis-panel" id="aiAnalysisPanel" aria-live="polite">
+          <div class="ai-analysis-placeholder">
+            <i class="fas fa-sparkles" aria-hidden="true"></i>
+            <p style="margin:0;">
+              Hasil evaluasi AI, skor, temuan perbaikan, dan hasil uji kasus akan ditampilkan di sini setelah Anda menekan <strong>Analisis Kode dengan AI</strong>.
+            </p>
+          </div>
+        </div>
+      </div>
+
+    </section>
+  </main>
+
+  <!-- Modular Site Footer -->
+  <%- include('../partials/footer') %>
+
+  <!-- Accessibility & Modular Layout Scripts -->
+  <script src="/javascripts/accessibility.js"></script>
+  <script src="/javascripts/layout-modular.js"></script>
+  <script src="/javascripts/labs.js?v=1.0"></script>
+</body>
+</html>

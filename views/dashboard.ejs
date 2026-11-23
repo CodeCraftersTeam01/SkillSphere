@@ -31,6 +31,7 @@
   <!-- Custom Alert & Toast Stylesheet & Script -->
   <link rel="stylesheet" href="/stylesheets/custom-alert.css">
   <link rel="stylesheet" href="/stylesheets/layout-modular.css?v=2.2">
+  <link rel="stylesheet" href="/stylesheets/student-radar.css">
   <script src="/javascripts/custom-alert.js"></script>
 
   <style>
@@ -1585,6 +1586,33 @@
               </div>
             </div>
           </div>
+
+          <!-- Peta Kompetensi & Tahap Belajar (Grafik Radar / Laba-Laba) -->
+          <section class="student-radar-card" id="studentRadarSection" aria-label="Peta Kompetensi dan Tahap Belajar Siswa">
+            <div class="radar-card-header">
+              <div>
+                <h2 class="radar-card-title"><i class="fas fa-diagram-project" aria-hidden="true"></i> Peta Kompetensi &amp; Tahap Belajar</h2>
+                <p class="radar-card-subtitle" id="radarStageSummary">Memuat analisis peta belajar Anda...</p>
+              </div>
+              <div class="radar-mode-tabs" role="tablist" aria-label="Mode Grafik Radar">
+                <button type="button" class="radar-tab-btn active" data-radar-tab="skill" role="tab" aria-selected="true">Bidang Dipelajari</button>
+                <button type="button" class="radar-tab-btn" data-radar-tab="stage" role="tab" aria-selected="false">Tahap Belajar</button>
+              </div>
+            </div>
+            <div class="radar-stage-bar" id="radarStageStepper"></div>
+            <div class="radar-main-grid">
+              <div class="radar-canvas-box">
+                <canvas id="studentLearningRadarCanvas" aria-label="Grafik Laba-Laba Kompetensi Siswa"></canvas>
+              </div>
+              <div class="radar-side-panel">
+                <div class="radar-metrics-mini" id="radarMetricsMini"></div>
+                <div class="radar-topics-block">
+                  <h3 class="radar-topics-heading">Topik &amp; Kursus yang Dipelajari</h3>
+                  <div class="radar-topics-list" id="radarStudiedTopics"></div>
+                </div>
+              </div>
+            </div>
+          </section>
 
           <!-- Aktivitas Lain & Eksplorasi -->
           <div class="section-card">
@@ -3285,5 +3313,8 @@
   <script src="/javascripts/accessibility.js"></script>
   <!-- Modular Layout Script -->
   <script src="/javascripts/layout-modular.js"></script>
+  <!-- Student Learning Radar Chart -->
+  <script src="/javascripts/chart.umd.min.js"></script>
+  <script src="/javascripts/student-radar.js"></script>
 </body>
 </html>

@@ -2043,6 +2043,7 @@
     let courseData = null;
     let flatMaterials = [];
     let courseExams = [];
+    let courseLabs = [];
     let currentMaterialIndex = 0;
     let completedMaterialIds = new Set();
     let isAIPanelOpen = false;
@@ -2194,6 +2195,22 @@
           }
         } catch (exErr) {
           console.error('Error fetching course exams for curriculum:', exErr);
+        }
+
+        // Fetch course labs & practicum challenges
+        try {
+          const token = localStorage.getItem('token') || localStorage.getItem('skillsphere_access_token') || '';
+          const labRes = await fetch(`/api/labs?course_id=${courseData.id}`, {
+            headers: token ? { 'Authorization': 'Bearer ' + token } : {}
+          });
+          const labJson = await labRes.json();
+          if (labJson && labJson.success && labJson.data) {
+            courseLabs = Array.isArray(labJson.data.items)
+              ? labJson.data.items
+              : (Array.isArray(labJson.data) ? labJson.data : []);
+          }
+        } catch (labErr) {
+          console.error('Error fetching course labs for curriculum:', labErr);
         }
 
         renderCurriculumTree();
@@ -2371,7 +2388,46 @@
         `).join('');
       }
 
-      container.innerHTML = sectionsHtml + finalExamsHtml;
+      // Render Ruang Lab & Praktikum linked to this course
+      let courseLabsHtml = '';
+      if (Array.isArray(courseLabs) && courseLabs.length > 0 && courseData) {
+        const solvedLabsCount = courseLabs.filter(l => l && l.user_status && l.user_status.solved).length;
+        const labItemsHtml = courseLabs.map(lab => {
+          const isFixMode = String(lab.challenge_mode || 'create').toLowerCase() === 'fix';
+          const isSolved = Boolean(lab.user_status && lab.user_status.solved);
+          const targetPath = `/labs?course_id=${courseData.id}&lab_id=${lab.id}`;
+          const modeLabel = isFixMode ? 'Perbaiki Kode' : 'Buat Kode';
+          return `
+            <a href="${targetPath}" class="module-item-btn" style="text-decoration:none;" title="${modeLabel}">
+              <div style="display:flex; align-items:center; gap:8px; overflow:hidden;">
+                <i class="fas ${isSolved ? 'fa-circle-check' : (isFixMode ? 'fa-wrench' : 'fa-code')}" style="color:${isSolved ? 'var(--color-success)' : 'var(--accent-primary, #D97757)'}; font-size:12px;"></i>
+                <div style="display:flex; flex-direction:column; overflow:hidden;">
+                  <span class="module-title-truncate" style="color:var(--text-primary);">${escapeHtml(lab.title || 'Tugas Kode')}</span>
+                  <span style="font-size:10.5px; color:var(--text-tertiary, #78716C);">${modeLabel}</span>
+                </div>
+              </div>
+              <span class="module-format-badge" style="font-size:9.5px; font-weight:700;">LAB</span>
+            </a>
+          `;
+        }).join('');
+
+        courseLabsHtml = `
+          <div class="chapter-group course-labs-group" style="margin-top:14px; border-top:1px dashed var(--border-subtle); padding-top:10px;">
+            <div class="chapter-header" onclick="toggleChapterAccordion(this)" style="cursor:pointer; background:rgba(217, 119, 87, 0.08); border-radius:var(--radius-md);">
+              <div class="chapter-title-text" style="color:var(--accent-primary, #D97757); font-weight:700;">
+                <i class="fas fa-terminal"></i>
+                <span>Ruang Lab &amp; Praktikum Kode</span>
+              </div>
+              <span class="chapter-meta-count">${solvedLabsCount}/${courseLabs.length}</span>
+            </div>
+            <div class="chapter-body" style="padding-left:4px; margin-top:4px;">
+              ${labItemsHtml}
+            </div>
+          </div>
+        `;
+      }
+
+      container.innerHTML = sectionsHtml + courseLabsHtml + finalExamsHtml;
     }
 
     function toggleChapterAccordion(el) {
