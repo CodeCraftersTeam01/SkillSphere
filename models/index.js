@@ -20,6 +20,8 @@ const TutorWallet = require('./TutorWallet');
 const WalletTransaction = require('./WalletTransaction');
 const WithdrawalRequest = require('./WithdrawalRequest');
 const UserDevice = require('./UserDevice');
+const LabExercise = require('./LabExercise');
+const LabSubmission = require('./LabSubmission');
 
 // 1. User <-> UserProfile (1:1)
 User.hasOne(UserProfile, { foreignKey: 'user_id', as: 'profile', onDelete: 'CASCADE' });
@@ -118,6 +120,18 @@ WithdrawalRequest.belongsTo(User, { foreignKey: 'tutor_id', as: 'tutor' });
 User.hasMany(UserDevice, { foreignKey: 'user_id', as: 'devices', onDelete: 'CASCADE' });
 UserDevice.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
 
+// 20. Course & User <-> LabExercise (1:N)
+Course.hasMany(LabExercise, { foreignKey: 'course_id', as: 'labs', onDelete: 'SET NULL' });
+LabExercise.belongsTo(Course, { foreignKey: 'course_id', as: 'course' });
+User.hasMany(LabExercise, { foreignKey: 'created_by', as: 'createdLabs', onDelete: 'CASCADE' });
+LabExercise.belongsTo(User, { foreignKey: 'created_by', as: 'creator' });
+
+// 21. LabExercise & User <-> LabSubmission (1:N)
+LabExercise.hasMany(LabSubmission, { foreignKey: 'lab_id', as: 'submissions', onDelete: 'CASCADE' });
+LabSubmission.belongsTo(LabExercise, { foreignKey: 'lab_id', as: 'lab' });
+User.hasMany(LabSubmission, { foreignKey: 'user_id', as: 'labSubmissions', onDelete: 'CASCADE' });
+LabSubmission.belongsTo(User, { foreignKey: 'user_id', as: 'student' });
+
 module.exports = {
   sequelize,
   User,
@@ -140,4 +154,6 @@ module.exports = {
   WalletTransaction,
   WithdrawalRequest,
   UserDevice,
+  LabExercise,
+  LabSubmission,
 };

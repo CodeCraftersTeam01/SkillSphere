@@ -21,7 +21,7 @@ const CourseMaterial = sequelize.define('CourseMaterial', {
   },
   file_url: {
     type: DataTypes.STRING(255),
-    allowNull: false,
+    allowNull: true,
   },
   content_text: {
     type: DataTypes.TEXT('long'),

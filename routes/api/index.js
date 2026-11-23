@@ -12,6 +12,8 @@ const paymentRoutes = require('./payments');
 const examRoutes = require('./exams');
 const milestoneRoutes = require('./milestones');
 const certificateRoutes = require('./certificates');
+const labRoutes = require('./labs');
+const studentRoutes = require('./student');
 
 // Health check endpoint
 router.get('/health', (req, res) => {
@@ -54,6 +56,8 @@ router.use('/payments', paymentRoutes);
 router.use('/exams', examRoutes);
 router.use('/milestones', milestoneRoutes);
 router.use('/certificates', certificateRoutes);
+router.use('/labs', labRoutes);
+router.use('/student', studentRoutes);
 
 
 module.exports = router;

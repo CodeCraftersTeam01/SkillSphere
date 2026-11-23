@@ -63,6 +63,14 @@ router.get(['/certificates', '/dashboard/certificates', '/sertifikat'], function
   res.render('student/certificates', { title: 'Sertifikat & Milestone Belajar | SkillSphere AI' });
 });
 
+/* GET Student Ruang Lab & Praktikum Kode (Unified) */
+router.get(['/labs', '/practicum'], function(req, res, next) {
+  res.render('student/labs', {
+    title: 'Ruang Lab & Praktikum Kode - SkillSphere AI',
+    initialRoom: 'all'
+  });
+});
+
 
 /* GET Course Catalog Page (Sprint 2 - Fadiyah) */
 router.get(['/courses', '/catalog', '/katalog'], function(req, res, next) {
@@ -118,9 +126,17 @@ router.get(['/intro', '/video'], function(req, res, next) {
   res.redirect('/motion/');
 });
 
-/* GET Admin Dashboard & Verification UI (Sprint 1 - Satrio) */
-router.get(['/admin', '/admin/dashboard', '/admin/verification'], function(req, res, next) {
-  res.render('admin/verification', { title: 'Dashboard Admin & Verifikasi Pengajar | SkillSphere AI' });
+/* GET Admin Dashboard & Management UI (Sprint 1 - Satrio) */
+router.get(['/admin', '/admin/dashboard', '/admin/verification', '/admin/users', '/admin/courses', '/admin/financial'], function(req, res, next) {
+  let activeView = 'overview';
+  if (req.path.includes('/verification')) activeView = 'verification';
+  else if (req.path.includes('/users')) activeView = 'users';
+  else if (req.path.includes('/courses')) activeView = 'courses';
+  else if (req.path.includes('/financial')) activeView = 'financial';
+  res.render('admin/verification', { 
+    title: 'Dashboard Admin & Manajemen Platform | SkillSphere AI',
+    activeView
+  });
 });
 
 /* GET Admin Reports & Platform Analytics */
@@ -146,6 +162,11 @@ router.get(['/tutor/courses/edit', '/tutor/course/edit', '/tutor/edit-course', '
 /* GET Tutor Exam Creator Portal (Sprint 4 - Satrio) */
 router.get(['/tutor/exams', '/tutor/exam-creator', '/dashboard/tutor/exams'], function(req, res, next) {
   res.render('tutor/exams', { title: 'Pembuat Ujian Kelulusan | Studio Pengajar SkillSphere AI' });
+});
+
+/* GET Tutor Lab & Practicum Studio */
+router.get('/tutor/labs', function(req, res, next) {
+  res.render('tutor/labs', { title: 'Studio Lab & Praktikum Pengajar - SkillSphere AI' });
 });
 
 /* GET Tutor Certificate Studio (Sprint 4 - Satrio & Arjuna) */

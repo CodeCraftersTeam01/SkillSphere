@@ -842,7 +842,11 @@ async function seedDatabase() {
       status: 'pending',
     });
 
-    console.log('🎉 Seeding successfully completed! All 19 tables populated with sample data.');
+    // 13. Seed Praktikum & Lab Kode untuk Kursus Mastering Modern HTML5
+    const { seedHtml5Labs } = require('./seedHtml5Labs');
+    await seedHtml5Labs({ courseId: course2.id, creatorId: tutor.id });
+
+    console.log('🎉 Seeding successfully completed! All tables including HTML5 Labs & Practicum populated with sample data.');
     process.exit(0);
   } catch (error) {
     console.error('❌ Seeding failed:', error);
