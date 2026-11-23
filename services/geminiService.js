@@ -57,7 +57,7 @@ async function callGeminiAPI(prompt, systemInstruction = null, temperature = 0.7
               'Content-Type': 'application/json',
               'Content-Length': Buffer.byteLength(payload),
             },
-            timeout: 5000,
+            timeout: Number(process.env.AI_API_TIMEOUT_MS) || 25000,
           };
 
           const req = client.request(options, (res) => {
