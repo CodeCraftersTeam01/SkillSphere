@@ -1,0 +1,1702 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= typeof title !== 'undefined' ? title : 'Studio Lab & Praktikum Pengajar - SkillSphere AI' %></title>
+  <meta name="description" content="Kelola tugas Lab &amp; Praktikum pemrograman terpadu, generate soal otomatis dengan AI, dan tinjau hasil pengerjaan siswa di SkillSphere AI.">
+
+  <!-- Immediate Theme Initializer -->
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('skillsphere_theme') || localStorage.getItem('theme') || 'light';
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    })();
+  </script>
+
+  <!-- Google Fonts: Newsreader, Plus Jakarta Sans, JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome 6 Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- Claude Design System Stylesheet & Modular Layout -->
+  <link rel="stylesheet" href="/stylesheets/claude-theme.css?v=2.0">
+  <link rel="stylesheet" href="/stylesheets/accessibility.css">
+  <link rel="stylesheet" href="/stylesheets/layout-modular.css?v=2.4">
+  <link rel="stylesheet" href="/stylesheets/custom-alert.css">
+  <script src="/javascripts/custom-alert.js"></script>
+
+  <style>
+    :root {
+      --lab-accent: #D97757;
+      --lab-accent-hover: #C46343;
+      --lab-accent-soft: rgba(217, 119, 87, 0.12);
+      --lab-green: #10B981;
+      --lab-green-soft: rgba(16, 185, 129, 0.12);
+      --lab-red: #EF4444;
+      --lab-red-soft: rgba(239, 68, 68, 0.12);
+      --lab-amber: #F59E0B;
+      --lab-amber-soft: rgba(245, 158, 11, 0.12);
+      --lab-blue: #3B82F6;
+      --lab-blue-soft: rgba(59, 130, 246, 0.12);
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+      background-color: var(--bg-app);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      min-height: 100vh;
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .labs-main-pane {
+      width: 100%;
+      max-width: 1220px;
+      margin: 0 auto;
+      padding: 28px 28px 72px;
+      min-width: 0;
+    }
+
+    /* Page Header */
+    .labs-page-header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+
+    .labs-page-title {
+      font-family: var(--font-serif);
+      font-size: clamp(1.65rem, 2.5vw, 2.15rem);
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+      margin: 0 0 6px;
+    }
+
+    .labs-page-subtitle {
+      margin: 0;
+      color: var(--text-secondary);
+      font-size: 0.94rem;
+      max-width: 660px;
+    }
+
+    /* Buttons */
+    .btn-primary-warm {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 18px;
+      border-radius: 10px;
+      border: 1px solid transparent;
+      background: var(--lab-accent);
+      color: #FFFFFF;
+      font-family: var(--font-sans);
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s ease, transform 0.12s ease;
+      white-space: nowrap;
+    }
+
+    .btn-primary-warm:hover:not(:disabled) {
+      background: var(--lab-accent-hover);
+      transform: translateY(-1px);
+    }
+
+    .btn-primary-warm:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .btn-outline-warm {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      padding: 8px 14px;
+      border-radius: 9px;
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-surface);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      font-size: 0.84rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s ease, border-color 0.15s ease;
+      white-space: nowrap;
+    }
+
+    .btn-outline-warm:hover:not(:disabled) {
+      background: var(--bg-surface-subtle);
+      border-color: var(--text-tertiary);
+    }
+
+    .btn-danger-ghost {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 8px 12px;
+      border-radius: 9px;
+      border: 1px solid rgba(239, 68, 68, 0.28);
+      background: transparent;
+      color: var(--lab-red);
+      font-family: var(--font-sans);
+      font-size: 0.84rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s ease;
+      white-space: nowrap;
+    }
+
+    .btn-danger-ghost:hover {
+      background: var(--lab-red-soft);
+    }
+
+    /* KPI Grid */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+
+    .kpi-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 14px;
+      padding: 18px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    .kpi-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .kpi-label {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    .kpi-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 9px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.92rem;
+      flex-shrink: 0;
+    }
+
+    .kpi-value {
+      font-family: var(--font-serif);
+      font-size: 1.9rem;
+      font-weight: 600;
+      line-height: 1.1;
+      color: var(--text-primary);
+    }
+
+    .kpi-sub {
+      font-size: 0.78rem;
+      color: var(--text-tertiary);
+    }
+
+    /* Action & Filter Bar */
+    .labs-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+      padding: 12px 14px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+    }
+
+    .filter-tabs {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .filter-tab-btn {
+      padding: 7px 14px;
+      border-radius: 8px;
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--text-secondary);
+      font-family: var(--font-sans);
+      font-size: 0.86rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .filter-tab-btn:hover {
+      background: var(--bg-surface-subtle);
+      color: var(--text-primary);
+    }
+
+    .filter-tab-btn.active {
+      background: var(--lab-accent-soft);
+      color: var(--lab-accent);
+      border-color: rgba(217, 119, 87, 0.35);
+    }
+
+    .toolbar-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      flex: 1;
+      justify-content: flex-end;
+      min-width: 220px;
+    }
+
+    .search-box {
+      position: relative;
+      flex: 1;
+      max-width: 280px;
+      min-width: 170px;
+    }
+
+    .search-box i {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-tertiary);
+      font-size: 0.84rem;
+      pointer-events: none;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 8px 12px 8px 34px;
+      border-radius: 9px;
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-app);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      font-size: 0.86rem;
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: var(--lab-accent);
+    }
+
+    /* Lab Cards List */
+    .labs-list-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .lab-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 14px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 14px;
+      min-width: 0;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .lab-card:hover {
+      border-color: rgba(217, 119, 87, 0.45);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.04);
+    }
+
+    .lab-card-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .lab-card-title {
+      font-family: var(--font-serif);
+      font-size: 1.18rem;
+      font-weight: 600;
+      margin: 0;
+      color: var(--text-primary);
+      word-break: break-word;
+    }
+
+    .status-pill {
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 3px 9px;
+      border-radius: 999px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .status-published {
+      background: var(--lab-green-soft);
+      color: #059669;
+    }
+
+    [data-theme="dark"] .status-published {
+      color: #34D399;
+    }
+
+    .status-draft {
+      background: var(--bg-surface-subtle);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .lab-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .lab-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 3px 9px;
+      border-radius: 6px;
+      border: 1px solid transparent;
+    }
+
+    .badge-room-unified {
+      background: var(--lab-blue-soft);
+      color: #1D4ED8;
+    }
+    [data-theme="dark"] .badge-room-unified { color: #60A5FA; }
+
+    .badge-mode-create {
+      background: var(--lab-green-soft);
+      color: #047857;
+    }
+    [data-theme="dark"] .badge-mode-create { color: #34D399; }
+
+    .badge-mode-debug {
+      background: var(--lab-red-soft);
+      color: #B91C1C;
+    }
+    [data-theme="dark"] .badge-mode-debug { color: #F87171; }
+
+    .badge-mono {
+      font-family: var(--font-mono);
+      background: var(--bg-surface-subtle);
+      color: var(--text-primary);
+      border-color: var(--border-subtle);
+    }
+
+    .badge-neutral {
+      background: var(--bg-surface-subtle);
+      color: var(--text-secondary);
+      border-color: var(--border-subtle);
+    }
+
+    .lab-card-desc {
+      margin: 0;
+      font-size: 0.87rem;
+      color: var(--text-secondary);
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      word-break: break-word;
+    }
+
+    .lab-card-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+      padding-top: 12px;
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .lab-card-actions-right {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    /* Empty / Loading State */
+    .empty-state-box {
+      grid-column: 1 / -1;
+      background: var(--bg-surface);
+      border: 1px dashed var(--border-subtle);
+      border-radius: 14px;
+      padding: 48px 24px;
+      text-align: center;
+      color: var(--text-secondary);
+    }
+
+    .empty-state-box i {
+      font-size: 2.2rem;
+      color: var(--lab-accent);
+      margin-bottom: 12px;
+    }
+
+    .empty-state-box h3 {
+      font-family: var(--font-serif);
+      font-size: 1.25rem;
+      margin: 0 0 6px;
+      color: var(--text-primary);
+    }
+
+    .empty-state-box p {
+      margin: 0 0 18px;
+      font-size: 0.9rem;
+    }
+
+    /* Modals */
+    .modal-backdrop-custom {
+      position: fixed;
+      inset: 0;
+      background: rgba(20, 20, 19, 0.62);
+      backdrop-filter: blur(4px);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .modal-backdrop-custom.open {
+      display: flex;
+    }
+
+    .modal-dialog-custom {
+      width: 100%;
+      max-width: 860px;
+      max-height: 90vh;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 16px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.28);
+    }
+
+    .modal-header-custom {
+      padding: 18px 22px;
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      background: var(--bg-surface);
+    }
+
+    .modal-title-custom {
+      font-family: var(--font-serif);
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin: 0;
+      color: var(--text-primary);
+    }
+
+    .modal-close-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      border: 1px solid var(--border-subtle);
+      background: transparent;
+      color: var(--text-secondary);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .modal-close-btn:hover {
+      background: var(--bg-surface-subtle);
+      color: var(--text-primary);
+    }
+
+    .modal-body-custom {
+      padding: 20px 22px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .modal-footer-custom {
+      padding: 14px 22px;
+      border-top: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 10px;
+      flex-wrap: wrap;
+      background: var(--bg-surface);
+    }
+
+    /* AI Generator Banner inside Modal */
+    .ai-generator-panel {
+      background: var(--bg-app);
+      border: 1px solid rgba(217, 119, 87, 0.35);
+      border-radius: 12px;
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .ai-generator-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .ai-generator-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .ai-generator-row input {
+      flex: 1;
+      min-width: 200px;
+    }
+
+    /* Form Controls */
+    .form-grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .form-grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .form-field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      min-width: 0;
+    }
+
+    .form-label {
+      font-size: 0.83rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .form-hint {
+      font-size: 0.76rem;
+      color: var(--text-tertiary);
+    }
+
+    .form-input, .form-select, .form-textarea {
+      width: 100%;
+      padding: 9px 12px;
+      border-radius: 9px;
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-app);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      font-size: 0.88rem;
+      transition: border-color 0.15s ease;
+    }
+
+    .form-input:focus, .form-select:focus, .form-textarea:focus {
+      outline: none;
+      border-color: var(--lab-accent);
+    }
+
+    .form-textarea.code-input {
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      line-height: 1.5;
+      tab-size: 2;
+      white-space: pre;
+      overflow-x: auto;
+    }
+
+    .checkbox-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 9px;
+      background: var(--bg-app);
+      border: 1px solid var(--border-subtle);
+      cursor: pointer;
+    }
+
+    .checkbox-row input[type="checkbox"] {
+      width: 17px;
+      height: 17px;
+      accent-color: var(--lab-accent);
+      cursor: pointer;
+    }
+
+    /* Submissions List in Modal */
+    .submission-card {
+      background: var(--bg-app);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .submission-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .submission-student-name {
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--text-primary);
+    }
+
+    .submission-meta {
+      font-size: 0.78rem;
+      color: var(--text-tertiary);
+    }
+
+    .submission-badges {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .score-pill {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 8px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+    }
+
+    .verdict-passed {
+      background: var(--lab-green-soft);
+      color: #047857;
+    }
+    [data-theme="dark"] .verdict-passed { color: #34D399; }
+
+    .verdict-failed {
+      background: var(--lab-red-soft);
+      color: #B91C1C;
+    }
+    [data-theme="dark"] .verdict-failed { color: #F87171; }
+
+    .verdict-partial {
+      background: var(--lab-amber-soft);
+      color: #B45309;
+    }
+    [data-theme="dark"] .verdict-partial { color: #FBBF24; }
+
+    .code-preview-block {
+      margin: 0;
+      padding: 12px 14px;
+      border-radius: 9px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      line-height: 1.5;
+      max-height: 220px;
+      overflow: auto;
+      white-space: pre;
+      color: var(--text-primary);
+    }
+
+    .ai-feedback-box {
+      padding: 12px 14px;
+      border-radius: 9px;
+      background: var(--bg-surface);
+      border-left: 3px solid var(--lab-accent);
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    /* Responsive Breakpoints */
+    @media (max-width: 980px) {
+      .kpi-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      .labs-list-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .labs-main-pane {
+        padding: 18px 14px 56px;
+      }
+      .form-grid-2, .form-grid-3 {
+        grid-template-columns: 1fr;
+      }
+      .toolbar-right {
+        justify-content: stretch;
+        width: 100%;
+      }
+      .search-box {
+        max-width: none;
+      }
+      .modal-dialog-custom {
+        max-height: 92vh;
+        border-radius: 12px;
+      }
+    }
+
+    @media (max-width: 440px) {
+      .kpi-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Modular Tutor Header -->
+  <%- include('../partials/tutor-header', { isCourseContext: false }) %>
+
+  <div class="classroom-app-container">
+    <!-- Modular Tutor Sidebar -->
+    <%- include('../partials/tutor-sidebar', { activeNav: 'labs' }) %>
+
+    <main class="classroom-main-pane labs-main-pane" role="main">
+      <!-- Page Header -->
+      <div class="labs-page-header">
+        <div>
+          <h1 class="labs-page-title">Studio Lab &amp; Praktikum Pengajar</h1>
+          <p class="labs-page-subtitle">Rancang latihan coding terstruktur dan studi kasus perbaikan kode dalam satu ruang Lab &amp; Praktikum terpadu dengan penilaian otomatis berbasis AI.</p>
+        </div>
+        <button type="button" class="btn-primary-warm" id="btn-open-create-lab" onclick="openLabModal()">
+          <i class="fas fa-plus" aria-hidden="true"></i>
+          <span>Buat Tugas Lab &amp; Praktikum</span>
+        </button>
+      </div>
+
+      <!-- Top KPI Summary Cards -->
+      <section class="kpi-grid" aria-label="Ringkasan Tugas Lab dan Praktikum">
+        <article class="kpi-card">
+          <div class="kpi-top">
+            <span class="kpi-label">Total Tugas Lab &amp; Praktikum</span>
+            <span class="kpi-icon" style="background: var(--lab-blue-soft); color: var(--lab-blue);">
+              <i class="fas fa-flask-vial" aria-hidden="true"></i>
+            </span>
+          </div>
+          <div class="kpi-value" id="kpi-total-tasks">0</div>
+          <span class="kpi-sub">Seluruh latihan &amp; praktikum terpadu</span>
+        </article>
+
+        <article class="kpi-card">
+          <div class="kpi-top">
+            <span class="kpi-label">Mode Buat Kode</span>
+            <span class="kpi-icon" style="background: var(--lab-accent-soft); color: var(--lab-accent);">
+              <i class="fas fa-code" aria-hidden="true"></i>
+            </span>
+          </div>
+          <div class="kpi-value" id="kpi-mode-create">0</div>
+          <span class="kpi-sub">Implementasi kode dari nol</span>
+        </article>
+
+        <article class="kpi-card">
+          <div class="kpi-top">
+            <span class="kpi-label">Mode Perbaiki Kode</span>
+            <span class="kpi-icon" style="background: var(--lab-red-soft); color: var(--lab-red);">
+              <i class="fas fa-bug" aria-hidden="true"></i>
+            </span>
+          </div>
+          <div class="kpi-value" id="kpi-mode-debug">0</div>
+          <span class="kpi-sub">Analisis bug &amp; perbaikan</span>
+        </article>
+
+        <article class="kpi-card">
+          <div class="kpi-top">
+            <span class="kpi-label">Status Dipublikasikan</span>
+            <span class="kpi-icon" style="background: var(--lab-green-soft); color: var(--lab-green);">
+              <i class="fas fa-circle-check" aria-hidden="true"></i>
+            </span>
+          </div>
+          <div class="kpi-value" id="kpi-published">0</div>
+          <span class="kpi-sub">Aktif &amp; tersedia untuk siswa</span>
+        </article>
+      </section>
+
+      <!-- Action & Filter Bar -->
+      <section class="labs-toolbar" aria-label="Filter dan Pencarian Tugas">
+        <div class="filter-tabs" role="tablist" aria-label="Filter Mode Tantangan">
+          <button type="button" class="filter-tab-btn active" role="tab" aria-selected="true" data-filter="all" onclick="setModeFilter('all')">Semua</button>
+          <button type="button" class="filter-tab-btn" role="tab" aria-selected="false" data-filter="create" onclick="setModeFilter('create')">Buat Kode</button>
+          <button type="button" class="filter-tab-btn" role="tab" aria-selected="false" data-filter="fix" onclick="setModeFilter('fix')">Perbaiki Kode</button>
+        </div>
+
+        <div class="toolbar-right">
+          <div class="search-box">
+            <i class="fas fa-magnifying-glass" aria-hidden="true"></i>
+            <input type="search" id="lab-search-input" class="search-input" placeholder="Cari judul atau bahasa..." oninput="renderLabsList()" aria-label="Cari tugas lab">
+          </div>
+          <button type="button" class="btn-outline-warm" onclick="loadTutorLabs()" title="Muat Ulang Daftar">
+            <i class="fas fa-rotate-right" aria-hidden="true"></i>
+            <span>Muat Ulang</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- Tutor Labs List -->
+      <section class="labs-list-grid" id="labs-list-container" aria-live="polite">
+        <div class="empty-state-box">
+          <i class="fas fa-spinner fa-spin" aria-hidden="true"></i>
+          <h3>Memuat Daftar Tugas...</h3>
+          <p>Sedang mengambil daftar tugas Lab &amp; Praktikum milik Anda.</p>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Create / Edit Lab Modal -->
+  <div class="modal-backdrop-custom" id="lab-form-modal" role="dialog" aria-modal="true" aria-labelledby="lab-modal-title">
+    <div class="modal-dialog-custom">
+      <div class="modal-header-custom">
+        <h2 class="modal-title-custom" id="lab-modal-title">Buat Tugas Lab &amp; Praktikum</h2>
+        <button type="button" class="modal-close-btn" onclick="closeLabModal()" aria-label="Tutup modal">
+          <i class="fas fa-xmark" aria-hidden="true"></i>
+        </button>
+      </div>
+
+      <form id="lab-form" onsubmit="submitLabForm(event)" style="display:flex; flex-direction:column; min-height:0; flex:1;">
+        <div class="modal-body-custom">
+          <input type="hidden" id="lab-id" value="">
+          <input type="hidden" id="lab-room-type" value="lab">
+
+          <!-- AI Generator Box -->
+          <div class="ai-generator-panel">
+            <div class="ai-generator-title">
+              <i class="fas fa-wand-magic-sparkles" style="color: var(--lab-accent);" aria-hidden="true"></i>
+              <span>Asisten Pembuat Soal AI</span>
+            </div>
+            <p class="form-hint" style="margin:0;">Pilih mode tantangan, bahasa, dan kesulitan di bawah, lalu masukkan topik untuk mengisi seluruh formulir secara otomatis.</p>
+            <div class="ai-generator-row">
+              <input type="text" id="ai-topic-input" class="form-input" placeholder="Contoh: Validasi email &amp; normalisasi data pengguna dengan fungsi murni">
+              <button type="button" class="btn-primary-warm" id="btn-ai-generate" onclick="generateLabWithAI()">
+                <i class="fas fa-sparkles" aria-hidden="true"></i>
+                <span>Generate Soal dengan AI</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Basic Metadata -->
+          <div class="form-field">
+            <label class="form-label" for="lab-title">Judul Tugas *</label>
+            <input type="text" id="lab-title" class="form-input" required placeholder="Contoh: Perbaikan Bug Query Agregasi Penjualan">
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-field">
+              <label class="form-label" for="lab-challenge-mode">Mode Tantangan *</label>
+              <select id="lab-challenge-mode" class="form-select" required onchange="syncCodeLabels()">
+                <option value="create">Buat Kode dari Nol</option>
+                <option value="debug">Perbaiki Kode / Debug</option>
+              </select>
+            </div>
+
+            <div class="form-field">
+              <label class="form-label" for="lab-language">Bahasa Pemrograman *</label>
+              <select id="lab-language" class="form-select" required>
+                <option value="javascript">JavaScript</option>
+                <option value="python">Python</option>
+                <option value="sql">SQL</option>
+                <option value="html">HTML / CSS</option>
+                <option value="php">PHP</option>
+                <option value="java">Java</option>
+                <option value="cpp">C++</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-field">
+              <label class="form-label" for="lab-difficulty">Tingkat Kesulitan *</label>
+              <select id="lab-difficulty" class="form-select" required>
+                <option value="beginner">Pemula (Beginner)</option>
+                <option value="intermediate">Menengah (Intermediate)</option>
+                <option value="advanced">Lanjutan (Advanced)</option>
+              </select>
+            </div>
+
+            <div class="form-field">
+              <label class="form-label" for="lab-passing-score">Nilai Kelulusan Minimum *</label>
+              <input type="number" id="lab-passing-score" class="form-input" min="0" max="100" value="75" required>
+            </div>
+          </div>
+
+          <!-- Description -->
+          <div class="form-field">
+            <label class="form-label" for="lab-description">Deskripsi Soal *</label>
+            <textarea id="lab-description" class="form-textarea" rows="4" required placeholder="Jelaskan konteks masalah, syarat fungsi/query, batasan input, dan kriteria keberhasilan..."></textarea>
+          </div>
+
+          <!-- Code Fields -->
+          <div class="form-field">
+            <label class="form-label" for="lab-starter-code" id="label-starter-code">Kode Awal / Kode Bermasalah</label>
+            <textarea id="lab-starter-code" class="form-textarea code-input" rows="6" placeholder="// Tulis kerangka kode awal atau kode yang mengandung bug untuk diperbaiki siswa..."></textarea>
+          </div>
+
+          <div class="form-field">
+            <label class="form-label" for="lab-solution-reference">Solusi Referensi untuk AI</label>
+            <textarea id="lab-solution-reference" class="form-textarea code-input" rows="6" placeholder="// Solusi acuan yang digunakan penilai AI untuk memverifikasi logika siswa..."></textarea>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-field">
+              <label class="form-label" for="lab-expected-output">Ekspektasi Output</label>
+              <textarea id="lab-expected-output" class="form-textarea code-input" rows="4" placeholder="Contoh output yang diharapkan saat kode dijalankan..."></textarea>
+            </div>
+
+            <div class="form-field">
+              <label class="form-label" for="lab-hints">Petunjuk / Hints (1 per baris)</label>
+              <textarea id="lab-hints" class="form-textarea" rows="4" placeholder="Periksa kondisi batas array kosong&#10;Pastikan tipe data dikonversi sebelum kalkulasi"></textarea>
+            </div>
+          </div>
+
+          <div class="form-field">
+            <label class="form-label" for="lab-test-cases">Kasus Uji / Test Cases (Opsional, format JSON Array)</label>
+            <textarea id="lab-test-cases" class="form-textarea code-input" rows="3" placeholder='[{"input": "5", "expected": "120"}]'></textarea>
+            <span class="form-hint">Terisi otomatis saat menggunakan Generate Soal dengan AI. Kosongkan jika tidak diperlukan.</span>
+          </div>
+
+          <label class="checkbox-row" for="lab-is-published">
+            <input type="checkbox" id="lab-is-published" checked>
+            <div>
+              <div class="form-label" style="margin:0;">Publikasikan Tugas ke Siswa</div>
+              <div class="form-hint">Jika dicentang, tugas langsung tampil di Ruang Lab &amp; Praktikum siswa.</div>
+            </div>
+          </label>
+        </div>
+
+        <div class="modal-footer-custom">
+          <button type="button" class="btn-outline-warm" onclick="closeLabModal()">Batal</button>
+          <button type="submit" class="btn-primary-warm" id="btn-submit-lab">
+            <i class="fas fa-floppy-disk" aria-hidden="true"></i>
+            <span id="btn-submit-lab-text">Simpan Tugas</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Student Submissions Modal -->
+  <div class="modal-backdrop-custom" id="submissions-modal" role="dialog" aria-modal="true" aria-labelledby="submissions-modal-title">
+    <div class="modal-dialog-custom">
+      <div class="modal-header-custom">
+        <div>
+          <h2 class="modal-title-custom" id="submissions-modal-title">Pengumpulan Siswa</h2>
+          <div class="form-hint" id="submissions-modal-subtitle">Daftar hasil pengerjaan dan evaluasi AI</div>
+        </div>
+        <button type="button" class="modal-close-btn" onclick="closeSubmissionsModal()" aria-label="Tutup modal pengumpulan">
+          <i class="fas fa-xmark" aria-hidden="true"></i>
+        </button>
+      </div>
+      <div class="modal-body-custom" id="submissions-modal-body">
+        <div class="empty-state-box">
+          <i class="fas fa-spinner fa-spin" aria-hidden="true"></i>
+          <h3>Memuat Pengumpulan...</h3>
+        </div>
+      </div>
+      <div class="modal-footer-custom">
+        <button type="button" class="btn-outline-warm" onclick="closeSubmissionsModal()">Tutup</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let tutorLabs = [];
+    let currentModeFilter = 'all';
+
+    function escapeHtml(str) {
+      if (str === null || str === undefined) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function getAuthToken() {
+      return localStorage.getItem('skillsphere_access_token') || localStorage.getItem('accessToken') || localStorage.getItem('token') || '';
+    }
+
+    function buildHeaders(includeJson) {
+      const headers = { 'Accept': 'application/json' };
+      if (includeJson) headers['Content-Type'] = 'application/json';
+      const token = getAuthToken();
+      if (token) headers['Authorization'] = 'Bearer ' + token;
+      return headers;
+    }
+
+    function notifyUser(message, type) {
+      if (typeof window.showToast === 'function') {
+        window.showToast(message, type || 'info');
+      } else {
+        alert(message);
+      }
+    }
+
+    function formatDifficulty(diff) {
+      const map = {
+        beginner: 'Pemula',
+        intermediate: 'Menengah',
+        advanced: 'Lanjutan'
+      };
+      return map[String(diff || '').toLowerCase()] || String(diff || 'Pemula');
+    }
+
+    function formatLanguage(lang) {
+      const map = {
+        javascript: 'JavaScript',
+        python: 'Python',
+        sql: 'SQL',
+        html: 'HTML',
+        php: 'PHP',
+        java: 'Java',
+        cpp: 'C++'
+      };
+      return map[String(lang || '').toLowerCase()] || String(lang || 'Kode').toUpperCase();
+    }
+
+    function formatVerdictBadge(verdict) {
+      const v = String(verdict || '').toLowerCase();
+      if (v === 'passed' || v === 'pass' || v === 'lulus') {
+        return '<span class="lab-badge verdict-passed"><i class="fas fa-circle-check" aria-hidden="true"></i> Lulus</span>';
+      }
+      if (v === 'partial' || v === 'sebagian') {
+        return '<span class="lab-badge verdict-partial"><i class="fas fa-circle-half-stroke" aria-hidden="true"></i> Sebagian</span>';
+      }
+      if (v === 'failed' || v === 'fail' || v === 'gagal') {
+        return '<span class="lab-badge verdict-failed"><i class="fas fa-circle-xmark" aria-hidden="true"></i> Perlu Perbaikan</span>';
+      }
+      return '<span class="lab-badge badge-neutral">' + escapeHtml(verdict || 'Dievaluasi') + '</span>';
+    }
+
+    function formatDateId(dateStr) {
+      if (!dateStr) return '-';
+      const d = new Date(dateStr);
+      if (Number.isNaN(d.getTime())) return '-';
+      return d.toLocaleString('id-ID', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    }
+
+    function updateKpiSummary() {
+      const safeList = Array.isArray(tutorLabs) ? tutorLabs : [];
+      const totalTasks = safeList.length;
+      const totalCreate = safeList.filter(item => item.challenge_mode === 'create').length;
+      const totalDebug = safeList.filter(item => item.challenge_mode === 'debug' || item.challenge_mode === 'fix').length;
+      const totalPublished = safeList.filter(item => item.is_published !== false).length;
+
+      document.getElementById('kpi-total-tasks').textContent = String(totalTasks);
+      document.getElementById('kpi-mode-create').textContent = String(totalCreate);
+      document.getElementById('kpi-mode-debug').textContent = String(totalDebug);
+      document.getElementById('kpi-published').textContent = String(totalPublished);
+    }
+
+    function setModeFilter(filterVal) {
+      currentModeFilter = filterVal;
+      document.querySelectorAll('.filter-tab-btn').forEach(btn => {
+        const isActive = btn.getAttribute('data-filter') === filterVal;
+        btn.classList.toggle('active', isActive);
+        btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
+      });
+      renderLabsList();
+    }
+
+    function renderLabsList() {
+      const container = document.getElementById('labs-list-container');
+      const searchInput = document.getElementById('lab-search-input');
+      const query = searchInput ? searchInput.value.trim().toLowerCase() : '';
+      const safeList = Array.isArray(tutorLabs) ? tutorLabs : [];
+
+      const filtered = safeList.filter(lab => {
+        if (currentModeFilter === 'create' && lab.challenge_mode !== 'create') {
+          return false;
+        }
+        if (currentModeFilter === 'fix' && lab.challenge_mode !== 'debug' && lab.challenge_mode !== 'fix') {
+          return false;
+        }
+        if (query) {
+          const hay = [lab.title, lab.language, lab.description, lab.difficulty].join(' ').toLowerCase();
+          return hay.includes(query);
+        }
+        return true;
+      });
+
+      if (filtered.length === 0) {
+        container.innerHTML =
+          '<div class="empty-state-box">' +
+            '<i class="fas fa-flask-vial" aria-hidden="true"></i>' +
+            '<h3>Belum Ada Tugas yang Sesuai</h3>' +
+            '<p>Buat tugas Lab &amp; Praktikum pertama Anda, atau ubah filter pencarian.</p>' +
+            '<button type="button" class="btn-primary-warm" onclick="openLabModal()">' +
+              '<i class="fas fa-plus" aria-hidden="true"></i>' +
+              '<span>Buat Tugas Baru</span>' +
+            '</button>' +
+          '</div>';
+        return;
+      }
+
+      container.innerHTML = filtered.map(lab => {
+        const isDebug = lab.challenge_mode === 'debug' || lab.challenge_mode === 'fix';
+        const isPublished = lab.is_published !== false;
+        const passingScore = lab.passing_score !== undefined && lab.passing_score !== null ? lab.passing_score : 75;
+
+        return (
+          '<article class="lab-card">' +
+            '<div style="display:flex; flex-direction:column; gap:10px;">' +
+              '<div class="lab-card-header">' +
+                '<h3 class="lab-card-title">' + escapeHtml(lab.title || 'Tanpa Judul') + '</h3>' +
+                '<span class="status-pill ' + (isPublished ? 'status-published' : 'status-draft') + '">' +
+                  (isPublished ? 'Dipublikasikan' : 'Draf') +
+                '</span>' +
+              '</div>' +
+
+              '<div class="lab-badges">' +
+                '<span class="lab-badge badge-room-unified">' +
+                  '<i class="fas fa-flask-vial" aria-hidden="true"></i> Lab &amp; Praktikum' +
+                '</span>' +
+                '<span class="lab-badge ' + (isDebug ? 'badge-mode-debug' : 'badge-mode-create') + '">' +
+                  '<i class="fas ' + (isDebug ? 'fa-bug' : 'fa-code') + '" aria-hidden="true"></i> ' +
+                  (isDebug ? 'Perbaiki Kode' : 'Buat Kode') +
+                '</span>' +
+                '<span class="lab-badge badge-mono">' + escapeHtml(formatLanguage(lab.language)) + '</span>' +
+                '<span class="lab-badge badge-neutral">' + escapeHtml(formatDifficulty(lab.difficulty)) + '</span>' +
+                '<span class="lab-badge badge-neutral">KKM: ' + escapeHtml(passingScore) + '</span>' +
+              '</div>' +
+
+              '<p class="lab-card-desc">' + escapeHtml(lab.description || 'Tidak ada deskripsi singkat.') + '</p>' +
+            '</div>' +
+
+            '<div class="lab-card-actions">' +
+              '<button type="button" class="btn-outline-warm" onclick="openSubmissionsModal(' + Number(lab.id) + ')">' +
+                '<i class="fas fa-users-viewfinder" aria-hidden="true"></i>' +
+                '<span>Lihat Pengumpulan Siswa</span>' +
+              '</button>' +
+              '<div class="lab-card-actions-right">' +
+                '<button type="button" class="btn-outline-warm" onclick="openLabModal(' + Number(lab.id) + ')">' +
+                  '<i class="fas fa-pen" aria-hidden="true"></i>' +
+                  '<span>Edit</span>' +
+                '</button>' +
+                '<button type="button" class="btn-danger-ghost" onclick="deleteLab(' + Number(lab.id) + ')">' +
+                  '<i class="fas fa-trash" aria-hidden="true"></i>' +
+                  '<span>Hapus</span>' +
+                '</button>' +
+              '</div>' +
+            '</div>' +
+          '</article>'
+        );
+      }).join('');
+    }
+
+    async function loadTutorLabs() {
+      const container = document.getElementById('labs-list-container');
+      container.innerHTML =
+        '<div class="empty-state-box">' +
+          '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i>' +
+          '<h3>Memuat Daftar Tugas...</h3>' +
+          '<p>Mohon tunggu sebentar.</p>' +
+        '</div>';
+
+      try {
+        const res = await fetch('/api/labs?mine=1', {
+          headers: buildHeaders(false),
+          credentials: 'include'
+        });
+        const json = await res.json();
+
+        if (!res.ok || !json.success) {
+          throw new Error(json.message || 'Gagal memuat daftar tugas lab.');
+        }
+
+        const list = (json.data && Array.isArray(json.data.items))
+          ? json.data.items
+          : (json.data && Array.isArray(json.data.labs))
+            ? json.data.labs
+            : (Array.isArray(json.data) ? json.data : []);
+
+        tutorLabs = list;
+        updateKpiSummary();
+        renderLabsList();
+      } catch (err) {
+        console.error('Error loading tutor labs:', err);
+        container.innerHTML =
+          '<div class="empty-state-box">' +
+            '<i class="fas fa-triangle-exclamation" aria-hidden="true"></i>' +
+            '<h3>Gagal Memuat Data</h3>' +
+            '<p>' + escapeHtml(err.message || 'Terjadi kesalahan jaringan.') + '</p>' +
+            '<button type="button" class="btn-outline-warm" onclick="loadTutorLabs()">Coba Lagi</button>' +
+          '</div>';
+      }
+    }
+
+    function syncCodeLabels() {
+      const mode = document.getElementById('lab-challenge-mode').value;
+      const label = document.getElementById('label-starter-code');
+      if (label) {
+        label.textContent = mode === 'debug'
+          ? 'Kode Bermasalah (Untuk Diperbaiki Siswa)'
+          : 'Kode Awal / Boilerplate';
+      }
+    }
+
+    function openLabModal(editId) {
+      const modal = document.getElementById('lab-form-modal');
+      const form = document.getElementById('lab-form');
+      const titleEl = document.getElementById('lab-modal-title');
+      const submitText = document.getElementById('btn-submit-lab-text');
+
+      form.reset();
+      document.getElementById('lab-id').value = '';
+      document.getElementById('lab-room-type').value = 'lab';
+      document.getElementById('lab-passing-score').value = 75;
+      document.getElementById('lab-is-published').checked = true;
+      document.getElementById('ai-topic-input').value = '';
+
+      if (editId !== undefined && editId !== null) {
+        const safeList = Array.isArray(tutorLabs) ? tutorLabs : [];
+        const target = safeList.find(item => Number(item.id) === Number(editId));
+        if (!target) {
+          notifyUser('Data tugas tidak ditemukan.', 'error');
+          return;
+        }
+        titleEl.textContent = 'Edit Tugas Lab & Praktikum';
+        submitText.textContent = 'Simpan Perubahan';
+
+        document.getElementById('lab-id').value = String(target.id);
+        document.getElementById('lab-title').value = target.title || '';
+        document.getElementById('lab-room-type').value = target.room_type || 'lab';
+        document.getElementById('lab-challenge-mode').value = (target.challenge_mode === 'fix' ? 'debug' : (target.challenge_mode || 'create'));
+        document.getElementById('lab-language').value = target.language || 'javascript';
+        document.getElementById('lab-difficulty').value = target.difficulty || 'beginner';
+        document.getElementById('lab-passing-score').value = target.passing_score !== undefined && target.passing_score !== null ? target.passing_score : 75;
+        document.getElementById('lab-description').value = target.description || '';
+        document.getElementById('lab-starter-code').value = target.starter_code || '';
+        document.getElementById('lab-solution-reference').value = target.solution_reference || '';
+        document.getElementById('lab-expected-output').value = target.expected_output || '';
+
+        let hintsText = '';
+        if (Array.isArray(target.hints)) {
+          hintsText = target.hints.join('\n');
+        } else if (typeof target.hints === 'string') {
+          try {
+            const parsedHints = JSON.parse(target.hints);
+            hintsText = Array.isArray(parsedHints) ? parsedHints.join('\n') : target.hints;
+          } catch (_) {
+            hintsText = target.hints;
+          }
+        }
+        document.getElementById('lab-hints').value = hintsText;
+
+        let testCasesText = '';
+        if (target.test_cases) {
+          testCasesText = typeof target.test_cases === 'string'
+            ? target.test_cases
+            : JSON.stringify(target.test_cases, null, 2);
+        }
+        document.getElementById('lab-test-cases').value = testCasesText;
+        document.getElementById('lab-is-published').checked = target.is_published !== false;
+      } else {
+        titleEl.textContent = 'Buat Tugas Lab & Praktikum';
+        submitText.textContent = 'Simpan Tugas';
+      }
+
+      syncCodeLabels();
+      modal.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeLabModal() {
+      const modal = document.getElementById('lab-form-modal');
+      modal.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    async function generateLabWithAI() {
+      const topic = document.getElementById('ai-topic-input').value.trim() || document.getElementById('lab-title').value.trim();
+      const language = document.getElementById('lab-language').value;
+      const room_type = document.getElementById('lab-room-type').value || 'lab';
+      const challenge_mode = document.getElementById('lab-challenge-mode').value;
+      const difficulty = document.getElementById('lab-difficulty').value;
+
+      if (!topic) {
+        notifyUser('Masukkan topik atau konsep soal terlebih dahulu sebelum menekan Generate AI.', 'warning');
+        document.getElementById('ai-topic-input').focus();
+        return;
+      }
+
+      const btn = document.getElementById('btn-ai-generate');
+      const originalHtml = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i><span>Sedang Membuat Soal...</span>';
+
+      try {
+        const res = await fetch('/api/labs/ai-generate', {
+          method: 'POST',
+          headers: buildHeaders(true),
+          credentials: 'include',
+          body: JSON.stringify({
+            topic,
+            language,
+            room_type,
+            challenge_mode,
+            difficulty
+          })
+        });
+
+        const json = await res.json();
+        if (!res.ok || !json.success) {
+          throw new Error(json.message || 'Gagal menghasilkan soal dari AI.');
+        }
+
+        const payload = (json.data && (json.data.generated || json.data.lab)) ? (json.data.generated || json.data.lab) : (json.data || {});
+
+        if (payload.title) document.getElementById('lab-title').value = payload.title;
+        if (payload.description) document.getElementById('lab-description').value = payload.description;
+        if (payload.starter_code !== undefined) document.getElementById('lab-starter-code').value = payload.starter_code || '';
+        if (payload.solution_reference !== undefined) document.getElementById('lab-solution-reference').value = payload.solution_reference || '';
+        if (payload.expected_output !== undefined) document.getElementById('lab-expected-output').value = payload.expected_output || '';
+
+        if (payload.test_cases !== undefined && payload.test_cases !== null) {
+          document.getElementById('lab-test-cases').value = typeof payload.test_cases === 'string'
+            ? payload.test_cases
+            : JSON.stringify(payload.test_cases, null, 2);
+        }
+
+        if (Array.isArray(payload.hints)) {
+          document.getElementById('lab-hints').value = payload.hints.join('\n');
+        } else if (typeof payload.hints === 'string') {
+          document.getElementById('lab-hints').value = payload.hints;
+        }
+
+        notifyUser('Draf soal berhasil dibuat oleh AI. Silakan tinjau sebelum menyimpan.', 'success');
+      } catch (err) {
+        console.error('AI generate lab error:', err);
+        notifyUser(err.message || 'Terjadi kesalahan saat generate soal AI.', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalHtml;
+      }
+    }
+
+    async function submitLabForm(event) {
+      event.preventDefault();
+
+      const id = document.getElementById('lab-id').value.trim();
+      const title = document.getElementById('lab-title').value.trim();
+      const room_type = document.getElementById('lab-room-type').value || 'lab';
+      const challenge_mode = document.getElementById('lab-challenge-mode').value;
+      const language = document.getElementById('lab-language').value;
+      const difficulty = document.getElementById('lab-difficulty').value;
+      const passing_score = Number(document.getElementById('lab-passing-score').value);
+      const description = document.getElementById('lab-description').value.trim();
+      const starter_code = document.getElementById('lab-starter-code').value;
+      const solution_reference = document.getElementById('lab-solution-reference').value;
+      const expected_output = document.getElementById('lab-expected-output').value;
+      const hintsRaw = document.getElementById('lab-hints').value;
+      const testCasesRaw = document.getElementById('lab-test-cases').value.trim();
+      const is_published = document.getElementById('lab-is-published').checked;
+
+      if (!title || !description) {
+        notifyUser('Judul tugas dan deskripsi soal wajib diisi.', 'warning');
+        return;
+      }
+
+      if (Number.isNaN(passing_score) || passing_score < 0 || passing_score > 100) {
+        notifyUser('Nilai kelulusan minimum harus antara 0 sampai 100.', 'warning');
+        return;
+      }
+
+      const hints = hintsRaw
+        .split('\n')
+        .map(line => line.trim())
+        .filter(Boolean);
+
+      let test_cases = [];
+      if (testCasesRaw) {
+        try {
+          const parsed = JSON.parse(testCasesRaw);
+          test_cases = Array.isArray(parsed) ? parsed : [parsed];
+        } catch (err) {
+          notifyUser('Format JSON pada Kasus Uji (Test Cases) tidak valid. Periksa kembali tanda kutip atau kurung.', 'warning');
+          return;
+        }
+      }
+
+      const submitBtn = document.getElementById('btn-submit-lab');
+      submitBtn.disabled = true;
+
+      try {
+        const endpoint = id ? ('/api/labs/' + encodeURIComponent(id)) : '/api/labs';
+        const method = id ? 'PUT' : 'POST';
+
+        const res = await fetch(endpoint, {
+          method: method,
+          headers: buildHeaders(true),
+          credentials: 'include',
+          body: JSON.stringify({
+            title,
+            room_type,
+            challenge_mode,
+            language,
+            difficulty,
+            passing_score,
+            description,
+            starter_code,
+            solution_reference,
+            expected_output,
+            test_cases,
+            hints,
+            is_published
+          })
+        });
+
+        const json = await res.json();
+        if (!res.ok || !json.success) {
+          throw new Error(json.message || 'Gagal menyimpan tugas lab.');
+        }
+
+        notifyUser(json.message || (id ? 'Tugas berhasil diperbarui.' : 'Tugas baru berhasil dibuat.'), 'success');
+        closeLabModal();
+        await loadTutorLabs();
+      } catch (err) {
+        console.error('Error saving lab:', err);
+        notifyUser(err.message || 'Terjadi kesalahan saat menyimpan tugas.', 'error');
+      } finally {
+        submitBtn.disabled = false;
+      }
+    }
+
+    async function deleteLab(labId) {
+      const safeList = Array.isArray(tutorLabs) ? tutorLabs : [];
+      const target = safeList.find(item => Number(item.id) === Number(labId));
+      const label = target ? target.title : ('#' + labId);
+
+      let confirmed = false;
+      if (typeof window.customConfirm === 'function') {
+        confirmed = await window.customConfirm(
+          'Hapus Tugas Lab?',
+          'Tugas "' + label + '" beserta riwayat pengumpulannya akan dihapus permanen.'
+        );
+      } else {
+        confirmed = window.confirm('Hapus tugas "' + label + '" secara permanen?');
+      }
+
+      if (!confirmed) return;
+
+      try {
+        const res = await fetch('/api/labs/' + encodeURIComponent(labId), {
+          method: 'DELETE',
+          headers: buildHeaders(false),
+          credentials: 'include'
+        });
+        const json = await res.json();
+        if (!res.ok || !json.success) {
+          throw new Error(json.message || 'Gagal menghapus tugas.');
+        }
+        notifyUser(json.message || 'Tugas berhasil dihapus.', 'success');
+        await loadTutorLabs();
+      } catch (err) {
+        console.error('Error deleting lab:', err);
+        notifyUser(err.message || 'Terjadi kesalahan saat menghapus tugas.', 'error');
+      }
+    }
+
+    async function openSubmissionsModal(labId) {
+      const modal = document.getElementById('submissions-modal');
+      const titleEl = document.getElementById('submissions-modal-title');
+      const subEl = document.getElementById('submissions-modal-subtitle');
+      const bodyEl = document.getElementById('submissions-modal-body');
+
+      const safeList = Array.isArray(tutorLabs) ? tutorLabs : [];
+      const lab = safeList.find(item => Number(item.id) === Number(labId));
+
+      titleEl.textContent = lab ? ('Pengumpulan: ' + lab.title) : 'Pengumpulan Siswa';
+      subEl.textContent = 'Memuat data pengumpulan siswa...';
+      bodyEl.innerHTML =
+        '<div class="empty-state-box">' +
+          '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i>' +
+          '<h3>Memuat Pengumpulan Siswa...</h3>' +
+        '</div>';
+
+      modal.classList.add('open');
+      document.body.style.overflow = 'hidden';
+
+      try {
+        const res = await fetch('/api/labs/' + encodeURIComponent(labId) + '/submissions', {
+          headers: buildHeaders(false),
+          credentials: 'include'
+        });
+        const json = await res.json();
+
+        if (!res.ok || !json.success) {
+          throw new Error(json.message || 'Gagal memuat pengumpulan siswa.');
+        }
+
+        const submissions = (json.data && Array.isArray(json.data.submissions))
+          ? json.data.submissions
+          : (json.data && Array.isArray(json.data.items))
+            ? json.data.items
+            : (Array.isArray(json.data) ? json.data : []);
+
+        subEl.textContent = 'Total ' + submissions.length + ' pengumpulan tercatat';
+
+        if (submissions.length === 0) {
+          bodyEl.innerHTML =
+            '<div class="empty-state-box">' +
+              '<i class="fas fa-inbox" aria-hidden="true"></i>' +
+              '<h3>Belum Ada Pengumpulan Siswa</h3>' +
+              '<p>Siswa belum mengirimkan jawaban untuk tugas ini.</p>' +
+            '</div>';
+          return;
+        }
+
+        bodyEl.innerHTML = submissions.map(sub => {
+          const studentName = (sub.student && sub.student.name)
+            ? sub.student.name
+            : (sub.user && sub.user.name)
+              ? sub.user.name
+              : (sub.student_name || 'Siswa');
+          const studentEmail = (sub.student && sub.student.email)
+            ? sub.student.email
+            : (sub.user && sub.user.email)
+              ? sub.user.email
+              : '';
+          const score = sub.ai_score !== undefined && sub.ai_score !== null
+            ? sub.ai_score
+            : (sub.score !== undefined && sub.score !== null ? sub.score : 0);
+          const code = sub.submitted_code || sub.code || '';
+          const feedback = sub.ai_feedback || sub.feedback || 'Belum ada umpan balik AI.';
+          const timestamp = formatDateId(sub.created_at || sub.createdAt || sub.submitted_at);
+
+          return (
+            '<article class="submission-card">' +
+              '<div class="submission-top">' +
+                '<div>' +
+                  '<div class="submission-student-name">' + escapeHtml(studentName) + '</div>' +
+                  '<div class="submission-meta">' +
+                    (studentEmail ? (escapeHtml(studentEmail) + ' &bull; ') : '') +
+                    escapeHtml(timestamp) +
+                  '</div>' +
+                '</div>' +
+                '<div class="submission-badges">' +
+                  formatVerdictBadge(sub.verdict || sub.status) +
+                  '<span class="score-pill">Skor AI: ' + escapeHtml(score) + '/100</span>' +
+                '</div>' +
+              '</div>' +
+
+              '<div>' +
+                '<div class="form-label" style="margin-bottom:6px;">Pratinjau Kode Siswa</div>' +
+                '<pre class="code-preview-block"><code>' + escapeHtml(code || '// Tidak ada kode terkirim') + '</code></pre>' +
+              '</div>' +
+
+              '<div>' +
+                '<div class="form-label" style="margin-bottom:6px;">Umpan Balik AI</div>' +
+                '<div class="ai-feedback-box">' + escapeHtml(feedback) + '</div>' +
+              '</div>' +
+            '</article>'
+          );
+        }).join('');
+      } catch (err) {
+        console.error('Error loading submissions:', err);
+        subEl.textContent = 'Gagal memuat data';
+        bodyEl.innerHTML =
+          '<div class="empty-state-box">' +
+            '<i class="fas fa-triangle-exclamation" aria-hidden="true"></i>' +
+            '<h3>Gagal Memuat Pengumpulan</h3>' +
+            '<p>' + escapeHtml(err.message || 'Terjadi kesalahan jaringan.') + '</p>' +
+          '</div>';
+      }
+    }
+
+    function closeSubmissionsModal() {
+      const modal = document.getElementById('submissions-modal');
+      modal.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    // Close modals on Escape key or backdrop click
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        closeLabModal();
+        closeSubmissionsModal();
+      }
+    });
+
+    document.getElementById('lab-form-modal').addEventListener('click', function(e) {
+      if (e.target === this) closeLabModal();
+    });
+
+    document.getElementById('submissions-modal').addEventListener('click', function(e) {
+      if (e.target === this) closeSubmissionsModal();
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+      loadTutorLabs();
+    });
+  </script>
+
+  <!-- Modular Layout Script (Theme, Profile, Sidebar Drawer, Logout) -->
+  <script src="/javascripts/layout-modular.js?v=2.4"></script>
+</body>
+</html>
